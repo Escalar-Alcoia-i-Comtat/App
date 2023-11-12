@@ -67,7 +67,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
 
             // Ktor client
-            implementation(libs.ktor.client.darwin)
+            implementation(libs.ktor.client.okhttp)
         }
     }
 }
