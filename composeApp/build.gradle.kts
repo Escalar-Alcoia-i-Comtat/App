@@ -50,6 +50,9 @@ kotlin {
             // KotlinX dependencies
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
+
+            // SQLDelight
+            implementation(libs.sqldelight.coroutines)
         }
 
         androidMain.dependencies {
