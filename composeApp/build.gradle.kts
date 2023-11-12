@@ -39,6 +39,9 @@ kotlin {
             implementation(compose.material)
             implementation(compose.runtime)
 
+            // Logging library
+            implementation(libs.napier)
+
             // Ktor client
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.contentNegotiation)
