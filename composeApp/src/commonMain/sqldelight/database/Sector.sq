@@ -1,0 +1,31 @@
+import data.generic.LatLng;
+import kotlin.Boolean;
+
+CREATE TABLE Sector (
+    id INTEGER PRIMARY KEY NOT NULL,
+    timestamp INTEGER NOT NULL,
+    displayName TEXT NOT NULL,
+    image TEXT NOT NULL,
+    kidsApt INTEGER AS Boolean NOT NULL,
+    weight TEXT NOT NULL,
+    walkingTime INTEGER,
+    point TEXT AS LatLng,
+    sunTime TEXT,
+    parentZoneId INTEGER NOT NULL,
+    FOREIGN KEY(parentZoneId) REFERENCES Zone(id)
+);
+
+getAll:
+SELECT * FROM Sector;
+
+get:
+SELECT * FROM Sector WHERE id=?;
+
+insert:
+INSERT INTO Sector(id, timestamp, displayName, image, kidsApt, weight, walkingTime, point, sunTime, parentZoneId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE Sector
+SET timestamp=?, displayName=?, image=?, kidsApt=?, weight=?, walkingTime=?, point=?, sunTime=?, parentZoneId=?
+WHERE id=?;

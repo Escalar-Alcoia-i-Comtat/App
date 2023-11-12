@@ -1,0 +1,31 @@
+import data.generic.LatLng;
+import data.generic.Point;
+import kotlin.collections.List;
+
+CREATE TABLE Zone (
+    id INTEGER PRIMARY KEY NOT NULL,
+    timestamp INTEGER NOT NULL,
+    displayName TEXT NOT NULL,
+    image TEXT NOT NULL,
+    webUrl TEXT NOT NULL,
+    kmzUUID TEXT NOT NULL,
+    point TEXT AS LatLng,
+    points TEXT AS List<Point> NOT NULL,
+    parentAreaId INTEGER NOT NULL,
+    FOREIGN KEY(parentAreaId) REFERENCES Area(id)
+);
+
+getAll:
+SELECT * FROM Zone;
+
+get:
+SELECT * FROM Zone WHERE id=?;
+
+insert:
+INSERT INTO Zone(id, timestamp, displayName, image, webUrl, kmzUUID, point, points, parentAreaId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE Zone
+SET timestamp=?, displayName=?, image=?, webUrl=?, kmzUUID=?, point=?, points=?, parentAreaId=?
+WHERE id=?;
