@@ -36,7 +36,8 @@ kotlin {
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.runtime)
 
             // Logging library
@@ -50,6 +51,7 @@ kotlin {
             // KotlinX dependencies
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
 
             // SQLDelight
             implementation(libs.sqldelight.coroutines)

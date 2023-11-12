@@ -5,6 +5,8 @@ import database.DriverFactory
 import database.createDatabase
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import network.ConnectivityStatus
+import network.connectivityStatus
 
 class App: Application() {
     override fun onCreate() {
@@ -17,5 +19,7 @@ class App: Application() {
 
         // Create the database
         createDatabase(DriverFactory(this))
+
+        connectivityStatus = ConnectivityStatus(this)
     }
 }

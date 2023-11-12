@@ -9,7 +9,7 @@ import database.database
 import io.github.aakira.napier.Napier
 import network.Backend
 
-object DataSync : SyncProcess {
+object DataSync : SyncProcess() {
     private fun <Type : DataTypeWithDisplayName, RowType : Any> insertOrUpdate(
         value: Type,
         get: (id: Long) -> RowType?,
@@ -26,13 +26,26 @@ object DataSync : SyncProcess {
         }
     }
 
-    override suspend fun synchronize() {
+    override suspend fun synchronize() = try {
         Napier.i { "Running data synchronization..." }
+        mutableStatus.value = Status.RUNNING.Indeterminate
+
         Napier.d { "Fetching tree from server..." }
         val areas = Backend.tree()
 
         database.transaction {
+            val totalSize = areas.sumOf { area ->
+                1 + area.zones.sumOf { zone ->
+                    1 + zone.sectors.sumOf { sector ->
+                        1 + sector.paths.size
+                    }
+                }
+            }
+            var counter = 0
+
             for (area in areas) {
+                mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
+
                 insertOrUpdate(
                     value = area,
                     get = { database.areaQueries.get(it).executeAsOneOrNull() },
@@ -57,6 +70,8 @@ object DataSync : SyncProcess {
                 )
 
                 for (zone in area.zones) {
+                    mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
+
                     insertOrUpdate(
                         value = zone,
                         get = { database.zoneQueries.get(it).executeAsOneOrNull() },
@@ -93,6 +108,8 @@ object DataSync : SyncProcess {
                     )
 
                     for (sector in zone.sectors) {
+                        mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
+
                         insertOrUpdate(
                             value = sector,
                             get = { database.sectorQueries.get(it).executeAsOneOrNull() },
@@ -131,6 +148,8 @@ object DataSync : SyncProcess {
                         )
 
                         for (path in sector.paths) {
+                            mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
+
                             insertOrUpdate(
                                 value = path,
                                 get = { database.pathQueries.get(it).executeAsOneOrNull() },
@@ -204,5 +223,7 @@ object DataSync : SyncProcess {
                 }
             }
         }
+    } finally {
+        mutableStatus.value = Status.FINISHED
     }
 }
