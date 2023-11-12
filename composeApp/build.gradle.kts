@@ -60,11 +60,17 @@ kotlin {
 
             // KotlinX coroutines
             implementation(libs.kotlinx.coroutines.android)
+
+            // SQLDelight
+            implementation(libs.sqldelight.driver.android)
         }
 
         iosMain.dependencies {
             // Ktor client
             implementation(libs.ktor.client.darwin)
+
+            // SQLDelight
+            implementation(libs.sqldelight.driver.native)
         }
 
         val desktopMain by getting
@@ -73,6 +79,9 @@ kotlin {
 
             // Ktor client
             implementation(libs.ktor.client.okhttp)
+
+            // SQLDelight
+            implementation(libs.sqldelight.driver.sqlite)
         }
     }
 }
@@ -138,7 +147,7 @@ compose.desktop {
 sqldelight {
     databases {
         create("Database") {
-            packageName.set("")
+            packageName.set("database")
         }
     }
 }
