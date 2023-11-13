@@ -13,13 +13,17 @@ actual class DriverFactory {
         if (!cacheDirectory.exists()) cacheDirectory.mkdirs()
 
         val file = cacheDirectory + DATABASE_FILE_NAME
+        val alreadyExists = file.exists()
+
         val driver: SqlDriver = JdbcSqliteDriver(
             url = "jdbc:sqlite:$file",
             properties = Properties().apply {
                 put("foreign_keys", "true")
             }
         )
-        Database.Schema.create(driver)
+        if (!alreadyExists) {
+            Database.Schema.create(driver)
+        }
         return driver
     }
 }

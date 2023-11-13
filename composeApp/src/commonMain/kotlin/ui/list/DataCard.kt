@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,9 +33,7 @@ fun <T: DataTypeWithImage> DataCard(
     onClick: () -> Unit
 ) {
     Column(
-        modifier = modifier.clickable(
-            onClick = onClick
-        )
+        modifier = modifier
     ) {
         Text(
             text = item.displayName,
@@ -51,7 +50,8 @@ fun <T: DataTypeWithImage> DataCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(imageHeight),
+                .height(imageHeight)
+                .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
             image?.let { bitmap ->
@@ -63,7 +63,7 @@ fun <T: DataTypeWithImage> DataCard(
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
-            }
+            } ?: CircularProgressIndicator()
         }
     }
 }
