@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -24,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cache.ImageCache
 import data.model.DataTypeWithImage
-import org.jetbrains.skia.Image
 
 @Composable
 fun <T: DataTypeWithImage> DataCard(
@@ -56,9 +54,9 @@ fun <T: DataTypeWithImage> DataCard(
                 .height(imageHeight),
             contentAlignment = Alignment.Center
         ) {
-            image?.let { data ->
+            image?.let { bitmap ->
                 Image(
-                    Image.makeFromEncoded(data).toComposeImageBitmap(),
+                    bitmap = bitmap,
                     contentDescription = item.displayName,
                     modifier = Modifier
                         .fillMaxSize()

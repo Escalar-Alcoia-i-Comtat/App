@@ -8,6 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import cache.Files.delete
 import cache.Files.exists
 import cache.Files.mkdirs
@@ -23,13 +25,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import network.Backend
+import org.jetbrains.skia.Image
 
 object ImageCache {
     private val client = HttpClient()
 
     @Composable
-    fun collectStateOf(uuid: String): State<ByteArray?> {
-        val state: MutableState<ByteArray?> = remember { mutableStateOf(null) }
+    fun collectStateOf(uuid: String): State<ImageBitmap?> {
+        val state: MutableState<ImageBitmap?> = remember { mutableStateOf(null) }
 
         /**
          * Stores whether the image data has already been fetched from the server in this lifecycle.
@@ -51,13 +54,15 @@ object ImageCache {
             CoroutineScope(Dispatchers.IO).launch {
                 if (file.exists()) {
                     Napier.d(tag = "ImageCache-$uuid") { "Already cached, sending bytes..." }
-                    state.value = file.readAllBytes()
+                    val bytes = file.readAllBytes()
+                    state.value = Image.makeFromEncoded(bytes).toComposeImageBitmap()
                 }
 
                 if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
                     try {
                         Napier.v(tag = "ImageCache-$uuid") { "Requesting file data..." }
                         val fileRequest = Backend.requestFile(uuid)
+                        Napier.v(tag = "ImageCache-$uuid") { "Got file data" }
                         if (!hashFile.exists() || hashFile.readAllBytes().decodeToString() != fileRequest.hash) {
                             // Download the file again
                             if (file.exists()) file.delete()
@@ -67,7 +72,7 @@ object ImageCache {
                             file.write(bytes)
                             hashFile.write(fileRequest.hash.encodeToByteArray())
 
-                            state.value = bytes
+                            state.value = Image.makeFromEncoded(bytes).toComposeImageBitmap()
                         } else {
                             Napier.v(tag = "ImageCache-$uuid") { "Cached file up to date" }
                         }
