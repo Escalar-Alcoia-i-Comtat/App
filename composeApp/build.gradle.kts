@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.moko)
     alias(libs.plugins.sqldelight)
 }
 
@@ -28,17 +29,32 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+
+            export(libs.moko.base)
+            export(libs.moko.graphics) // toUIColor here
         }
     }
     
     sourceSets {
         commonMain.dependencies {
+            // Compose - Base
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
             implementation(compose.runtime)
+
+            // Compose - Utilities
+            implementation(libs.compose.windowSizeClass)
+
+            // Compose - Navigation
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.transitions)
+
+            // Compose - Resources
+            api(libs.moko.base)
+            api(libs.moko.compose)
 
             // Logging library
             implementation(libs.napier)
@@ -55,6 +71,10 @@ kotlin {
 
             // SQLDelight
             implementation(libs.sqldelight.coroutines)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.moko.test)
         }
 
         androidMain.dependencies {
@@ -81,15 +101,18 @@ kotlin {
             implementation(libs.sqldelight.driver.native)
         }
 
-        val desktopMain by getting
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
+        val desktopMain by getting {
+            dependsOn(commonMain.get())
 
-            // Ktor client
-            implementation(libs.ktor.client.okhttp)
+            dependencies {
+                implementation(compose.desktop.currentOs)
 
-            // SQLDelight
-            implementation(libs.sqldelight.driver.sqlite)
+                // Ktor client
+                implementation(libs.ktor.client.okhttp)
+
+                // SQLDelight
+                implementation(libs.sqldelight.driver.sqlite)
+            }
         }
     }
 }
@@ -158,4 +181,8 @@ sqldelight {
             packageName.set("database")
         }
     }
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = "resources"
 }

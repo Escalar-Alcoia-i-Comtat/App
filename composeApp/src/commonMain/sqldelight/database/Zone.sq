@@ -16,7 +16,7 @@ CREATE TABLE Zone (
 );
 
 getAll:
-SELECT * FROM Zone;
+SELECT * FROM Zone WHERE parentAreaId=?;
 
 get:
 SELECT * FROM Zone WHERE id=?;

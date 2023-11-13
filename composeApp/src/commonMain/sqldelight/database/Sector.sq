@@ -16,7 +16,7 @@ CREATE TABLE Sector (
 );
 
 getAll:
-SELECT * FROM Sector;
+SELECT * FROM Sector WHERE parentZoneId=?;
 
 get:
 SELECT * FROM Sector WHERE id=?;
