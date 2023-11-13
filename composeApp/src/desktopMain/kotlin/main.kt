@@ -2,6 +2,8 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import cache.StorageProvider
+import cache.storageProvider
 import database.DriverFactory
 import database.createDatabase
 import io.github.aakira.napier.DebugAntilog
@@ -17,6 +19,8 @@ fun main() = application {
     createDatabase(DriverFactory())
 
     connectivityStatus = ConnectivityStatus()
+
+    storageProvider = StorageProvider()
 
     Window(onCloseRequest = ::exitApplication) {
         App()

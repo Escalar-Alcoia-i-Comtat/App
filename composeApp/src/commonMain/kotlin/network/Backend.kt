@@ -1,6 +1,7 @@
 package network
 
 import data.Area
+import data.FileRequestData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -44,5 +45,14 @@ object Backend {
         )
         val body = response.body<DataResponse<AreasData>>()
         return body.data.areas
+    }
+
+    suspend fun requestFile(uuid: String): FileRequestData {
+        val response = client.get(
+            URLBuilder(baseUrl)
+                .appendPathSegments("file", uuid)
+                .build()
+        )
+        return response.body<DataResponse<FileRequestData>>().data
     }
 }

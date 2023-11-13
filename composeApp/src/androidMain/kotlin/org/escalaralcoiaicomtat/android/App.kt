@@ -1,6 +1,8 @@
 package org.escalaralcoiaicomtat.android
 
 import android.app.Application
+import cache.StorageProvider
+import cache.storageProvider
 import database.DriverFactory
 import database.createDatabase
 import io.github.aakira.napier.DebugAntilog
@@ -20,6 +22,10 @@ class App: Application() {
         // Create the database
         createDatabase(DriverFactory(this))
 
+        // Initialize the storage provider
+        storageProvider = StorageProvider(this)
+
+        // Initialize the connectivity status checker
         connectivityStatus = ConnectivityStatus(this)
     }
 }
