@@ -2,13 +2,19 @@ package database
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import cache.Files.exists
+import cache.Files.mkdirs
+import cache.storageProvider
 import java.util.Properties
 
 actual class DriverFactory {
     actual fun createDriver(): SqlDriver {
-        // TODO - store in a physical location, not in-memory
+        val cacheDirectory = storageProvider.cacheDirectory
+        if (!cacheDirectory.exists()) cacheDirectory.mkdirs()
+
+        val file = cacheDirectory + DATABASE_FILE_NAME
         val driver: SqlDriver = JdbcSqliteDriver(
-            url = JdbcSqliteDriver.IN_MEMORY,
+            url = "jdbc:sqlite:$file",
             properties = Properties().apply {
                 put("foreign_keys", "true")
             }

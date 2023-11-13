@@ -15,12 +15,12 @@ fun main() = application {
     // Initialize the logging library
     Napier.base(DebugAntilog())
 
+    storageProvider = StorageProvider()
+
     // Initialize the database
     createDatabase(DriverFactory())
 
     connectivityStatus = ConnectivityStatus()
-
-    storageProvider = StorageProvider()
 
     Window(onCloseRequest = ::exitApplication) {
         App()
