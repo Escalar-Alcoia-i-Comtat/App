@@ -12,9 +12,12 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import cache.Files.delete
 import cache.Files.exists
+import cache.Files.isDirectory
+import cache.Files.listAllFiles
 import cache.Files.mkdirs
 import cache.Files.readAllBytes
 import cache.Files.write
+import data.FileRequestData
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -34,6 +37,75 @@ object ImageCache {
         storageProvider.cacheDirectory + "images"
     }
 
+    private val uuidRegex = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}")
+
+    init {
+        Napier.i { "Image cache directory: $imageCacheDirectory" }
+    }
+
+    /**
+     * Checks that the value provided in [fileRequest] matches the local data.
+     * Downloads the file again if needed.
+     *
+     * @param fileRequest The response given by the server for the current data of the file.
+     *
+     * @return `null` if the file is up to date, the new file's data otherwise.
+     */
+    private suspend fun validateCachedFile(fileRequest: FileRequestData): ByteArray? {
+        val uuid = fileRequest.uuid
+        val file = imageCacheDirectory + uuid
+        val hashFile = File(file.path + "_hash")
+
+        Napier.v(tag = "ImageCache-$uuid") { "Got file data" }
+        if (!hashFile.exists() || hashFile.readAllBytes().decodeToString() != fileRequest.hash) {
+            Napier.d(tag = "ImageCache-$uuid") {
+                "Cached file not up to date. Deleting local copy and downloading again..."
+            }
+
+            // Download the file again
+            if (file.exists()) file.delete()
+            if (hashFile.exists()) hashFile.delete()
+
+            val bytes = client.get(fileRequest.download).bodyAsChannel().toByteArray()
+            file.write(bytes)
+            hashFile.write(fileRequest.hash.encodeToByteArray())
+
+            return bytes
+        } else {
+            Napier.v(tag = "ImageCache-$uuid") { "Cached file up to date" }
+        }
+        return null
+    }
+
+    /**
+     * Fetches the data of all the files currently in cache, and updates them in case it's
+     * necessary.
+     */
+    suspend fun updateCache() {
+        if (!imageCacheDirectory.exists()) {
+            // There isn't any file cached, just ignore
+            Napier.i(tag = "ImageCache-updates") { "There isn't any cached image. Ignoring..." }
+            return
+        }
+
+        val files = imageCacheDirectory.listAllFiles()
+            // Exclude all directories
+            ?.filter { !it.isDirectory }
+            // Exclude all non-uuid
+            ?.filter { uuidRegex.matches(it.name) }
+            // Collect only the file names (uuid)
+            ?.map { it.name }
+        if (files == null) {
+            Napier.w(tag = "ImageCache-updates") { "Cache directory doesn't support file listing." }
+            return
+        }
+        Napier.d(tag = "ImageCache-updates") { "Got ${files.size} cached files." }
+        val resultCount = Backend.requestFiles(files)
+            .also { Napier.d(tag = "ImageCache-updates") { "Got response of ${it.size} files." } }
+            .count { data -> validateCachedFile(data) != null }
+        Napier.d(tag = "ImageCache-updates") { "Updated $resultCount cached files." }
+    }
+
     @Composable
     fun collectStateOf(uuid: String): State<ImageBitmap?> {
         val state: MutableState<ImageBitmap?> = remember { mutableStateOf(null) }
@@ -51,7 +123,6 @@ object ImageCache {
             }
 
             val file = imageCacheDirectory + uuid
-            val hashFile = imageCacheDirectory + uuid + "_hash"
 
             Napier.v(tag = "ImageCache-$uuid") { "$file" }
 
@@ -66,19 +137,8 @@ object ImageCache {
                     try {
                         Napier.v(tag = "ImageCache-$uuid") { "Requesting file data..." }
                         val fileRequest = Backend.requestFile(uuid)
-                        Napier.v(tag = "ImageCache-$uuid") { "Got file data" }
-                        if (!hashFile.exists() || hashFile.readAllBytes().decodeToString() != fileRequest.hash) {
-                            // Download the file again
-                            if (file.exists()) file.delete()
-                            if (hashFile.exists()) hashFile.delete()
-
-                            val bytes = client.get(fileRequest.download).bodyAsChannel().toByteArray()
-                            file.write(bytes)
-                            hashFile.write(fileRequest.hash.encodeToByteArray())
-
+                        validateCachedFile(fileRequest)?.let { bytes ->
                             state.value = Image.makeFromEncoded(bytes).toComposeImageBitmap()
-                        } else {
-                            Napier.v(tag = "ImageCache-$uuid") { "Cached file up to date" }
                         }
 
                         alreadyFetchedUpdate = true

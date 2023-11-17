@@ -17,6 +17,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import cache.ImageCache
 import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +52,8 @@ fun App() {
         LaunchedEffect(Unit) {
             CoroutineScope(Dispatchers.IO).launch {
                 DataSync.start()
+
+                ImageCache.updateCache()
             }
         }
 
