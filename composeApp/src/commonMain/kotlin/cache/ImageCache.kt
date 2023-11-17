@@ -30,6 +30,10 @@ import org.jetbrains.skia.Image
 object ImageCache {
     private val client = HttpClient()
 
+    private val imageCacheDirectory: File by lazy {
+        storageProvider.cacheDirectory + "images"
+    }
+
     @Composable
     fun collectStateOf(uuid: String): State<ImageBitmap?> {
         val state: MutableState<ImageBitmap?> = remember { mutableStateOf(null) }
@@ -40,14 +44,14 @@ object ImageCache {
         var alreadyFetchedUpdate by remember { mutableStateOf(false) }
 
         LaunchedEffect(uuid) {
-            if (!storageProvider.cacheDirectory.exists()) {
-                require(storageProvider.cacheDirectory.mkdirs()) {
-                    "Could not create cache directory (${storageProvider.cacheDirectory})."
+            if (!imageCacheDirectory.exists()) {
+                require(imageCacheDirectory.mkdirs()) {
+                    "Could not create cache directory ($imageCacheDirectory)."
                 }
             }
 
-            val file = storageProvider.cacheDirectory + uuid
-            val hashFile = storageProvider.cacheDirectory + uuid + "_hash"
+            val file = imageCacheDirectory + uuid
+            val hashFile = imageCacheDirectory + uuid + "_hash"
 
             Napier.v(tag = "ImageCache-$uuid") { "$file" }
 
