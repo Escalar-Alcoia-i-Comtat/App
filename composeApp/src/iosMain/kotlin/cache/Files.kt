@@ -3,6 +3,10 @@ package cache
 import cache.Files.file
 
 actual object Files {
+    actual val separator: Char = java.io.File.separatorChar
+
+    actual val File.isDirectory: Boolean get() = file.isDirectory
+
     private val File.file: java.io.File get() = java.io.File(path)
 
     actual fun File.write(bytes: ByteArray) {
@@ -18,4 +22,6 @@ actual object Files {
     actual fun File.delete(): Boolean = file.delete()
 
     actual fun File.mkdirs(): Boolean = file.mkdirs()
+
+    actual fun File.listAllFiles(): List<File>? = file.listFiles()?.map { it.file }
 }
