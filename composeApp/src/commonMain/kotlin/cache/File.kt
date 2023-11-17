@@ -9,7 +9,9 @@ class File(
     val name = path.split(Files.separator).last()
 
     constructor(file: File, path: String): this(
-        "${path.substringBeforeLast('/')}/${file.path.substringAfter('/')}"
+        path.substringBeforeLast(Files.separator) +
+            Files.separator +
+            file.path.substringAfter(Files.separator)
     )
 
     operator fun plus(other: File): File {
@@ -21,15 +23,15 @@ class File(
     }
 
     fun join(file: File): File {
-        val before = path.substringBeforeLast('/')
-        val after = file.path.substringAfter('/')
+        val before = path.substringBeforeLast(Files.separator)
+        val after = file.path.substringAfter(Files.separator)
 
         return File("$before/$after")
     }
 
     fun join(path: String): File {
-        val before = this.path.substringBeforeLast('/')
-        val after = path.substringAfter('/')
+        val before = this.path.substringBeforeLast(Files.separator)
+        val after = path.substringAfter(Files.separator)
 
         return File("$before/$after")
     }
