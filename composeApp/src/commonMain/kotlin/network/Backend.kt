@@ -3,16 +3,17 @@ package network
 import data.Area
 import data.FileRequestData
 import data.FilesRequestData
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
+import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import network.response.DataResponse
+import network.response.ErrorResponse
 
 /**
  * Allows running requests to the application backend.
@@ -23,7 +24,7 @@ object Backend {
         isLenient = true
     }
 
-    private val client = HttpClient {
+    private val client = createHttpClient {
         install(ContentNegotiation) {
             json(
                 json = json
@@ -54,7 +55,11 @@ object Backend {
                 .appendPathSegments("file", uuid)
                 .build()
         )
-        return response.body<DataResponse<FileRequestData>>().data
+        return try {
+            response.body<DataResponse<FileRequestData>>().data
+        } catch (_: JsonConvertException) {
+            throw response.body<ErrorResponse>().exception
+        }
     }
 
     suspend fun requestFiles(uuids: List<String>): List<FileRequestData> {
@@ -63,6 +68,10 @@ object Backend {
                 .appendPathSegments("file", uuids.joinToString(","))
                 .build()
         )
-        return response.body<DataResponse<FilesRequestData>>().data.files
+        return try {
+            response.body<DataResponse<FilesRequestData>>().data.files
+        } catch (_: JsonConvertException) {
+            throw response.body<ErrorResponse>().exception
+        }
     }
 }

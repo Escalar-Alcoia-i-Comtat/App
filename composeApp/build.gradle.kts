@@ -71,26 +71,33 @@ kotlin {
 
             // SQLDelight
             implementation(libs.sqldelight.coroutines)
+
+            // Settings storage
+            implementation(libs.multiplatformSettings)
         }
 
         commonTest.dependencies {
             implementation(libs.moko.test)
         }
 
-        androidMain.dependencies {
-            implementation(libs.androidx.activity.compose)
+        val androidMain by getting {
+            dependsOn(commonMain.get())
 
-            implementation(libs.compose.ui)
-            implementation(libs.compose.ui.tooling.preview)
+            dependencies {
+                implementation(libs.androidx.activity.compose)
 
-            // Ktor client
-            implementation(libs.ktor.client.okhttp)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.ui.tooling.preview)
 
-            // KotlinX coroutines
-            implementation(libs.kotlinx.coroutines.android)
+                // Ktor client
+                implementation(libs.ktor.client.android)
 
-            // SQLDelight
-            implementation(libs.sqldelight.driver.android)
+                // KotlinX coroutines
+                implementation(libs.kotlinx.coroutines.android)
+
+                // SQLDelight
+                implementation(libs.sqldelight.driver.android)
+            }
         }
 
         val iosX64Main by getting
@@ -118,7 +125,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
 
                 // Ktor client
-                implementation(libs.ktor.client.okhttp)
+                implementation(libs.ktor.client.java)
 
                 // SQLDelight
                 implementation(libs.sqldelight.driver.sqlite)

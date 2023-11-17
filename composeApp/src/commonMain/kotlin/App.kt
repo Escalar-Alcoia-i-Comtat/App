@@ -14,19 +14,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import cache.ImageCache
 import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.launch
 import network.connectivityStatus
 import resources.MR
-import sync.DataSync
 import ui.navigation.AdaptiveNavigationScaffold
 import ui.navigation.NavigationItem
 import ui.screen.MainScreen
@@ -48,14 +41,6 @@ fun App() {
 
     MaterialTheme {
         val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
-
-        LaunchedEffect(Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
-                DataSync.start()
-
-                ImageCache.updateCache()
-            }
-        }
 
         AdaptiveNavigationScaffold(
             items = listOf(

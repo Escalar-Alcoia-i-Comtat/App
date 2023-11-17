@@ -1,13 +1,18 @@
 package sync
 
+import com.russhwolf.settings.set
 import data.Area
 import data.Path
 import data.Sector
 import data.Zone
 import data.model.DataTypeWithDisplayName
+import database.SettingsKeys
 import database.database
+import database.settings
 import io.github.aakira.napier.Napier
+import kotlinx.datetime.Clock
 import network.Backend
+import network.connectivityStatus
 
 object DataSync : SyncProcess() {
     private fun <Type : DataTypeWithDisplayName, RowType : Any> insertOrUpdate(
@@ -26,7 +31,17 @@ object DataSync : SyncProcess() {
         }
     }
 
+    /**
+     * Synchronizes the data from the server with the local database.
+     *
+     * @throws IllegalStateException If there's not a valid network connection available.
+     */
     override suspend fun synchronize() = try {
+        Napier.i { "Waiting until a network is available" }
+        if (!connectivityStatus.await(10_000)) {
+            throw IllegalStateException("Network is not available. Won't fetch server")
+        }
+
         Napier.i { "Running data synchronization..." }
         mutableStatus.value = Status.RUNNING.Indeterminate
 
@@ -223,6 +238,11 @@ object DataSync : SyncProcess() {
                 }
             }
         }
+
+        settings.set(SettingsKeys.LAST_SYNC, Clock.System.now().toEpochMilliseconds())
+    } catch (e: Exception) {
+        Napier.e(throwable = e) { "Could not synchronize with server." }
+        throw e
     } finally {
         mutableStatus.value = Status.FINISHED
     }

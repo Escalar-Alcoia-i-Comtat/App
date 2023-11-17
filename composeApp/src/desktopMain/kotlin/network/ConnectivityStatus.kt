@@ -6,12 +6,14 @@ import io.ktor.client.request.get
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 
 actual class ConnectivityStatus {
     companion object {
@@ -22,6 +24,8 @@ actual class ConnectivityStatus {
     }
 
     actual val isNetworkConnected: MutableStateFlow<Boolean> = MutableStateFlow(true)
+
+    private val isStarted = MutableStateFlow(false)
 
     private val client = HttpClient()
 
@@ -54,13 +58,15 @@ actual class ConnectivityStatus {
 
                 delay(CHECK_DELAY)
             }
-        }.also { Napier.d("Started") }
+        }.also {
+            Napier.d("Started")
+            isStarted.value = true
+        }
     }
 
     actual fun stop() {
-        runBlocking {
-            loopingJob?.cancelAndJoin()
-        }
+        isStarted.value = false
+        runBlocking { loopingJob?.cancelAndJoin() }
         loopingJob = null
 
         Napier.d("Stopped")
@@ -74,5 +80,22 @@ actual class ConnectivityStatus {
                 }
             }
         }
+    }
+
+    /**
+     * Locks the current thread until the connectivity status is started, or [timeout] milliseconds
+     * have passed.
+     *
+     * @throws TimeoutCancellationException If the waiting has timed out.
+     */
+    actual suspend fun await(timeout: Long): Boolean {
+        withTimeout(timeout) {
+            while (!isStarted.value) {
+                // Wait a little bit until next check
+                delay(1)
+            }
+        }
+
+        return isNetworkConnected.value
     }
 }

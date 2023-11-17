@@ -1,22 +1,27 @@
 package network
 
-import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import org.escalaralcoiaicomtat.android.applicationContext
 
-actual class ConnectivityStatus(private val context: Context) {
+actual class ConnectivityStatus {
     actual val isNetworkConnected = MutableStateFlow(false)
 
     private val connectivityManager: ConnectivityManager by lazy {
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        applicationContext.getSystemService(ConnectivityManager::class.java)
     }
+
+    private val isStarted = MutableStateFlow(false)
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -58,6 +63,7 @@ actual class ConnectivityStatus(private val context: Context) {
             }
 
             Napier.d("Started")
+            isStarted.value = true
         } catch (e: Exception) {
             Napier.d("Failed to start: ${e.message.toString()}")
             e.printStackTrace()
@@ -68,6 +74,7 @@ actual class ConnectivityStatus(private val context: Context) {
     actual fun stop() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
         Napier.d("Stopped")
+        isStarted.value = false
     }
 
     actual fun getStatus(success: (Boolean) -> Unit) {
@@ -78,5 +85,21 @@ actual class ConnectivityStatus(private val context: Context) {
                 }
             }
         }
+    }
+
+    /**
+     * Locks the current thread until the connectivity status is started, or [timeout] milliseconds
+     * have passed.
+     *
+     * @throws TimeoutCancellationException If the waiting has timed out.
+     */
+    actual suspend fun await(timeout: Long): Boolean {
+        withTimeout(timeout) {
+            while (!isStarted.value) {
+                // Wait a little bit until next check
+                delay(1)
+            }
+        }
+        return isNetworkConnected.value
     }
 }

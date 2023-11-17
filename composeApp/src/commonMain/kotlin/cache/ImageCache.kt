@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import cache.Files.delete
 import cache.Files.exists
 import cache.Files.isDirectory
@@ -18,6 +17,7 @@ import cache.Files.mkdirs
 import cache.Files.readAllBytes
 import cache.Files.write
 import data.FileRequestData
+import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -28,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import network.Backend
-import org.jetbrains.skia.Image
 
 object ImageCache {
     private val client = HttpClient()
@@ -48,10 +47,14 @@ object ImageCache {
      * Downloads the file again if needed.
      *
      * @param fileRequest The response given by the server for the current data of the file.
+     * @param enforceHttps If `true`, all `http://` requests will be converted into `https://`
      *
      * @return `null` if the file is up to date, the new file's data otherwise.
      */
-    private suspend fun validateCachedFile(fileRequest: FileRequestData): ByteArray? {
+    private suspend fun validateCachedFile(
+        fileRequest: FileRequestData,
+        enforceHttps: Boolean = true
+    ): ByteArray? {
         val uuid = fileRequest.uuid
         val file = imageCacheDirectory + uuid
         val hashFile = File(file.path + "_hash")
@@ -66,7 +69,12 @@ object ImageCache {
             if (file.exists()) file.delete()
             if (hashFile.exists()) hashFile.delete()
 
-            val bytes = client.get(fileRequest.download).bodyAsChannel().toByteArray()
+            var url = fileRequest.download
+            if (enforceHttps && url.startsWith("http:")) {
+                url = url.replace("http:", "https:")
+            }
+
+            val bytes = client.get(url).bodyAsChannel().toByteArray()
             file.write(bytes)
             hashFile.write(fileRequest.hash.encodeToByteArray())
 
@@ -130,7 +138,7 @@ object ImageCache {
                 if (file.exists()) {
                     Napier.d(tag = "ImageCache-$uuid") { "Already cached, sending bytes..." }
                     val bytes = file.readAllBytes()
-                    state.value = Image.makeFromEncoded(bytes).toComposeImageBitmap()
+                    state.value = bytes.decodeImage()
                 }
 
                 if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
@@ -138,7 +146,7 @@ object ImageCache {
                         Napier.v(tag = "ImageCache-$uuid") { "Requesting file data..." }
                         val fileRequest = Backend.requestFile(uuid)
                         validateCachedFile(fileRequest)?.let { bytes ->
-                            state.value = Image.makeFromEncoded(bytes).toComposeImageBitmap()
+                            state.value = bytes.decodeImage()
                         }
 
                         alreadyFetchedUpdate = true
