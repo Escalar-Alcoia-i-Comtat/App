@@ -2,8 +2,10 @@ package ui.screen
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -52,6 +54,8 @@ object MainScreen: Screen {
 
             if (status == SyncProcess.Status.FINISHED) {
                 items(
+                    contentType = { "area" },
+                    key = { it.id },
                     items = areas.sortedBy { it.displayName }
                 ) { area ->
                     DataCard(
@@ -61,6 +65,9 @@ object MainScreen: Screen {
                     ) {}
                 }
             }
+
+            // Add some padding at the end
+            item { Spacer(Modifier.height(8.dp)) }
         }
     }
 }
