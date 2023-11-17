@@ -3,6 +3,11 @@ package cache
 class File(
     val path: String
 ) {
+    /**
+     * Obtains the last part of [path].
+     */
+    val name = path.split(Files.separator).last()
+
     constructor(file: File, path: String): this(
         "${path.substringBeforeLast('/')}/${file.path.substringAfter('/')}"
     )
