@@ -1,5 +1,6 @@
 package network.response
 
+import exception.ServerException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -8,6 +9,9 @@ data class ErrorResponse(
     val code: Int,
     val message: String? = null
 ): Response(false) {
+    /**
+     * Provides an exception based on the response that can be thrown.
+     */
     @Transient
-    val exception: RuntimeException = RuntimeException("Server responded with an exception. Code: $code. Message: $message")
+    val exception: ServerException = ServerException(code, message)
 }
