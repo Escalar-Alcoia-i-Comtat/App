@@ -3,9 +3,12 @@ package network
 import data.Area
 import data.FileRequestData
 import data.FilesRequestData
+import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.HttpRequest
 import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.serialization.JsonConvertException
@@ -39,14 +42,27 @@ object Backend {
         val areas: List<Area>
     )
 
+    private suspend fun <DataType: Any> decodeBody(response: HttpResponse): DataType {
+        val status = response.status.value
+
+        if (status in 200..299) {
+            return try {
+                response.body<DataResponse<DataType>>().data
+            } catch (_: NoTransformationFoundException) {
+                throw response.body<ErrorResponse>().exception
+            }
+        } else {
+            throw response.body<ErrorResponse>().exception
+        }
+    }
+
     suspend fun tree(): List<Area> {
         val response = client.get(
             URLBuilder(baseUrl)
                 .appendPathSegments("tree")
                 .build()
         )
-        val body = response.body<DataResponse<AreasData>>()
-        return body.data.areas
+        return decodeBody<AreasData>(response).areas
     }
 
     suspend fun requestFile(uuid: String): FileRequestData {
@@ -55,11 +71,7 @@ object Backend {
                 .appendPathSegments("file", uuid)
                 .build()
         )
-        return try {
-            response.body<DataResponse<FileRequestData>>().data
-        } catch (_: JsonConvertException) {
-            throw response.body<ErrorResponse>().exception
-        }
+        return decodeBody(response)
     }
 
     suspend fun requestFiles(uuids: List<String>): List<FileRequestData> {
@@ -68,10 +80,6 @@ object Backend {
                 .appendPathSegments("file", uuids.joinToString(","))
                 .build()
         )
-        return try {
-            response.body<DataResponse<FilesRequestData>>().data.files
-        } catch (_: JsonConvertException) {
-            throw response.body<ErrorResponse>().exception
-        }
+        return decodeBody(response)
     }
 }
