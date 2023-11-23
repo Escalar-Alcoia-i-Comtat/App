@@ -49,10 +49,10 @@ object Backend {
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
     private suspend fun <DataType: DataResponseType> decodeBody(response: HttpResponse): DataType {
-        val status = response.status.value
-        val body = response.bodyAsText(fallbackCharset = Charsets.UTF_8)
-
         return try {
+            val status = response.status.value
+            val body = response.bodyAsText(fallbackCharset = Charsets.UTF_8)
+
             Napier.v(tag = "Backend") { "Got response from server ($status). Raw body: $body" }
             if (status in 200..299) {
                 json.decodeFromString<DataResponse<DataType>>(body).data.also {
@@ -66,13 +66,16 @@ object Backend {
                 }
                 throw json.decodeFromString<ErrorResponse>(body).exception
             }
-        } catch (e: NoTransformationFoundException) {
-            Napier.e(tag = "Backend", throwable = e) { "Got unexpected response from server." }
-            try {
-                throw json.decodeFromString<ErrorResponse>(body).exception
-            } catch (e: SerializationException) {
-                throw IllegalStateException("Received an unhandleable response from the server.")
+        } catch (exception: NoTransformationFoundException) {
+            Napier.e(tag = "Backend", throwable = exception) {
+                "Got unexpected response from server. It cannot be parsed."
             }
+            throw IllegalStateException("Received an unhandleable response from the server.")
+        } catch (exception: Exception) {
+            Napier.e(tag = "Backend", throwable = exception) {
+                "Could not decode server's body. Unknown exception."
+            }
+            throw exception
         }
     }
 
