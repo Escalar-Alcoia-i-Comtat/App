@@ -1,4 +1,4 @@
-package data
+package network.response.data
 
 import kotlinx.serialization.Serializable
 
@@ -9,4 +9,4 @@ data class FileRequestData(
     val filename: String,
     val download: String,
     val size: Long
-)
+): DataResponseType

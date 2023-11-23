@@ -1,23 +1,25 @@
 package network
 
 import data.Area
-import data.FileRequestData
-import data.FilesRequestData
+import network.response.data.FileRequestData
 import exception.ServerException
+import io.github.aakira.napier.Napier
 import io.ktor.client.call.NoTransformationFoundException
-import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.HttpRequest
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
-import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.Serializable
+import io.ktor.utils.io.charsets.Charsets
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import network.response.DataResponse
+import network.response.data.DataResponseType
 import network.response.ErrorResponse
+import network.response.data.AreasData
 
 /**
  * Allows running requests to the application backend.
@@ -38,30 +40,60 @@ object Backend {
 
     private const val baseUrl = "https://backend.escalaralcoiaicomtat.org"
 
-    @Serializable
-    data class AreasData(
-        val areas: List<Area>
-    )
-
     /**
      * If the request was successful, extracts a [DataResponse] with type [DataType] from its body.
      * Otherwise extracts the error given, and throws it as a [ServerException].
      *
      * @throws ServerException If the server responded with an exception, or the body of the body of
      * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend fun <DataType: Any> decodeBody(response: HttpResponse): DataType {
+    private suspend fun <DataType: DataResponseType> decodeBody(response: HttpResponse): DataType {
         val status = response.status.value
+        val body = response.bodyAsText(fallbackCharset = Charsets.UTF_8)
 
-        return if (status in 200..299) {
-            try {
-                response.body<DataResponse<DataType>>().data
-            } catch (_: NoTransformationFoundException) {
-                throw response.body<ErrorResponse>().exception
+        return try {
+            Napier.v(tag = "Backend") { "Got response from server ($status). Raw body: $body" }
+            if (status in 200..299) {
+                json.decodeFromString<DataResponse<DataType>>(body).data.also {
+                    Napier.d(tag = "Backend") {
+                        "Server responded successfully to ${response.request.url}. Status: $status"
+                    }
+                }
+            } else {
+                Napier.e(tag = "Backend") {
+                    "Server responded with an exception. Code: $status. Body: $body"
+                }
+                throw json.decodeFromString<ErrorResponse>(body).exception
             }
-        } else {
-            throw response.body<ErrorResponse>().exception
+        } catch (e: NoTransformationFoundException) {
+            Napier.e(tag = "Backend", throwable = e) { "Got unexpected response from server." }
+            try {
+                throw json.decodeFromString<ErrorResponse>(body).exception
+            } catch (e: SerializationException) {
+                throw IllegalStateException("Received an unhandleable response from the server.")
+            }
         }
+    }
+
+    /**
+     * Runs an HTTP GET request to the backend server, at the given path.
+     *
+     * @param pathComponents The components of the path to request.
+     *
+     * @return The response given by the server, of the type desired.
+     *
+     * @throws ServerException If the server responded with an exception, or the body of the body of
+     * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
+     */
+    private suspend fun <DataType: DataResponseType> get(vararg pathComponents: String): DataType {
+        val response = client.get(
+            URLBuilder(baseUrl)
+                .appendPathSegments(*pathComponents)
+                .build()
+        )
+        return decodeBody(response)
     }
 
     /**
@@ -71,14 +103,10 @@ object Backend {
      *
      * @throws ServerException If the server responded with an exception, or the body of the body of
      * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
      */
     suspend fun tree(): List<Area> {
-        val response = client.get(
-            URLBuilder(baseUrl)
-                .appendPathSegments("tree")
-                .build()
-        )
-        return decodeBody<AreasData>(response).areas
+        return get<AreasData>("tree").areas
     }
 
     /**
@@ -91,14 +119,10 @@ object Backend {
      *
      * @throws ServerException If the server responded with an exception, or the body of the body of
      * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
      */
     suspend fun requestFile(uuid: String): FileRequestData {
-        val response = client.get(
-            URLBuilder(baseUrl)
-                .appendPathSegments("file", uuid)
-                .build()
-        )
-        return decodeBody(response)
+        return get("file", uuid)
     }
 
     /**
@@ -111,13 +135,9 @@ object Backend {
      *
      * @throws ServerException If the server responded with an exception, or the body of the body of
      * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
      */
     suspend fun requestFiles(uuids: List<String>): List<FileRequestData> {
-        val response = client.get(
-            URLBuilder(baseUrl)
-                .appendPathSegments("file", uuids.joinToString(","))
-                .build()
-        )
-        return decodeBody(response)
+        return get("file", uuids.joinToString(","))
     }
 }

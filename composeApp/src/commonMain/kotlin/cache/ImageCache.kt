@@ -16,7 +16,7 @@ import cache.Files.listAllFiles
 import cache.Files.mkdirs
 import cache.Files.readAllBytes
 import cache.Files.write
-import data.FileRequestData
+import network.response.data.FileRequestData
 import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient

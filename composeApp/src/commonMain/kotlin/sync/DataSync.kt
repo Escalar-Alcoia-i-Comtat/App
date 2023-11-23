@@ -48,6 +48,7 @@ object DataSync : SyncProcess() {
         Napier.d { "Fetching tree from server..." }
         val areas = Backend.tree()
 
+        Napier.d { "Got ${areas.size} areas. Adding them into the database..." }
         database.transaction {
             val totalSize = areas.sumOf { area ->
                 1 + area.zones.sumOf { zone ->
@@ -238,6 +239,7 @@ object DataSync : SyncProcess() {
                 }
             }
         }
+        Napier.i { "All data synchronized with server." }
 
         settings.set(SettingsKeys.LAST_SYNC, Clock.System.now().toEpochMilliseconds())
     } catch (e: Exception) {

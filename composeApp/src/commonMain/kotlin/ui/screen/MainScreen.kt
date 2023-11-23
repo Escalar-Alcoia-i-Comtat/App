@@ -13,6 +13,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import cache.ImageCache
 import cafe.adriel.voyager.core.screen.Screen
 import data.Area
@@ -31,6 +34,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import sync.DataSync
 import sync.SyncProcess
@@ -44,7 +48,9 @@ object MainScreen: Screen {
 
         val areas by database.areaQueries
             .getAll()
-            .collectAsStateList()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .collectAsState(emptyList())
 
         /**
          * If true, a warning will be shown notifying the user that a network connection is not
