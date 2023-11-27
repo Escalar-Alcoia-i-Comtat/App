@@ -16,7 +16,6 @@ import cache.Files.listAllFiles
 import cache.Files.mkdirs
 import cache.Files.readAllBytes
 import cache.Files.write
-import network.response.data.FileRequestData
 import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -28,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import network.Backend
+import network.response.data.FileRequestData
 
 object ImageCache {
     private val client = HttpClient()
@@ -101,6 +101,8 @@ object ImageCache {
             ?.filter { !it.isDirectory }
             // Exclude all non-uuid
             ?.filter { uuidRegex.matches(it.name) }
+            // Filter empty uuids
+            ?.filter { it.name.isNotBlank() }
             // Collect only the file names (uuid)
             ?.map { it.name }
         if (files == null) {
@@ -108,10 +110,11 @@ object ImageCache {
             return
         }
         Napier.d(tag = "ImageCache-updates") { "Got ${files.size} cached files." }
-        val resultCount = Backend.requestFiles(files)
+        // todo - not working
+        /*val resultCount = Backend.requestFiles(files)
             .also { Napier.d(tag = "ImageCache-updates") { "Got response of ${it.size} files." } }
             .count { data -> validateCachedFile(data) != null }
-        Napier.d(tag = "ImageCache-updates") { "Updated $resultCount cached files." }
+        Napier.d(tag = "ImageCache-updates") { "Updated $resultCount cached files." }*/
     }
 
     @Composable
@@ -143,7 +146,7 @@ object ImageCache {
 
                 if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
                     try {
-                        Napier.v(tag = "ImageCache-$uuid") { "Requesting file data..." }
+                        Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
                         val fileRequest = Backend.requestFile(uuid)
                         validateCachedFile(fileRequest)?.let { bytes ->
                             state.value = bytes.decodeImage()

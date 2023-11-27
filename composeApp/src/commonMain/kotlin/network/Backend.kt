@@ -1,7 +1,6 @@
 package network
 
 import data.Area
-import network.response.data.FileRequestData
 import exception.ServerException
 import io.github.aakira.napier.Napier
 import io.ktor.client.call.NoTransformationFoundException
@@ -14,12 +13,12 @@ import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.charsets.Charsets
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import network.response.DataResponse
-import network.response.data.DataResponseType
 import network.response.ErrorResponse
 import network.response.data.AreasData
+import network.response.data.DataResponseType
+import network.response.data.FileRequestData
 
 /**
  * Allows running requests to the application backend.
@@ -48,23 +47,29 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend fun <DataType: DataResponseType> decodeBody(response: HttpResponse): DataType {
+    private suspend inline fun <reified DataType: DataResponseType> decodeBody(
+        response: HttpResponse
+    ): DataType {
         return try {
+            val url = response.request.url
             val status = response.status.value
             val body = response.bodyAsText(fallbackCharset = Charsets.UTF_8)
 
-            Napier.v(tag = "Backend") { "Got response from server ($status). Raw body: $body" }
+            Napier.v(tag = "Backend") {
+                "Got response from server ($url - $status). Raw body: $body"
+            }
+
             if (status in 200..299) {
-                json.decodeFromString<DataResponse<DataType>>(body).data.also {
+                DataResponse.decode<DataType>(body).also {
                     Napier.d(tag = "Backend") {
                         "Server responded successfully to ${response.request.url}. Status: $status"
                     }
                 }
             } else {
                 Napier.e(tag = "Backend") {
-                    "Server responded with an exception. Code: $status. Body: $body"
+                    "Server responded with an exception.\nUrl: $url\nCode: $status. Body: $body"
                 }
-                throw json.decodeFromString<ErrorResponse>(body).exception
+                json.decodeFromString<ErrorResponse>(body).throwException(url)
             }
         } catch (exception: NoTransformationFoundException) {
             Napier.e(tag = "Backend", throwable = exception) {
@@ -90,11 +95,14 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend fun <DataType: DataResponseType> get(vararg pathComponents: String): DataType {
+    private suspend inline fun <reified DataType: DataResponseType> get(
+        vararg pathComponents: String
+    ): DataType {
         val response = client.get(
             URLBuilder(baseUrl)
                 .appendPathSegments(*pathComponents)
                 .build()
+                .also { Napier.v("GET :: $it") }
         )
         return decodeBody(response)
     }

@@ -23,10 +23,10 @@ object DataSync : SyncProcess() {
     ) {
         val row = get(value.id)
         if (row == null) {
-            Napier.d { "Inserting ${value::class.simpleName}#${value.id} into database..." }
+            // Napier.v { "Inserting ${value::class.simpleName}#${value.id} into database..." }
             insert(value)
         } else {
-            Napier.d { "Updating ${value::class.simpleName}#${value.id} into database..." }
+            // Napier.v { "Updating ${value::class.simpleName}#${value.id} into database..." }
             update(value)
         }
     }
@@ -39,7 +39,7 @@ object DataSync : SyncProcess() {
     override suspend fun synchronize() = try {
         Napier.i { "Waiting until a network is available" }
         if (!connectivityStatus.await(10_000)) {
-            throw IllegalStateException("Network is not available. Won't fetch server")
+            error("Network is not available. Won't fetch server")
         }
 
         Napier.i { "Running data synchronization..." }
@@ -47,6 +47,9 @@ object DataSync : SyncProcess() {
 
         Napier.d { "Fetching tree from server..." }
         val areas = Backend.tree()
+        val zones = areas.flatMap { it.zones }
+        val sectors = zones.flatMap { it.sectors }
+        val paths = sectors.flatMap { it.paths }
 
         Napier.d { "Got ${areas.size} areas. Adding them into the database..." }
         database.transaction {
@@ -60,7 +63,7 @@ object DataSync : SyncProcess() {
             var counter = 0
 
             for (area in areas) {
-                mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
+                mutableStatus.value = Status.RUNNING(counter++ / totalSize.toFloat())
 
                 insertOrUpdate(
                     value = area,
@@ -84,159 +87,156 @@ object DataSync : SyncProcess() {
                         )
                     }
                 )
+            }
+            for (zone in zones) {
+                mutableStatus.value = Status.RUNNING(counter++ / totalSize.toFloat())
 
-                for (zone in area.zones) {
-                    mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
-
-                    insertOrUpdate(
-                        value = zone,
-                        get = { database.zoneQueries.get(it).executeAsOneOrNull() },
-                        insert = { i: Zone ->
-                            with(i) {
-                                database.zoneQueries.insert(
-                                    id,
-                                    timestamp,
-                                    displayName,
-                                    image,
-                                    webUrl,
-                                    kmzUUID,
-                                    point,
-                                    points,
-                                    parentAreaId
-                                )
-                            }
-                        },
-                        update = { i: Zone ->
-                            with(i) {
-                                database.zoneQueries.update(
-                                    timestamp,
-                                    displayName,
-                                    image,
-                                    webUrl,
-                                    kmzUUID,
-                                    point,
-                                    points,
-                                    parentAreaId,
-                                    id
-                                )
-                            }
+                insertOrUpdate(
+                    value = zone,
+                    get = { database.zoneQueries.get(it).executeAsOneOrNull() },
+                    insert = { i: Zone ->
+                        with(i) {
+                            database.zoneQueries.insert(
+                                id,
+                                timestamp,
+                                displayName,
+                                image,
+                                webUrl,
+                                kmzUUID,
+                                point,
+                                points,
+                                parentAreaId
+                            )
                         }
-                    )
-
-                    for (sector in zone.sectors) {
-                        mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
-
-                        insertOrUpdate(
-                            value = sector,
-                            get = { database.sectorQueries.get(it).executeAsOneOrNull() },
-                            insert = { i: Sector ->
-                                with(i) {
-                                    database.sectorQueries.insert(
-                                        id,
-                                        timestamp,
-                                        displayName,
-                                        image,
-                                        kidsApt,
-                                        weight,
-                                        walkingTime,
-                                        point,
-                                        sunTime,
-                                        parentZoneId
-                                    )
-                                }
-                            },
-                            update = { i: Sector ->
-                                with(i) {
-                                    database.sectorQueries.update(
-                                        timestamp,
-                                        displayName,
-                                        image,
-                                        kidsApt,
-                                        weight,
-                                        walkingTime,
-                                        point,
-                                        sunTime,
-                                        parentZoneId,
-                                        id
-                                    )
-                                }
-                            }
-                        )
-
-                        for (path in sector.paths) {
-                            mutableStatus.value = Status.RUNNING(totalSize.toFloat() / counter++)
-
-                            insertOrUpdate(
-                                value = path,
-                                get = { database.pathQueries.get(it).executeAsOneOrNull() },
-                                insert = { i: Path ->
-                                    with(i) {
-                                        database.pathQueries.insert(
-                                            id,
-                                            timestamp,
-                                            displayName,
-                                            sketchId,
-                                            height,
-                                            grade,
-                                            ending,
-                                            pitches,
-                                            stringCount,
-                                            paraboltCount,
-                                            burilCount,
-                                            pitonCount,
-                                            spitCount,
-                                            tensorCount,
-                                            nutRequired,
-                                            friendRequired,
-                                            lanyardRequired,
-                                            nailRequired,
-                                            pitonRequired,
-                                            stapesRequired,
-                                            showDescription,
-                                            description,
-                                            builder,
-                                            reBuilders,
-                                            images,
-                                            parentSectorId
-                                        )
-                                    }
-                                },
-                                update = { i: Path ->
-                                    with(i) {
-                                        database.pathQueries.update(
-                                            timestamp,
-                                            displayName,
-                                            sketchId,
-                                            height,
-                                            grade,
-                                            ending,
-                                            pitches,
-                                            stringCount,
-                                            paraboltCount,
-                                            burilCount,
-                                            pitonCount,
-                                            spitCount,
-                                            tensorCount,
-                                            nutRequired,
-                                            friendRequired,
-                                            lanyardRequired,
-                                            nailRequired,
-                                            pitonRequired,
-                                            stapesRequired,
-                                            showDescription,
-                                            description,
-                                            builder,
-                                            reBuilders,
-                                            images,
-                                            parentSectorId,
-                                            id
-                                        )
-                                    }
-                                }
+                    },
+                    update = { i: Zone ->
+                        with(i) {
+                            database.zoneQueries.update(
+                                timestamp,
+                                displayName,
+                                image,
+                                webUrl,
+                                kmzUUID,
+                                point,
+                                points,
+                                parentAreaId,
+                                id
                             )
                         }
                     }
-                }
+                )
+            }
+            for (sector in sectors) {
+                mutableStatus.value = Status.RUNNING(counter++ / totalSize.toFloat())
+
+                insertOrUpdate(
+                    value = sector,
+                    get = { database.sectorQueries.get(it).executeAsOneOrNull() },
+                    insert = { i: Sector ->
+                        with(i) {
+                            database.sectorQueries.insert(
+                                id,
+                                timestamp,
+                                displayName,
+                                image,
+                                kidsApt,
+                                weight,
+                                walkingTime,
+                                point,
+                                sunTime,
+                                parentZoneId
+                            )
+                        }
+                    },
+                    update = { i: Sector ->
+                        with(i) {
+                            database.sectorQueries.update(
+                                timestamp,
+                                displayName,
+                                image,
+                                kidsApt,
+                                weight,
+                                walkingTime,
+                                point,
+                                sunTime,
+                                parentZoneId,
+                                id
+                            )
+                        }
+                    }
+                )
+            }
+            for (path in paths) {
+                mutableStatus.value = Status.RUNNING(counter++ / totalSize.toFloat())
+
+                insertOrUpdate(
+                    value = path,
+                    get = { database.pathQueries.get(it).executeAsOneOrNull() },
+                    insert = { i: Path ->
+                        with(i) {
+                            database.pathQueries.insert(
+                                id,
+                                timestamp,
+                                displayName,
+                                sketchId,
+                                height,
+                                grade,
+                                ending,
+                                pitches,
+                                stringCount,
+                                paraboltCount,
+                                burilCount,
+                                pitonCount,
+                                spitCount,
+                                tensorCount,
+                                nutRequired,
+                                friendRequired,
+                                lanyardRequired,
+                                nailRequired,
+                                pitonRequired,
+                                stapesRequired,
+                                showDescription,
+                                description,
+                                builder,
+                                reBuilders,
+                                images,
+                                parentSectorId
+                            )
+                        }
+                    },
+                    update = { i: Path ->
+                        with(i) {
+                            database.pathQueries.update(
+                                timestamp,
+                                displayName,
+                                sketchId,
+                                height,
+                                grade,
+                                ending,
+                                pitches,
+                                stringCount,
+                                paraboltCount,
+                                burilCount,
+                                pitonCount,
+                                spitCount,
+                                tensorCount,
+                                nutRequired,
+                                friendRequired,
+                                lanyardRequired,
+                                nailRequired,
+                                pitonRequired,
+                                stapesRequired,
+                                showDescription,
+                                description,
+                                builder,
+                                reBuilders,
+                                images,
+                                parentSectorId,
+                                id
+                            )
+                        }
+                    }
+                )
             }
         }
         Napier.i { "All data synchronized with server." }

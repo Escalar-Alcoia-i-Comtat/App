@@ -1,17 +1,21 @@
 package network.response
 
 import exception.ServerException
+import io.ktor.http.Url
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 data class ErrorResponse(
-    val code: Int,
-    val message: String? = null
-): Response(false) {
-    /**
-     * Provides an exception based on the response that can be thrown.
-     */
-    @Transient
-    val exception: ServerException = ServerException(code, message)
+    val error: Error,
+    val success: Boolean = false
+): Response {
+    @Serializable
+    data class Error(
+        val code: Int,
+        val message: String? = null
+    )
+
+    fun <R> throwException(url: Url?): R {
+        throw with(error) { ServerException(code, message, url) }
+    }
 }

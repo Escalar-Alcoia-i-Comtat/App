@@ -20,6 +20,21 @@ abstract class SyncProcess {
             data object Indeterminate: RUNNING(-1f)
 
             val isIndeterminate: Boolean = progress < 0f
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other == null || this::class != other::class) return false
+
+                other as RUNNING
+
+                if (progress != other.progress) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                return progress.hashCode()
+            }
         }
         data object FINISHED: Status()
     }

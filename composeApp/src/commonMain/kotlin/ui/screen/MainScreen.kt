@@ -27,14 +27,12 @@ import cache.ImageCache
 import cafe.adriel.voyager.core.screen.Screen
 import data.Area
 import database.SettingsKeys
-import database.collectAsStateList
 import database.database
 import database.settings
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import sync.DataSync
 import sync.SyncProcess
@@ -49,7 +47,7 @@ object MainScreen: Screen {
         val areas by database.areaQueries
             .getAll()
             .asFlow()
-            .mapToList(Dispatchers.IO)
+            .mapToList(Dispatchers.Default)
             .collectAsState(emptyList())
 
         /**
@@ -66,7 +64,7 @@ object MainScreen: Screen {
                     DataSync.start()
 
                     ImageCache.updateCache()
-                } catch (e: IllegalStateException) {
+                } catch (_: IllegalStateException) {
                     // There's no Internet connection, check if the data is downloaded
                     val lastSync = settings.getLongOrNull(SettingsKeys.LAST_SYNC)
                     if (lastSync != null) {
@@ -104,18 +102,16 @@ object MainScreen: Screen {
                 Text("Network not available!")
             }
 
-            if (status == SyncProcess.Status.FINISHED) {
-                items(
-                    contentType = { "area" },
-                    key = { it.id },
-                    items = areas.sortedBy { it.displayName }
-                ) { area ->
-                    DataCard(
-                        item = Area(area),
-                        imageHeight = 200.dp,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    ) {}
-                }
+            items(
+                contentType = { "area" },
+                key = { it.id },
+                items = areas.sortedBy { it.displayName }
+            ) { area ->
+                DataCard(
+                    item = Area(area),
+                    imageHeight = 200.dp,
+                    modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 12.dp)
+                ) {}
             }
 
             // Add some padding at the end
