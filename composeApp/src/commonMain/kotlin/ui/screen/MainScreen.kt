@@ -1,14 +1,12 @@
 package ui.screen
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,18 +76,30 @@ object MainScreen: Screen {
             }
         }
 
+        AnimatedVisibility(
+            visible = areas.isEmpty() && (status is SyncProcess.Status.RUNNING || status == SyncProcess.Status.WAITING),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             stickyHeader {
                 AnimatedContent(status) { currentStatus ->
-                    if (currentStatus is SyncProcess.Status.RUNNING) {
+                    if (areas.isNotEmpty() && currentStatus is SyncProcess.Status.RUNNING) {
                         LinearProgressIndicator(
                             progress = currentStatus.progress,
                             modifier = Modifier.fillMaxWidth()
                         )
-                    } else if (currentStatus == SyncProcess.Status.WAITING) {
+                    } else if (areas.isNotEmpty() && currentStatus == SyncProcess.Status.WAITING) {
                         LinearProgressIndicator(
                             modifier = Modifier.fillMaxWidth()
                         )
