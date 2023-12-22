@@ -57,6 +57,9 @@ kotlin {
             api(libs.moko.base)
             api(libs.moko.compose)
 
+            // Compose - Zoomable
+            implementation(libs.zoomable)
+
             // Logging library
             implementation(libs.napier)
 

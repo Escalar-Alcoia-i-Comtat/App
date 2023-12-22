@@ -26,6 +26,7 @@ multiplatform-settings = "1.1.1"
 napier = "2.6.1"
 sqldelight = "2.0.1"
 voyager = "1.0.0"
+zoomable = "1.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -67,6 +68,7 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

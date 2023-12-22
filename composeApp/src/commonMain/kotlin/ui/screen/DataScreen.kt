@@ -1,7 +1,6 @@
 package ui.screen
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,7 +27,6 @@ import data.model.DataTypeWithImage
 import ui.list.DataCard
 import ui.model.DataScreenModel
 
-@OptIn(ExperimentalAnimationApi::class)
 abstract class DataScreen<Parent : DataTypeWithImage, Children : DataTypeWithDisplayName>(
     val id: Long,
     depth: Int,
@@ -80,29 +77,29 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataTypeWithDis
                     CircularProgressIndicator()
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(childrenState ?: emptyList()) { child ->
-                        if (child is DataTypeWithImage) {
-                            DataCard(
-                                item = child,
-                                imageHeight = 200.dp,
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .padding(bottom = 12.dp)
-                                    .animateEnterExit(
-                                        enter = fadeIn() + slideInHorizontally { it },
-                                        exit = fadeOut() + slideOutHorizontally { it }
-                                    )
-                            ) {
-                                val screen = subScreenFactory?.let { it(child.id) }
-                                screen?.let { navigator?.push(screen) }
-                            }
-                        } else {
-                            // FIXME - display paths
-                            Text(child.displayName)
-                        }
+                ContentView(parent, childrenState)
+            }
+        }
+    }
+
+    @Composable
+    open fun ContentView(parentState: Parent, childrenState: List<Children>?) {
+        val navigator = LocalNavigator.current
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(childrenState ?: emptyList()) { child ->
+                if (child is DataTypeWithImage) {
+                    DataCard(
+                        item = child,
+                        imageHeight = 200.dp,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .padding(bottom = 12.dp)
+                    ) {
+                        val screen = subScreenFactory?.let { it(child.id) }
+                        screen?.let { navigator?.push(screen) }
                     }
                 }
             }

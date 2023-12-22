@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 fun AdaptiveNavigationScaffold(
     items: List<NavigationItem>,
     initialPage: Int = 0,
+    userScrollEnabled: Boolean = true,
     topBar: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
     floatingActionButton: @Composable (() -> Unit)? = null,
@@ -133,7 +134,8 @@ fun AdaptiveNavigationScaffold(
                 if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Expanded) {
                     HorizontalPager(
                         state = pagerState,
-                        modifier = Modifier.fillMaxSize().padding(paddingValues)
+                        modifier = Modifier.fillMaxSize().padding(paddingValues),
+                        userScrollEnabled = userScrollEnabled
                     ) { page ->
                         content(page)
                     }

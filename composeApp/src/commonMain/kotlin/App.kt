@@ -86,137 +86,140 @@ fun App() {
             .mapToList(Dispatchers.Default)
             .collectAsState(emptyList())
 
-        AdaptiveNavigationScaffold(
-            items = listOf(
-                NavigationItem(
-                    label = { stringResource(MR.strings.navigation_explore) },
-                    icon = { Icons.Outlined.Explore }
-                ),
-                NavigationItem(
-                    label = { stringResource(MR.strings.navigation_settings) },
-                    icon = { Icons.Outlined.Settings }
-                )
-            ),
-            topBar = {
-                var searchQuery by remember { mutableStateOf("") }
-                var isSearching by remember { mutableStateOf(false) }
-
-                AnimatedContent(
-                    targetState = isSearching
-                ) { searching ->
-                    if (searching) {
-                        SearchBar(
-                            query = searchQuery,
-                            onQueryChange = { searchQuery = it },
-                            onSearch = {},
-                            active = isSearching,
-                            onActiveChange = { isSearching = it },
-                            placeholder = {
-                                Text(stringResource(MR.strings.search))
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Outlined.Search, null)
-                            },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = { searchQuery = "" }
-                                ) {
-                                    Icon(Icons.Rounded.Close, null)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            if (searchQuery.isBlank()) {
-                                Text(stringResource(MR.strings.search_empty))
-                            } else {
-                                LazyColumn {
-                                    items(
-                                        items = areas.filter {
-                                            it.displayName.unaccent().contains(searchQuery.unaccent(), true)
-                                        }
-                                    ) { area ->
-                                        ListItem(
-                                            headlineContent = { Text(area.displayName) },
-                                            supportingContent = { Text("Area") }
-                                        )
-                                    }
-                                    items(
-                                        items = zones.filter {
-                                            it.displayName.unaccent().contains(searchQuery.unaccent(), true)
-                                        }
-                                    ) { zone ->
-                                        ListItem(
-                                            headlineContent = { Text(zone.displayName) },
-                                            supportingContent = { Text("Zone") }
-                                        )
-                                    }
-                                    items(
-                                        items = sectors.filter {
-                                            it.displayName.unaccent().contains(searchQuery.unaccent(), true)
-                                        }
-                                    ) { sector ->
-                                        ListItem(
-                                            headlineContent = { Text(sector.displayName) },
-                                            supportingContent = { Text("Sector") }
-                                        )
-                                    }
-                                    items(
-                                        items = paths.filter {
-                                            it.displayName.unaccent().contains(searchQuery.unaccent(), true)
-                                        }
-                                    ) { path ->
-                                        ListItem(
-                                            headlineContent = { Text(path.displayName) },
-                                            supportingContent = { Text("Path") }
-                                        )
-                                    }
-                                }
-                            }
-                        }
+        Navigator(MainScreen) { navigator ->
+            ScreenTransition(
+                navigator,
+                transition = {
+                    val initialDepth = (initialState as? DepthScreen)?.depth ?: 0
+                    val targetDepth = (targetState as? DepthScreen)?.depth ?: 0
+                    if (initialDepth < targetDepth) {
+                        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
                     } else {
-                        CenterAlignedTopAppBar(
-                            title = { Text("Escalar Alcoià i Comtat") },
-                            actions = {
-                                AnimatedVisibility(
-                                    visible = !isNetworkConnected
-                                ) {
-                                    PlainTooltipBox(
-                                        tooltip = { Text(stringResource(MR.strings.status_network_unavailable)) }
-                                    ) {
-                                        IconButton(
-                                            onClick = {}
-                                        ) {
-                                            Icon(Icons.Rounded.CloudOff, null)
-                                        }
-                                    }
-                                }
-                                IconButton(
-                                    onClick = { isSearching = true }
-                                ) {
-                                    Icon(Icons.Rounded.Search, null)
-                                }
-                            }
-                        )
+                        slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
                     }
                 }
-            }
-        ) { page ->
-            when (page) {
-                0 -> Navigator(MainScreen) { navigator ->
-                    ScreenTransition(
-                        navigator,
-                        transition = {
-                            val initialDepth = (initialState as? DepthScreen)?.depth ?: 0
-                            val targetDepth = (targetState as? DepthScreen)?.depth ?: 0
-                            if (initialDepth < targetDepth) {
-                                slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+            ) { screen ->
+                AdaptiveNavigationScaffold(
+                    items = listOf(
+                        NavigationItem(
+                            label = { stringResource(MR.strings.navigation_explore) },
+                            icon = { Icons.Outlined.Explore }
+                        ),
+                        NavigationItem(
+                            label = { stringResource(MR.strings.navigation_settings) },
+                            icon = { Icons.Outlined.Settings }
+                        )
+                    ),
+                    userScrollEnabled = (screen as? DepthScreen)?.let { it.depth <= 0 } ?: true,
+                    topBar = {
+                        var searchQuery by remember { mutableStateOf("") }
+                        var isSearching by remember { mutableStateOf(false) }
+
+                        AnimatedContent(
+                            targetState = isSearching
+                        ) { searching ->
+                            if (searching) {
+                                SearchBar(
+                                    query = searchQuery,
+                                    onQueryChange = { searchQuery = it },
+                                    onSearch = {},
+                                    active = isSearching,
+                                    onActiveChange = { isSearching = it },
+                                    placeholder = {
+                                        Text(stringResource(MR.strings.search))
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Outlined.Search, null)
+                                    },
+                                    trailingIcon = {
+                                        IconButton(
+                                            onClick = { searchQuery = "" }
+                                        ) {
+                                            Icon(Icons.Rounded.Close, null)
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    if (searchQuery.isBlank()) {
+                                        Text(stringResource(MR.strings.search_empty))
+                                    } else {
+                                        LazyColumn {
+                                            items(
+                                                items = areas.filter {
+                                                    it.displayName.unaccent().contains(searchQuery.unaccent(), true)
+                                                }
+                                            ) { area ->
+                                                ListItem(
+                                                    headlineContent = { Text(area.displayName) },
+                                                    supportingContent = { Text("Area") }
+                                                )
+                                            }
+                                            items(
+                                                items = zones.filter {
+                                                    it.displayName.unaccent().contains(searchQuery.unaccent(), true)
+                                                }
+                                            ) { zone ->
+                                                ListItem(
+                                                    headlineContent = { Text(zone.displayName) },
+                                                    supportingContent = { Text("Zone") }
+                                                )
+                                            }
+                                            items(
+                                                items = sectors.filter {
+                                                    it.displayName.unaccent().contains(searchQuery.unaccent(), true)
+                                                }
+                                            ) { sector ->
+                                                ListItem(
+                                                    headlineContent = { Text(sector.displayName) },
+                                                    supportingContent = { Text("Sector") }
+                                                )
+                                            }
+                                            items(
+                                                items = paths.filter {
+                                                    it.displayName.unaccent().contains(searchQuery.unaccent(), true)
+                                                }
+                                            ) { path ->
+                                                ListItem(
+                                                    headlineContent = { Text(path.displayName) },
+                                                    supportingContent = { Text("Path") }
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             } else {
-                                slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+                                CenterAlignedTopAppBar(
+                                    title = { Text("Escalar Alcoià i Comtat") },
+                                    actions = {
+                                        AnimatedVisibility(
+                                            visible = !isNetworkConnected
+                                        ) {
+                                            PlainTooltipBox(
+                                                tooltip = { Text(stringResource(MR.strings.status_network_unavailable)) }
+                                            ) {
+                                                IconButton(
+                                                    onClick = {}
+                                                ) {
+                                                    Icon(Icons.Rounded.CloudOff, null)
+                                                }
+                                            }
+                                        }
+                                        IconButton(
+                                            onClick = { isSearching = true }
+                                        ) {
+                                            Icon(Icons.Rounded.Search, null)
+                                        }
+                                    }
+                                )
                             }
                         }
-                    )
+                    }
+                ) { page ->
+                    when (page) {
+                        0 -> screen.Content()
+                        else -> Text("This is page $page")
+                    }
                 }
-                else -> Text("This is page $page")
             }
         }
     }
