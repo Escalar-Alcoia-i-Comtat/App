@@ -16,6 +16,9 @@ CREATE TABLE Sector (
 );
 
 getAll:
+SELECT * FROM Sector;
+
+getAllByParent:
 SELECT * FROM Sector WHERE parentZoneId=?;
 
 get:

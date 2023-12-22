@@ -45,6 +45,9 @@ CREATE TABLE Path (
 );
 
 getAll:
+SELECT * FROM Path;
+
+getAllByParent:
 SELECT * FROM Path WHERE parentSectorId=?;
 
 get:
