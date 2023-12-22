@@ -55,9 +55,9 @@ object Backend {
             val status = response.status.value
             val body = response.bodyAsText(fallbackCharset = Charsets.UTF_8)
 
-            Napier.v(tag = "Backend") {
+            /*Napier.v(tag = "Backend") {
                 "Got response from server ($url - $status). Raw body: $body"
-            }
+            }*/
 
             if (status in 200..299) {
                 DataResponse.decode<DataType>(body).also {
