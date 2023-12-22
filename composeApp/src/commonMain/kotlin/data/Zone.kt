@@ -3,6 +3,7 @@ package data
 import data.generic.LatLng
 import data.generic.Point
 import data.model.DataTypeWithImage
+import database.Zone
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,4 +19,18 @@ data class Zone(
     val points: List<Point>,
     @SerialName("area_id") val parentAreaId: Long,
     val sectors: List<Sector>
-): DataTypeWithImage()
+) : DataTypeWithImage() {
+    // TODO - load sectors
+    constructor(zone: Zone) : this(
+        zone.id,
+        zone.timestamp,
+        zone.displayName,
+        zone.image,
+        zone.webUrl,
+        zone.kmzUUID,
+        zone.point,
+        zone.points,
+        zone.parentAreaId,
+        emptyList()
+    )
+}

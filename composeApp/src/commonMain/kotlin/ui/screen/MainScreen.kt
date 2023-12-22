@@ -3,7 +3,12 @@ package ui.screen
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,6 +28,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import cache.ImageCache
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import data.Area
 import database.SettingsKeys
 import database.database
@@ -40,6 +46,8 @@ object MainScreen: Screen {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.current
+
         val status by DataSync.status
 
         val areas by database.areaQueries
@@ -121,7 +129,7 @@ object MainScreen: Screen {
                     item = Area(area),
                     imageHeight = 200.dp,
                     modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 12.dp)
-                ) {}
+                ) { navigator?.push(ZonesScreen(area.id)) }
             }
 
             // Add some padding at the end
