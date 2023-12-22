@@ -50,6 +50,7 @@ kotlin {
 
             // Compose - Navigation
             implementation(libs.voyager.navigator)
+            implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.transitions)
 
             // Compose - Resources

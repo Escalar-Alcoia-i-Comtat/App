@@ -3,29 +3,29 @@ agp = "8.1.4"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
-androidx-activityCompose = "1.8.1"
+androidx-activityCompose = "1.8.2"
 androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
 androidx-core-ktx = "1.12.0"
 androidx-espresso-core = "3.5.1"
-androidx-material = "1.10.0"
+androidx-material = "1.11.0"
 androidx-test-junit = "1.1.5"
 compose = "1.5.4"
 compose-compiler = "1.5.4"
-compose-plugin = "1.5.10"
+compose-plugin = "1.5.11"
 compose-windowSizeClass = "0.3.1"
 junit = "4.13.2"
 kotlin = "1.9.20"
 kotlinx = "1.7.3"
-kotlinx-datetime = "0.4.1"
-kotlinx-json = "1.6.0"
-ktor = "2.3.6"
+kotlinx-datetime = "0.5.0"
+kotlinx-json = "1.6.2"
+ktor = "2.3.7"
 moko = "0.23.0"
 moko-graphics = "0.9.0"
-multiplatform-settings = "1.1.0"
+multiplatform-settings = "1.1.1"
 napier = "2.6.1"
-sqldelight = "2.0.0"
-voyager = "1.0.0-rc10"
+sqldelight = "2.0.1"
+voyager = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -65,6 +65,7 @@ sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", versi
 sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
 [plugins]
