@@ -2,6 +2,7 @@ package ui.list
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Place
@@ -32,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cache.ImageCache
 import data.DataTypeWithImage
+import data.DataTypeWithPoint
+import data.DataTypeWithPoints
+import platform.launchPoint
 
 @Composable
 fun <T: DataTypeWithImage> DataCard(
@@ -81,12 +86,27 @@ fun <T: DataTypeWithImage> DataCard(
             } ?: progress?.let { CircularProgressIndicator(it) } ?: CircularProgressIndicator()
 
             Row(
-                modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart)
+                modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Bottom
             ) {
-                SmallFloatingActionButton(
-                    onClick = {}
-                ) {
-                    Icon(Icons.Outlined.Place, "")
+                if (item is DataTypeWithPoints) {
+                    for (point in item.points) {
+                        SmallFloatingActionButton(
+                            onClick = { launchPoint(point.location, item.displayName) },
+                            modifier = Modifier.padding(bottom = 4.dp).size(32.dp)
+                        ) {
+                            Icon(point.iconVector, null)
+                        }
+                    }
+                }
+
+                if (item is DataTypeWithPoint) item.point?.let { point ->
+                    SmallFloatingActionButton(
+                        onClick = { launchPoint(point, item.displayName) }
+                    ) {
+                        Icon(Icons.Outlined.Place, null)
+                    }
                 }
             }
         }
