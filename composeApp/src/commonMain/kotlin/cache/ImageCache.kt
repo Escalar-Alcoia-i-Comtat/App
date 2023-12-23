@@ -1,7 +1,7 @@
 package cache
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -16,9 +16,11 @@ import cache.Files.listAllFiles
 import cache.Files.mkdirs
 import cache.Files.readAllBytes
 import cache.Files.write
+import exception.UserLeftScreenException
 import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.toByteArray
@@ -53,7 +55,8 @@ object ImageCache {
      */
     private suspend fun validateCachedFile(
         fileRequest: FileRequestData,
-        enforceHttps: Boolean = true
+        enforceHttps: Boolean = true,
+        onProgressUpdate: (suspend (current: Long, max: Long) -> Unit)? = null
     ): ByteArray? {
         val uuid = fileRequest.uuid
         val file = imageCacheDirectory + uuid
@@ -74,7 +77,9 @@ object ImageCache {
                 url = url.replace("http:", "https:")
             }
 
-            val bytes = client.get(url).bodyAsChannel().toByteArray()
+            val bytes = client.get(url) {
+                onDownload(onProgressUpdate)
+            }.bodyAsChannel().toByteArray()
             file.write(bytes)
             hashFile.write(fileRequest.hash.encodeToByteArray())
 
@@ -118,7 +123,10 @@ object ImageCache {
     }
 
     @Composable
-    fun collectStateOf(uuid: String): State<ImageBitmap?> {
+    fun collectStateOf(
+        uuid: String,
+        onProgressUpdate: (suspend (current: Long, max: Long) -> Unit)? = null
+    ): State<ImageBitmap?> {
         val state: MutableState<ImageBitmap?> = remember { mutableStateOf(null) }
 
         /**
@@ -126,7 +134,7 @@ object ImageCache {
          */
         var alreadyFetchedUpdate by remember { mutableStateOf(false) }
 
-        LaunchedEffect(uuid) {
+        DisposableEffect(uuid) {
             if (!imageCacheDirectory.exists()) {
                 require(imageCacheDirectory.mkdirs()) {
                     "Could not create cache directory ($imageCacheDirectory)."
@@ -137,7 +145,7 @@ object ImageCache {
 
             Napier.v(tag = "ImageCache-$uuid") { "$file" }
 
-            CoroutineScope(Dispatchers.IO).launch {
+            val job = CoroutineScope(Dispatchers.IO).launch {
                 if (file.exists()) {
                     Napier.d(tag = "ImageCache-$uuid") { "Already cached, sending bytes..." }
                     val bytes = file.readAllBytes()
@@ -147,8 +155,8 @@ object ImageCache {
                 if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
                     try {
                         Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
-                        val fileRequest = Backend.requestFile(uuid)
-                        validateCachedFile(fileRequest)?.let { bytes ->
+                        val fileRequest = Backend.requestFile(uuid, onProgressUpdate)
+                        validateCachedFile(fileRequest, onProgressUpdate = onProgressUpdate)?.let { bytes ->
                             state.value = bytes.decodeImage()
                         }
 
@@ -159,6 +167,12 @@ object ImageCache {
                         }
                     }
                 }
+            }
+
+            onDispose {
+                job.cancel(
+                    UserLeftScreenException("Stopped loading image $uuid.")
+                )
             }
         }
 

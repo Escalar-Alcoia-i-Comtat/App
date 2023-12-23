@@ -5,6 +5,7 @@ import exception.ServerException
 import io.github.aakira.napier.Napier
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -75,7 +76,7 @@ object Backend {
             Napier.e(tag = "Backend", throwable = exception) {
                 "Got unexpected response from server. It cannot be parsed."
             }
-            throw IllegalStateException("Received an unhandleable response from the server.")
+            error("Received an unhandleable response from the server.")
         } catch (exception: Exception) {
             Napier.e(tag = "Backend", throwable = exception) {
                 "Could not decode server's body. Unknown exception."
@@ -88,6 +89,7 @@ object Backend {
      * Runs an HTTP GET request to the backend server, at the given path.
      *
      * @param pathComponents The components of the path to request.
+     * @param progress If not null, will be called with the progress of the request.
      *
      * @return The response given by the server, of the type desired.
      *
@@ -96,19 +98,30 @@ object Backend {
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
     private suspend inline fun <reified DataType: DataResponseType> get(
-        vararg pathComponents: String
+        vararg pathComponents: String,
+        noinline progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): DataType {
+        var length: Long = 0
+        progress?.invoke(0, length)
         val response = client.get(
             URLBuilder(baseUrl)
                 .appendPathSegments(*pathComponents)
                 .build()
                 .also { Napier.v("GET :: $it") }
-        )
+        ) {
+            onDownload { bytesSentTotal, contentLength ->
+                length = contentLength
+                progress?.invoke(bytesSentTotal, contentLength)
+            }
+        }
+        progress?.invoke(length, length)
         return decodeBody(response)
     }
 
     /**
      * Makes a call to the `/tree` endpoint.
+     *
+     * @param progress If not null, will be called with the progress of the request.
      *
      * @return A list of all the [Area]s provided by the server.
      *
@@ -116,8 +129,10 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    suspend fun tree(): List<Area> {
-        return get<AreasData>("tree").areas
+    suspend fun tree(
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): List<Area> {
+        return get<AreasData>("tree", progress = progress).areas
     }
 
     /**
@@ -125,6 +140,7 @@ object Backend {
      * An exception may be thrown if the file was not found in the server.
      *
      * @param uuid The UUID of the file to fetch.
+     * @param progress If not null, will be called with the progress of the request.
      *
      * @return The data of the file requested.
      *
@@ -132,8 +148,11 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    suspend fun requestFile(uuid: String): FileRequestData {
-        return get("file", uuid)
+    suspend fun requestFile(
+        uuid: String,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): FileRequestData {
+        return get("file", uuid, progress = progress)
     }
 
     /**
@@ -141,6 +160,7 @@ object Backend {
      * An exception may be thrown if at least one file was not found in the server.
      *
      * @param uuids The UUIDs of the files to fetch.
+     * @param progress If not null, will be called with the progress of the request.
      *
      * @return The data of the file requested.
      *
@@ -148,7 +168,10 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    suspend fun requestFiles(uuids: List<String>): List<FileRequestData> {
-        return get("file", uuids.joinToString(","))
+    suspend fun requestFiles(
+        uuids: List<String>,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): List<FileRequestData> {
+        return get("file", uuids.joinToString(","), progress = progress)
     }
 }

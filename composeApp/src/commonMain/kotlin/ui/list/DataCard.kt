@@ -14,6 +14,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,7 +48,14 @@ fun <T: DataTypeWithImage> DataCard(
             fontSize = 20.sp
         )
 
-        val image by ImageCache.collectStateOf(item.image)
+        var progress by remember { mutableStateOf<Float?>(null) }
+        val image by ImageCache.collectStateOf(item.image) { current, max ->
+            progress = if (current == max) {
+                null
+            } else {
+                (current.toDouble() / max).toFloat()
+            }
+        }
 
         Box(
             modifier = Modifier
@@ -63,7 +73,7 @@ fun <T: DataTypeWithImage> DataCard(
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
-            } ?: CircularProgressIndicator()
+            } ?: progress?.let { CircularProgressIndicator(it) } ?: CircularProgressIndicator()
         }
     }
 }
