@@ -1,10 +1,13 @@
-package data.model
+package data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-abstract class DataTypeWithDisplayName: DataType() {
+sealed interface DataType {
+    val id: Long
+    val timestamp: Long
+
     @SerialName("display_name")
-    abstract val displayName: String
+    val displayName: String
 }

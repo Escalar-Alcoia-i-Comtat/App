@@ -2,10 +2,10 @@ package sync
 
 import com.russhwolf.settings.set
 import data.Area
+import data.DataType
 import data.Path
 import data.Sector
 import data.Zone
-import data.model.DataTypeWithDisplayName
 import database.SettingsKeys
 import database.database
 import database.settings
@@ -15,7 +15,7 @@ import network.Backend
 import network.connectivityStatus
 
 object DataSync : SyncProcess() {
-    private fun <Type : DataTypeWithDisplayName, RowType : Any> insertOrUpdate(
+    private fun <Type : DataType, RowType : Any> insertOrUpdate(
         value: Type,
         get: (id: Long) -> RowType?,
         insert: (value: Type) -> Unit,

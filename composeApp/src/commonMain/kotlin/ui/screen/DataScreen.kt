@@ -22,12 +22,12 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import data.model.DataTypeWithDisplayName
-import data.model.DataTypeWithImage
+import data.DataType
+import data.DataTypeWithImage
 import ui.list.DataCard
 import ui.model.DataScreenModel
 
-abstract class DataScreen<Parent : DataTypeWithImage, Children : DataTypeWithDisplayName>(
+abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
     val id: Long,
     depth: Int,
     private val modelFactory: () -> DataScreenModel<Parent, Children>,

@@ -1,7 +1,6 @@
 package data
 
 import data.generic.LatLng
-import data.model.DataTypeWithImage
 import database.Sector
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -15,11 +14,11 @@ data class Sector(
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String,
     @SerialName("walking_time") val walkingTime: Long? = null,
-    val point: LatLng? = null,
+    override val point: LatLng? = null,
     @SerialName("sun_time") val sunTime: String?,
     @SerialName("zone_id") val parentZoneId: Long,
     val paths: List<Path>
-): DataTypeWithImage() {
+): DataTypeWithImage, DataTypeWithPoint {
     constructor(sector: Sector): this(
         sector.id,
         sector.timestamp,

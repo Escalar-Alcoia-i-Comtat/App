@@ -3,7 +3,6 @@ package data
 import data.generic.Builder
 import data.generic.Ending
 import data.generic.PitchInfo
-import data.model.DataTypeWithDisplayName
 import database.Path
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -45,7 +44,7 @@ data class Path(
     val images: List<String>? = null,
 
     @SerialName("sector_id") val parentSectorId: Long
-): DataTypeWithDisplayName() {
+): DataType {
     constructor(path: Path): this(
         path.id,
         path.timestamp,

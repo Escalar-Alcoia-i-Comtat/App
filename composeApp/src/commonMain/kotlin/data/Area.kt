@@ -1,6 +1,5 @@
 package data
 
-import data.model.DataTypeWithImage
 import database.Area
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,7 +12,7 @@ class Area(
     override val image: String,
     @SerialName("web_url") val webUrl: String,
     val zones: List<Zone>
-): DataTypeWithImage() {
+): DataTypeWithImage {
     // TODO - load zones
     constructor(area: Area): this(area.id, area.timestamp, area.displayName, area.image, area.webUrl, emptyList())
 }
