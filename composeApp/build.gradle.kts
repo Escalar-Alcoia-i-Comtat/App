@@ -103,6 +103,9 @@ kotlin {
 
                 // SQLDelight
                 implementation(libs.sqldelight.driver.android)
+
+                // Instant Apps Support
+                implementation(libs.play.instantapps)
             }
         }
 

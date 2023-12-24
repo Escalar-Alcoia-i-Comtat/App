@@ -24,6 +24,7 @@ moko = "0.23.0"
 moko-graphics = "0.9.0"
 multiplatform-settings = "1.1.1"
 napier = "2.6.1"
+play-instantapps = "17.0.0"
 sqldelight = "2.0.1"
 voyager = "1.0.0"
 zoomable = "1.6.1"
@@ -61,6 +62,7 @@ moko-graphics = { module = "dev.icerock.moko:graphics", version.ref = "moko-grap
 moko-test = { module = "dev.icerock.moko:resources-test", version.ref = "moko" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+play-instantapps = { module = "com.google.android.gms:play-services-instantapps", version.ref = "play-instantapps" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
