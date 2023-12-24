@@ -16,7 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  update_release_draft:
+  publish_internal_release:
+    name: Publish Internal Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
