@@ -34,6 +34,10 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
             android:name=".MainActivity">
 
+            <meta-data
+                android:name="default-url"
+                android:value="https://app.escalaralcoiaicomtat.org" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
