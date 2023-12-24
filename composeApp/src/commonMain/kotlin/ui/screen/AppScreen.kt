@@ -6,6 +6,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -131,8 +132,8 @@ object AppScreen : Screen {
                     ),
                     userScrollEnabled = (screen as? DepthScreen)?.let { it.depth <= 0 } ?: true,
                     topBar = {
-                        var searchQuery by remember { mutableStateOf("") }
-                        var isSearching by remember { mutableStateOf(false) }
+                        val searchQuery by searchModel.query.collectAsState("")
+                        val isSearching by searchModel.isSearching.collectAsState(false)
 
                         fun <Type: Any> filter(
                             list: List<Type>,
@@ -153,19 +154,19 @@ object AppScreen : Screen {
                         }
 
                         val filteredAreas = searchModel.filteredAreas
-                        LaunchedEffect(areas, filterAreas) {
+                        LaunchedEffect(areas, filterAreas, searchQuery) {
                             filter(areas, filteredAreas, Area::displayName, filterAreas)
                         }
                         val filteredZones = searchModel.filteredZones
-                        LaunchedEffect(zones, filterZones) {
+                        LaunchedEffect(zones, filterZones, searchQuery) {
                             filter(zones, filteredZones, Zone::displayName, filterZones)
                         }
                         val filteredSectors = searchModel.filteredSectors
-                        LaunchedEffect(sectors, filterSectors) {
+                        LaunchedEffect(sectors, filterSectors, searchQuery) {
                             filter(sectors, filteredSectors, Sector::displayName, filterSectors)
                         }
                         val filteredPaths = searchModel.filteredPaths
-                        LaunchedEffect(paths, filterPaths) {
+                        LaunchedEffect(paths, filterPaths, searchQuery) {
                             filter(paths, filteredPaths, Path::displayName, filterPaths)
                         }
 
@@ -175,10 +176,10 @@ object AppScreen : Screen {
                             if (searching) {
                                 SearchBar(
                                     query = searchQuery,
-                                    onQueryChange = { searchQuery = it },
+                                    onQueryChange = { searchModel.query.value = it },
                                     onSearch = {},
                                     active = isSearching,
-                                    onActiveChange = { isSearching = it },
+                                    onActiveChange = { searchModel.isSearching.value = it },
                                     placeholder = {
                                         Text(stringResource(MR.strings.search))
                                     },
@@ -188,7 +189,7 @@ object AppScreen : Screen {
                                     trailingIcon = {
                                         Row {
                                             IconButton(
-                                                onClick = { searchQuery = "" }
+                                                onClick = { searchModel.query.value = "" }
                                             ) {
                                                 Icon(Icons.Rounded.Close, null)
                                             }
@@ -211,7 +212,13 @@ object AppScreen : Screen {
                                                 if (area == null) return@items
                                                 ListItem(
                                                     headlineContent = { Text(area.displayName) },
-                                                    supportingContent = { Text("Area") }
+                                                    supportingContent = { Text("Area") },
+                                                    modifier = Modifier.clickable {
+                                                        navigator.push(
+                                                            ZonesScreen(area.id)
+                                                        )
+                                                        searchModel.dismiss()
+                                                    }
                                                 )
                                             }
                                             items(
@@ -220,7 +227,13 @@ object AppScreen : Screen {
                                                 if (zone == null) return@items
                                                 ListItem(
                                                     headlineContent = { Text(zone.displayName) },
-                                                    supportingContent = { Text("Zone") }
+                                                    supportingContent = { Text("Zone") },
+                                                    modifier = Modifier.clickable {
+                                                        navigator.push(
+                                                            SectorsScreen(zone.id)
+                                                        )
+                                                        searchModel.dismiss()
+                                                    }
                                                 )
                                             }
                                             items(
@@ -229,7 +242,13 @@ object AppScreen : Screen {
                                                 if (sector == null) return@items
                                                 ListItem(
                                                     headlineContent = { Text(sector.displayName) },
-                                                    supportingContent = { Text("Sector") }
+                                                    supportingContent = { Text("Sector") },
+                                                    modifier = Modifier.clickable {
+                                                        navigator.push(
+                                                            PathsScreen(sector.id)
+                                                        )
+                                                        searchModel.dismiss()
+                                                    }
                                                 )
                                             }
                                             items(
@@ -238,7 +257,13 @@ object AppScreen : Screen {
                                                 if (path == null) return@items
                                                 ListItem(
                                                     headlineContent = { Text(path.displayName) },
-                                                    supportingContent = { Text("Path") }
+                                                    supportingContent = { Text("Path") },
+                                                    modifier = Modifier.clickable {
+                                                        navigator.push(
+                                                            PathsScreen(path.parentSectorId, highlightPathId = path.id)
+                                                        )
+                                                        searchModel.dismiss()
+                                                    }
                                                 )
                                             }
                                         }
@@ -252,7 +277,9 @@ object AppScreen : Screen {
                                             visible = !isNetworkConnected
                                         ) {
                                             PlainTooltipBox(
-                                                tooltip = { Text(stringResource(MR.strings.status_network_unavailable)) }
+                                                tooltip = {
+                                                    Text(stringResource(MR.strings.status_network_unavailable))
+                                                }
                                             ) {
                                                 IconButton(
                                                     onClick = {}
@@ -262,7 +289,8 @@ object AppScreen : Screen {
                                             }
                                         }
                                         IconButton(
-                                            onClick = { isSearching = true }
+                                            onClick = { searchModel.isSearching.value = true },
+                                            enabled = areas.isNotEmpty()
                                         ) {
                                             Icon(Icons.Rounded.Search, null)
                                         }

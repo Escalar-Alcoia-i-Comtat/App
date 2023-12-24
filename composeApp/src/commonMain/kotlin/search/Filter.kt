@@ -1,6 +1,8 @@
 package search
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 
 abstract class Filter<Type>(
     /**
@@ -9,7 +11,8 @@ abstract class Filter<Type>(
     val value: Boolean = true
 ) {
     companion object {
-        val Defaults: Array<Filter<Any>> = arrayOf(VisibilityFilter.Visible)
+        val Defaults: SnapshotStateList<Filter<Any>>
+            get() = mutableStateListOf(VisibilityFilter.Visible)
     }
 
     protected abstract val valueTrue: Filter<Type>

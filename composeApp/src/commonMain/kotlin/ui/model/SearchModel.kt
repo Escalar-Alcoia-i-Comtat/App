@@ -18,8 +18,13 @@ class SearchModel : ScreenModel {
     val filteredSectors = mutableStateListOf<Sector?>()
     val filteredPaths = mutableStateListOf<Path?>()
 
-    val filterAreas = mutableStateListOf(*Filter.Defaults)
-    val filterZones = mutableStateListOf(*Filter.Defaults)
-    val filterSectors = mutableStateListOf(*Filter.Defaults)
-    val filterPaths = mutableStateListOf(*Filter.Defaults)
+    val filterAreas = Filter.Defaults
+    val filterZones = Filter.Defaults
+    val filterSectors = Filter.Defaults
+    val filterPaths = Filter.Defaults
+
+    fun dismiss() {
+        isSearching.value = false
+        query.value = ""
+    }
 }

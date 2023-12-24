@@ -24,6 +24,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import data.DataType
 import data.DataTypeWithImage
+import io.github.aakira.napier.Napier
 import ui.list.DataCard
 import ui.model.DataScreenModel
 
@@ -49,6 +50,7 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
 
         LaunchedEffect(notFound) {
             if (notFound) {
+                Napier.w { "Could not find element with id $id" }
                 navigator?.pop()
             }
         }

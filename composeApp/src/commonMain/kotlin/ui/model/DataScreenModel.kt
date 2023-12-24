@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import data.DataType
 import data.DataTypeWithImage
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +25,10 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
 
         val dbParent = parentQuery(id)
         if (dbParent == null) {
+            Napier.w { "Could not find #$id" }
             notFound.emit(true)
         } else {
+            Napier.d { "Emitting #$id" }
             parent.emit(dbParent)
         }
     }

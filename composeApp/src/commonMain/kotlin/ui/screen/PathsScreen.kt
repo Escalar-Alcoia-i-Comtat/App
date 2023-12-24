@@ -19,7 +19,10 @@ import data.Path
 import data.Sector
 import ui.model.PathsScreenModel
 
-class PathsScreen(id: Long) : DataScreen<Sector, Path>(
+class PathsScreen(
+    id: Long,
+    private val highlightPathId: Long? = null
+) : DataScreen<Sector, Path>(
     id = id,
     depth = @Suppress("MagicNumber") 3,
     { PathsScreenModel() },

@@ -29,6 +29,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import cache.ImageCache
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import data.Area
 import database.SettingsKeys
 import database.database
@@ -43,10 +44,13 @@ import sync.SyncProcess
 import ui.list.DataCard
 
 object MainScreen: Screen {
+    var navigator: Navigator? = null
+        private set
+
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.current.also { navigator = it }
 
         val status by DataSync.status
 
