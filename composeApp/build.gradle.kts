@@ -184,9 +184,20 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = System.getenv("KEYSTORE_ALIAS")
+            keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD")
+
+            storeFile = File(rootDir, "keystore.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+        }
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -224,7 +235,7 @@ multiplatformResources {
     multiplatformResourcesPackage = "resources"
 }
 
-task("increaseVersionCode") {
+val increaseVersionCode = task("increaseVersionCode") {
     doFirst {
         val versionPropsFile = project.rootProject.file("version.properties")
         if (!versionPropsFile.canRead()) {
@@ -244,3 +255,5 @@ task("increaseVersionCode") {
         println("Increased version code to $code")
     }
 }
+
+tasks.findByName("bundleRelease")?.dependsOn?.add(increaseVersionCode)
