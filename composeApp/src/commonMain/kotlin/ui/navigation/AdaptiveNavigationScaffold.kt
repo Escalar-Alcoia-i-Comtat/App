@@ -1,8 +1,11 @@
 package ui.navigation
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Row
@@ -48,7 +51,9 @@ fun AdaptiveNavigationScaffold(
     items: List<NavigationItem>,
     initialPage: Int = 0,
     userScrollEnabled: Boolean = true,
+    navigationBarVisible: Boolean = true,
     topBar: @Composable () -> Unit = {},
+    topBarVisible: Boolean = true,
     snackbarHost: @Composable () -> Unit = {},
     floatingActionButton: @Composable (() -> Unit)? = null,
     floatingActionButtonPosition: FabPosition = FabPosition.End,
@@ -105,7 +110,15 @@ fun AdaptiveNavigationScaffold(
 
             Scaffold(
                 modifier = Modifier.fillMaxHeight().weight(1f),
-                topBar = topBar,
+                topBar = {
+                    AnimatedVisibility(
+                        visible = topBarVisible,
+                        enter = slideInVertically { -it },
+                        exit = slideOutVertically { -it }
+                    ) {
+                        topBar()
+                    }
+                },
                 snackbarHost = snackbarHost,
                 floatingActionButton = {
                     floatingActionButton
@@ -118,14 +131,20 @@ fun AdaptiveNavigationScaffold(
                 contentWindowInsets = contentWindowInsets,
                 bottomBar = {
                     if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
-                        NavigationBar {
-                            for ((index, item) in items.withIndex()) {
-                                NavigationBarItem(
-                                    selected = pagerState.currentPage == index,
-                                    onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                                    icon = { Icon(item.icon(), item.label()) },
-                                    label = { Text(item.label()) }
-                                )
+                        AnimatedVisibility(
+                            visible = navigationBarVisible,
+                            enter = slideInVertically { it },
+                            exit = slideOutVertically { it }
+                        ) {
+                            NavigationBar {
+                                for ((index, item) in items.withIndex()) {
+                                    NavigationBarItem(
+                                        selected = pagerState.currentPage == index,
+                                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                                        icon = { Icon(item.icon(), item.label()) },
+                                        label = { Text(item.label()) }
+                                    )
+                                }
                             }
                         }
                     }
