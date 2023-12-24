@@ -1,3 +1,5 @@
+import java.time.LocalDateTime
+import java.util.Properties
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
@@ -148,11 +150,22 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "org.escalaralcoiaicomtat.app"
+        applicationId = "org.escalaralcoiaicomtat.android"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
         versionName = "2.1.0-dev01"
+        versionNameSuffix = "_instant"
+
+        val versionPropsFile = project.rootProject.file("version.properties")
+        if (!versionPropsFile.canRead()) {
+            throw GradleException("Cannot read version.properties")
+        }
+        val versionProps = Properties().apply {
+            versionPropsFile.inputStream().use {
+                load(versionPropsFile.inputStream())
+            }
+        }
+        versionCode = versionProps.getProperty("VERSION_CODE").toInt()
     }
     buildFeatures {
         compose = true
@@ -206,4 +219,25 @@ sqldelight {
 
 multiplatformResources {
     multiplatformResourcesPackage = "resources"
+}
+
+task("increaseVersionCode") {
+    doFirst {
+        val versionPropsFile = project.rootProject.file("version.properties")
+        if (!versionPropsFile.canRead()) {
+            throw GradleException("Cannot read version.properties")
+        }
+        val versionProps = Properties().apply {
+            versionPropsFile.inputStream().use {
+                load(versionPropsFile.inputStream())
+            }
+        }
+        val code = versionProps.getProperty("VERSION_CODE").toInt() + 1
+        versionProps["VERSION_CODE"] = code.toString()
+        versionPropsFile.outputStream().use {
+            val date = LocalDateTime.now()
+            versionProps.store(it, "Updated at $date")
+        }
+        println("Increased version code to $code")
+    }
 }
