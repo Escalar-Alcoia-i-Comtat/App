@@ -36,45 +36,41 @@
             </intent-filter>
 
             <!-- Deep Links -->
-            <intent-filter android:label="@string/link_view_area">
+            <intent-filter android:label="@string/link_view_area" android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="https"
-                    android:host="app.escalaralcoiaicomtat.org"
-                    android:pathPrefix="/area" />
-                <!-- note that the leading "/" is required for pathPrefix-->
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="app.escalaralcoiaicomtat.org" />
+                <data android:pathPrefix="/area" />
             </intent-filter>
-            <intent-filter android:label="@string/link_view_zone">
+            <intent-filter android:label="@string/link_view_zone" android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="https"
-                    android:host="app.escalaralcoiaicomtat.org"
-                    android:pathPrefix="/zone" />
-                <!-- note that the leading "/" is required for pathPrefix-->
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="app.escalaralcoiaicomtat.org" />
+                <data android:pathPrefix="/zone" />
             </intent-filter>
-            <intent-filter android:label="@string/link_view_sector">
+            <intent-filter android:label="@string/link_view_sector" android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="https"
-                    android:host="app.escalaralcoiaicomtat.org"
-                    android:pathPrefix="/sector" />
-                <!-- note that the leading "/" is required for pathPrefix-->
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="app.escalaralcoiaicomtat.org" />
+                <data android:pathPrefix="/sector" />
             </intent-filter>
-            <intent-filter android:label="@string/link_view_path">
+            <intent-filter android:label="@string/link_view_path" android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="https"
-                    android:host="app.escalaralcoiaicomtat.org"
-                    android:pathPrefix="/path" />
-                <!-- note that the leading "/" is required for pathPrefix-->
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="app.escalaralcoiaicomtat.org" />
+                <data android:pathPrefix="/path" />
             </intent-filter>
         </activity>
 
