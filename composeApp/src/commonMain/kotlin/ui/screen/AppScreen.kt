@@ -47,6 +47,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.ScreenTransition
+import data.EDataType
 import database.Area
 import database.Path
 import database.Sector
@@ -56,6 +57,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import network.connectivityStatus
 import resources.MR
 import search.Filter
+import ui.composition.LocalLifecycleManager
 import ui.dialog.SearchFiltersDialog
 import ui.model.AppScreenModel
 import ui.model.SearchModel
@@ -68,9 +70,12 @@ import utils.unaccent
     ExperimentalFoundationApi::class, ExperimentalMaterial3WindowSizeClassApi::class,
     ExperimentalMaterial3Api::class
 )
-object AppScreen : Screen {
+class AppScreen(
+    private val initial: Pair<EDataType, Long>? = null
+) : Screen {
     @Composable
     override fun Content() {
+        val lifecycleManager = LocalLifecycleManager.current
         val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
         val areas by database.areaQueries.getAll().collectAsStateList()
@@ -80,7 +85,16 @@ object AppScreen : Screen {
 
         val searchModel = rememberScreenModel { SearchModel() }
 
-        Navigator(MainScreen) { navigator ->
+        Navigator(
+            screen = when (initial?.first) {
+                EDataType.AREA -> ZonesScreen(initial.second)
+                EDataType.ZONE -> SectorsScreen(initial.second)
+                EDataType.SECTOR -> PathsScreen(initial.second)
+                // TODO: highlight paths
+                EDataType.PATH -> PathsScreen(initial.second)
+                else -> MainScreen
+            }
+        ) { navigator ->
             val model = navigator.rememberNavigatorScreenModel { AppScreenModel() }
 
             val screen = navigator.lastItem
@@ -137,13 +151,24 @@ object AppScreen : Screen {
                                     ) {
                                         IconButton(
                                             onClick = {
-                                                navigator.pop()
-                                                if (depth?.let { it <= 1 } == true) {
-                                                    model.clear()
+                                                if (navigator.size <= 1) {
+                                                    lifecycleManager.finish()
+                                                } else {
+                                                    navigator.pop()
+                                                    if (depth?.let { it <= 1 } == true) {
+                                                        model.clear()
+                                                    }
                                                 }
                                             }
                                         ) {
-                                            Icon(Icons.Rounded.ChevronLeft, null)
+                                            Icon(
+                                                imageVector = if (navigator.size <= 1) {
+                                                    Icons.Rounded.Close
+                                                } else {
+                                                    Icons.Rounded.ChevronLeft
+                                                },
+                                                contentDescription = null
+                                            )
                                         }
                                     }
                                 },
