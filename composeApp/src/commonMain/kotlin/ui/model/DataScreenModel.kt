@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
+    private val appScreenModel: AppScreenModel,
     private val parentQuery: suspend (id: Long) -> Parent?,
     private val childrenQuery: suspend (parentId: Long) -> List<Children>
 ) : ScreenModel {
@@ -20,6 +21,7 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
     val notFound = MutableStateFlow(false)
 
     fun load(id: Long) = screenModelScope.launch(Dispatchers.IO) {
+        appScreenModel.selection.emit(null)
         val dbChildren = childrenQuery(id)
         children.emit(dbChildren)
 
@@ -30,6 +32,7 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
         } else {
             Napier.d { "Emitting #$id" }
             parent.emit(dbParent)
+            appScreenModel.selection.emit(dbParent)
         }
     }
 }

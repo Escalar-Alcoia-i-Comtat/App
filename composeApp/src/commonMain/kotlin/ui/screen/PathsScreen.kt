@@ -25,7 +25,7 @@ class PathsScreen(
 ) : DataScreen<Sector, Path>(
     id = id,
     depth = @Suppress("MagicNumber") 3,
-    { PathsScreenModel() },
+    { PathsScreenModel(it) },
     null
 ) {
     @Composable

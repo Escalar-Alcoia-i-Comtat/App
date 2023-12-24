@@ -19,26 +19,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import data.DataType
 import data.DataTypeWithImage
 import io.github.aakira.napier.Napier
 import ui.list.DataCard
+import ui.model.AppScreenModel
 import ui.model.DataScreenModel
 
 abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
     val id: Long,
     depth: Int,
-    private val modelFactory: () -> DataScreenModel<Parent, Children>,
+    private val modelFactory: (AppScreenModel) -> DataScreenModel<Parent, Children>,
     private val subScreenFactory: ((id: Long) -> Screen)?
 ) : DepthScreen(depth) {
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
 
-        val model = rememberScreenModel { modelFactory() }
+        val appScreenModel = navigator.rememberNavigatorScreenModel { AppScreenModel() }
+        val model = rememberScreenModel { modelFactory(appScreenModel) }
 
         val parentState: Parent? by model.parent.collectAsState(null)
         val childrenState: List<Children>? by model.children.collectAsState(null)
@@ -51,7 +55,7 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
         LaunchedEffect(notFound) {
             if (notFound) {
                 Napier.w { "Could not find element with id $id" }
-                navigator?.pop()
+                navigator.pop()
             }
         }
 

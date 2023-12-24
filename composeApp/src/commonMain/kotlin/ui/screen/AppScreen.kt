@@ -2,8 +2,12 @@ package ui.screen
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -38,8 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
+import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
@@ -50,14 +53,15 @@ import database.Sector
 import database.Zone
 import database.database
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.coroutines.Dispatchers
 import network.connectivityStatus
 import resources.MR
 import search.Filter
 import ui.dialog.SearchFiltersDialog
+import ui.model.AppScreenModel
 import ui.model.SearchModel
 import ui.navigation.AdaptiveNavigationScaffold
 import ui.navigation.NavigationItem
+import ui.state.collectAsStateList
 import utils.unaccent
 
 @OptIn(
@@ -69,49 +73,21 @@ object AppScreen : Screen {
     override fun Content() {
         val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
-        val areas by database.areaQueries
-            .getAll()
-            .asFlow()
-            .mapToList(Dispatchers.Default)
-            .collectAsState(emptyList())
-        val zones by database.zoneQueries
-            .getAll()
-            .asFlow()
-            .mapToList(Dispatchers.Default)
-            .collectAsState(emptyList())
-        val sectors by database.sectorQueries
-            .getAll()
-            .asFlow()
-            .mapToList(Dispatchers.Default)
-            .collectAsState(emptyList())
-        val paths by database.pathQueries
-            .getAll()
-            .asFlow()
-            .mapToList(Dispatchers.Default)
-            .collectAsState(emptyList())
+        val areas by database.areaQueries.getAll().collectAsStateList()
+        val zones by database.zoneQueries.getAll().collectAsStateList()
+        val sectors by database.sectorQueries.getAll().collectAsStateList()
+        val paths by database.pathQueries.getAll().collectAsStateList()
 
         val searchModel = rememberScreenModel { SearchModel() }
 
-        val filterAreas = searchModel.filterAreas
-        val filterZones = searchModel.filterZones
-        val filterSectors = searchModel.filterSectors
-        val filterPaths = searchModel.filterPaths
-
-        var showingFiltersDialog by remember { mutableStateOf(false) }
-        if (showingFiltersDialog) {
-            SearchFiltersDialog(
-                filterAreas,
-                filterZones,
-                filterSectors,
-                filterPaths,
-                onDismissRequest = { showingFiltersDialog = false }
-            )
-        }
-
         Navigator(MainScreen) { navigator ->
-            val screen = navigator.lastItem
+            val model = navigator.rememberNavigatorScreenModel { AppScreenModel() }
 
-            val isRoot = (screen as? DepthScreen)?.let { it.depth <= 0 } ?: true
+            val screen = navigator.lastItem
+            val depth = (screen as? DepthScreen)?.depth
+            val isRoot = depth?.let { it <= 0 } ?: true
+
+            val selection by model.selection.collectAsState()
 
             AdaptiveNavigationScaffold(
                 items = listOf(
@@ -127,146 +103,32 @@ object AppScreen : Screen {
                 userScrollEnabled = isRoot,
                 navigationBarVisible = isRoot,
                 topBar = {
-                    val searchQuery by searchModel.query.collectAsState("")
                     val isSearching by searchModel.isSearching.collectAsState(false)
-
-                    fun <Type : Any> filter(
-                        list: List<Type>,
-                        filteredList: SnapshotStateList<Type?>,
-                        name: (Type) -> String,
-                        filters: List<Filter<Any>>
-                    ) {
-                        for ((index, item) in list.withIndex()) {
-                            val passesFilters = filters.all { it.show(item) }
-                            val passesQuery = name(item).unaccent().contains(searchQuery.unaccent(), true)
-                            val element = item.takeIf { passesFilters && passesQuery }
-                            if (filteredList.size > index) {
-                                filteredList[index] = element
-                            } else {
-                                filteredList.add(element)
-                            }
-                        }
-                    }
-
-                    val filteredAreas = searchModel.filteredAreas
-                    LaunchedEffect(areas, filterAreas, searchQuery) {
-                        filter(areas, filteredAreas, Area::displayName, filterAreas)
-                    }
-                    val filteredZones = searchModel.filteredZones
-                    LaunchedEffect(zones, filterZones, searchQuery) {
-                        filter(zones, filteredZones, Zone::displayName, filterZones)
-                    }
-                    val filteredSectors = searchModel.filteredSectors
-                    LaunchedEffect(sectors, filterSectors, searchQuery) {
-                        filter(sectors, filteredSectors, Sector::displayName, filterSectors)
-                    }
-                    val filteredPaths = searchModel.filteredPaths
-                    LaunchedEffect(paths, filterPaths, searchQuery) {
-                        filter(paths, filteredPaths, Path::displayName, filterPaths)
-                    }
 
                     AnimatedContent(
                         targetState = isSearching
                     ) { searching ->
                         if (searching) {
-                            SearchBar(
-                                query = searchQuery,
-                                onQueryChange = { searchModel.query.value = it },
-                                onSearch = {},
-                                active = isSearching,
-                                onActiveChange = { searchModel.isSearching.value = it },
-                                placeholder = {
-                                    Text(stringResource(MR.strings.search))
-                                },
-                                leadingIcon = {
-                                    Icon(Icons.Outlined.Search, null)
-                                },
-                                trailingIcon = {
-                                    Row {
-                                        IconButton(
-                                            onClick = { searchModel.query.value = "" }
-                                        ) {
-                                            Icon(Icons.Rounded.Close, null)
-                                        }
-                                        IconButton(
-                                            onClick = { showingFiltersDialog = true }
-                                        ) {
-                                            Icon(Icons.Rounded.FilterAlt, null)
-                                        }
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                if (searchQuery.isBlank()) {
-                                    Text(stringResource(MR.strings.search_empty))
-                                } else {
-                                    LazyColumn {
-                                        items(
-                                            items = filteredAreas
-                                        ) { area ->
-                                            if (area == null) return@items
-                                            ListItem(
-                                                headlineContent = { Text(area.displayName) },
-                                                supportingContent = { Text("Area") },
-                                                modifier = Modifier.clickable {
-                                                    navigator.push(
-                                                        ZonesScreen(area.id)
-                                                    )
-                                                    searchModel.dismiss()
-                                                }
-                                            )
-                                        }
-                                        items(
-                                            items = filteredZones
-                                        ) { zone ->
-                                            if (zone == null) return@items
-                                            ListItem(
-                                                headlineContent = { Text(zone.displayName) },
-                                                supportingContent = { Text("Zone") },
-                                                modifier = Modifier.clickable {
-                                                    navigator.push(
-                                                        SectorsScreen(zone.id)
-                                                    )
-                                                    searchModel.dismiss()
-                                                }
-                                            )
-                                        }
-                                        items(
-                                            items = filteredSectors
-                                        ) { sector ->
-                                            if (sector == null) return@items
-                                            ListItem(
-                                                headlineContent = { Text(sector.displayName) },
-                                                supportingContent = { Text("Sector") },
-                                                modifier = Modifier.clickable {
-                                                    navigator.push(
-                                                        PathsScreen(sector.id)
-                                                    )
-                                                    searchModel.dismiss()
-                                                }
-                                            )
-                                        }
-                                        items(
-                                            items = filteredPaths
-                                        ) { path ->
-                                            if (path == null) return@items
-                                            ListItem(
-                                                headlineContent = { Text(path.displayName) },
-                                                supportingContent = { Text("Path") },
-                                                modifier = Modifier.clickable {
-                                                    navigator.push(
-                                                        PathsScreen(path.parentSectorId, highlightPathId = path.id)
-                                                    )
-                                                    searchModel.dismiss()
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
+                            SearchBarLogic(areas, zones, sectors, paths, searchModel, navigator)
                         } else {
                             CenterAlignedTopAppBar(
-                                title = { Text("Escalar Alcoià i Comtat") },
+                                title = {
+                                    AnimatedContent(
+                                        targetState = selection,
+                                        transitionSpec = {
+                                            val enter = (slideInVertically { -it } + fadeIn())
+                                            val exit = (slideOutVertically { -it } + fadeOut())
+                                            enter togetherWith exit
+                                        }
+                                    ) { dataType ->
+                                        Text(
+                                            text = when {
+                                                dataType != null -> dataType.displayName
+                                                else -> "Escalar Alcoià i Comtat"
+                                            }
+                                        )
+                                    }
+                                },
                                 navigationIcon = {
                                     AnimatedVisibility(
                                         visible = !isRoot,
@@ -274,7 +136,12 @@ object AppScreen : Screen {
                                         exit = slideOutHorizontally { -it }
                                     ) {
                                         IconButton(
-                                            onClick = { navigator.pop() }
+                                            onClick = {
+                                                navigator.pop()
+                                                if (depth?.let { it <= 1 } == true) {
+                                                    model.clear()
+                                                }
+                                            }
                                         ) {
                                             Icon(Icons.Rounded.ChevronLeft, null)
                                         }
@@ -324,6 +191,166 @@ object AppScreen : Screen {
                     )
 
                     else -> Text("This is page $page")
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun SearchBarLogic(
+        areas: List<Area>,
+        zones: List<Zone>,
+        sectors: List<Sector>,
+        paths: List<Path>,
+        searchModel: SearchModel,
+        navigator: Navigator
+    ) {
+        val searchQuery by searchModel.query.collectAsState("")
+        val isSearching by searchModel.isSearching.collectAsState(false)
+
+        val filterAreas = searchModel.filterAreas
+        val filterZones = searchModel.filterZones
+        val filterSectors = searchModel.filterSectors
+        val filterPaths = searchModel.filterPaths
+
+        fun <Type : Any> filter(
+            list: List<Type>,
+            filteredList: SnapshotStateList<Type?>,
+            name: (Type) -> String,
+            filters: List<Filter<Any>>
+        ) {
+            for ((index, item) in list.withIndex()) {
+                val passesFilters = filters.all { it.show(item) }
+                val passesQuery = name(item).unaccent().contains(searchQuery.unaccent(), true)
+                val element = item.takeIf { passesFilters && passesQuery }
+                if (filteredList.size > index) {
+                    filteredList[index] = element
+                } else {
+                    filteredList.add(element)
+                }
+            }
+        }
+
+        val filteredAreas = searchModel.filteredAreas
+        LaunchedEffect(areas, filterAreas, searchQuery) {
+            filter(areas, filteredAreas, Area::displayName, filterAreas)
+        }
+        val filteredZones = searchModel.filteredZones
+        LaunchedEffect(zones, filterZones, searchQuery) {
+            filter(zones, filteredZones, Zone::displayName, filterZones)
+        }
+        val filteredSectors = searchModel.filteredSectors
+        LaunchedEffect(sectors, filterSectors, searchQuery) {
+            filter(sectors, filteredSectors, Sector::displayName, filterSectors)
+        }
+        val filteredPaths = searchModel.filteredPaths
+        LaunchedEffect(paths, filterPaths, searchQuery) {
+            filter(paths, filteredPaths, Path::displayName, filterPaths)
+        }
+
+        var showingFiltersDialog by remember { mutableStateOf(false) }
+        if (showingFiltersDialog) {
+            SearchFiltersDialog(
+                filterAreas,
+                filterZones,
+                filterSectors,
+                filterPaths,
+                onDismissRequest = { showingFiltersDialog = false }
+            )
+        }
+
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = { searchModel.query.value = it },
+            onSearch = {},
+            active = isSearching,
+            onActiveChange = { searchModel.isSearching.value = it },
+            placeholder = {
+                Text(stringResource(MR.strings.search))
+            },
+            leadingIcon = {
+                Icon(Icons.Outlined.Search, null)
+            },
+            trailingIcon = {
+                Row {
+                    IconButton(
+                        onClick = { searchModel.query.value = "" }
+                    ) {
+                        Icon(Icons.Rounded.Close, null)
+                    }
+                    IconButton(
+                        onClick = { showingFiltersDialog = true }
+                    ) {
+                        Icon(Icons.Rounded.FilterAlt, null)
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (searchQuery.isBlank()) {
+                Text(stringResource(MR.strings.search_empty))
+            } else {
+                LazyColumn {
+                    items(
+                        items = filteredAreas
+                    ) { area ->
+                        if (area == null) return@items
+                        ListItem(
+                            headlineContent = { Text(area.displayName) },
+                            supportingContent = { Text("Area") },
+                            modifier = Modifier.clickable {
+                                navigator.push(
+                                    ZonesScreen(area.id)
+                                )
+                                searchModel.dismiss()
+                            }
+                        )
+                    }
+                    items(
+                        items = filteredZones
+                    ) { zone ->
+                        if (zone == null) return@items
+                        ListItem(
+                            headlineContent = { Text(zone.displayName) },
+                            supportingContent = { Text("Zone") },
+                            modifier = Modifier.clickable {
+                                navigator.push(
+                                    SectorsScreen(zone.id)
+                                )
+                                searchModel.dismiss()
+                            }
+                        )
+                    }
+                    items(
+                        items = filteredSectors
+                    ) { sector ->
+                        if (sector == null) return@items
+                        ListItem(
+                            headlineContent = { Text(sector.displayName) },
+                            supportingContent = { Text("Sector") },
+                            modifier = Modifier.clickable {
+                                navigator.push(
+                                    PathsScreen(sector.id)
+                                )
+                                searchModel.dismiss()
+                            }
+                        )
+                    }
+                    items(
+                        items = filteredPaths
+                    ) { path ->
+                        if (path == null) return@items
+                        ListItem(
+                            headlineContent = { Text(path.displayName) },
+                            supportingContent = { Text("Path") },
+                            modifier = Modifier.clickable {
+                                navigator.push(
+                                    PathsScreen(path.parentSectorId, highlightPathId = path.id)
+                                )
+                                searchModel.dismiss()
+                            }
+                        )
+                    }
                 }
             }
         }
