@@ -1,8 +1,5 @@
 package cache
 
-import cache.Files.file
-import cache.Files.readAllBytes
-import cache.Files.write
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemPathSeparator
 

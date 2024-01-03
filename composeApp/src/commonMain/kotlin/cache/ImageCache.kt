@@ -9,13 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import cache.Files.delete
-import cache.Files.exists
-import cache.Files.isDirectory
-import cache.Files.listAllFiles
-import cache.Files.mkdirs
-import cache.Files.readAllBytes
-import cache.Files.write
 import exception.UserLeftScreenException
 import image.decodeImage
 import io.github.aakira.napier.Napier
@@ -136,9 +129,7 @@ object ImageCache {
 
         DisposableEffect(uuid) {
             if (!imageCacheDirectory.exists()) {
-                require(imageCacheDirectory.mkdirs()) {
-                    "Could not create cache directory ($imageCacheDirectory)."
-                }
+                imageCacheDirectory.mkdirs()
             }
 
             val file = imageCacheDirectory + uuid

@@ -19,12 +19,12 @@ kotlin = "1.9.20"
 kotlinx = "1.7.3"
 kotlinx-datetime = "0.5.0"
 kotlinx-json = "1.6.2"
-kotlinx-io = "0.3.0"
 ktor = "2.3.7"
 moko = "0.23.0"
 moko-graphics = "0.9.0"
 multiplatform-settings = "1.1.1"
 napier = "2.6.1"
+okio = "3.7.0"
 play-instantapps = "17.0.0"
 sqldelight = "2.0.1"
 voyager = "1.0.0"
@@ -50,7 +50,6 @@ kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
-kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlinx-serialization-json =  { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
@@ -63,6 +62,7 @@ moko-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "m
 moko-graphics = { module = "dev.icerock.moko:graphics", version.ref = "moko-graphics" }
 moko-test = { module = "dev.icerock.moko:resources-test", version.ref = "moko" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 play-instantapps = { module = "com.google.android.gms:play-services-instantapps", version.ref = "play-instantapps" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }

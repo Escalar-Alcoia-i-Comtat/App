@@ -72,8 +72,11 @@ kotlin {
 
             // KotlinX dependencies
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.serialization.json)
+
+            // Okio
+            implementation(libs.okio)
 
             // SQLDelight
             implementation(libs.sqldelight.coroutines)
@@ -124,9 +127,6 @@ kotlin {
 
                 // SQLDelight
                 implementation(libs.sqldelight.driver.native)
-
-                // KotlinX IO
-                implementation(libs.kotlinx.io.core)
             }
         }
 

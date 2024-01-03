@@ -2,8 +2,6 @@ package database
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import cache.Files.exists
-import cache.Files.mkdirs
 import cache.storageProvider
 import io.github.aakira.napier.Napier
 import java.util.Properties

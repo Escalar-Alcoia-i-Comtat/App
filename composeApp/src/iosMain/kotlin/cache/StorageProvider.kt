@@ -1,7 +1,5 @@
 package cache
 
-import cache.Files.file
-
 actual class StorageProvider {
     private val home = java.io.File(System.getProperty("user.home"))
 
