@@ -3,8 +3,8 @@ import SwiftUI
 import ComposeApp
 
 struct ComposeView: UIViewControllerRepresentable {
-    init {
-        NapierProxyKt.debugBuild()
+    init() {
+        Initialization_iosKt.debugBuild()
     }
 
     func makeUIViewController(context: Context) -> UIViewController {
