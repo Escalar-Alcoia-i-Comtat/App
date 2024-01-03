@@ -68,10 +68,6 @@ kotlin {
             // Compose - Utilities
             implementation(libs.compose.windowSizeClass)
 
-            // Compose - Maps
-            implementation(libs.compose.maps.base)
-            implementation(libs.compose.maps.utils)
-
             // Compose - Navigation
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
@@ -120,6 +116,10 @@ kotlin {
                 implementation(libs.compose.ui)
                 implementation(libs.compose.ui.tooling.preview)
 
+                // Compose - Maps
+                implementation(libs.compose.maps.base)
+                implementation(libs.compose.maps.utils)
+
                 // Ktor client
                 implementation(libs.ktor.client.android)
 
@@ -149,6 +149,12 @@ kotlin {
 
                 // SQLDelight
                 implementation(libs.sqldelight.driver.native)
+
+                // KmpIO (only used for zip)
+                implementation(libs.kmpio)
+
+                // XML Parsing
+                implementation(libs.ksoup)
             }
         }
 

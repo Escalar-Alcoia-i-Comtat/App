@@ -9,10 +9,12 @@ compose-compiler = "1.5.4"
 compose-maps = "4.3.0"
 compose-plugin = "1.5.11"
 compose-windowSizeClass = "0.3.1"
+kmpio = "0.1.5"
 kotlin = "1.9.21"
 kotlinx = "1.7.3"
 kotlinx-datetime = "0.5.0"
 kotlinx-json = "1.6.2"
+ksoup = "0.1.2"
 ktor = "2.3.7"
 moko = "0.23.0"
 moko-graphics = "0.9.0"
@@ -32,10 +34,12 @@ compose-windowSizeClass = { module = "dev.chrisbanes.material3:material3-window-
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+kmpio = { module = "io.github.skolson:kmp-io", version.ref = "kmpio" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json =  { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
+ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

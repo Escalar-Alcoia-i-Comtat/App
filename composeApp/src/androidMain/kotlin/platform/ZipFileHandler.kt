@@ -11,7 +11,7 @@ actual object ZipFileHandler {
     /**
      * Extracts the zip file stored at [file] into the given directory ([dir]).
      */
-    actual fun unzip(file: File, dir: File) {
+    actual suspend fun unzip(file: File, dir: File) {
         Napier.d { "Extracting $file into $dir..." }
         val path = file.path.toPath()
         val zipFileSystem = fileSystem.openZip(path)
