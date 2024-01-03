@@ -1,8 +1,8 @@
-import java.time.LocalDateTime
-import java.util.Properties
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import java.time.LocalDateTime
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -57,6 +57,10 @@ kotlin {
 
             // Compose - Utilities
             implementation(libs.compose.windowSizeClass)
+
+            // Compose - Maps
+            implementation(libs.compose.maps.base)
+            implementation(libs.compose.maps.utils)
 
             // Compose - Navigation
             implementation(libs.voyager.navigator)
