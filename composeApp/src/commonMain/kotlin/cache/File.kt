@@ -22,13 +22,12 @@ class File(
     private val _path: Path = path.toPath()
 
     constructor(file: File, path: String): this(
-        path.removeSuffix(PATH_SEPARATOR.toString()) +
+        file.path.removeSuffix(PATH_SEPARATOR.toString()) +
             PATH_SEPARATOR +
-            file.path.removePrefix(PATH_SEPARATOR.toString())
+            path.removePrefix(PATH_SEPARATOR.toString())
     )
 
     operator fun plus(other: File): File {
-        
         return join(other)
     }
 
