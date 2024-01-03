@@ -2,6 +2,7 @@ import java.time.LocalDateTime
 import java.util.Properties
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -34,6 +35,13 @@ kotlin {
 
             export(libs.moko.base)
             export(libs.moko.graphics) // toUIColor here
+        }
+    }
+
+    targets.withType<KotlinNativeTarget> {
+        binaries.all {
+            freeCompilerArgs += "-Xadd-light-debug=enable"
+            freeCompilerArgs += "-Xexpect-actual-classes"
         }
     }
     
