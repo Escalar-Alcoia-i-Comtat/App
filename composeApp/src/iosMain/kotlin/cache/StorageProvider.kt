@@ -1,7 +1,10 @@
 package cache
 
-actual class StorageProvider {
-    private val home = java.io.File(System.getProperty("user.home"))
+import cache.File.Companion.asFile
+import okio.FileSystem
 
-    actual val cacheDirectory: File = java.io.File(home, ".escalaralcoiaicomtat").file
+actual class StorageProvider {
+    private val temp = FileSystem.SYSTEM_TEMPORARY_DIRECTORY
+
+    actual val cacheDirectory: File = (temp / ".escalaralcoiaicomtat").asFile
 }
