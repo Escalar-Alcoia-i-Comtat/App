@@ -13,6 +13,16 @@ plugins {
     alias(libs.plugins.sqldelight)
 }
 
+fun readProperties(fileName: String): Properties {
+    val propsFile = project.rootProject.file(fileName)
+    if (!propsFile.canRead()) {
+        throw GradleException("Cannot read $fileName")
+    }
+    return Properties().apply {
+        propsFile.inputStream().use { load(it) }
+    }
+}
+
 kotlin {
     androidTarget {
         compilations.all {
@@ -174,16 +184,11 @@ android {
         versionName = "2.1.0-dev01"
         versionNameSuffix = "_instant"
 
-        val versionPropsFile = project.rootProject.file("version.properties")
-        if (!versionPropsFile.canRead()) {
-            throw GradleException("Cannot read version.properties")
-        }
-        val versionProps = Properties().apply {
-            versionPropsFile.inputStream().use {
-                load(versionPropsFile.inputStream())
-            }
-        }
-        versionCode = versionProps.getProperty("VERSION_CODE").toInt()
+        val versionProperties = readProperties("version.properties")
+        versionCode = versionProperties.getProperty("VERSION_CODE").toInt()
+
+        val localProperties = readProperties("local.properties")
+        resValue("string", "maps_api_key", localProperties.getProperty("MAPS_API_KEY"))
     }
     buildFeatures {
         compose = true
@@ -253,14 +258,7 @@ multiplatformResources {
 val increaseVersionCode = task("increaseVersionCode") {
     doFirst {
         val versionPropsFile = project.rootProject.file("version.properties")
-        if (!versionPropsFile.canRead()) {
-            throw GradleException("Cannot read version.properties")
-        }
-        val versionProps = Properties().apply {
-            versionPropsFile.inputStream().use {
-                load(versionPropsFile.inputStream())
-            }
-        }
+        val versionProps = readProperties(versionPropsFile.name)
         val code = versionProps.getProperty("VERSION_CODE").toInt() + 1
         versionProps["VERSION_CODE"] = code.toString()
         versionPropsFile.outputStream().use {

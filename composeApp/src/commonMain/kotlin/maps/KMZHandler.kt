@@ -73,6 +73,29 @@ object KMZHandler {
         return file
     }
 
+    private val hrefRegex = "<href>[\\w/.-]+</href>".toRegex()
+
+    private fun replaceImages(dataDir: File) {
+        val kmlFile = File(dataDir, "doc.kml")
+        var data = kmlFile.readAllBytes().decodeToString()
+        val matches = hrefRegex.findAll(data)
+        for (match in matches) {
+            val path = match.value.substring("<href>".length).substringBeforeLast("</href>")
+            // Check if already replaced
+            if (path.startsWith('/')) continue
+
+            val file = File(dataDir, path)
+            if (file.exists()) {
+                data = data.replace(match.value, "<href>$file</href>")
+                Napier.v { "Replaced icon $path" }
+            } else {
+                Napier.v { "Got a non existing icon (${path}): $file" }
+            }
+        }
+        kmlFile.delete()
+        kmlFile.write(data.encodeToByteArray())
+    }
+
     /**
      * Downloads the KMZ stored in the given URL, decompresses it, and returns it in a way that can
      * be loaded by Maps UI engines.
@@ -81,12 +104,14 @@ object KMZHandler {
      */
     suspend fun load(
         uuid: String,
+        replaceImagePaths: Boolean = true,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): File {
         val kmzFile = download(uuid, progress)
         val dataDir = File(kmzCacheDirectory, "${uuid}_data")
         if (dataDir.exists()) dataDir.delete()
         ZipFileHandler.unzip(kmzFile, dataDir)
+        if (replaceImagePaths) replaceImages(dataDir)
         return File(dataDir, "doc.kml")
     }
 }
