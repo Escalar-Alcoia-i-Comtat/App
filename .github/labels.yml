@@ -1,0 +1,90 @@
+---
+# The repository labels will be automatically configured using this file and
+# the GitHub Action https://github.com/marketplace/actions/github-labeler.
+- name: bug
+  description: Something isn't working
+  color: d73a4a
+
+- name: documentation
+  description: Improvements or additions to documentation
+  color: 0075ca
+
+- name: duplicate
+  description: This issue or pull request already exists
+  color: cfd3d7
+
+- name: feature
+  description: New feature or request
+  color: a2eeef
+
+- name: dependency
+  description: Adding or removing dependencies
+  color: fcba03
+
+- name: github_actions
+  description: Pull requests that update Github actions/workflow code
+  color: "000000"
+
+- name: good first issue
+  description: Good for newcomers
+  color: 7057ff
+
+- name: help wanted
+  description: Extra attention is needed
+  color: 008672
+
+- name: invalid
+  description: This doesn't seem right
+  color: e4e669
+
+- name: performance
+  description: Performance
+  color: "016175"
+
+- name: question
+  description: Further information is requested
+  color: d876e3
+
+- name: refactoring
+  description: Refactoring
+  color: ef67c4
+
+- name: removal
+  description: Removals and Deprecations
+  color: 9ae7ea
+
+- name: wontfix
+  description: This will not be worked on
+  color: ffffff
+
+- name: cleanup
+  description: When code cleanup is done
+  color: c1e050
+
+- name: ios
+  description: Updates to the iOS configuration or specific docode
+  color: 292b2a
+
+- name: android
+  description: Updates to Android-specific code
+  color: 1e8f18
+
+- name: testing
+  description: Updates to the tests
+  color: 19a81e
+
+- name: detekt
+  description: Updates to the detekt configuration
+  color: 8a290b
+
+- name: gradle
+  description: Updates to gradle files
+  color: 0c5c09
+
+- name: dependencies
+  description: Updates to libraries
+  color: 9a08fc
+
+- name: dependent
+  description: This issue or PR depends on another one
+  color: cdcfd1
