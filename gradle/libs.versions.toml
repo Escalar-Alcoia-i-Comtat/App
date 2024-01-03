@@ -19,6 +19,7 @@ kotlin = "1.9.20"
 kotlinx = "1.7.3"
 kotlinx-datetime = "0.5.0"
 kotlinx-json = "1.6.2"
+kotlinx-io = "0.3.0"
 ktor = "2.3.7"
 moko = "0.23.0"
 moko-graphics = "0.9.0"
@@ -49,6 +50,7 @@ kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlinx-serialization-json =  { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }

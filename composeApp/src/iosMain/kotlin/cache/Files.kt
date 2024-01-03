@@ -1,16 +1,20 @@
 package cache
 
 import cache.Files.file
+import cache.Files.readAllBytes
+import cache.Files.write
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemPathSeparator
 
 actual object Files {
-    actual val separator: Char = java.io.File.separatorChar
+    actual val separator: Char = SystemPathSeparator
 
-    actual val File.isDirectory: Boolean get() = file.isDirectory
+    actual val File.isDirectory: Boolean get() = TODO()
 
-    private val File.file: java.io.File get() = java.io.File(path)
+    private val File.ioPath: Path get() = Path(path)
 
     actual fun File.write(bytes: ByteArray) {
-        file.writeBytes(bytes)
+        ioPath.write(bytes)
     }
 
     actual fun File.readAllBytes(): ByteArray {

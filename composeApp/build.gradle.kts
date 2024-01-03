@@ -124,6 +124,9 @@ kotlin {
 
                 // SQLDelight
                 implementation(libs.sqldelight.driver.native)
+
+                // KotlinX IO
+                implementation(libs.kotlinx.io.core)
             }
         }
 
