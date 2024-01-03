@@ -19,16 +19,17 @@ actual fun launchPoint(point: LatLng, label: String?): Boolean {
     // see: https://developers.google.com/maps/documentation/urls/ios-urlscheme
 
     // Check whether Google Maps is installed
-    if (UIApplication.sharedApplication.canOpenURL(NSURL("comgooglemaps://"))){
+    val url = if (
+        UIApplication.sharedApplication.canOpenURL(NSURL.URLWithString("comgooglemaps://")!!)
+    ){
         // Google Maps is available, launch in the app
-        UIApplication.sharedApplication.openURL(
-            NSURL("comgooglemaps://?center=${point.longitude},${point.latitude}&zoom=$DEFAULT_ZOOM")
-        )
+        "comgooglemaps://?center=${point.longitude},${point.latitude}&zoom=$DEFAULT_ZOOM"
     } else {
         // Google Maps is not installed, launch in the browser
-        UIApplication.sharedApplication.openURL(
-            NSURL("https://www.google.com/maps/@${point.longitude},${point.latitude},${DEFAULT_ZOOM}z")
-        )
+        "https://www.google.com/maps/@${point.longitude},${point.latitude},${DEFAULT_ZOOM}z"
     }
-    return true
+
+    return UIApplication.sharedApplication.openURL(
+        NSURL.URLWithString(url)!!
+    )
 }
