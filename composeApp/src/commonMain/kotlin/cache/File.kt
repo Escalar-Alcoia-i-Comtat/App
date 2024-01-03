@@ -13,7 +13,7 @@ class File(
 
         val Path.asFile: File get() = File(toString())
     }
-    
+
     /**
      * Obtains the last part of [path].
      */
@@ -21,7 +21,7 @@ class File(
 
     private val _path: Path = path.toPath()
 
-    constructor(file: File, path: String): this(
+    constructor(file: File, path: String) : this(
         file.path.removeSuffix(PATH_SEPARATOR.toString()) +
             PATH_SEPARATOR +
             path.removePrefix(PATH_SEPARATOR.toString())
@@ -53,6 +53,8 @@ class File(
 
     val isDirectory: Boolean get() = fileSystem.metadataOrNull(_path)?.isDirectory ?: false
 
+    val parent: File get() = File(path.substringBeforeLast('/'))
+
     fun write(bytes: ByteArray) {
         fileSystem.sink(_path).use { sink ->
             sink.buffer().use { bufferedSink ->
@@ -68,7 +70,8 @@ class File(
     fun exists(): Boolean = fileSystem.exists(_path)
 
     fun delete() {
-        fileSystem.delete(_path)
+        if (isDirectory) fileSystem.deleteRecursively(_path)
+        else fileSystem.delete(_path)
     }
 
     fun mkdirs() {
