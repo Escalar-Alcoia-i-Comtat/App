@@ -7,16 +7,12 @@ import platform.MapKit.MKMapView
 interface Placemark {
     companion object {
         fun parse(placemark: Element): Placemark? {
-            val point = placemark.getElementsByTag("Point").firstOrNull()
-            return if (point != null) {
-                Point(
-                    placemark.getElementsByTag("name").first()!!.text(),
-                    placemark.getElementsByTag("name").firstOrNull()?.text(),
-                    placemark.getElementsByTag("name").firstOrNull()?.text(),
-                    point.getElementsByTag("coordinates").first()!!.text()
-                )
-            } else {
-                null
+            val point = Point.parse(placemark)
+            val polygon = Polygon.parse(placemark)
+            return when {
+                point != null -> point
+                polygon != null -> polygon
+                else -> null
             }
         }
     }
