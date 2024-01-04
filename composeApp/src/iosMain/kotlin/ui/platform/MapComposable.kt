@@ -49,8 +49,11 @@ private suspend inline fun loadKMZ(
     val dataDir = kmlFile.parent
     val xml = Ksoup.parse(kmlString)
     val document = xml.root().getElementsByTag("Document")[0]
-    val styles = document.getElementsByTag("Style").mapNotNull(Style::parse)
+    val styles = document.getElementsByTag("Style")
+        .also { Napier.d { "Processing ${it.size} style elements..." } }
+        .mapNotNull(Style::parse)
     val placemarks = document.getElementsByTag("Folder")
+        .also { Napier.d { "Processing ${it.size} folders..." } }
         .flatMap { folder ->
             folder.getElementsByTag("Placemark").map { Placemark.parse(it) }
         }
@@ -133,13 +136,13 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
             }
         },
         update = { mapView ->
-            // Clear all annotations
-            Napier.d { "Removing ${mapView.annotations.size} annotations..." }
-            for (annotation in mapView.annotations) {
-                mapView.removeAnnotation(annotation as MKAnnotationProtocol)
-            }
-
             mapData?.let { data ->
+                // Clear all annotations
+                Napier.d { "Removing ${mapView.annotations.size} annotations..." }
+                for (annotation in mapView.annotations) {
+                    mapView.removeAnnotation(annotation as MKAnnotationProtocol)
+                }
+
                 val points = mutableListOf<Pair<Double, Double>>()
 
                 Napier.d { "Loaded ${data.styles.size} styles." }

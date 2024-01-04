@@ -1,14 +1,20 @@
 package map
 
+import io.github.aakira.napier.Napier
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.interpretCPointer
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.pointed
+import map.utils.findById
+import platform.CoreGraphics.CGRect
+import platform.CoreGraphics.CGRectMake
 import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
+import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
+import platform.UIKit.UIImage
 
 @OptIn(ExperimentalForeignApi::class)
 data class Point(
@@ -22,20 +28,29 @@ data class Point(
 
     val coordinate = CLLocationCoordinate2DMake(latitude, longitude)
 
-    override fun addToPoints(list: MutableList<CLLocationCoordinate2D>) {
-        val location = interpretCPointer<CLLocationCoordinate2D>(coordinate.objcPtr())!!
+    override fun addToPoints(list: MutableList<Pair<Double, Double>>) {
         list.add(
-            location.pointed
+            latitude to longitude
         )
     }
 
     @ExperimentalForeignApi
-    override fun addToMap(mapView: MKMapView) {
+    override fun addToMap(mapView: MKMapView, styles: List<Style>) {
+        Napier.d(tag = "Point") { "Adding marker at $latitude,$longitude ($name) to map." }
         val annotation = MKPointAnnotation(
             coordinate = coordinate,
             title = name,
             subtitle = description
         )
+        styleUrl?.let(styles::findById)?.takeIf { it is IconStyle }?.let { style ->
+            style as IconStyle
+            Napier.d { "Setting image for $name: ${style.iconHref}" }
+            val annotationView = MKAnnotationView(annotation, name).apply {
+                image = UIImage.imageNamed("")
+                // frame = CGRectMake(x = 0.0, y = 0.0, width = 25.0, height = 25.0)
+            }
+        }
+        mapView.viewForAnnotation(annotation)
         mapView.addAnnotation(annotation)
     }
 }

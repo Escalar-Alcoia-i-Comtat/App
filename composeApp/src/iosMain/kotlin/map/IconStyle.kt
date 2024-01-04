@@ -10,15 +10,12 @@ data class IconStyle(
 ): Style {
     companion object: StyleParser<IconStyle> {
         override fun parse(style: Element): IconStyle? {
-            val iconStyle = style.getElementsByTag("IconStyle").firstOrNull()
-            return if (iconStyle != null) {
+            return style.getElementsByTag("IconStyle").firstOrNull()?.let { element ->
                 IconStyle(
                     style.attr("id"),
-                    iconStyle.getElementsByTag("scale")[0].value().toFloat(),
-                    iconStyle.getElementsByTag("Icon")[0].getElementsByTag("href")[0].value()
+                    element.getElementsByTag("scale")[0].value().toFloat(),
+                    element.getElementsByTag("Icon")[0].getElementsByTag("href")[0].value()
                 )
-            } else {
-                null
             }
         }
     }
