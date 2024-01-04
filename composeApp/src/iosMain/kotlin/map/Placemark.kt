@@ -1,7 +1,6 @@
 package map
 
 import com.fleeksoft.ksoup.nodes.Element
-import platform.CoreLocation.CLLocationCoordinate2D
 import platform.MapKit.MKMapView
 
 interface Placemark {
@@ -25,7 +24,7 @@ interface Placemark {
     val description: String?
     val styleUrl: String?
 
-    fun addToPoints(list: MutableList<CLLocationCoordinate2D>)
+    fun addToPoints(list: MutableList<Pair<Double, Double>>)
 
-    fun addToMap(mapView: MKMapView)
+    fun addToMap(mapView: MKMapView, styles: List<Style>)
 }
