@@ -1,6 +1,10 @@
 name: Create Labels
 
-on: push
+on:
+  push:
+    paths:
+      - .github/workflows/create-labels.yml
+      - .github/labels.yml
 
 jobs:
   labeler:

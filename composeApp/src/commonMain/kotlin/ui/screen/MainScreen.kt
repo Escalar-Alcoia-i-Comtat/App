@@ -18,21 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import cache.ImageCache
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import data.Area
 import database.SettingsKeys
-import database.database
 import database.settings
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
@@ -42,30 +37,19 @@ import kotlinx.coroutines.launch
 import sync.DataSync
 import sync.SyncProcess
 import ui.list.DataCard
+import ui.model.MainScreenModel
 
+@OptIn(ExperimentalFoundationApi::class)
 object MainScreen: Screen {
-    var navigator: Navigator? = null
-        private set
-
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.current.also { navigator = it }
-
         val status by DataSync.status
 
-        val areas by database.areaQueries
-            .getAll()
-            .asFlow()
+        val screenModel = rememberScreenModel { MainScreenModel() }
+
+        val areas by screenModel.areas
             .mapToList(Dispatchers.Default)
             .collectAsState(emptyList())
-
-        /**
-         * If true, a warning will be shown notifying the user that a network connection is not
-         * available, and that no data is downloaded locally, so it's needed to connect at some
-         * point to fetch the data.
-         */
-        var connectionNotAvailableWarning by remember { mutableStateOf(false) }
 
         // TODO: when connection is available, and connectionNotAvailableWarning is true, run sync
         LaunchedEffect(Unit) {
@@ -82,7 +66,7 @@ object MainScreen: Screen {
                         // be updated when a connection is available
                         Napier.i { "No connection is available. Won't synchronize." }
                     } else {
-                        connectionNotAvailableWarning = true
+                        screenModel.showConnectionNotAvailableWarning.emit(true)
                     }
                 }
             }
@@ -99,6 +83,22 @@ object MainScreen: Screen {
                 CircularProgressIndicator()
             }
         }
+
+        AreasList(screenModel, status)
+    }
+
+    @Composable
+    fun AreasList(
+        model: MainScreenModel,
+        status: SyncProcess.Status
+    ) {
+        val navigator = LocalNavigator.current
+
+        val connectionNotAvailableWarning by model.showConnectionNotAvailableWarning.collectAsState(false)
+
+        val areas by model.areas
+            .mapToList(Dispatchers.Default)
+            .collectAsState(emptyList())
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
