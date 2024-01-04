@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import map.Placemark
+import map.Style
 import maps.KMZHandler
 import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
@@ -34,123 +35,89 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-private suspend inline fun loadKMZ(kmzUUID: String, onDocumentLoaded: (List<Placemark>) -> Unit) {
+data class MapData(
+    val placemarks: List<Placemark>,
+    val styles: List<Style>
+)
+
+private suspend inline fun loadKMZ(
+    kmzUUID: String,
+    onDocumentLoaded: (data: MapData) -> Unit
+) {
     val kmlFile = KMZHandler.load(kmzUUID, replaceImagePaths = false)
     val kmlString = kmlFile.readAllBytes().decodeToString()
     val dataDir = kmlFile.parent
     val xml = Ksoup.parse(kmlString)
     val document = xml.root().getElementsByTag("Document")[0]
+    val styles = document.getElementsByTag("Style").mapNotNull(Style::parse)
     val placemarks = document.getElementsByTag("Folder")
         .flatMap { folder ->
             folder.getElementsByTag("Placemark").map { Placemark.parse(it) }
         }
         .filterNotNull()
-    onDocumentLoaded(placemarks)
+    onDocumentLoaded(
+        MapData(placemarks, styles)
+    )
 }
 
-fun degreesToRadians(degrees: Double): Double = PI * degrees / 180.0
-
-fun radiansToDegrees(radians: Double): Double = radians * 180.0 / PI
-
-fun midPoint(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Pair<Double, Double> {
-    val dLon = degreesToRadians(lon2 - lon1)
-
-    val lat1r = degreesToRadians(lat1)
-    val lat2r = degreesToRadians(lat2)
-    val lon1r = degreesToRadians(lon1)
-
-    val bx = cos(lat2) * cos(dLon)
-    val by = cos(lat2) * sin(dLon)
-
-    val lat3 = atan2(sin(lat1r) + sin(lat2r), sqrt((cos(lat1r) + bx) * (cos(lat1r) + bx) + by * by))
-    val lon3 = lon1r + atan2(by, cos(lat1r) + bx)
-    return radiansToDegrees(lat3) to radiansToDegrees(lon3)
-}
-
-@OptIn(ExperimentalForeignApi::class)
-private fun computeCentroid(points: List<CLLocationCoordinate2D>): CLLocationCoordinate2D? {
-    if (points.isEmpty()) return null
-
-    var latitude = points[0].latitude
-    var longitude = points[1].longitude
-
-    for (point in points) {
-        val (lat, lon) = midPoint(latitude, longitude, point.latitude, point.longitude)
-        latitude = lat
-        longitude = lon
-    }
-
-    val center = CLLocationCoordinate2DMake(latitude, longitude)
-    return interpretCPointer<CLLocationCoordinate2D>(center.objcPtr())!!.pointed
-}
-
-@OptIn(ExperimentalForeignApi::class)
-fun transform(c: CLLocationCoordinate2D): CLLocationCoordinate2D {
-    return if (c.longitude < 0) {
-        val p = CLLocationCoordinate2DMake(c.latitude, 360 + c.longitude)
-        interpretCPointer<CLLocationCoordinate2D>(p.objcPtr())!!.pointed
+fun transform(c: Pair<Double, Double>): Pair<Double, Double> {
+    return if (c.second < 0) {
+        c.first to (360 + c.second)
     } else {
         c
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
-fun inverseTransform(c: CLLocationCoordinate2D): CLLocationCoordinate2D {
-    return if (c.longitude > 180) {
-        val p = CLLocationCoordinate2DMake(c.latitude, -360 + c.longitude)
-        interpretCPointer<CLLocationCoordinate2D>(p.objcPtr())!!.pointed
+fun inverseTransform(c: Pair<Double, Double>): Pair<Double, Double> {
+    return if (c.second > 180) {
+        c.first to (-360 + c.second)
     } else {
         c
     }
 }
 
 @ExperimentalForeignApi
-fun regionForPoints(coordinates: List<CLLocationCoordinate2D>): CValue<MKCoordinateRegion>? {
+fun regionForPoints(coordinates: List<Pair<Double, Double>>): CValue<MKCoordinateRegion>? {
     return if (coordinates.isEmpty()) {
         null
     } else if (coordinates.size == 1) {
         val center = coordinates[0]
 
         MKCoordinateRegionMake(
-            CLLocationCoordinate2DMake(center.latitude, center.longitude),
+            CLLocationCoordinate2DMake(center.first, center.second),
             MKCoordinateSpanMake(1.0, 1.0)
         )
     } else {
-        /*val transformed = coordinates.map(::transform)
-        val minLat = transformed.minOf { it.latitude }
-        val maxLat = transformed.maxOf { it.latitude }
-        val minLon = transformed.minOf { it.longitude }
-        val maxLon = transformed.maxOf { it.longitude }
+        val transformed = coordinates.map(::transform)
+        val minLat = transformed.minOf { it.first }
+        val maxLat = transformed.maxOf { it.first }
+        val minLon = transformed.minOf { it.second }
+        val maxLon = transformed.maxOf { it.second }
 
         val latitudeDelta = maxLat - minLat
         val longitudeDelta = maxLon - minLon
-        val span = MKCoordinateSpanMake(latitudeDelta, longitudeDelta)
+        val span = MKCoordinateSpanMake(
+            latitudeDelta,
+            longitudeDelta
+        )
         val center = inverseTransform(
-            interpretCPointer<CLLocationCoordinate2D>(
-                CLLocationCoordinate2DMake(
-                    maxLat - latitudeDelta / 2,
-                    maxLon - longitudeDelta / 2
-                ).objcPtr()
-            )!!.pointed
-        )*/
+            (maxLat - latitudeDelta / 2) to (maxLon - longitudeDelta / 2)
+        )
 
-        val span = MKCoordinateSpanMake(1.0, 1.0)
-        val center = computeCentroid(coordinates)!!
-
-        // FIXME - Camera movement. It's not centered correctly
-        Napier.i { "Center is on ${center.latitude},${center.longitude}" }
-        MKCoordinateRegionMake(CLLocationCoordinate2DMake(center.latitude, center.longitude), span)
+        val (lat, lon) = center
+        Napier.i { "Center is on ${lat},${lon}" }
+        MKCoordinateRegionMake(CLLocationCoordinate2DMake(lat, lon), span)
     }
 }
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
-    var placemarks by remember { mutableStateOf<List<Placemark>?>(null) }
+    var mapData by remember { mutableStateOf<MapData?>(null) }
 
     LaunchedEffect(kmzUUID) {
         if (kmzUUID != null) CoroutineScope(Dispatchers.IO).launch {
-            loadKMZ(kmzUUID) { placemarks = it }
+            loadKMZ(kmzUUID) { mapData = it }
         }
     }
 
@@ -172,12 +139,14 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
                 mapView.removeAnnotation(annotation as MKAnnotationProtocol)
             }
 
-            placemarks?.let { list ->
-                val points = mutableListOf<CLLocationCoordinate2D>()
+            mapData?.let { data ->
+                val points = mutableListOf<Pair<Double, Double>>()
 
-                for (item in list) {
-                    item.addToPoints(points)
-                    item.addToMap(mapView)
+                Napier.d { "Loaded ${data.styles.size} styles." }
+                Napier.d { "Drawing ${data.placemarks.size} placemarks..." }
+                for (placemark in data.placemarks) {
+                    placemark.addToPoints(points)
+                    placemark.addToMap(mapView, data.styles)
                 }
 
                 regionForPoints(points)?.let {
