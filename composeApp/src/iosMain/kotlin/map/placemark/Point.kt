@@ -1,15 +1,10 @@
-package map
+package map.placemark
 
 import io.github.aakira.napier.Napier
-import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.interpretCPointer
-import kotlinx.cinterop.objcPtr
-import kotlinx.cinterop.pointed
+import map.style.IconStyle
+import map.style.Style
 import map.utils.findById
-import platform.CoreGraphics.CGRect
-import platform.CoreGraphics.CGRectMake
-import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKMapView

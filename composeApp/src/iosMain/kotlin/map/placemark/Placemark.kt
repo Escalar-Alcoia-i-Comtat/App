@@ -1,6 +1,7 @@
-package map
+package map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
+import map.style.Style
 import platform.MapKit.MKMapView
 
 interface Placemark {

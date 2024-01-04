@@ -1,4 +1,4 @@
-package map
+package map.style
 
 import com.fleeksoft.ksoup.nodes.Element
 

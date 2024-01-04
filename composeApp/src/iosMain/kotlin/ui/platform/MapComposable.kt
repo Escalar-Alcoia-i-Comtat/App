@@ -12,28 +12,19 @@ import com.fleeksoft.ksoup.Ksoup
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.interpretCPointer
-import kotlinx.cinterop.objcPtr
-import kotlinx.cinterop.pointed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
-import map.Placemark
-import map.Style
+import map.placemark.Placemark
+import map.style.Style
 import maps.KMZHandler
-import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKAnnotationProtocol
 import platform.MapKit.MKCoordinateRegion
 import platform.MapKit.MKCoordinateRegionMake
 import platform.MapKit.MKCoordinateSpanMake
 import platform.MapKit.MKMapView
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 data class MapData(
     val placemarks: List<Placemark>,
