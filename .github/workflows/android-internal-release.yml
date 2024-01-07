@@ -39,6 +39,9 @@ jobs:
           echo ${{ secrets.KEYSTORE_BASE64 }} > keystore.txt
           base64 --decode keystore.txt > keystore.jks
 
+      - name: Write local.properties
+        run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
+
       - name: Build AAB
         id: build_aab
         env:

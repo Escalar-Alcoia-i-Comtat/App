@@ -18,5 +18,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
+      - name: Write local.properties
+        run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
+
       - name: Execute Gradle build
         run: ./gradlew build
