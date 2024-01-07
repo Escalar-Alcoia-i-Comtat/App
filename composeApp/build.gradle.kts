@@ -15,6 +15,9 @@ plugins {
 
 fun readProperties(fileName: String): Properties {
     val propsFile = project.rootProject.file(fileName)
+    if (!propsFile.exists()) {
+        throw GradleException("$fileName doesn't exist")
+    }
     if (!propsFile.canRead()) {
         throw GradleException("Cannot read $fileName")
     }
