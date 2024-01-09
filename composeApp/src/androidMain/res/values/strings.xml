@@ -1,8 +1,17 @@
 <resources>
     <string name="app_name">Escalar Alcoia i Comtat</string>
 
+    <string name="choose">Choose</string>
+
     <string name="link_view_area">View Area</string>
     <string name="link_view_zone">View Zone</string>
     <string name="link_view_sector">View Sector</string>
     <string name="link_view_path">View Path</string>
+
+    <string name="gender_masculine">Masculine</string>
+    <string name="gender_feminine">Feminine</string>
+    <string name="gender_neuter">Neuter</string>
+
+    <string name="intro_0_title">Hello!</string>
+    <string name="intro_0_message">How do you prefer that we refer to you?</string>
 </resources>
