@@ -37,7 +37,7 @@ import ui.reusable.icon
 
 @OptIn(ExperimentalFoundationApi::class)
 class IntroScreen : Screen {
-    private val pages: List<@Composable () -> Unit> get() = listOfNotNull(
+    private val pages: List<@Composable () -> Unit> = listOfNotNull(
         *IntroScreenPages.pages,
         {
             IntroPage<Any>(
@@ -96,21 +96,13 @@ class IntroScreen : Screen {
 
         val pagerState = rememberPagerState { pages.size }
 
-        LaunchedEffect(Unit) {
-            settings.addBooleanListener(SettingsKeys.SHOWN_INTRO, false) { shownIntro ->
-                Napier.i { "Shown Intro: $shownIntro" }
-                if (shownIntro) {
-                    navigator?.push(MainScreen)
-                }
-            }
-        }
-
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
                         if (pagerState.currentPage + 1 >= pages.size) {
                             settings.putBoolean(SettingsKeys.SHOWN_INTRO, true)
+                            navigator?.push(MainScreen)
                         } else scope.launch {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
@@ -129,7 +121,10 @@ class IntroScreen : Screen {
                     .padding(paddingValues)
             ) {
                 TextButton(
-                    onClick = { settings.putBoolean(SettingsKeys.SHOWN_INTRO, true) },
+                    onClick = {
+                        settings.putBoolean(SettingsKeys.SHOWN_INTRO, true)
+                        navigator?.push(MainScreen)
+                    },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 8.dp, end = 8.dp)
