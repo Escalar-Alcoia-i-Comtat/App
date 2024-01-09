@@ -18,11 +18,10 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.toByteArray
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import network.Backend
 import network.response.data.FileRequestData
+import platform.ioDispatcher
 
 object ImageCache {
     private val client = HttpClient()
@@ -136,14 +135,14 @@ object ImageCache {
 
             Napier.v(tag = "ImageCache-$uuid") { "$file" }
 
-            val job = CoroutineScope(Dispatchers.IO).launch {
+            val job = CoroutineScope(ioDispatcher).launch {
                 if (file.exists()) {
                     Napier.d(tag = "ImageCache-$uuid") { "Already cached, sending bytes..." }
                     val bytes = file.readAllBytes()
                     state.value = bytes.decodeImage()
                 }
 
-                if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
+                if (!file.exists() || !alreadyFetchedUpdate) launch(ioDispatcher) {
                     try {
                         Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
                         val fileRequest = Backend.requestFile(uuid, onProgressUpdate)

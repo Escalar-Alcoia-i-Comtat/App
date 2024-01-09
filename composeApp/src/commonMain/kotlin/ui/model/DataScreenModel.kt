@@ -6,9 +6,9 @@ import data.DataType
 import data.DataTypeWithImage
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import platform.ioDispatcher
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
     private val appScreenModel: AppScreenModel,
@@ -20,7 +20,7 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
 
     val notFound = MutableStateFlow(false)
 
-    fun load(id: Long) = screenModelScope.launch(Dispatchers.IO) {
+    fun load(id: Long) = screenModelScope.launch(ioDispatcher) {
         appScreenModel.selection.emit(null)
         val dbChildren = childrenQuery(id)
         children.emit(dbChildren)

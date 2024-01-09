@@ -1,8 +1,8 @@
 package database
 
-import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.PreferencesSettings
+import com.russhwolf.settings.Settings
 
-actual val settings: ObservableSettings by lazy {
+actual val settings: Settings by lazy {
     PreferencesSettings.Factory().create("escalaralcoiaicomtat")
 }

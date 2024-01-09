@@ -32,9 +32,9 @@ import database.settings
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import platform.BackHandler
+import platform.ioDispatcher
 import sync.DataSync
 import sync.SyncProcess
 import ui.composition.LocalLifecycleManager
@@ -57,7 +57,7 @@ object MainScreen: Screen {
 
         // TODO: when connection is available, and connectionNotAvailableWarning is true, run sync
         LaunchedEffect(Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(ioDispatcher).launch {
                 try {
                     DataSync.start()
 

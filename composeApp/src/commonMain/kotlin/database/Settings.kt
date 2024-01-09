@@ -1,8 +1,8 @@
 package database
 
-import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.Settings
 
-expect val settings: ObservableSettings
+expect val settings: Settings
 
 object SettingsKeys {
     /**

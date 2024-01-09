@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import app.cash.sqldelight.Query
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import platform.ioDispatcher
 
 @Composable
 fun <RowType: Any> Query<RowType>.collectAsStateList(): State<List<RowType>> {
@@ -23,7 +23,7 @@ fun <RowType: Any> Query<RowType>.collectAsStateList(): State<List<RowType>> {
         }
         addListener(listener)
 
-        coroutineScope.launch(Dispatchers.IO) {
+        coroutineScope.launch(ioDispatcher) {
             // Update the default value with the current list entries
             state.value = executeAsList()
         }

@@ -23,6 +23,11 @@ kotlin {
     }
     
     jvm("desktop")
+
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
     
     listOf(
         iosX64(),
@@ -68,7 +73,8 @@ kotlin {
             api(libs.moko.compose)
 
             // Compose - Zoomable
-            implementation(libs.zoomable)
+            // FIXME: Compatibility with web
+            // implementation(libs.zoomable)
 
             // Logging library
             implementation(libs.napier)
@@ -84,7 +90,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
 
             // Okio
-            implementation(libs.okio)
+            implementation(libs.okio.base)
 
             // SQLDelight
             implementation(libs.sqldelight.coroutines)
@@ -105,6 +111,9 @@ kotlin {
 
                 implementation(libs.compose.ui)
                 implementation(libs.compose.ui.tooling.preview)
+
+                // Compose - Zoomable
+                implementation(libs.zoomable)
 
                 // Ktor client
                 implementation(libs.ktor.client.android)
@@ -130,6 +139,9 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
 
             dependencies {
+                // Compose - Zoomable
+                implementation(libs.zoomable)
+
                 // Ktor client
                 implementation(libs.ktor.client.darwin)
 
@@ -144,6 +156,9 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
 
+                // Compose - Zoomable
+                implementation(libs.zoomable)
+
                 // Ktor client
                 implementation(libs.ktor.client.java)
 
@@ -151,6 +166,25 @@ kotlin {
                 implementation(libs.sqldelight.driver.sqlite)
             }
         }
+
+        val jsMain by getting {
+            dependsOn(commonMain.get())
+            dependencies {
+                // Okio
+                implementation(libs.okio.node)
+
+                // SQLDelight
+                implementation(libs.sqldelight.driver.sqljs)
+                implementation(npm("sql.js", "1.6.2"))
+                implementation(devNpm("copy-webpack-plugin", "9.1.0"))
+
+                // Ktor client
+                implementation(libs.ktor.client.javascript)
+            }
+        }
+        /*val wasmJsMain by getting {
+            dependsOn(jsWasmMain)
+        }*/
     }
 }
 
