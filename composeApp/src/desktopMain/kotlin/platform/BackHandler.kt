@@ -1,0 +1,30 @@
+package platform
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
+
+/**
+ * Set to true when the user has made the "back" gesture.
+ */
+val backEventReceiver = MutableStateFlow(false)
+
+@Composable
+actual fun BackHandler(enabled: Boolean, onBack: () -> Unit) {
+    val hasGoneBack by backEventReceiver.collectAsState(false)
+
+    LaunchedEffect(hasGoneBack) {
+        if (hasGoneBack && enabled) {
+            onBack()
+            // Set back to false
+            synchronized(backEventReceiver) {
+                if (backEventReceiver.value) runBlocking {
+                    backEventReceiver.emit(false)
+                }
+            }
+        }
+    }
+}
