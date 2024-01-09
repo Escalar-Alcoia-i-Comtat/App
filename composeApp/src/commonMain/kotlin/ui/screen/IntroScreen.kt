@@ -30,8 +30,10 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
+import platform.BackHandler
 import platform.IntroScreenPages
 import resources.MR
+import ui.composition.LocalLifecycleManager
 import ui.reusable.IntroPage
 import ui.reusable.icon
 
@@ -91,10 +93,15 @@ class IntroScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.current
+        val lifecycleManager = LocalLifecycleManager.current
 
         val scope = rememberCoroutineScope()
 
         val pagerState = rememberPagerState { pages.size }
+
+        BackHandler {
+            lifecycleManager.finish()
+        }
 
         Scaffold(
             floatingActionButton = {
