@@ -1,6 +1,7 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.time.LocalDateTime
 import java.util.Properties
 
@@ -25,7 +26,27 @@ kotlin {
     jvm("desktop")
 
     js(IR) {
-        browser()
+        moduleName = "escalaralcoiaicomtat"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "escalaralcoiaicomtat.js"
+
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    // Uncomment and configure this if you want to open a browser different from the system default
+                    // open = mapOf(
+                    //     "app" to mapOf(
+                    //         "name" to "google chrome"
+                    //     )
+                    // )
+
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(project.rootDir.path)
+                        add(project.rootDir.path + "/composeApp/")
+                    }
+                }
+            }
+        }
         binaries.executable()
     }
     
@@ -176,6 +197,7 @@ kotlin {
                 // SQLDelight
                 implementation(libs.sqldelight.driver.sqljs)
                 implementation(npm("sql.js", "1.6.2"))
+                // implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.0.1"))
                 implementation(devNpm("copy-webpack-plugin", "9.1.0"))
 
                 // Ktor client
@@ -268,6 +290,10 @@ compose.desktop {
     }
 }
 
+compose.experimental {
+    web.application {}
+}
+
 sqldelight {
     databases {
         create("Database") {
@@ -303,3 +329,18 @@ val increaseVersionCode = task("increaseVersionCode") {
 }
 
 tasks.findByName("bundleRelease")?.dependsOn?.add(increaseVersionCode)
+
+
+val copyJsResources = tasks.create("copyJsResourcesWorkaround", Copy::class.java) {
+    from(file("src/commonMain/resources"))
+    into("build/processedResources/js/main")
+}
+
+val copyMapFile = tasks.create("copyModuleMapFile") {
+    val from = File(rootDir, "build/js/packages/escalaralcoiaicomtat/kotlin/escalaralcoiaicomtat.js.map")
+    val to = File(rootDir, "build/js/packages/escalaralcoiaicomtat/kotlin/escalaralcoiaicomtat.map")
+    from.copyTo(to, overwrite = true)
+}
+
+copyJsResources.dependsOn(copyMapFile)
+tasks.getByName("jsProcessResources").dependsOn.add(copyJsResources)
