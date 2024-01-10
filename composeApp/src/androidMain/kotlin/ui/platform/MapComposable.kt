@@ -1,5 +1,6 @@
 package ui.platform
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.compose.runtime.Composable
@@ -9,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -20,6 +22,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.data.Feature
 import com.google.maps.android.data.Geometry
 import com.google.maps.android.data.kml.KmlContainer
@@ -109,7 +112,8 @@ private suspend inline fun loadKMZ(
     context: Context,
     googleMap: GoogleMap,
     kmzUUID: String,
-    onKmlLayerLoaded: (KmlLayer) -> Unit
+    onKmlLayerLoaded: (KmlLayer) -> Unit,
+    crossinline onMoveCameraRequested: (CameraUpdate) -> Unit
 ) {
     val kml = KMZHandler.load(kmzUUID)
     kml.readAllBytes().inputStream().use { stream ->
@@ -139,7 +143,7 @@ private suspend inline fun loadKMZ(
             val boundsBuilder = LatLngBounds.builder()
             for (point in points) boundsBuilder.include(point)
             withContext(Dispatchers.Main) {
-                googleMap.moveCamera(
+                onMoveCameraRequested(
                     CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 2)
                 )
             }
@@ -149,6 +153,7 @@ private suspend inline fun loadKMZ(
 
 @Composable
 @OptIn(MapsComposeExperimentalApi::class)
+@SuppressLint("PotentialBehaviorOverride")
 actual fun MapComposable(
     modifier: Modifier,
     kmzUUID: String?
@@ -158,7 +163,10 @@ actual fun MapComposable(
     var kmlLayer by remember { mutableStateOf<KmlLayer?>(null) }
     var loadComplete by remember { mutableStateOf(kmzUUID == null) }
 
+    val cameraPositionState = rememberCameraPositionState()
+
     GoogleMap(
+        cameraPositionState = cameraPositionState,
         modifier = modifier,
         uiSettings = MapUiSettings(
             compassEnabled = false,
@@ -172,13 +180,24 @@ actual fun MapComposable(
             zoomControlsEnabled = false
         )
     ) {
+        MapEffect(Unit) {
+            // Skip default marker events
+            it.setOnMarkerClickListener { true }
+        }
+
         MapEffect(kmzUUID) { googleMap ->
             if (kmzUUID != null) {
                 // Remove previous KML
                 kmlLayer?.removeLayerFromMap()?.also { kmlLayer = null }
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    loadKMZ(context, googleMap, kmzUUID) { kmlLayer = it }
+                    loadKMZ(
+                        context,
+                        googleMap,
+                        kmzUUID,
+                        { kmlLayer = it },
+                        cameraPositionState::move
+                    )
                     withContext(Dispatchers.Main) { loadComplete = true }
                 }
             }
