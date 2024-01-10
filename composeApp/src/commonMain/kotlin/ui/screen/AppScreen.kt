@@ -51,8 +51,10 @@ import data.EDataType
 import database.Area
 import database.Path
 import database.Sector
+import database.SettingsKeys
 import database.Zone
 import database.database
+import database.settings
 import dev.icerock.moko.resources.compose.stringResource
 import network.connectivityStatus
 import resources.MR
@@ -85,6 +87,15 @@ class AppScreen(
 
         val searchModel = rememberScreenModel { SearchModel() }
 
+        var shownIntro by remember {
+            mutableStateOf(settings.getBoolean(SettingsKeys.SHOWN_INTRO, false))
+        }
+        LaunchedEffect(Unit) {
+            settings.addBooleanListener(SettingsKeys.SHOWN_INTRO, false) {
+                shownIntro = it
+            }
+        }
+
         Navigator(
             screen = when (initial?.first) {
                 EDataType.AREA -> ZonesScreen(initial.second)
@@ -100,8 +111,15 @@ class AppScreen(
             val screen = navigator.lastItem
             val depth = (screen as? DepthScreen)?.depth
             val isRoot = depth?.let { it <= 0 } ?: true
+            val isIntro = screen is IntroScreen
 
             val selection by model.selection.collectAsState()
+
+            LaunchedEffect(shownIntro) {
+                if (!shownIntro) {
+                    navigator.push(IntroScreen())
+                }
+            }
 
             AdaptiveNavigationScaffold(
                 items = listOf(
@@ -115,7 +133,8 @@ class AppScreen(
                     )
                 ),
                 userScrollEnabled = isRoot,
-                navigationBarVisible = isRoot,
+                topBarVisible = !isIntro,
+                navigationBarVisible = isRoot && !isIntro,
                 topBar = {
                     val isSearching by searchModel.isSearching.collectAsState(false)
 

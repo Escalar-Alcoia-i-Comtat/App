@@ -34,8 +34,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import platform.BackHandler
 import sync.DataSync
 import sync.SyncProcess
+import ui.composition.LocalLifecycleManager
 import ui.list.DataCard
 import ui.model.MainScreenModel
 
@@ -43,6 +45,8 @@ import ui.model.MainScreenModel
 object MainScreen: Screen {
     @Composable
     override fun Content() {
+        val lifecycleManager = LocalLifecycleManager.current
+
         val status by DataSync.status
 
         val screenModel = rememberScreenModel { MainScreenModel() }
@@ -70,6 +74,10 @@ object MainScreen: Screen {
                     }
                 }
             }
+        }
+
+        BackHandler {
+            lifecycleManager.finish()
         }
 
         AnimatedVisibility(
