@@ -1,7 +1,7 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import java.time.LocalDateTime
 import java.util.Properties
 
@@ -25,26 +25,12 @@ kotlin {
     
     jvm("desktop")
 
-    js(IR) {
-        moduleName = "escalaralcoiaicomtat"
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "composeApp"
         browser {
             commonWebpackConfig {
-                outputFileName = "escalaralcoiaicomtat.js"
-
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    // Uncomment and configure this if you want to open a browser different from the system default
-                    // open = mapOf(
-                    //     "app" to mapOf(
-                    //         "name" to "google chrome"
-                    //     )
-                    // )
-
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(project.rootDir.path)
-                        add(project.rootDir.path + "/composeApp/")
-                    }
-                }
+                outputFileName = "composeApp.js"
             }
         }
         binaries.executable()
@@ -188,7 +174,7 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
+        val wasmJsMain by getting {
             dependsOn(commonMain.get())
             dependencies {
                 // Okio
@@ -204,9 +190,6 @@ kotlin {
                 implementation(libs.ktor.client.javascript)
             }
         }
-        /*val wasmJsMain by getting {
-            dependsOn(jsWasmMain)
-        }*/
     }
 }
 
@@ -329,18 +312,3 @@ val increaseVersionCode = task("increaseVersionCode") {
 }
 
 tasks.findByName("bundleRelease")?.dependsOn?.add(increaseVersionCode)
-
-
-val copyJsResources = tasks.create("copyJsResourcesWorkaround", Copy::class.java) {
-    from(file("src/commonMain/resources"))
-    into("build/processedResources/js/main")
-}
-
-val copyMapFile = tasks.create("copyModuleMapFile") {
-    val from = File(rootDir, "build/js/packages/escalaralcoiaicomtat/kotlin/escalaralcoiaicomtat.js.map")
-    val to = File(rootDir, "build/js/packages/escalaralcoiaicomtat/kotlin/escalaralcoiaicomtat.map")
-    from.copyTo(to, overwrite = true)
-}
-
-copyJsResources.dependsOn(copyMapFile)
-tasks.getByName("jsProcessResources").dependsOn.add(copyJsResources)
