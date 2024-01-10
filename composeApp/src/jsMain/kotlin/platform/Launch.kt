@@ -1,6 +1,7 @@
 package platform
 
 import data.generic.LatLng
+import kotlinx.browser.window
 
 /**
  * Shows the given [point] in an external application.
@@ -12,6 +13,9 @@ import data.generic.LatLng
  * launched for any reason.
  */
 actual fun launchPoint(point: LatLng, label: String?): Boolean {
-    // TODO: Launch url
-    return false
+    val url = "https://www.google.com/maps/@${point.latitude},${point.longitude},15z"
+
+    window.open(url, "_blank")
+
+    return true
 }
