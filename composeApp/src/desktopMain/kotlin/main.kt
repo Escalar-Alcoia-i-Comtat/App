@@ -16,6 +16,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import platform.backEventReceiver
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -26,7 +27,7 @@ fun main() = application {
     storageProvider = StorageProvider()
 
     // Initialize the database
-    createDatabase(DriverFactory())
+    runBlocking { createDatabase(DriverFactory()) }
 
     Window(onCloseRequest = ::exitApplication) {
         App(
