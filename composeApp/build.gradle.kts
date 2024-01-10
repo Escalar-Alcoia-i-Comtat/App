@@ -1,8 +1,8 @@
-import java.time.LocalDateTime
-import java.util.Properties
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import java.time.LocalDateTime
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -11,6 +11,19 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.moko)
     alias(libs.plugins.sqldelight)
+}
+
+fun readProperties(fileName: String): Properties {
+    val propsFile = project.rootProject.file(fileName)
+    if (!propsFile.exists()) {
+        throw GradleException("$fileName doesn't exist")
+    }
+    if (!propsFile.canRead()) {
+        throw GradleException("Cannot read $fileName")
+    }
+    return Properties().apply {
+        propsFile.inputStream().use { load(it) }
+    }
 }
 
 kotlin {
@@ -106,6 +119,10 @@ kotlin {
                 implementation(libs.compose.ui)
                 implementation(libs.compose.ui.tooling.preview)
 
+                // Compose - Maps
+                implementation(libs.compose.maps.base)
+                implementation(libs.compose.maps.utils)
+
                 // Ktor client
                 implementation(libs.ktor.client.android)
 
@@ -135,6 +152,12 @@ kotlin {
 
                 // SQLDelight
                 implementation(libs.sqldelight.driver.native)
+
+                // KmpIO (only used for zip)
+                implementation(libs.kmpio)
+
+                // XML Parsing
+                implementation(libs.ksoup)
             }
         }
 
@@ -170,16 +193,11 @@ android {
         versionName = "2.1.0-dev01"
         versionNameSuffix = "_instant"
 
-        val versionPropsFile = project.rootProject.file("version.properties")
-        if (!versionPropsFile.canRead()) {
-            throw GradleException("Cannot read version.properties")
-        }
-        val versionProps = Properties().apply {
-            versionPropsFile.inputStream().use {
-                load(versionPropsFile.inputStream())
-            }
-        }
-        versionCode = versionProps.getProperty("VERSION_CODE").toInt()
+        val versionProperties = readProperties("version.properties")
+        versionCode = versionProperties.getProperty("VERSION_CODE").toInt()
+
+        val localProperties = readProperties("local.properties")
+        resValue("string", "maps_api_key", localProperties.getProperty("MAPS_API_KEY"))
     }
     buildFeatures {
         compose = true
@@ -249,14 +267,7 @@ multiplatformResources {
 val increaseVersionCode = task("increaseVersionCode") {
     doFirst {
         val versionPropsFile = project.rootProject.file("version.properties")
-        if (!versionPropsFile.canRead()) {
-            throw GradleException("Cannot read version.properties")
-        }
-        val versionProps = Properties().apply {
-            versionPropsFile.inputStream().use {
-                load(versionPropsFile.inputStream())
-            }
-        }
+        val versionProps = readProperties(versionPropsFile.name)
         val code = versionProps.getProperty("VERSION_CODE").toInt() + 1
         versionProps["VERSION_CODE"] = code.toString()
         versionPropsFile.outputStream().use {
