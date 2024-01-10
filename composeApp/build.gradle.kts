@@ -1,8 +1,8 @@
-import java.time.LocalDateTime
-import java.util.Properties
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import java.time.LocalDateTime
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -272,6 +272,7 @@ sqldelight {
     databases {
         create("Database") {
             packageName.set("database")
+            generateAsync.set(true)
         }
     }
 }

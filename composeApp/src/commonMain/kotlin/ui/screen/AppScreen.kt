@@ -47,6 +47,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.ScreenTransition
+import com.russhwolf.settings.ObservableSettings
 import data.EDataType
 import database.Area
 import database.Path
@@ -56,6 +57,7 @@ import database.Zone
 import database.database
 import database.settings
 import dev.icerock.moko.resources.compose.stringResource
+import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import resources.MR
 import search.Filter
@@ -91,8 +93,10 @@ class AppScreen(
             mutableStateOf(settings.getBoolean(SettingsKeys.SHOWN_INTRO, false))
         }
         LaunchedEffect(Unit) {
-            settings.addBooleanListener(SettingsKeys.SHOWN_INTRO, false) {
+            (settings as? ObservableSettings)?.addBooleanListener(SettingsKeys.SHOWN_INTRO, false) {
                 shownIntro = it
+            } ?: Napier.w {
+                "Won't observe for changes on ${SettingsKeys.SHOWN_INTRO} since not supported in current platform."
             }
         }
 

@@ -20,9 +20,9 @@ lateinit var database: Database
  * Creates the local database using the given [driverFactory], and stores it automatically into
  * [database].
  */
-fun createDatabase(driverFactory: DriverFactory): Database {
+suspend fun createDatabase(driverFactory: DriverFactory): Database {
     Napier.d { "Creating database driver..." }
-    val driver = driverFactory.createDriver()
+    val driver = driverFactory.createDriver(Database.Schema)
 
     Napier.d { "Creating database..." }
     return Database(

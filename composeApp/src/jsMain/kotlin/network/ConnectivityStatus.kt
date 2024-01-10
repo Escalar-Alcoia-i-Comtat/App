@@ -10,9 +10,9 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import platform.ioDispatcher
 
 actual class ConnectivityStatus {
     companion object {
@@ -33,7 +33,7 @@ actual class ConnectivityStatus {
     actual fun start() {
         if (loopingJob != null) return
 
-        loopingJob = CoroutineScope(Dispatchers.IO).launch {
+        loopingJob = CoroutineScope(ioDispatcher).launch {
             while (true) {
                 val isConnected = try {
                     client.get("https://google.com")
@@ -65,7 +65,11 @@ actual class ConnectivityStatus {
 
     actual fun stop() {
         isStarted.value = false
-        runBlocking { loopingJob?.cancelAndJoin() }
+        val job = CoroutineScope(ioDispatcher).launch {
+            loopingJob?.cancelAndJoin()
+        }
+        // lock thread until job is completed
+        while (!job.isCompleted) { }
         loopingJob = null
 
         Napier.d("Stopped")

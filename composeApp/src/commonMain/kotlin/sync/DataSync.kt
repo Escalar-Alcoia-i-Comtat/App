@@ -15,7 +15,7 @@ import network.Backend
 import network.connectivityStatus
 
 object DataSync : SyncProcess() {
-    private fun <Type : DataType, RowType : Any> insertOrUpdate(
+    private inline fun <Type : DataType, RowType : Any> insertOrUpdate(
         value: Type,
         get: (id: Long) -> RowType?,
         insert: (value: Type) -> Unit,

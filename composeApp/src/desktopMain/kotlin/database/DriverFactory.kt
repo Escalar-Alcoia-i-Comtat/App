@@ -1,13 +1,15 @@
 package database
 
+import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import cache.storageProvider
 import io.github.aakira.napier.Napier
 import java.util.Properties
 
 actual class DriverFactory {
-    actual fun createDriver(): SqlDriver {
+    actual suspend fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
         Napier.v { "Creating cache directory..." }
         val cacheDirectory = storageProvider.cacheDirectory
         if (!cacheDirectory.exists()) cacheDirectory.mkdirs()
@@ -24,7 +26,7 @@ actual class DriverFactory {
         )
         if (!alreadyExists) {
             Napier.i { "Database doesn't exist, creating now..." }
-            Database.Schema.create(driver)
+            schema.create(driver).await()
         }
         return driver
     }
