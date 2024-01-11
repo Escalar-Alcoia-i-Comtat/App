@@ -320,6 +320,8 @@ compose.desktop {
             } Escalar Alcoià i Comtat. All rights reserved."
             vendor = "Escalar Alcoià i Comtat"
 
+            val iconsDir = File(rootDir, "icons")
+
             windows {
                 dirChooser = true
                 perUserInstall = true
@@ -337,6 +339,21 @@ compose.desktop {
                 appRelease = version.versionCode.toString()
                 debPackageVersion = version.versionName
                 rpmPackageVersion = version.versionName
+            }
+            macOS {
+                iconFile.set(
+                    File(iconsDir, "icon.icns")
+                )
+                bundleID = "org.escalaralcoiaicomtat.app"
+                dockName = "Escalar Alcoià i Comtat"
+                appStore = true
+                appCategory = "public.app-category.sports"
+                val version = getVersionForPlatform(Platform.MacOS)
+                dmgPackageVersion = version.versionName
+                pkgPackageVersion = version.versionName
+                packageBuildVersion = version.versionName
+                dmgPackageBuildVersion = version.versionName
+                pkgPackageBuildVersion = version.versionName
             }
         }
     }
