@@ -22,7 +22,9 @@ import cache.storageProvider
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
 import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
+import com.mapbox.api.staticmap.v1.models.StaticPolylineAnnotation
 import com.mapbox.geojson.Point
+import com.mapbox.geojson.utils.PolylineUtils
 import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
@@ -37,9 +39,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import map.MapData
 import map.kmz.KMZLoader
+import map.placemark.Polygon
 import network.createHttpClient
 
 private val httpClient = createHttpClient()
+
+private const val POLYLINE_PRECISION = 5
 
 @Composable
 actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
@@ -70,6 +75,7 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
 
         val uuidBuilder = StringBuilder("")
 
+        data.styles.let { Napier.d { "There are ${it.size} styles loaded." } }
 
         val builder = MapboxStaticMap.builder()
             .accessToken(BuildKonfig.MAPBOX_ACCESS_TOKEN)
@@ -77,20 +83,40 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
             .also { uuidBuilder.append(StaticMapCriteria.OUTDOORS_STYLE) }
             .cameraAuto(true)
             .also { uuidBuilder.append(";auto") }
-            //.cameraPoint(Point.fromLngLat(-0.455466, 38.7326039))
-            //.also { uuidBuilder.append(";-0.455466,38.7326039") }
-            //.cameraZoom(8.0)
-            //.also { uuidBuilder.append(";8") }
             .width(size.width)
             .also { uuidBuilder.append(";${size.width}") }
             .height(size.height)
             .also { uuidBuilder.append(";${size.height}") }
+            .staticPolylineAnnotations(
+                data.placemarks
+                    .filterIsInstance<Polygon>()
+                    // Log markers count
+                    .also { Napier.d { "There are ${it.size} polygons in map." } }
+                    .map { polygon ->
+                        val pointsHashCode = polygon.coordinates
+                            .joinToString(";") { (lat, lon) -> "$lat,$lon" }
+                            .hashCode()
+                        uuidBuilder.append(";${POLYLINE_PRECISION}")
+                        uuidBuilder.append(";$pointsHashCode")
+
+                        StaticPolylineAnnotation.builder()
+                            .polyline(
+                                PolylineUtils.encode(
+                                    polygon.coordinates.map { (lat, lon) -> Point.fromLngLat(lat, lon) },
+                                    POLYLINE_PRECISION
+                                )
+                            )
+                            .build()
+                    }
+            )
             .staticMarkerAnnotations(
                 data.placemarks
                     // Take only points
                     .filterIsInstance<map.placemark.Point>()
                     // Sort from top to bottom to display ordered
                     .sortedByDescending { it.longitude }
+                    // Log markers count
+                    .also { Napier.d { "There are ${it.size} markers in map." } }
                     .map { point ->
                         uuidBuilder.append(";${point.latitude},${point.longitude}")
 
