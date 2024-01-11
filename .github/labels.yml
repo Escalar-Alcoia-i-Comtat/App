@@ -92,3 +92,7 @@
 - name: dependent
   description: This issue or PR depends on another one
   color: cdcfd1
+
+- name: gui
+  description: Updates to the user interface
+  color: AEA04B
