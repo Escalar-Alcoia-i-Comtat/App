@@ -1,3 +1,4 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -6,8 +7,9 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.buildkonfig)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.moko)
     alias(libs.plugins.sqldelight)
@@ -172,6 +174,10 @@ kotlin {
 
                 // SQLDelight
                 implementation(libs.sqldelight.driver.sqlite)
+
+                // Mapbox SDK
+                implementation(libs.mapbox.core)
+                implementation(libs.mapbox.services)
             }
         }
     }
@@ -262,6 +268,22 @@ sqldelight {
 
 multiplatformResources {
     multiplatformResourcesPackage = "resources"
+}
+
+buildkonfig {
+    packageName = "build"
+
+    defaultConfigs {
+        buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", "null")
+    }
+
+    val versionProps = readProperties("local.properties")
+
+    targetConfigs {
+        create("desktop") {
+            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", versionProps.getProperty("MAPBOX_ACCESS_TOKEN"))
+        }
+    }
 }
 
 val increaseVersionCode = task("increaseVersionCode") {
