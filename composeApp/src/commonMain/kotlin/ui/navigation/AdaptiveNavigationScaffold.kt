@@ -76,15 +76,20 @@ fun AdaptiveNavigationScaffold(
     PermanentNavigationDrawer(
         drawerContent = {
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded) {
-                PermanentDrawerSheet {
-                    for ((index, item) in items.withIndex()) {
-                        NavigationDrawerItem(
-                            selected = currentPage == index,
-                            onClick = { scope.launch { pagerState.scrollToPage(index); currentPage = index } },
-                            icon = { Icon(item.icon(), item.label()) },
-                            label = { Text(item.label()) },
-                            modifier = Modifier.padding(8.dp)
-                        )
+                AnimatedVisibility(navigationBarVisible) {
+                    PermanentDrawerSheet {
+                        for ((index, item) in items.withIndex()) {
+                            NavigationDrawerItem(
+                                selected = currentPage == index,
+                                onClick = {
+                                    scope.launch { pagerState.scrollToPage(index) }
+                                    currentPage = index
+                                },
+                                icon = { Icon(item.icon(), item.label()) },
+                                label = { Text(item.label()) },
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -94,16 +99,18 @@ fun AdaptiveNavigationScaffold(
             modifier = Modifier.fillMaxSize()
         ) {
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium) {
-                NavigationRail(
-                    header = floatingActionButton?.let { fab -> { fab() } }
-                ) {
-                    for ((index, item) in items.withIndex()) {
-                        NavigationRailItem(
-                            selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                            icon = { Icon(item.icon(), item.label()) },
-                            label = { Text(item.label()) }
-                        )
+                AnimatedVisibility(navigationBarVisible) {
+                    NavigationRail(
+                        header = floatingActionButton?.let { fab -> { fab() } }
+                    ) {
+                        for ((index, item) in items.withIndex()) {
+                            NavigationRailItem(
+                                selected = pagerState.currentPage == index,
+                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                                icon = { Icon(item.icon(), item.label()) },
+                                label = { Text(item.label()) }
+                            )
+                        }
                     }
                 }
             }
