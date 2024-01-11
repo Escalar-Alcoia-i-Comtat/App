@@ -2,7 +2,9 @@ import Build_gradle.IOSVersion
 import Build_gradle.LinuxVersion
 import Build_gradle.MacOSVersion
 import Build_gradle.WindowsVersion
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -385,18 +387,58 @@ buildkonfig {
     packageName = "build"
 
     defaultConfigs {
-        buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", "null")
+        buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
+        val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
+        buildConfigField(STRING, "VERSION_NAME", defaultVersion.versionName)
+        buildConfigField(INT, "VERSION_CODE", null, nullable = true)
+
+        val date = object {
+            val now = Calendar.getInstance()
+            val year = now.get(Calendar.YEAR)
+            val month = now.get(Calendar.MONTH).plus(1).toString().padStart(2, '0')
+            val day = now.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')
+            val hour = now.get(Calendar.HOUR_OF_DAY).toString().padStart(2, '0')
+            val minute = now.get(Calendar.MINUTE).toString().padStart(2, '0')
+            val second = now.get(Calendar.SECOND).toString().padStart(2, '0')
+        }
+        buildConfigField(
+            STRING,
+            "BUILD_DATE",
+            "${date.year}/${date.month}/${date.day} ${date.hour}:${date.minute}:${date.second}"
+        )
     }
 
     val versionProps = readProperties("local.properties")
 
     targetConfigs {
-        create("desktop") {
-            buildConfigField(
-                STRING,
-                "MAPBOX_ACCESS_TOKEN",
-                versionProps.getProperty("MAPBOX_ACCESS_TOKEN")
-            )
+        create("android") {
+            val version = getVersionForPlatform(Platform.Android)
+            buildConfigField(STRING, "VERSION_NAME", version.versionName)
+            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString())
+        }
+        create("ios") {
+            val version = getVersionForPlatform(Platform.Android)
+            buildConfigField(STRING, "VERSION_NAME", version.versionName)
+        }
+
+        fun TargetConfigDsl.commonDesktop() {
+            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", versionProps.getProperty("MAPBOX_ACCESS_TOKEN"))
+        }
+        create("macos") {
+            commonDesktop()
+            val version = getVersionForPlatform(Platform.MacOS)
+            buildConfigField(STRING, "VERSION_NAME", version.versionName)
+        }
+        create("linux") {
+            commonDesktop()
+            val version = getVersionForPlatform(Platform.Linux)
+            buildConfigField(STRING, "VERSION_NAME", version.versionName)
+            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString())
+        }
+        create("mingw") {
+            commonDesktop()
+            val version = getVersionForPlatform(Platform.Windows)
+            buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
     }
 }
