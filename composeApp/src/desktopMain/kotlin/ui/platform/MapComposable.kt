@@ -186,6 +186,4 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
             )
         } ?: loadingProgress?.let { CircularProgressIndicator(it) } ?: CircularProgressIndicator()
     }
-
-    // TODO : Platform Map
 }
