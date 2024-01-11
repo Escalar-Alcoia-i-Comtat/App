@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -124,6 +125,8 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .padding(bottom = 12.dp)
+                            .widthIn(max = 600.dp)
+                            .fillMaxWidth()
                     ) {
                         val screen = subScreenFactory?.let { it(child.id) }
                         screen?.let { navigator?.push(screen) }
