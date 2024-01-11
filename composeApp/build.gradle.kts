@@ -323,6 +323,9 @@ compose.desktop {
             val iconsDir = File(rootDir, "icons")
 
             windows {
+                iconFile.set(
+                    File(iconsDir, "icon.ico")
+                )
                 dirChooser = true
                 perUserInstall = true
                 menuGroup = "Escalar Alcoià i Comtat"
@@ -332,6 +335,9 @@ compose.desktop {
                 exePackageVersion = version.versionName
             }
             linux {
+                iconFile.set(
+                    File(iconsDir, "icon.png")
+                )
                 debMaintainer = "app.linux@escalaralcoiaicomtat.org"
                 menuGroup = "Escalar Alcoià i Comtat"
                 appCategory = "Sports"
