@@ -69,6 +69,10 @@
   description: Updates to Android-specific code
   color: 1e8f18
 
+- name: desktop
+  description: Updates to Desktop (JVM)-specific code
+  color: fcba03
+
 - name: testing
   description: Updates to the tests
   color: 19a81e
