@@ -175,6 +175,9 @@ kotlin {
                 // SQLDelight
                 implementation(libs.sqldelight.driver.sqlite)
 
+                // XML Parsing
+                implementation(libs.ksoup)
+                
                 // Mapbox SDK
                 implementation(libs.mapbox.core)
                 implementation(libs.mapbox.services)
