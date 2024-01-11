@@ -3,6 +3,7 @@ import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import java.time.LocalDateTime
+import java.util.Calendar
 import java.util.Properties
 
 plugins {
@@ -255,8 +256,13 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
             packageName = "org.escalaralcoiaicomtat.app"
             packageVersion = "1.0.0"
+
+            description = "Escalar Alcoià i Comtat"
+            copyright = "© ${Calendar.getInstance().get(Calendar.YEAR)} Escalar Alcoià i Comtat. All rights reserved."
+            vendor = "Escalar Alcoià i Comtat"
         }
     }
 }
