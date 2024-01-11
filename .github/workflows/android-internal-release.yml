@@ -68,6 +68,8 @@ jobs:
       - name: Upload to Play Store
         id: upload_play_store
         uses: r0adkll/upload-google-play@v1.1.2
+        # Disabled since cannot upload instant apps through API
+        if: false
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_GOOGLE_CLOUD_JSON }}
           packageName: org.escalaralcoiaicomtat.android
