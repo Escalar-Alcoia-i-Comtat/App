@@ -28,7 +28,10 @@ fun main() = application {
     // Initialize the database
     createDatabase(DriverFactory())
 
-    Window(onCloseRequest = ::exitApplication) {
+    Window(
+        title = "Escalar Alcoià i Comtat",
+        onCloseRequest = ::exitApplication
+    ) {
         App(
             modifier = Modifier
                 .onPointerEvent(PointerEventType.Press) {
