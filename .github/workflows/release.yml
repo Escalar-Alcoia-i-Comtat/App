@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-android:
-    name: Publish Internal Release
+    name: Build for Android
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
