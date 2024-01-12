@@ -65,12 +65,7 @@ jobs:
       - name: Write local.properties
         run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
 
-      - name: Build Linux
-        if: ${{ matrix.os }} == 'ubuntu-latest'
-        run: ./gradlew :composeApp:increaseLinuxRelease :composeApp:packageReleaseDistributionForCurrentOS
-
-      - name: Build Linux
-        if: ${{ matrix.os }} != 'ubuntu-latest'
+      - name: Build
         run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS
 
       - name: Release
