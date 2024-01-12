@@ -17,9 +17,11 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Route
-import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -34,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import build.BuildKonfig
 import cache.File
 import cache.ImageCache
-import cache.storageProvider
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import maps.KMZHandler
@@ -54,6 +55,39 @@ private fun SettingsCacheRow(
     onDeletingStatusChanged: (Boolean) -> Unit
 ) {
     var cacheSize by remember { mutableLongStateOf(directory.size() ?: 0L) }
+    var showingDialog by remember { mutableStateOf(false) }
+
+    if (showingDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                // Do not allow dismiss while deleting
+                if (!isDeleting) showingDialog = false
+            },
+            title = { Text(stringResource(MR.strings.settings_storage_dialog_title)) },
+            text = { Text(stringResource(MR.strings.settings_storage_dialog_message)) },
+            confirmButton = {
+                TextButton(
+                    enabled = !isDeleting,
+                    onClick = {
+                        onDeletingStatusChanged(true)
+                        try {
+                            directory.delete()
+                            cacheSize = directory.size() ?: 0L
+                        } finally {
+                            onDeletingStatusChanged(false)
+                            showingDialog = false
+                        }
+                    }
+                ) { Text(stringResource(MR.strings.action_clear)) }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !isDeleting,
+                    onClick = { showingDialog = false }
+                ) { Text(stringResource(MR.strings.action_cancel)) }
+            }
+        )
+    }
 
     SettingsRow(
         headline = stringResource(title),
@@ -63,15 +97,7 @@ private fun SettingsCacheRow(
             "0KB",
         icon = icon,
         enabled = !isDeleting
-    ) {
-        onDeletingStatusChanged(true)
-        try {
-            directory.delete()
-            cacheSize = directory.size() ?: 0L
-        } finally {
-            onDeletingStatusChanged(false)
-        }
-    }
+    ) { showingDialog = true }
 }
 
 @Composable
@@ -98,13 +124,6 @@ fun SettingsPage() {
             SettingsCategory(
                 text = stringResource(MR.strings.settings_category_storage)
             )
-            SettingsCacheRow(
-                MR.strings.settings_storage_cache,
-                Icons.Outlined.Storage,
-                storageProvider.cacheDirectory,
-                deleting
-            ) { deleting = it }
-            Divider()
             SettingsCacheRow(
                 MR.strings.settings_storage_images,
                 Icons.Outlined.PhotoLibrary,
