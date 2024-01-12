@@ -77,4 +77,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: composeApp/build/compose/binaries/main-release/**
+          files: |
+            composeApp/build/compose/binaries/main-release/**/*.dmg
+            composeApp/build/compose/binaries/main-release/**/*.msi
+            composeApp/build/compose/binaries/main-release/**/*.deb
