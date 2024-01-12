@@ -4,17 +4,22 @@ android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.8.2"
+buildkonfig = "0.15.1"
 compose = "1.5.4"
 # Check latest at https://developer.android.com/jetpack/androidx/releases/compose-compiler
 compose-compiler = "1.5.7"
+compose-maps = "4.3.0"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.5.11"
 compose-windowSizeClass = "0.3.2"
+kmpio = "0.1.5"
 kotlin = "1.9.21"
 kotlinx = "1.7.3"
 kotlinx-datetime = "0.5.0"
 kotlinx-json = "1.6.2"
+ksoup = "0.1.2"
 ktor = "2.3.7"
+mapbox = "5.8.0"
 moko = "0.23.0"
 moko-graphics = "0.9.0"
 multiplatform-settings = "1.1.1"
@@ -27,14 +32,18 @@ zoomable = "1.6.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+compose-maps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-maps" }
+compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-maps" }
 compose-windowSizeClass = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "compose-windowSizeClass" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+kmpio = { module = "io.github.skolson:kmp-io", version.ref = "kmpio" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json =  { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
+ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -42,6 +51,8 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-client-javascript = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+mapbox-core = { module = "com.mapbox.mapboxsdk:mapbox-sdk-core", version.ref = "mapbox" }
+mapbox-services = { module = "com.mapbox.mapboxsdk:mapbox-sdk-services", version.ref = "mapbox" }
 moko-base = { module = "dev.icerock.moko:resources", version.ref = "moko" }
 moko-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko" }
 moko-graphics = { module = "dev.icerock.moko:graphics", version.ref = "moko-graphics" }
@@ -64,6 +75,7 @@ zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable"
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

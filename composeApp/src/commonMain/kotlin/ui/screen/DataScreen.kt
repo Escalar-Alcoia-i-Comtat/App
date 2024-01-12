@@ -8,9 +8,13 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -26,10 +32,12 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import data.DataType
 import data.DataTypeWithImage
+import data.Zone
 import io.github.aakira.napier.Napier
 import ui.list.DataCard
 import ui.model.AppScreenModel
 import ui.model.DataScreenModel
+import ui.platform.MapComposable
 
 abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
     val id: Long,
@@ -93,8 +101,24 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
         val navigator = LocalNavigator.current
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (parentState is Zone) {
+                item {
+                    MapComposable(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 8.dp)
+                            .widthIn(max = 600.dp)
+                            .height(180.dp)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .shadow(3.dp),
+                        kmzUUID = parentState.kmzUUID
+                    )
+                }
+            }
             items(childrenState ?: emptyList()) { child ->
                 if (child is DataTypeWithImage) {
                     DataCard(
@@ -103,6 +127,8 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .padding(bottom = 12.dp)
+                            .widthIn(max = 600.dp)
+                            .fillMaxWidth()
                     ) {
                         val screen = subScreenFactory?.let { it(child.id) }
                         screen?.let { navigator?.push(screen) }

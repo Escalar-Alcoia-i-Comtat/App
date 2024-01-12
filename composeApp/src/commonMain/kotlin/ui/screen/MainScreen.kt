@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -140,7 +141,11 @@ object MainScreen: Screen {
                 DataCard(
                     item = Area(area),
                     imageHeight = 200.dp,
-                    modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 12.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .padding(bottom = 12.dp)
+                        .widthIn(max = 600.dp)
+                        .fillMaxWidth()
                 ) { navigator?.push(ZonesScreen(area.id)) }
             }
 
