@@ -340,7 +340,8 @@ compose.desktop {
                 )
                 dirChooser = true
                 perUserInstall = true
-                menuGroup = "Escalar Alcoià i Comtat"
+                menuGroup = "Escalar Alcoia i Comtat"
+                packageName = "Escalar Alcoia i Comtat"
                 upgradeUuid = "1193b0ce-a276-42cc-b38a-f066b5cfe81e"
                 val version = getVersionForPlatform(Platform.Windows)
                 msiPackageVersion = version.versionName
