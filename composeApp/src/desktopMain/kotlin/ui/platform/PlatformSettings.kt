@@ -59,13 +59,14 @@ actual fun ColumnScope.PlatformSettings() {
                     when (error) {
                         Error.NO_ASSETS -> stringResource(MR.strings.settings_updates_error_no_assets)
                         Error.RELEASE_NOT_FOUND -> stringResource(MR.strings.settings_updates_error_not_found)
+                        Error.UNKNOWN_OS -> stringResource(MR.strings.settings_updates_error_unknown_os)
                     }
                 )
             },
             confirmButton = {
                 TextButton(
                     onClick = { Updates.updateError.tryEmit(null) }
-                ) { Text(stringResource(MR.strings.action_cancel)) }
+                ) { Text(stringResource(MR.strings.action_close)) }
             }
         )
     }

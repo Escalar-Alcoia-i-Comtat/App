@@ -21,6 +21,8 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import network.createHttpClient
+import platform.os.OSType
+import platform.os.OsCheck
 
 actual object Updates {
     private val client = createHttpClient()
@@ -130,6 +132,11 @@ actual object Updates {
      * @return The job that is performing the update, or null if updates are not available.
      */
     actual fun requestUpdate(): Job? = CoroutineScope(Dispatchers.IO).launch {
+        val osType = OsCheck.getOSType()
+        if (osType == OSType.Other) {
+            updateError.emit(Error.UNKNOWN_OS)
+            return@launch
+        }
         val versions = getVersions() ?: return@launch
         val version = versions.last()
         if (version.assets.isEmpty()) {
