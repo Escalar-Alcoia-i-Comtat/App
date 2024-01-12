@@ -386,6 +386,8 @@ multiplatformResources {
 buildkonfig {
     packageName = "build"
 
+    val localProperties = readProperties("local.properties")
+
     defaultConfigs {
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
         val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
@@ -408,13 +410,11 @@ buildkonfig {
         )
     }
 
-    val versionProps = readProperties("local.properties")
-
     targetConfigs {
         create("android") {
             val version = getVersionForPlatform(Platform.Android)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
-            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString())
+            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString(), nullable = true)
         }
         create("ios") {
             val version = getVersionForPlatform(Platform.Android)
@@ -422,7 +422,7 @@ buildkonfig {
         }
 
         fun TargetConfigDsl.commonDesktop() {
-            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", versionProps.getProperty("MAPBOX_ACCESS_TOKEN"))
+            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties.getProperty("MAPBOX_ACCESS_TOKEN"))
         }
         create("macos") {
             commonDesktop()
@@ -433,7 +433,7 @@ buildkonfig {
             commonDesktop()
             val version = getVersionForPlatform(Platform.Linux)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
-            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString())
+            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString(), nullable = true)
         }
         create("mingw") {
             commonDesktop()
