@@ -38,13 +38,6 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: ./gradlew :composeApp:increaseVersionCode :composeApp:bundleRelease :composeApp:assembleRelease
 
-      - name: Commit version.properties
-        id: commit_version
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Increased Version Code
-          file_pattern: 'version.properties'
-
       - name: Release AAB & APK
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -79,13 +72,6 @@ jobs:
       - name: Build Linux
         if: ${{ matrix.os }} != 'ubuntu-latest'
         run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS
-
-      - name: Commit version.properties
-        id: commit_version
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Increased Version Code
-          file_pattern: 'version.properties'
 
       - name: Release
         uses: softprops/action-gh-release@v1
