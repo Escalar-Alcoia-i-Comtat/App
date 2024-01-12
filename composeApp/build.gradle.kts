@@ -6,7 +6,6 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Properties
@@ -94,9 +93,9 @@ kotlin {
 
     jvm("desktop")
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+    js(IR) {
         moduleName = "composeApp"
+        useCommonJs()
         browser {
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
@@ -126,6 +125,7 @@ kotlin {
         }
     }
 
+    @Suppress("UnusedPrivateProperty")
     sourceSets {
         commonMain.dependencies {
             // Compose - Base
@@ -260,9 +260,12 @@ kotlin {
             }
         }
 
-        val wasmJsMain by getting {
+        val jsMain by getting {
             dependsOn(commonMain.get())
             dependencies {
+                // Compose Web dependency
+                implementation(compose.html.core)
+
                 // Okio
                 implementation(libs.okio.node)
 
