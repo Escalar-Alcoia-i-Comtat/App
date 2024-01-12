@@ -101,14 +101,16 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
         val navigator = LocalNavigator.current
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (parentState is Zone) {
                 item {
                     MapComposable(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .widthIn(max = 600.dp)
                             .height(180.dp)
+                            .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                             .padding(bottom = 8.dp)
                             .clip(RoundedCornerShape(12.dp))
