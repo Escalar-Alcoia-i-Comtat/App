@@ -1,4 +1,4 @@
-name: Build for Desktop
+name: Release Binaries
 
 on:
   release:
@@ -74,11 +74,11 @@ jobs:
         run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
 
       - name: Build Linux
-        if: ${{ matrix.os == "ubuntu-latest" }}
+        if: ${{ matrix.os }} == 'ubuntu-latest'
         run: ./gradlew :composeApp:increaseLinuxRelease :composeApp:packageReleaseDistributionForCurrentOS
 
       - name: Build Linux
-        if: ${{ matrix.os != "ubuntu-latest" }}
+        if: ${{ matrix.os }} != 'ubuntu-latest'
         run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS
 
       - name: Commit version.properties
