@@ -19,5 +19,11 @@ actual object Updates {
      *
      * @return The job that is performing the update, or null if updates are not available.
      */
-    actual suspend fun requestUpdate(): Job? = null
+    actual fun requestUpdate(): Job? = null
+
+    /**
+     * If supported, holds the name of the latest version available. Only applies if
+     * [updateAvailable] is true.
+     */
+    actual val latestVersion: MutableStateFlow<String?> = MutableStateFlow(null)
 }
