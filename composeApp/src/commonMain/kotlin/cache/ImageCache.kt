@@ -27,7 +27,7 @@ import network.response.data.FileRequestData
 object ImageCache {
     private val client = HttpClient()
 
-    private val imageCacheDirectory: File by lazy {
+    val imageCacheDirectory: File by lazy {
         storageProvider.cacheDirectory + "images"
     }
 
