@@ -1,20 +1,80 @@
 package ui.pages
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.PhotoLibrary
+import androidx.compose.material.icons.outlined.Route
+import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import build.BuildKonfig
+import cache.File
+import cache.ImageCache
+import cache.storageProvider
+import dev.icerock.moko.resources.StringResource
+import dev.icerock.moko.resources.compose.stringResource
+import maps.KMZHandler
+import maps.MapsCache
+import resources.MR
+import ui.reusable.settings.SettingsCategory
+import utils.formatBytes
+
+@Composable
+private fun SettingsCacheRow(
+    title: StringResource,
+    icon: ImageVector,
+    directory: File,
+    isDeleting: Boolean,
+    onDeletingStatusChanged: (Boolean) -> Unit
+) {
+    var cacheSize by remember { mutableLongStateOf(directory.size() ?: 0L) }
+
+    ListItem(
+        headlineContent = { Text(stringResource(title)) },
+        supportingContent = {
+            Text(
+                text = if (cacheSize >= 0)
+                    stringResource(MR.strings.settings_storage_size, formatBytes(cacheSize))
+                else
+                    "0KB"
+            )
+        },
+        leadingContent = { Icon(icon, null) },
+        modifier = Modifier.clickable(enabled = !isDeleting) {
+            onDeletingStatusChanged(true)
+            try {
+                directory.delete()
+                cacheSize = directory.size() ?: 0L
+            } finally {
+                onDeletingStatusChanged(false)
+            }
+        }
+    )
+}
 
 @Composable
 fun SettingsPage() {
@@ -25,27 +85,66 @@ fun SettingsPage() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+            modifier = Modifier
+                .widthIn(max = 600.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
         ) {
             Spacer(Modifier.height(8.dp))
 
-            // TODO: Header for storage configuration
-            // TODO: Fields for clearing specific cache pieces
+            var deleting by remember { mutableStateOf(false) }
 
-            // TODO: Header for app information
-            ListItem(
-                headlineContent = { Text("Version Name") },
-                supportingContent = { Text(BuildKonfig.VERSION_NAME) }
+            SettingsCategory(
+                text = stringResource(MR.strings.settings_category_storage)
+            )
+            SettingsCacheRow(
+                MR.strings.settings_storage_cache,
+                Icons.Outlined.Storage,
+                storageProvider.cacheDirectory,
+                deleting
+            ) { deleting = it }
+            SettingsCacheRow(
+                MR.strings.settings_storage_images,
+                Icons.Outlined.PhotoLibrary,
+                ImageCache.imageCacheDirectory,
+                deleting
+            ) { deleting = it }
+            SettingsCacheRow(
+                MR.strings.settings_storage_kmz,
+                Icons.Outlined.Route,
+                KMZHandler.kmzCacheDirectory,
+                deleting
+            ) { deleting = it }
+            MapsCache.tilesCacheDirectory?.let { dir ->
+                SettingsCacheRow(
+                    MR.strings.settings_storage_maps,
+                    Icons.Outlined.Map,
+                    dir,
+                    deleting
+                ) { deleting = it }
+            }
+
+            SettingsCategory(
+                text = stringResource(MR.strings.settings_category_app_info)
             )
             BuildKonfig.VERSION_CODE?.let { versionCode ->
                 ListItem(
-                    headlineContent = { Text("Version Code") },
-                    supportingContent = { Text(versionCode.toString()) }
+                    headlineContent = { Text(stringResource(MR.strings.settings_app_info_version_code)) },
+                    supportingContent = { Text("${BuildKonfig.VERSION_NAME} ($versionCode)") },
+                    leadingContent = { Icon(Icons.Outlined.Info, null) }
+                )
+            } ?: run {
+                ListItem(
+                    headlineContent = { Text(stringResource(MR.strings.settings_app_info_version)) },
+                    supportingContent = { Text(BuildKonfig.VERSION_NAME) },
+                    leadingContent = { Icon(Icons.Outlined.Info, null) }
                 )
             }
+            Divider()
             ListItem(
-                headlineContent = { Text("Build Date") },
-                supportingContent = { Text(BuildKonfig.BUILD_DATE) }
+                headlineContent = { Text(stringResource(MR.strings.settings_app_info_build_date)) },
+                supportingContent = { Text(BuildKonfig.BUILD_DATE) },
+                leadingContent = { Icon(Icons.Outlined.Event, null) }
             )
         }
     }
