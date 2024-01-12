@@ -7,10 +7,13 @@ import github.data.Release
 import io.github.aakira.napier.Napier
 import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
+import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
+import io.ktor.util.toByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,6 +26,9 @@ import kotlinx.serialization.json.jsonArray
 import network.createHttpClient
 import platform.os.OSType
 import platform.os.OsCheck
+import java.awt.Desktop
+import java.io.File
+import kotlin.system.exitProcess
 
 actual object Updates {
     private val client = createHttpClient()
@@ -42,6 +48,11 @@ actual object Updates {
         /** The release doesn't have the installer expected for the current OS */
         INSTALLER_NOT_FOUND
     }
+
+    /** When the installer is being stored in the filesystem */
+    const val DOWNLOAD_PROGRESS_STORING: Float = 2f
+    /** When the installer has been started */
+    const val DOWNLOAD_PROGRESS_INSTALLING: Float = 3f
 
     /**
      * Whether the platform supports updates.
@@ -128,23 +139,55 @@ actual object Updates {
         return latestVersion > installedVersion
     }
 
+    private suspend fun runInstaller(osType: OSType, installer: File) {
+        Napier.i { "Launching installer at: $installer" }
+        if (osType == OSType.Windows) {
+            val runtime = Runtime.getRuntime()
+            val process = runtime.exec("msiexec /i \"$installer\"")
+            downloadProgress.emit(DOWNLOAD_PROGRESS_INSTALLING)
+            val input = process.inputStream.reader().buffered()
+            var line: String? = input.readLine()
+            while (line != null) {
+                Napier.v(tag = "Installer") { line ?: "" }
+                line = input.readLine()
+            }
+            val result = process.exitValue()
+            if (result == 0) {
+                val defaultLocation = File(System.getenv("LOCALAPPDATA"), "org.escalaralcoiaicomtat.app")
+                val defaultInstaller = File(defaultLocation, "org.escalaralcoiaicomtat.app.exe")
+                if (defaultInstaller.exists())
+                    Desktop.getDesktop().open(defaultInstaller)
+                exitProcess(0)
+            }
+            Napier.i { "Finished installer. Result: ${process.exitValue()}" }
+        } else {
+            Napier.i { "Installer is not MSI." }
+            Desktop.getDesktop().open(installer)
+            exitProcess(0)
+        }
+    }
+
     /**
      * Requests the device to update to the latest version available.
      *
      * @return The job that is performing the update, or null if updates are not available.
      */
     actual fun requestUpdate(): Job? = CoroutineScope(Dispatchers.IO).launch {
+        downloadProgress.emit(null)
+
         val osType = OsCheck.getOSType()
         if (osType == OSType.Other) {
             updateError.emit(Error.UNKNOWN_OS)
             return@launch
         }
+
         val versions = getVersions() ?: return@launch
         val version = versions.last()
         if (version.assets.isEmpty()) {
             updateError.emit(Error.NO_ASSETS)
             return@launch
         }
+
         val assets = version.assets.joinToString(", ") { "${it.name}: ${it.url}" }
         Napier.i { "Assets: $assets" }
         val asset = version.assets.find { asset ->
@@ -154,5 +197,21 @@ actual object Updates {
             updateError.emit(Error.INSTALLER_NOT_FOUND)
             return@launch
         }
+
+        val result = client.get(asset.browserDownloadUrl) {
+            onDownload { bytesSentTotal, contentLength ->
+                downloadProgress.emit(
+                    (bytesSentTotal.toDouble() / contentLength.toDouble()).toFloat()
+                )
+            }
+        }
+        downloadProgress.emit(DOWNLOAD_PROGRESS_STORING)
+        val installerFile = File.createTempFile("eaic", "installer")
+        val bytes = result.bodyAsChannel().toByteArray()
+        installerFile.outputStream().use { it.write(bytes) }
+
+        runInstaller(osType, installerFile)
+
+        downloadProgress.emit(null)
     }
 }

@@ -80,10 +80,14 @@ actual fun ColumnScope.PlatformSettings() {
                 stringResource(MR.strings.settings_updates_true_summary)
             } else {
                 downloadProgress?.let { progress ->
-                    stringResource(
-                        MR.strings.settings_updates_downloading_progress,
-                        (progress * 100).toInt()
-                    )
+                    when (progress) {
+                        in 0f..1f -> stringResource(
+                            MR.strings.settings_updates_downloading_progress,
+                            (progress * 100).toInt()
+                        )
+                        Updates.DOWNLOAD_PROGRESS_STORING -> stringResource(MR.strings.settings_updates_storing)
+                        else -> null
+                    }
                 } ?: stringResource(MR.strings.settings_updates_downloading)
             },
             icon = Icons.Outlined.SystemSecurityUpdate,
