@@ -237,6 +237,9 @@ kotlin {
                 // Mapbox SDK
                 implementation(libs.mapbox.core)
                 implementation(libs.mapbox.services)
+
+                // Semantic Versioning
+                implementation(libs.semver)
             }
         }
     }
@@ -310,9 +313,9 @@ compose.desktop {
     application {
         mainClass = "MainKt"
 
-        /*buildTypes.release.proguard {
-            obfuscate.set(true)
-        }*/
+        buildTypes.release.proguard {
+            isEnabled = false
+        }
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
@@ -390,6 +393,8 @@ buildkonfig {
 
     defaultConfigs {
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
+        buildConfigField(STRING, "GITHUB_TOKEN", localProperties.getProperty("GITHUB_TOKEN"))
+
         val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
         buildConfigField(STRING, "VERSION_NAME", defaultVersion.versionName)
         buildConfigField(INT, "VERSION_CODE", null, nullable = true)
