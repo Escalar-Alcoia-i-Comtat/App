@@ -26,6 +26,7 @@ multiplatform-settings = "1.1.1"
 napier = "2.7.1"
 okio = "3.7.0"
 play-instantapps = "18.0.1"
+semver = "1.4.2"
 sqldelight = "2.0.1"
 voyager = "1.0.0"
 zoomable = "1.6.1"
@@ -60,6 +61,7 @@ multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", versi
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 play-instantapps = { module = "com.google.android.gms:play-services-instantapps", version.ref = "play-instantapps" }
+semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
