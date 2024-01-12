@@ -18,6 +18,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import platform.Updates
 import platform.backEventReceiver
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -29,6 +30,10 @@ fun main() = application {
 
     // Initialize the database
     createDatabase(DriverFactory())
+
+    CoroutineScope(Dispatchers.IO).launch {
+        Updates.checkForUpdates()
+    }
 
     val density = LocalDensity.current
     Window(

@@ -10,6 +10,7 @@
     <string name="action_done">Done</string>
     <string name="action_next">Next</string>
     <string name="action_skip">Skip</string>
+    <string name="action_update">Update</string>
     <string name="action_view_video">View Video</string>
 
     <string name="search">Search...</string>
@@ -51,4 +52,17 @@
     <string name="settings_links_crowdin">Translations</string>
 
     <string name="settings_soon" comment="Shown on settings entries that are currently not available, but will be in the future">Soon</string>
+
+    <string name="settings_category_updates">Updates</string>
+    <string name="settings_updates_false_title">No new update available</string>
+    <string name="settings_updates_false_summary">Tap to check again</string>
+    <string name="settings_updates_checking">Checking...</string>
+    <string name="settings_updates_true_title">New update available!</string>
+    <string name="settings_updates_true_summary">Tap to install</string>
+    <string name="settings_updates_downloading">Downloading...</string>
+    <string name="settings_updates_downloading_progress">Downloading... %d%%</string>
+
+    <string name="update_available_dialog_title">Update Available</string>
+    <string name="update_available_dialog_message">There\'s a new update available to download.</string>
+    <string name="update_available_dialog_message_version">There\'s a new update available to download. You are currently running %s and the latest version is %s.</string>
 </resources>
