@@ -36,9 +36,7 @@ jobs:
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        run: |
-          yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;34.0.0"
-          bash ./gradlew :composeApp:increaseVersionCode :composeApp:bundleRelease :composeApp:assembleRelease
+        run: ./gradlew :composeApp:increaseVersionCode :composeApp:bundleRelease :composeApp:assembleRelease
 
       - name: Commit version.properties
         id: commit_version
