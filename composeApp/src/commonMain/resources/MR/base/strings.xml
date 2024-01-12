@@ -27,4 +27,16 @@
     <string name="intro_4_message">If you climb with your children, make sure it\'s safe for them. Use proper equipment, warn them about the hazards of climbing, and make sure they are well informed. Each sector has information to make sure there\'s a safe place to stay.</string>
     <string name="intro_5_title">Enjoy!</string>
     <string name="intro_5_message">You are ready to access the app! Don\'t hesitate in contacting us if you find any data wrong or inaccurate.</string>
+
+    <string name="settings_category_app_info">Application Information</string>
+    <string name="settings_app_info_version">App Version</string>
+    <string name="settings_app_info_version_code">App Version and Code</string>
+    <string name="settings_app_info_build_date">Build Date</string>
+
+    <string name="settings_category_storage">Storage</string>
+    <string name="settings_storage_cache">Total Cache Size</string>
+    <string name="settings_storage_images">Images Cache Size</string>
+    <string name="settings_storage_kmz">KMZ Cache Size</string>
+    <string name="settings_storage_maps">Maps Cache Size</string>
+    <string name="settings_storage_size">%s - Tap to Clear</string>
 </resources>
