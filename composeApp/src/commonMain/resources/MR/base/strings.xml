@@ -39,4 +39,13 @@
     <string name="settings_storage_kmz">KMZ Cache Size</string>
     <string name="settings_storage_maps">Maps Cache Size</string>
     <string name="settings_storage_size">%s - Tap to Clear</string>
+
+    <string name="settings_category_links">External Links</string>
+    <string name="settings_links_tap" comment="Shown in a link in settings to indicate the user that it can be tapped to be viewed on a browser.">Tap to View</string>
+    <string name="settings_links_status">Server Status</string>
+    <string name="settings_links_github_app">App Source Code</string>
+    <string name="settings_links_github_server">Server Source Code</string>
+    <string name="settings_links_crowdin">Translations</string>
+
+    <string name="settings_soon" comment="Shown on settings entries that are currently not available, but will be in the future">Soon</string>
 </resources>

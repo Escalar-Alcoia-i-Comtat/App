@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -26,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import build.BuildKonfig
 import cache.File
@@ -41,6 +45,7 @@ import ui.reusable.settings.SettingsRow
 import utils.formatBytes
 
 @Composable
+@ExperimentalMaterial3Api
 private fun SettingsCacheRow(
     title: StringResource,
     icon: ImageVector,
@@ -70,7 +75,10 @@ private fun SettingsCacheRow(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun SettingsPage() {
+    val uriHandler = LocalUriHandler.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -96,12 +104,14 @@ fun SettingsPage() {
                 storageProvider.cacheDirectory,
                 deleting
             ) { deleting = it }
+            Divider()
             SettingsCacheRow(
                 MR.strings.settings_storage_images,
                 Icons.Outlined.PhotoLibrary,
                 ImageCache.imageCacheDirectory,
                 deleting
             ) { deleting = it }
+            Divider()
             SettingsCacheRow(
                 MR.strings.settings_storage_kmz,
                 Icons.Outlined.Route,
@@ -109,6 +119,7 @@ fun SettingsPage() {
                 deleting
             ) { deleting = it }
             MapsCache.tilesCacheDirectory?.let { dir ->
+                Divider()
                 SettingsCacheRow(
                     MR.strings.settings_storage_maps,
                     Icons.Outlined.Map,
@@ -117,6 +128,7 @@ fun SettingsPage() {
                 ) { deleting = it }
             }
 
+            Spacer(Modifier.height(16.dp))
             SettingsCategory(
                 text = stringResource(MR.strings.settings_category_app_info)
             )
@@ -138,6 +150,35 @@ fun SettingsPage() {
                 headline = stringResource(MR.strings.settings_app_info_build_date),
                 summary = BuildKonfig.BUILD_DATE,
                 icon = Icons.Outlined.Event
+            )
+
+            Spacer(Modifier.height(16.dp))
+            SettingsCategory(
+                text = stringResource(MR.strings.settings_category_links)
+            )
+            SettingsRow(
+                headline = stringResource(MR.strings.settings_links_status),
+                summary = stringResource(MR.strings.settings_links_tap),
+                icon = Icons.Outlined.Dns
+            ) { uriHandler.openUri("https://status.arnyminerz.com/status/escalaralcoiaicomtat") }
+            Divider()
+            SettingsRow(
+                headline = stringResource(MR.strings.settings_links_github_app),
+                summary = stringResource(MR.strings.settings_links_tap),
+                icon = Icons.Outlined.Code
+            ) { uriHandler.openUri("https://github.com/Escalar-Alcoia-i-Comtat/App") }
+            Divider()
+            SettingsRow(
+                headline = stringResource(MR.strings.settings_links_github_server),
+                summary = stringResource(MR.strings.settings_links_tap),
+                icon = Icons.Outlined.Dns
+            ) { uriHandler.openUri("https://github.com/Escalar-Alcoia-i-Comtat/BackendKotlin") }
+            Divider()
+            SettingsRow(
+                headline = stringResource(MR.strings.settings_links_crowdin),
+                summary = stringResource(MR.strings.settings_links_tap),
+                icon = Icons.Outlined.Dns,
+                badgeText = stringResource(MR.strings.settings_soon)
             )
         }
     }
