@@ -7,9 +7,11 @@
 
     <string name="action_cancel">Cancel</string>
     <string name="action_clear">Clear</string>
+    <string name="action_close">Close</string>
     <string name="action_done">Done</string>
     <string name="action_next">Next</string>
     <string name="action_skip">Skip</string>
+    <string name="action_update">Update</string>
     <string name="action_view_video">View Video</string>
 
     <string name="search">Search...</string>
@@ -51,4 +53,23 @@
     <string name="settings_links_crowdin">Translations</string>
 
     <string name="settings_soon" comment="Shown on settings entries that are currently not available, but will be in the future">Soon</string>
+
+    <string name="settings_category_updates">Updates</string>
+    <string name="settings_updates_false_title">No new update available</string>
+    <string name="settings_updates_false_summary">Tap to check again</string>
+    <string name="settings_updates_checking">Checking...</string>
+    <string name="settings_updates_true_title">New update available!</string>
+    <string name="settings_updates_true_summary">Tap to install</string>
+    <string name="settings_updates_downloading">Downloading...</string>
+    <string name="settings_updates_downloading_progress">Downloading... %d%%</string>
+    <string name="settings_updates_storing">Storing...</string>
+    <string name="settings_updates_error_title">Could not download update</string>
+    <string name="settings_updates_error_no_assets">The release doesn\'t have any assets. It might be too soon to download, please wait a bit and try again later.</string>
+    <string name="settings_updates_error_not_found">Could not find the release file for the current platform.</string>
+    <string name="settings_updates_error_unknown_os">The current operating system could not be determined.</string>
+    <string name="settings_updates_error_installer_not_found">The installer for the current operating system was not found.</string>
+
+    <string name="update_available_dialog_title">Update Available</string>
+    <string name="update_available_dialog_message">There\'s a new update available to download.</string>
+    <string name="update_available_dialog_message_version">There\'s a new update available to download. You are currently running %s and the latest version is %s.</string>
 </resources>

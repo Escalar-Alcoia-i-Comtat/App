@@ -41,6 +41,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import maps.KMZHandler
 import maps.MapsCache
 import resources.MR
+import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
 import utils.formatBytes
@@ -118,6 +119,8 @@ fun SettingsPage() {
                 .padding(horizontal = 8.dp)
         ) {
             Spacer(Modifier.height(8.dp))
+
+            PlatformSettings()
 
             var deleting by remember { mutableStateOf(false) }
 
