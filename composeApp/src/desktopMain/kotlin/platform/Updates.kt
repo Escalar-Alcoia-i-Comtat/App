@@ -32,7 +32,9 @@ actual object Updates {
 
     enum class Error {
         /** There are no assets in the release */
-        NO_ASSETS
+        NO_ASSETS,
+        /** Release for current platform not found */
+        RELEASE_NOT_FOUND
     }
 
     /**

@@ -58,6 +58,7 @@ actual fun ColumnScope.PlatformSettings() {
                 Text(
                     when (error) {
                         Error.NO_ASSETS -> stringResource(MR.strings.settings_updates_error_no_assets)
+                        Error.RELEASE_NOT_FOUND -> stringResource(MR.strings.settings_updates_error_not_found)
                     }
                 )
             },
