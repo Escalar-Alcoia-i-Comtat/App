@@ -108,11 +108,11 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
                 item {
                     MapComposable(
                         modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 8.dp)
                             .widthIn(max = 600.dp)
                             .height(180.dp)
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 8.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .shadow(3.dp),
                         kmzUUID = parentState.kmzUUID
