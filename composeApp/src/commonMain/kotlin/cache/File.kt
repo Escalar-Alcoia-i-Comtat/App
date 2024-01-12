@@ -88,4 +88,24 @@ class File(
         val files: List<Path>? = fileSystem.listOrNull(_path)
         return files?.map { it.asFile }
     }
+
+    /**
+     * The number of bytes readable from this file. The amount of storage resources consumed by this
+     * file may be larger (due to block size overhead, redundant copies for RAID, etc.), or smaller
+     * (due to file system compression, shared inodes, etc).
+     *
+     * @return This returns null if there is no file at path.
+     */
+    fun size(): Long? {
+        if (!exists()) return null
+        var size = 0L
+        if (isDirectory) {
+            listAllFiles()?.forEach {
+                size += it.size() ?: 0L
+            }
+        } else {
+            size += fileSystem.metadata(_path).size ?: 0L
+        }
+        return size
+    }
 }
