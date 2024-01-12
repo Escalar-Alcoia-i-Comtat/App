@@ -25,6 +25,7 @@ moko-graphics = "0.9.0"
 multiplatform-settings = "1.1.1"
 napier = "2.7.1"
 okio = "3.7.0"
+play-appupdate = "2.1.0"
 play-instantapps = "18.0.1"
 semver = "1.4.2"
 sqldelight = "2.0.1"
@@ -60,6 +61,7 @@ moko-test = { module = "dev.icerock.moko:resources-test", version.ref = "moko" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+play-appupdate = { module = "com.google.android.play:app-update-ktx", version.ref = "play-appupdate" }
 play-instantapps = { module = "com.google.android.gms:play-services-instantapps", version.ref = "play-instantapps" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
