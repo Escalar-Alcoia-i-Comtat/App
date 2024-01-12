@@ -1,6 +1,5 @@
 package ui.pages
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,9 +17,6 @@ import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -41,6 +37,7 @@ import maps.KMZHandler
 import maps.MapsCache
 import resources.MR
 import ui.reusable.settings.SettingsCategory
+import ui.reusable.settings.SettingsRow
 import utils.formatBytes
 
 @Composable
@@ -53,27 +50,23 @@ private fun SettingsCacheRow(
 ) {
     var cacheSize by remember { mutableLongStateOf(directory.size() ?: 0L) }
 
-    ListItem(
-        headlineContent = { Text(stringResource(title)) },
-        supportingContent = {
-            Text(
-                text = if (cacheSize >= 0)
-                    stringResource(MR.strings.settings_storage_size, formatBytes(cacheSize))
-                else
-                    "0KB"
-            )
-        },
-        leadingContent = { Icon(icon, null) },
-        modifier = Modifier.clickable(enabled = !isDeleting) {
-            onDeletingStatusChanged(true)
-            try {
-                directory.delete()
-                cacheSize = directory.size() ?: 0L
-            } finally {
-                onDeletingStatusChanged(false)
-            }
+    SettingsRow(
+        headline = stringResource(title),
+        summary = if (cacheSize >= 0)
+            stringResource(MR.strings.settings_storage_size, formatBytes(cacheSize))
+        else
+            "0KB",
+        icon = icon,
+        enabled = !isDeleting
+    ) {
+        onDeletingStatusChanged(true)
+        try {
+            directory.delete()
+            cacheSize = directory.size() ?: 0L
+        } finally {
+            onDeletingStatusChanged(false)
         }
-    )
+    }
 }
 
 @Composable
@@ -128,23 +121,23 @@ fun SettingsPage() {
                 text = stringResource(MR.strings.settings_category_app_info)
             )
             BuildKonfig.VERSION_CODE?.let { versionCode ->
-                ListItem(
-                    headlineContent = { Text(stringResource(MR.strings.settings_app_info_version_code)) },
-                    supportingContent = { Text("${BuildKonfig.VERSION_NAME} ($versionCode)") },
-                    leadingContent = { Icon(Icons.Outlined.Info, null) }
+                SettingsRow(
+                    headline = stringResource(MR.strings.settings_app_info_version_code),
+                    summary = "${BuildKonfig.VERSION_NAME} ($versionCode)",
+                    icon = Icons.Outlined.Info
                 )
             } ?: run {
-                ListItem(
-                    headlineContent = { Text(stringResource(MR.strings.settings_app_info_version)) },
-                    supportingContent = { Text(BuildKonfig.VERSION_NAME) },
-                    leadingContent = { Icon(Icons.Outlined.Info, null) }
+                SettingsRow(
+                    headline = stringResource(MR.strings.settings_app_info_version),
+                    summary = BuildKonfig.VERSION_NAME,
+                    icon = Icons.Outlined.Info
                 )
             }
             Divider()
-            ListItem(
-                headlineContent = { Text(stringResource(MR.strings.settings_app_info_build_date)) },
-                supportingContent = { Text(BuildKonfig.BUILD_DATE) },
-                leadingContent = { Icon(Icons.Outlined.Event, null) }
+            SettingsRow(
+                headline = stringResource(MR.strings.settings_app_info_build_date),
+                summary = BuildKonfig.BUILD_DATE,
+                icon = Icons.Outlined.Event
             )
         }
     }
