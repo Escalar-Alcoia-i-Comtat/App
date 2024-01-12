@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SystemSecurityUpdate
 import androidx.compose.material.icons.outlined.SystemSecurityUpdateGood
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import platform.Updates
+import platform.Updates.Error
 import resources.MR
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
@@ -32,6 +36,7 @@ actual fun ColumnScope.PlatformSettings() {
 
     var performingUpdate by remember { mutableStateOf(false) }
     val downloadProgress by Updates.downloadProgress.collectAsState()
+    val updateError by Updates.updateError.collectAsState()
 
     fun checkForUpdates() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -44,6 +49,25 @@ actual fun ColumnScope.PlatformSettings() {
         }
     }
     LaunchedEffect(Unit) { checkForUpdates() }
+
+    updateError?.let { error ->
+        AlertDialog(
+            onDismissRequest = { Updates.updateError.tryEmit(null) },
+            title = { Text(stringResource(MR.strings.settings_updates_error_title)) },
+            text = {
+                Text(
+                    when (error) {
+                        Error.NO_ASSETS -> stringResource(MR.strings.settings_updates_error_no_assets)
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { Updates.updateError.tryEmit(null) }
+                ) { Text(stringResource(MR.strings.action_cancel)) }
+            }
+        )
+    }
 
     if (updateAvailable || updateAvailableAfterCheck) {
         SettingsRow(

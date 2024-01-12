@@ -30,6 +30,11 @@ actual object Updates {
         ignoreUnknownKeys = true
     }
 
+    enum class Error {
+        /** There are no assets in the release */
+        NO_ASSETS
+    }
+
     /**
      * Whether the platform supports updates.
      */
@@ -50,6 +55,11 @@ actual object Updates {
      * If not null, specifies the download progress of the latest version.
      */
     val downloadProgress: MutableStateFlow<Float?> = MutableStateFlow(null)
+
+    /**
+     * Stores the error that happened during the update, if any.
+     */
+    val updateError: MutableStateFlow<Error?> = MutableStateFlow(null)
 
     private suspend fun getVersions(): List<Release>? {
         val result = client.get(
@@ -118,5 +128,11 @@ actual object Updates {
     actual fun requestUpdate(): Job? = CoroutineScope(Dispatchers.IO).launch {
         val versions = getVersions() ?: return@launch
         val version = versions.last()
+        if (version.assets.isEmpty()) {
+            updateError.emit(Error.NO_ASSETS)
+            return@launch
+        }
+        val assets = version.assets.joinToString(", ") { "${it.name}: ${it.url}" }
+        Napier.i { "Assets: $assets" }
     }
 }

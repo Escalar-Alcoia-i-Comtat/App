@@ -61,6 +61,8 @@
     <string name="settings_updates_true_summary">Tap to install</string>
     <string name="settings_updates_downloading">Downloading...</string>
     <string name="settings_updates_downloading_progress">Downloading... %d%%</string>
+    <string name="settings_updates_error_title">Could not download update</string>
+    <string name="settings_updates_error_no_assets">The release doesn\'t have any assets. It might be too soon to download, please wait a bit and try again later.</string>
 
     <string name="update_available_dialog_title">Update Available</string>
     <string name="update_available_dialog_message">There\'s a new update available to download.</string>
