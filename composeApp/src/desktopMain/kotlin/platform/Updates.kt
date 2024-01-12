@@ -34,7 +34,9 @@ actual object Updates {
         /** There are no assets in the release */
         NO_ASSETS,
         /** Release for current platform not found */
-        RELEASE_NOT_FOUND
+        RELEASE_NOT_FOUND,
+        /** Internal exception, should not happen. The running OS was not recognized */
+        UNKNOWN_OS
     }
 
     /**
@@ -136,5 +138,6 @@ actual object Updates {
         }
         val assets = version.assets.joinToString(", ") { "${it.name}: ${it.url}" }
         Napier.i { "Assets: $assets" }
+
     }
 }
