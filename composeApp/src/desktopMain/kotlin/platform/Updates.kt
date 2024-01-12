@@ -153,8 +153,8 @@ actual object Updates {
             }
             val result = process.exitValue()
             if (result == 0) {
-                val defaultLocation = File(System.getenv("LOCALAPPDATA"), "org.escalaralcoiaicomtat.app")
-                val defaultInstaller = File(defaultLocation, "org.escalaralcoiaicomtat.app.exe")
+                val defaultLocation = File(System.getenv("LOCALAPPDATA"), "Escalar Alcoia i Comtat")
+                val defaultInstaller = File(defaultLocation, "Escalar Alcoia i Comtat.exe")
                 if (defaultInstaller.exists())
                     Desktop.getDesktop().open(defaultInstaller)
                 exitProcess(0)
