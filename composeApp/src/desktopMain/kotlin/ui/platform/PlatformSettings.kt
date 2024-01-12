@@ -55,12 +55,14 @@ actual fun ColumnScope.PlatformSettings() {
             onDismissRequest = { Updates.updateError.tryEmit(null) },
             title = { Text(stringResource(MR.strings.settings_updates_error_title)) },
             text = {
+                val errorRes = when (error) {
+                    Error.NO_ASSETS -> MR.strings.settings_updates_error_no_assets
+                    Error.RELEASE_NOT_FOUND -> MR.strings.settings_updates_error_not_found
+                    Error.UNKNOWN_OS -> MR.strings.settings_updates_error_unknown_os
+                    Error.INSTALLER_NOT_FOUND -> MR.strings.settings_updates_error_installer_not_found
+                }
                 Text(
-                    when (error) {
-                        Error.NO_ASSETS -> stringResource(MR.strings.settings_updates_error_no_assets)
-                        Error.RELEASE_NOT_FOUND -> stringResource(MR.strings.settings_updates_error_not_found)
-                        Error.UNKNOWN_OS -> stringResource(MR.strings.settings_updates_error_unknown_os)
-                    }
+                    text = stringResource(errorRes)
                 )
             },
             confirmButton = {
@@ -76,7 +78,7 @@ actual fun ColumnScope.PlatformSettings() {
             headline = stringResource(MR.strings.settings_updates_true_title),
             summary = if (!performingUpdate) {
                 stringResource(MR.strings.settings_updates_true_summary)
-            }else {
+            } else {
                 downloadProgress?.let { progress ->
                     stringResource(
                         MR.strings.settings_updates_downloading_progress,

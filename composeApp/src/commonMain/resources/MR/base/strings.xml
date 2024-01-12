@@ -66,6 +66,7 @@
     <string name="settings_updates_error_no_assets">The release doesn\'t have any assets. It might be too soon to download, please wait a bit and try again later.</string>
     <string name="settings_updates_error_not_found">Could not find the release file for the current platform.</string>
     <string name="settings_updates_error_unknown_os">The current operating system could not be determined.</string>
+    <string name="settings_updates_error_installer_not_found">The installer for the current operating system was not found.</string>
 
     <string name="update_available_dialog_title">Update Available</string>
     <string name="update_available_dialog_message">There\'s a new update available to download.</string>

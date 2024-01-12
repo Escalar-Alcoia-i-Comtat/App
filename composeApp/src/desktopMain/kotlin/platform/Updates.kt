@@ -38,7 +38,9 @@ actual object Updates {
         /** Release for current platform not found */
         RELEASE_NOT_FOUND,
         /** Internal exception, should not happen. The running OS was not recognized */
-        UNKNOWN_OS
+        UNKNOWN_OS,
+        /** The release doesn't have the installer expected for the current OS */
+        INSTALLER_NOT_FOUND
     }
 
     /**
@@ -145,6 +147,12 @@ actual object Updates {
         }
         val assets = version.assets.joinToString(", ") { "${it.name}: ${it.url}" }
         Napier.i { "Assets: $assets" }
-
+        val asset = version.assets.find { asset ->
+            osType.installerFormats.find { asset.name.endsWith(it, ignoreCase = true) } != null
+        }
+        if (asset == null) {
+            updateError.emit(Error.INSTALLER_NOT_FOUND)
+            return@launch
+        }
     }
 }
