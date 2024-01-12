@@ -14,7 +14,7 @@ import platform.ZipFileHandler
 object KMZHandler {
     private val client = createHttpClient()
 
-    private val kmzCacheDirectory: File by lazy {
+    val kmzCacheDirectory: File by lazy {
         storageProvider.cacheDirectory + "kmz"
     }
 

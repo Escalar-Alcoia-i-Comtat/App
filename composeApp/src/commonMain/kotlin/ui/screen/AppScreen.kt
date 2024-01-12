@@ -65,6 +65,7 @@ import ui.model.AppScreenModel
 import ui.model.SearchModel
 import ui.navigation.AdaptiveNavigationScaffold
 import ui.navigation.NavigationItem
+import ui.pages.SettingsPage
 import ui.state.collectAsStateList
 import utils.unaccent
 
@@ -233,6 +234,8 @@ class AppScreen(
                             }
                         }
                     )
+
+                    1 -> SettingsPage()
 
                     else -> Text("This is page $page")
                 }

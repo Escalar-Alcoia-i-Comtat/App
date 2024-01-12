@@ -5,6 +5,8 @@
 
     <string name="status_network_unavailable">Network not available</string>
 
+    <string name="action_cancel">Cancel</string>
+    <string name="action_clear">Clear</string>
     <string name="action_done">Done</string>
     <string name="action_next">Next</string>
     <string name="action_skip">Skip</string>
@@ -27,4 +29,26 @@
     <string name="intro_4_message">If you climb with your children, make sure it\'s safe for them. Use proper equipment, warn them about the hazards of climbing, and make sure they are well informed. Each sector has information to make sure there\'s a safe place to stay.</string>
     <string name="intro_5_title">Enjoy!</string>
     <string name="intro_5_message">You are ready to access the app! Don\'t hesitate in contacting us if you find any data wrong or inaccurate.</string>
+
+    <string name="settings_category_app_info">Application Information</string>
+    <string name="settings_app_info_version">App Version</string>
+    <string name="settings_app_info_version_code">App Version and Code</string>
+    <string name="settings_app_info_build_date">Build Date</string>
+
+    <string name="settings_category_storage">Storage</string>
+    <string name="settings_storage_images">Images Cache Size</string>
+    <string name="settings_storage_kmz">KMZ Cache Size</string>
+    <string name="settings_storage_maps">Maps Cache Size</string>
+    <string name="settings_storage_size">%s - Tap to Clear</string>
+    <string name="settings_storage_dialog_title">Clear cache</string>
+    <string name="settings_storage_dialog_message">Are you sure that you want to clear the cache? This action is not reversible, and all the data will have to be downloaded again.</string>
+
+    <string name="settings_category_links">External Links</string>
+    <string name="settings_links_tap" comment="Shown in a link in settings to indicate the user that it can be tapped to be viewed on a browser.">Tap to View</string>
+    <string name="settings_links_status">Server Status</string>
+    <string name="settings_links_github_app">App Source Code</string>
+    <string name="settings_links_github_server">Server Source Code</string>
+    <string name="settings_links_crowdin">Translations</string>
+
+    <string name="settings_soon" comment="Shown on settings entries that are currently not available, but will be in the future">Soon</string>
 </resources>

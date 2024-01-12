@@ -78,7 +78,7 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
         data.styles.let { Napier.d { "There are ${it.size} styles loaded." } }
 
         val builder = MapboxStaticMap.builder()
-            .accessToken(BuildKonfig.MAPBOX_ACCESS_TOKEN)
+            .accessToken(BuildKonfig.MAPBOX_ACCESS_TOKEN!!)
             .styleId(StaticMapCriteria.OUTDOORS_STYLE)
             .also { uuidBuilder.append(StaticMapCriteria.OUTDOORS_STYLE) }
             .cameraAuto(true)
