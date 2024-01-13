@@ -2,6 +2,14 @@
 
 package data.generic
 
+import ui.color.ColorGroup
+import ui.theme.ColorGrade1
+import ui.theme.ColorGrade2
+import ui.theme.ColorGrade3
+import ui.theme.ColorGrade4
+import ui.theme.ColorGradeA
+import ui.theme.ColorGradeP
+
 interface GradeValue {
     companion object {
         fun fromString(value: String): GradeValue {
@@ -17,6 +25,24 @@ interface GradeValue {
 
     val name: String
 }
+
+val GradeValue?.color: ColorGroup
+    get() =
+        if (this is SportsGrade) {
+            val number = name[1].digitToInt()
+            if (number <= 5)
+                ColorGrade1
+            else if (number <= 6)
+                ColorGrade2
+            else if (number <= 7)
+                ColorGrade3
+            else
+                ColorGrade4
+        } else if (this is ArtificialGrade) {
+            ColorGradeA
+        } else {
+            ColorGradeP
+        }
 
 enum class SportsGrade : GradeValue {
     G1,
