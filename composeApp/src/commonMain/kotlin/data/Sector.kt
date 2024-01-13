@@ -32,4 +32,8 @@ data class Sector(
         sector.parentZoneId,
         emptyList()
     )
+
+    override fun compareTo(other: DataType): Int {
+        return displayName.compareTo(other.displayName)
+    }
 }

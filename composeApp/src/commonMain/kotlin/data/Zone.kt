@@ -32,4 +32,8 @@ data class Zone(
         zone.parentAreaId,
         emptyList()
     )
+
+    override fun compareTo(other: DataType): Int {
+        return displayName.compareTo(other.displayName)
+    }
 }

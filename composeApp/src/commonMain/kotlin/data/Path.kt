@@ -73,4 +73,13 @@ data class Path(
         path.images,
         path.parentSectorId
     )
+
+    override fun compareTo(other: DataType): Int {
+        return (other as? data.Path)
+            // If other is a Path, try to compare by sketchId
+            ?.let { sketchId.compareTo(other.sketchId) }
+            // If they are equal, don't take, and fallback to displayName
+            ?.takeIf { it != 0 }
+            ?: displayName.compareTo(other.displayName)
+    }
 }
