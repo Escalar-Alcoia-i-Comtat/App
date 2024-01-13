@@ -2,6 +2,7 @@ package data
 
 import data.generic.Builder
 import data.generic.Ending
+import data.generic.GradeValue
 import data.generic.PitchInfo
 import database.Path
 import kotlinx.serialization.SerialName
@@ -16,7 +17,7 @@ data class Path(
     @SerialName("sketch_id") val sketchId: UInt,
 
     val height: UInt? = null,
-    val grade: String? = null,
+    @SerialName("grade") val gradeValue: String? = null,
     val ending: Ending? = null,
     val pitches: List<PitchInfo>? = null,
 
@@ -73,6 +74,8 @@ data class Path(
         path.images,
         path.parentSectorId
     )
+
+    val grade: GradeValue? get() = gradeValue?.let(GradeValue::fromString)
 
     override fun compareTo(other: DataType): Int {
         return (other as? data.Path)
