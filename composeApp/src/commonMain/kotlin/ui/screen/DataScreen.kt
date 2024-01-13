@@ -7,6 +7,9 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,10 +19,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,7 +52,14 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
     private val modelFactory: (AppScreenModel) -> DataScreenModel<Parent, Children>,
     private val subScreenFactory: ((id: Long) -> Screen)?
 ) : DepthScreen(depth) {
+    /**
+     * Checks whether the side panel should be displayed.
+     * Defaults to always false.
+     */
+    open fun shouldDisplaySidePanel(windowSizeClass: WindowSizeClass): Boolean = false
+
     @Composable
+    @ExperimentalMaterial3WindowSizeClassApi
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
@@ -66,6 +80,8 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
                 navigator.pop()
             }
         }
+
+        val windowSizeClass = calculateWindowSizeClass()
 
         AnimatedContent(
             targetState = parentState,
@@ -91,7 +107,26 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
                     CircularProgressIndicator()
                 }
             } else {
-                ContentView(parent, childrenState)
+                val shouldDisplaySidePanel = remember(windowSizeClass) {
+                    shouldDisplaySidePanel(windowSizeClass)
+                }
+                Row(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    /*AnimatedVisibility(
+                        visible = shouldDisplaySidePanel,
+                        enter = slideInHorizontally { -it },
+                        exit = slideOutHorizontally { -it }
+                    ) {
+                        SidePanel(parent, childrenState)
+                    }*/
+                    if (shouldDisplaySidePanel) SidePanel(parent, childrenState)
+                    Box(
+                        modifier = Modifier.fillMaxHeight().weight(1f)
+                    ) {
+                        ContentView(parent, childrenState)
+                    }
+                }
             }
         }
     }
@@ -137,4 +172,11 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
             }
         }
     }
+
+    /**
+     * Only visible if [shouldDisplaySidePanel] returns `true`.
+     * Should adapt to the space available with [RowScope.weight], for example.
+     */
+    @Composable
+    open fun RowScope.SidePanel(parentState: Parent, childrenState: List<Children>?) {}
 }
