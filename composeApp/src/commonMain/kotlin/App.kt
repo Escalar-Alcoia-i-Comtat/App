@@ -1,7 +1,6 @@
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -23,6 +22,7 @@ import network.connectivityStatus
 import platform.Updates
 import resources.MR
 import ui.screen.AppScreen
+import ui.theme.AppTheme
 import utils.createStore
 
 val store = CoroutineScope(SupervisorJob()).createStore()
@@ -40,7 +40,7 @@ fun App(
         }
     }
 
-    MaterialTheme {
+    AppTheme {
         val updateAvailable by Updates.updateAvailable.collectAsState()
         val latestVersion by Updates.latestVersion.collectAsState()
         if (updateAvailable) {
