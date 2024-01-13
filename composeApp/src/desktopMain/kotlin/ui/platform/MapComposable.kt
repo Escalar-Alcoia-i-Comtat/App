@@ -48,6 +48,8 @@ private const val POLYLINE_PRECISION = 5
 
 @Composable
 actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
+    val mapboxAccessToken = BuildKonfig.MAPBOX_ACCESS_TOKEN ?: return
+
     var layoutSize: IntSize? by remember { mutableStateOf(null) }
     var mapData: MapData? by remember { mutableStateOf(null) }
     var staticMap: MapboxStaticMap? by remember { mutableStateOf(null) }
@@ -78,7 +80,7 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
         data.styles.let { Napier.d { "There are ${it.size} styles loaded." } }
 
         val builder = MapboxStaticMap.builder()
-            .accessToken(BuildKonfig.MAPBOX_ACCESS_TOKEN!!)
+            .accessToken(mapboxAccessToken)
             .styleId(StaticMapCriteria.OUTDOORS_STYLE)
             .also { uuidBuilder.append(StaticMapCriteria.OUTDOORS_STYLE) }
             .cameraAuto(true)
