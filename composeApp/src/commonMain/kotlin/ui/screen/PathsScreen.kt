@@ -179,6 +179,8 @@ class PathsScreen(
                     }
                 }
             }
+            Text("Height: ${child.height}")
+            Text("Grade: ${child.grade}")
         }
     }
 }
