@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.dp
@@ -107,12 +109,14 @@ class PathsScreen(
 
         LazyColumn(
             modifier = modifier,
-            state = listState
+            state = listState,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(childrenState ?: emptyList()) { path ->
                 PathListItem(
                     path,
                     modifier = Modifier
+                        .widthIn(max = 600.dp)
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     highlight = highlightPathId == path.id
