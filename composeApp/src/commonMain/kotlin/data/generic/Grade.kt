@@ -29,8 +29,10 @@ interface GradeValue {
 val GradeValue?.color: ColorGroup
     get() =
         if (this is SportsGrade) {
-            val number = name[1].digitToInt()
-            if (number <= 5)
+            val number = name[1].digitToIntOrNull()
+            if (number == null)
+                ColorGradeP
+            else if (number <= 5)
                 ColorGrade1
             else if (number <= 6)
                 ColorGrade2
