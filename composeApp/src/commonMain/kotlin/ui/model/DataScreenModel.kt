@@ -26,6 +26,11 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
 
     val notFound = MutableStateFlow(false)
 
+    /**
+     * When not `null`, displays a bottom sheet with the contents desired.
+     */
+    val displayingChild = MutableStateFlow<Children?>(null)
+
     fun load(id: Long) = screenModelScope.launch(Dispatchers.IO) {
         appScreenModel.selection.emit(null)
         val dbChildren = childrenQuery(id)

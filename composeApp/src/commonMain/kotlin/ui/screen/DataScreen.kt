@@ -4,9 +4,14 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -19,6 +24,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -31,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -46,18 +55,22 @@ import ui.model.AppScreenModel
 import ui.model.DataScreenModel
 import ui.platform.MapComposable
 
-abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
+abstract class DataScreen<Parent : DataTypeWithImage, ChildrenType : DataType>(
     val id: Long,
     depth: Int,
-    private val modelFactory: (AppScreenModel) -> DataScreenModel<Parent, Children>,
+    private val modelFactory: (AppScreenModel) -> DataScreenModel<Parent, ChildrenType>,
     private val subScreenFactory: ((id: Long) -> Screen)?
 ) : DepthScreen(depth) {
+    protected open val sidePathInformationPanelHeight: Dp = 100.dp
+    protected open val sidePathInformationPanelMaxWidth: Dp = 600.dp
+
     /**
      * Checks whether the side panel should be displayed.
      * Defaults to always false.
      */
     open fun shouldDisplaySidePanel(windowSizeClass: WindowSizeClass): Boolean = false
 
+    @ExperimentalMaterial3Api
     @Composable
     @ExperimentalMaterial3WindowSizeClassApi
     override fun Content() {
@@ -67,7 +80,7 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
         val model = rememberScreenModel { modelFactory(appScreenModel) }
 
         val parentState: Parent? by model.parent.collectAsState(null)
-        val childrenState: List<Children>? by model.children.collectAsState(null)
+        val childrenState: List<ChildrenType>? by model.children.collectAsState(null)
         val notFound: Boolean by model.notFound.collectAsState(false)
 
         LaunchedEffect(id) {
@@ -107,24 +120,58 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
                     CircularProgressIndicator()
                 }
             } else {
+                val displayingChild: ChildrenType? by model.displayingChild.collectAsState()
+
                 val shouldDisplaySidePanel = remember(windowSizeClass) {
                     shouldDisplaySidePanel(windowSizeClass)
                 }
                 Row(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    /*AnimatedVisibility(
-                        visible = shouldDisplaySidePanel,
-                        enter = slideInHorizontally { -it },
-                        exit = slideOutHorizontally { -it }
-                    ) {
-                        SidePanel(parent, childrenState)
-                    }*/
-                    if (shouldDisplaySidePanel) SidePanel(parent, childrenState)
+                    if (shouldDisplaySidePanel) SidePanel?.let { composable ->
+                        Column(
+                            modifier = Modifier.fillMaxHeight().weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            with(composable) {
+                                Content(parent, childrenState, appScreenModel, model)
+                            }
+
+                            AnimatedContent(
+                                targetState = displayingChild,
+                                transitionSpec = {
+                                    slideInVertically { it } togetherWith slideOutVertically { it }
+                                }
+                            ) {
+                                if (it != null) {
+                                    Column(
+                                        modifier = Modifier
+                                            .widthIn(max = sidePathInformationPanelMaxWidth)
+                                            .fillMaxWidth()
+                                            .height(sidePathInformationPanelHeight)
+                                            .clip(
+                                                RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                                            )
+                                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    ) {
+                                        BottomSheetContents(it, model, false)
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        displayingChild?.let {
+                            ModalBottomSheet(
+                                onDismissRequest = { model.displayingChild.tryEmit(null) }
+                            ) {
+                                BottomSheetContents(it, model, true)
+                            }
+                        }
+                    }
                     Box(
                         modifier = Modifier.fillMaxHeight().weight(1f)
                     ) {
-                        ContentView(parent, childrenState)
+                        ContentView(parent, childrenState, appScreenModel, model)
                     }
                 }
             }
@@ -132,7 +179,12 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
     }
 
     @Composable
-    open fun ContentView(parentState: Parent, childrenState: List<Children>?) {
+    open fun ContentView(
+        parentState: Parent,
+        childrenState: List<ChildrenType>?,
+        appScreenModel: AppScreenModel,
+        model: DataScreenModel<Parent, ChildrenType>
+    ) {
         val navigator = LocalNavigator.current
 
         LazyColumn(
@@ -177,6 +229,24 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
      * Only visible if [shouldDisplaySidePanel] returns `true`.
      * Should adapt to the space available with [RowScope.weight], for example.
      */
+    @Suppress("VariableNaming")
+    open val SidePanel: SidePanelContents<Parent, ChildrenType>? = null
+
     @Composable
-    open fun RowScope.SidePanel(parentState: Parent, childrenState: List<Children>?) {}
+    open fun ColumnScope.BottomSheetContents(
+        child: ChildrenType,
+        model: DataScreenModel<Parent, ChildrenType>,
+        isModal: Boolean
+    ) {
+    }
+
+    fun interface SidePanelContents<Parent : DataTypeWithImage, ChildrenType : DataType> {
+        @Composable
+        fun ColumnScope.Content(
+            parentState: Parent,
+            childrenState: List<ChildrenType>?,
+            appScreenModel: AppScreenModel,
+            model: DataScreenModel<Parent, ChildrenType>
+        )
+    }
 }

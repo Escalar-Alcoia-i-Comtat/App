@@ -3,7 +3,8 @@ package ui.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +14,14 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -34,7 +41,10 @@ import data.Path
 import data.Sector
 import kotlinx.coroutines.launch
 import ui.list.PathListItem
+import ui.model.AppScreenModel
+import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
+import ui.screen.DataScreen.SidePanelContents
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 class PathsScreen(
@@ -51,7 +61,15 @@ class PathsScreen(
     }
 
     @Composable
-    override fun ContentView(parentState: Sector, childrenState: List<Path>?) {
+    override fun ContentView(
+        parentState: Sector,
+        childrenState: List<Path>?,
+        appScreenModel: AppScreenModel,
+        model: DataScreenModel<Sector, Path>
+    ) {
+        // Cast the model as the correct type
+        model as PathsScreenModel
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -80,22 +98,31 @@ class PathsScreen(
             ) {
                 PathsListView(
                     childrenState,
-                    modifier = Modifier.fillMaxWidth().weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    onPathClicked = model.displayingChild::tryEmit
                 )
             }
         }
     }
 
-    @Composable
-    override fun RowScope.SidePanel(parentState: Sector, childrenState: List<Path>?) {
-        PathsListView(
-            childrenState,
-            modifier = Modifier.fillMaxHeight().weight(1f)
-        )
-    }
+    override val SidePanel: SidePanelContents<Sector, Path> =
+        SidePanelContents { parentState, childrenState, appScreenModel, model ->
+            // Cast the model as the correct type
+            model as PathsScreenModel
+
+            PathsListView(
+                childrenState,
+                modifier = Modifier.fillMaxHeight().weight(1f),
+                onPathClicked = model.displayingChild::tryEmit
+            )
+        }
 
     @Composable
-    fun PathsListView(childrenState: List<Path>?, modifier: Modifier = Modifier) {
+    private fun PathsListView(
+        childrenState: List<Path>?,
+        modifier: Modifier = Modifier,
+        onPathClicked: (path: Path) -> Unit
+    ) {
         val scope = rememberCoroutineScope()
         val listState = rememberLazyListState()
 
@@ -120,7 +147,37 @@ class PathsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     highlight = highlightPathId == path.id
-                ) { /*TODO*/ }
+                ) { onPathClicked(path) }
+            }
+        }
+    }
+
+    @Composable
+    override fun ColumnScope.BottomSheetContents(
+        child: Path,
+        model: DataScreenModel<Sector, Path>,
+        isModal: Boolean
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = child.displayName,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f)
+                )
+                if (!isModal) {
+                    IconButton(
+                        onClick = { model.displayingChild.tryEmit(null) }
+                    ) {
+                        Icon(Icons.Rounded.Close, null)
+                    }
+                }
             }
         }
     }
