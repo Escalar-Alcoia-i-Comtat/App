@@ -147,6 +147,10 @@ kotlin {
             // Compose - Zoomable
             implementation(libs.zoomable)
 
+            // Compose - Cupertino
+            implementation(libs.compose.cupertino.adaptive)
+            implementation(libs.compose.cupertino.iconsExtended)
+
             // Logging library
             implementation(libs.napier)
 
