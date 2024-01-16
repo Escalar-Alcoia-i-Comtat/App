@@ -34,6 +34,8 @@ import data.DataType
 import data.DataTypeWithImage
 import data.Zone
 import io.github.aakira.napier.Napier
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveCircularProgressIndicator
+import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
 import ui.list.DataCard
 import ui.model.AppScreenModel
 import ui.model.DataScreenModel
@@ -45,6 +47,7 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
     private val modelFactory: (AppScreenModel) -> DataScreenModel<Parent, Children>,
     private val subScreenFactory: ((id: Long) -> Screen)?
 ) : DepthScreen(depth) {
+    @OptIn(ExperimentalAdaptiveApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -88,7 +91,7 @@ abstract class DataScreen<Parent : DataTypeWithImage, Children : DataType>(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    AdaptiveCircularProgressIndicator()
                 }
             } else {
                 ContentView(parent, childrenState)
