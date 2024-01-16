@@ -8,14 +8,17 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -42,8 +45,17 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import io.github.alexzhirkevich.cupertino.FabPosition
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveNavigationBar
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveNavigationBarItem
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveScaffold
+import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
+import io.github.alexzhirkevich.cupertino.adaptive.Theme
 import kotlinx.coroutines.launch
 
+private val MinimumDrawerWidth = 240.dp
+
+@OptIn(ExperimentalAdaptiveApi::class)
 @Composable
 @ExperimentalFoundationApi
 @ExperimentalMaterial3WindowSizeClassApi
@@ -73,11 +85,62 @@ fun AdaptiveNavigationScaffold(
             .collect { currentPage = it }
     }
 
-    PermanentNavigationDrawer(
-        drawerContent = {
+    AdaptiveScaffold(
+        topBar = {
+            AnimatedVisibility(
+                visible = topBarVisible,
+                enter = slideInVertically { -it },
+                exit = slideOutVertically { -it }
+            ) {
+                topBar()
+            }
+        },
+        snackbarHost = snackbarHost,
+        floatingActionButton = {
+            floatingActionButton
+                .takeUnless { windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium }
+                ?.invoke()
+        },
+        floatingActionButtonPosition = floatingActionButtonPosition,
+        contentColor = contentColor,
+        containerColor = containerColor,
+        contentWindowInsets = contentWindowInsets,
+        bottomBar = {
+            if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+                AnimatedVisibility(
+                    visible = navigationBarVisible,
+                    enter = slideInVertically { it },
+                    exit = slideOutVertically { it }
+                ) {
+                    AdaptiveNavigationBar {
+                        for ((index, item) in items.withIndex()) {
+                            AdaptiveNavigationBarItem(
+                                selected = pagerState.currentPage == index,
+                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                                icon = { Icon(item.icon(), item.label()) },
+                                label = { Text(item.label()) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    ) { paddingValues ->
+        Row(
+            modifier = Modifier.fillMaxSize().padding(paddingValues)
+        ) {
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded) {
                 AnimatedVisibility(navigationBarVisible) {
-                    PermanentDrawerSheet {
+                    Column(
+                        // TODO: Background color
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .widthIn(
+                                min = MinimumDrawerWidth,
+                                max = DrawerDefaults.MaximumDrawerWidth
+                            )
+                            .weight(1f)
+                    ) {
                         for ((index, item) in items.withIndex()) {
                             NavigationDrawerItem(
                                 selected = currentPage == index,
@@ -92,13 +155,7 @@ fun AdaptiveNavigationScaffold(
                         }
                     }
                 }
-            }
-        }
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium) {
+            } else if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium) {
                 AnimatedVisibility(navigationBarVisible) {
                     NavigationRail(
                         header = floatingActionButton?.let { fab -> { fab() } }
@@ -115,78 +172,35 @@ fun AdaptiveNavigationScaffold(
                 }
             }
 
-            Scaffold(
-                modifier = Modifier.fillMaxHeight().weight(1f),
-                topBar = {
-                    AnimatedVisibility(
-                        visible = topBarVisible,
-                        enter = slideInVertically { -it },
-                        exit = slideOutVertically { -it }
-                    ) {
-                        topBar()
-                    }
-                },
-                snackbarHost = snackbarHost,
-                floatingActionButton = {
-                    floatingActionButton
-                        .takeUnless { windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium }
-                        ?.invoke()
-                },
-                floatingActionButtonPosition = floatingActionButtonPosition,
-                contentColor = contentColor,
-                containerColor = containerColor,
-                contentWindowInsets = contentWindowInsets,
-                bottomBar = {
-                    if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
-                        AnimatedVisibility(
-                            visible = navigationBarVisible,
-                            enter = slideInVertically { it },
-                            exit = slideOutVertically { it }
-                        ) {
-                            NavigationBar {
-                                for ((index, item) in items.withIndex()) {
-                                    NavigationBarItem(
-                                        selected = pagerState.currentPage == index,
-                                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                                        icon = { Icon(item.icon(), item.label()) },
-                                        label = { Text(item.label()) }
-                                    )
-                                }
-                            }
-                        }
-                    }
+            if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Expanded) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    userScrollEnabled = userScrollEnabled
+                ) { page ->
+                    content(page)
                 }
-            ) { paddingValues ->
-                if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Expanded) {
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize().padding(paddingValues),
-                        userScrollEnabled = userScrollEnabled
-                    ) { page ->
-                        content(page)
-                    }
-                } else {
-                    AnimatedContent(
-                        targetState = currentPage,
-                        modifier = Modifier.fillMaxSize().padding(paddingValues),
-                        transitionSpec = {
-                            slideInHorizontally {
-                                if (initialState > targetState) {
-                                    -it
-                                } else {
-                                    it
-                                }
-                            } togetherWith slideOutHorizontally {
-                                if (initialState > targetState) {
-                                    it
-                                } else {
-                                    -it
-                                }
+            } else {
+                AnimatedContent(
+                    targetState = currentPage,
+                    modifier = Modifier.fillMaxSize(),
+                    transitionSpec = {
+                        slideInHorizontally {
+                            if (initialState > targetState) {
+                                -it
+                            } else {
+                                it
+                            }
+                        } togetherWith slideOutHorizontally {
+                            if (initialState > targetState) {
+                                it
+                            } else {
+                                -it
                             }
                         }
-                    ) { page ->
-                        content(page)
                     }
+                ) { page ->
+                    content(page)
                 }
             }
         }

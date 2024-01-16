@@ -17,9 +17,15 @@ import data.EDataType
 import database.SettingsKeys
 import database.settings
 import dev.icerock.moko.resources.compose.stringResource
+import io.github.alexzhirkevich.cupertino.AlertActionStyle
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveAlertDialog
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
+import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
+import io.github.alexzhirkevich.cupertino.adaptive.Theme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import network.connectivityStatus
+import platform.PlatformInfo
 import platform.Updates
 import resources.MR
 import ui.screen.AppScreen
@@ -27,6 +33,7 @@ import utils.createStore
 
 val store = CoroutineScope(SupervisorJob()).createStore()
 
+@OptIn(ExperimentalAdaptiveApi::class)
 @Composable
 fun App(
     initial: Pair<EDataType, Long>? = null,
@@ -40,14 +47,16 @@ fun App(
         }
     }
 
-    MaterialTheme {
+    AdaptiveTheme(
+        PlatformInfo.type.theme
+    ) {
         val updateAvailable by Updates.updateAvailable.collectAsState()
         val latestVersion by Updates.latestVersion.collectAsState()
         if (updateAvailable) {
-            AlertDialog(
+            AdaptiveAlertDialog(
                 onDismissRequest = { Updates.updateAvailable.tryEmit(false) },
                 title = { Text(stringResource(MR.strings.update_available_dialog_title)) },
-                text = {
+                message = {
                     Text(
                         text = latestVersion?.let {
                             stringResource(
@@ -58,18 +67,22 @@ fun App(
                         } ?: stringResource(MR.strings.update_available_dialog_message)
                     )
                 },
-                confirmButton = {
-                    TextButton(
-                        onClick = { /*TODO*/ }
-                    ) { Text(stringResource(MR.strings.action_update)) }
-                },
-                dismissButton = {
-                    TextButton(
+                buttons = {
+                    action(
                         onClick = {
                             settings[SettingsKeys.SKIP_VERSION] = latestVersion
                             Updates.updateAvailable.tryEmit(false)
-                        }
-                    ) { Text(stringResource(MR.strings.action_skip)) }
+                        },
+                        style = AlertActionStyle.Destructive
+                    ) {
+                        Text(stringResource(MR.strings.action_skip))
+                    }
+                    action(
+                        onClick = { /*TODO*/ },
+                        style = AlertActionStyle.Default
+                    ) {
+                        Text(stringResource(MR.strings.action_update))
+                    }
                 }
             )
         }

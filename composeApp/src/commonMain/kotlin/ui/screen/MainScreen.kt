@@ -31,6 +31,8 @@ import data.Area
 import database.SettingsKeys
 import database.settings
 import io.github.aakira.napier.Napier
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveCircularProgressIndicator
+import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -44,6 +46,7 @@ import ui.model.MainScreenModel
 
 @OptIn(ExperimentalFoundationApi::class)
 object MainScreen: Screen {
+    @OptIn(ExperimentalAdaptiveApi::class)
     @Composable
     override fun Content() {
         val lifecycleManager = LocalLifecycleManager.current
@@ -89,7 +92,7 @@ object MainScreen: Screen {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                AdaptiveCircularProgressIndicator()
             }
         }
 

@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ChevronLeft
@@ -42,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -56,6 +58,18 @@ import database.Zone
 import database.database
 import database.settings
 import dev.icerock.moko.resources.compose.stringResource
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptationScope
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveIconButton
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTopAppBar
+import io.github.alexzhirkevich.cupertino.adaptive.CupertinoIconButtonAdaptation
+import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
+import io.github.alexzhirkevich.cupertino.adaptive.MaterialIconButtonAdaptation
+import io.github.alexzhirkevich.cupertino.adaptive.icons.AdaptiveIcons
+import io.github.alexzhirkevich.cupertino.adaptive.icons.Close
+import io.github.alexzhirkevich.cupertino.adaptive.icons.Home
+import io.github.alexzhirkevich.cupertino.adaptive.icons.KeyboardArrowLeft
+import io.github.alexzhirkevich.cupertino.adaptive.icons.Search
+import io.github.alexzhirkevich.cupertino.adaptive.icons.Settings
 import network.connectivityStatus
 import resources.MR
 import search.Filter
@@ -76,6 +90,7 @@ import utils.unaccent
 class AppScreen(
     private val initial: Pair<EDataType, Long>? = null
 ) : Screen {
+    @OptIn(ExperimentalAdaptiveApi::class)
     @Composable
     override fun Content() {
         val lifecycleManager = LocalLifecycleManager.current
@@ -126,11 +141,11 @@ class AppScreen(
                 items = listOf(
                     NavigationItem(
                         label = { stringResource(MR.strings.navigation_explore) },
-                        icon = { Icons.Outlined.Explore }
+                        icon = { AdaptiveIcons.Outlined.Home }
                     ),
                     NavigationItem(
                         label = { stringResource(MR.strings.navigation_settings) },
-                        icon = { Icons.Outlined.Settings }
+                        icon = { AdaptiveIcons.Outlined.Settings }
                     )
                 ),
                 userScrollEnabled = isRoot,
@@ -145,7 +160,7 @@ class AppScreen(
                         if (searching) {
                             SearchBarLogic(areas, zones, sectors, paths, searchModel, navigator)
                         } else {
-                            CenterAlignedTopAppBar(
+                            AdaptiveTopAppBar(
                                 title = {
                                     AnimatedContent(
                                         targetState = selection,
@@ -159,7 +174,9 @@ class AppScreen(
                                             text = when {
                                                 dataType != null -> dataType.displayName
                                                 else -> "Escalar Alcoià i Comtat"
-                                            }
+                                            },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = TextAlign.Center
                                         )
                                     }
                                 },
@@ -169,7 +186,7 @@ class AppScreen(
                                         enter = slideInHorizontally { -it },
                                         exit = slideOutHorizontally { -it }
                                     ) {
-                                        IconButton(
+                                        AdaptiveIconButton(
                                             onClick = {
                                                 if (navigator.size <= 1) {
                                                     lifecycleManager.finish()
@@ -179,17 +196,18 @@ class AppScreen(
                                                         model.clear()
                                                     }
                                                 }
+                                                      },
+                                            content = {
+                                                Icon(
+                                                    imageVector = if (navigator.size <= 1) {
+                                                        AdaptiveIcons.Outlined.Close
+                                                    } else {
+                                                        AdaptiveIcons.Outlined.KeyboardArrowLeft
+                                                    },
+                                                    contentDescription = null
+                                                )
                                             }
-                                        ) {
-                                            Icon(
-                                                imageVector = if (navigator.size <= 1) {
-                                                    Icons.Rounded.Close
-                                                } else {
-                                                    Icons.Rounded.ChevronLeft
-                                                },
-                                                contentDescription = null
-                                            )
-                                        }
+                                        )
                                     }
                                 },
                                 actions = {
@@ -201,7 +219,7 @@ class AppScreen(
                                                 Text(stringResource(MR.strings.status_network_unavailable))
                                             }
                                         ) {
-                                            IconButton(
+                                            AdaptiveIconButton(
                                                 onClick = {},
                                                 enabled = false
                                             ) {
@@ -316,19 +334,24 @@ class AppScreen(
                 Text(stringResource(MR.strings.search))
             },
             leadingIcon = {
-                Icon(Icons.Outlined.Search, null)
+                Icon(AdaptiveIcons.Outlined.Search, null)
             },
             trailingIcon = {
                 Row {
                     IconButton(
-                        onClick = { searchModel.query.value = "" }
+                        onClick = {
+                            if (searchQuery.isBlank())
+                                searchModel.isSearching.tryEmit(false)
+                            else
+                                searchModel.query.value = ""
+                        }
                     ) {
-                        Icon(Icons.Rounded.Close, null)
+                        Icon(AdaptiveIcons.Outlined.Close, null)
                     }
                     IconButton(
                         onClick = { showingFiltersDialog = true }
                     ) {
-                        Icon(Icons.Rounded.FilterAlt, null)
+                        Icon(Icons.Outlined.FilterAlt, null)
                     }
                 }
             },
