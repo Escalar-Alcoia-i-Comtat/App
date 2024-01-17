@@ -5,11 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
@@ -34,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import cache.ImageCache
 import com.mxalbert.zoomable.Zoomable
@@ -106,7 +110,7 @@ class PathsScreen(
     }
 
     override val SidePanel: SidePanelContents<Sector, Path> =
-        SidePanelContents { parentState, childrenState, appScreenModel, model ->
+        SidePanelContents { _, childrenState, _, model ->
             // Cast the model as the correct type
             model as PathsScreenModel
 
@@ -181,6 +185,29 @@ class PathsScreen(
             }
             Text("Height: ${child.height}")
             Text("Grade: ${child.grade}")
+        }
+    }
+
+    @Composable
+    fun MetaCard(
+        icon: ImageVector,
+        text: String,
+        modifier: Modifier = Modifier,
+        iconContentDescription: String? = null,
+        trailingContent: (@Composable RowScope.() -> Unit)? = null
+    ) {
+        OutlinedCard(modifier) {
+            Row {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = iconContentDescription,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(
+                    text = text
+                )
+                trailingContent?.invoke(this)
+            }
         }
     }
 }
