@@ -35,6 +35,16 @@ fun readProperties(fileName: String): Properties {
     }
 }
 
+inline fun updateProperties(fileName: String, block: Properties.() -> Unit) {
+    val propsFile = project.rootProject.file(fileName)
+    val props = readProperties(propsFile.name)
+    block(props)
+    propsFile.outputStream().use {
+        val date = LocalDateTime.now()
+        props.store(it, "Updated at $date")
+    }
+}
+
 open class PlatformVersion(
     open val versionName: String
 )
@@ -459,14 +469,12 @@ buildkonfig {
 }
 
 fun increaseNumberInProperties(key: String) {
-    val versionPropsFile = project.rootProject.file("version.properties")
-    val versionProps = readProperties(versionPropsFile.name)
-    val code = versionProps.getProperty(key).toInt() + 1
-    versionProps[key] = code.toString()
-    versionPropsFile.outputStream().use {
-        val date = LocalDateTime.now()
-        versionProps.store(it, "Updated at $date")
+    var code = 0
+    updateProperties("version.properties") {
+        code = getProperty(key).toInt() + 1
+        setProperty(key, code.toString())
     }
+
     println("Increased $key to $code")
 }
 
