@@ -37,13 +37,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cache.ImageCache
 import com.mxalbert.zoomable.Zoomable
 import data.Path
 import data.Sector
+import data.generic.color
 import kotlinx.coroutines.launch
+import ui.icons.ClimbingShoes
+import ui.icons.Rope
 import ui.list.PathListItem
 import ui.model.AppScreenModel
 import ui.model.DataScreenModel
@@ -183,8 +188,29 @@ class PathsScreen(
                     }
                 }
             }
-            Text("Height: ${child.height}")
-            Text("Grade: ${child.grade}")
+            child.height?.let { height ->
+                MetaCard(
+                    icon = Icons.Filled.Rope,
+                    // TODO: Localization
+                    text = "Height",
+                    bigText = "$height m",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+            }
+            child.grade?.let { grade ->
+                MetaCard(
+                    icon = Icons.Filled.ClimbingShoes,
+                    // TODO: Localization
+                    text = "Grade",
+                    bigText = grade.toString(),
+                    bigTextColor = grade.color.current,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+            }
         }
     }
 
@@ -194,19 +220,39 @@ class PathsScreen(
         text: String,
         modifier: Modifier = Modifier,
         iconContentDescription: String? = null,
-        trailingContent: (@Composable RowScope.() -> Unit)? = null
+        bigText: String? = null,
+        bigTextColor: Color = Color.Unspecified
     ) {
         OutlinedCard(modifier) {
             Row {
                 Icon(
                     imageVector = icon,
                     contentDescription = iconContentDescription,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(48.dp)
                 )
-                Text(
-                    text = text
-                )
-                trailingContent?.invoke(this)
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 12.dp)
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(
+                        text = text,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    bigText?.let { text ->
+                        Text(
+                            text = text,
+                            color = bigTextColor,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
             }
         }
     }
