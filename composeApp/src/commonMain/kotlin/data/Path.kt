@@ -45,8 +45,8 @@ data class Path(
     val images: List<String>? = null,
 
     @SerialName("sector_id") val parentSectorId: Long
-): DataType {
-    constructor(path: Path): this(
+) : DataType {
+    constructor(path: Path) : this(
         path.id,
         path.timestamp,
         path.displayName,
@@ -76,6 +76,11 @@ data class Path(
     )
 
     val grade: GradeValue? get() = gradeValue?.let(GradeValue::fromString)
+
+    val hasAnyTypeCount: Boolean = paraboltCount != null || burilCount != null ||
+        pitonCount != null || spitCount != null || tensorCount != null
+
+    val hasAnyCount: Boolean = stringCount != null || hasAnyTypeCount
 
     override fun compareTo(other: DataType): Int {
         return (other as? data.Path)

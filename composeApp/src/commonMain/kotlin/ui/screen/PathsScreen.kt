@@ -46,16 +46,19 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import data.Path
 import data.Sector
 import data.generic.color
+import dev.icerock.moko.resources.PluralsResource
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import resources.MR
 import ui.composition.LocalUnitsConfiguration
+import ui.icons.ClimbingAnchor
 import ui.icons.ClimbingShoes
 import ui.icons.Rope
 import ui.list.PathListItem
 import ui.model.AppScreenModel
 import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
+import ui.platform.pluralResource
 import ui.screen.DataScreen.SidePanelContents
 import utils.unit.meters
 
@@ -218,6 +221,39 @@ class PathsScreen(
                         .padding(vertical = 4.dp)
                 )
             }
+            CountMetaCard(child)
+        }
+    }
+
+    @Composable
+    private fun CountMetaCard(child: Path) {
+        if (child.hasAnyCount) {
+            MetaCard(
+                icon = Icons.Filled.ClimbingAnchor,
+                text = if (child.hasAnyTypeCount) {
+                    val list = mutableListOf("")
+                    @Composable
+                    fun add(amount: UInt?, res: PluralsResource) {
+                        amount?.toInt()
+                            ?.let { pluralResource(res, it, it) }
+                            ?.let(list::add)
+                    }
+                    add(child.paraboltCount, MR.plurals.path_safes_parabolt)
+                    add(child.burilCount, MR.plurals.path_safes_buril)
+                    add(child.pitonCount, MR.plurals.path_safes_piton)
+                    add(child.spitCount, MR.plurals.path_safes_spit)
+                    add(child.tensorCount, MR.plurals.path_safes_tensor)
+
+                    stringResource(
+                        MR.strings.path_safes_count,
+                        list.joinToString("\n")
+                    )
+                } else
+                    stringResource(MR.strings.path_safes_none),
+                bigText = child.stringCount?.toInt()?.let {
+                    stringResource(MR.strings.path_quickdraws, it)
+                }
+            )
         }
     }
 
