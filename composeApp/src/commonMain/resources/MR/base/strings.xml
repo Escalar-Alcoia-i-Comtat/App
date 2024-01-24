@@ -32,6 +32,9 @@
     <string name="intro_5_title">Enjoy!</string>
     <string name="intro_5_message">You are ready to access the app! Don\'t hesitate in contacting us if you find any data wrong or inaccurate.</string>
 
+    <string name="settings_category_general">General Configuration</string>
+    <string name="settings_units_distance">Distance Units</string>
+
     <string name="settings_category_app_info">Application Information</string>
     <string name="settings_app_info_version">App Version</string>
     <string name="settings_app_info_version_code">App Version and Code</string>

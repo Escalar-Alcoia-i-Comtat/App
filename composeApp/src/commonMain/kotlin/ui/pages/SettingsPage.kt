@@ -17,12 +17,14 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Route
+import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,15 +38,19 @@ import androidx.compose.ui.unit.dp
 import build.BuildKonfig
 import cache.File
 import cache.ImageCache
+import com.russhwolf.settings.ExperimentalSettingsApi
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import maps.KMZHandler
 import maps.MapsCache
 import resources.MR
+import ui.composition.LocalUnitsConfiguration
 import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
+import ui.reusable.settings.SettingsSelector
 import utils.formatBytes
+import utils.unit.DistanceUnits
 
 @Composable
 @ExperimentalMaterial3Api
@@ -102,9 +108,10 @@ private fun SettingsCacheRow(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSettingsApi::class)
 fun SettingsPage() {
     val uriHandler = LocalUriHandler.current
+    val unitsConfiguration = LocalUnitsConfiguration.current
 
     Column(
         modifier = Modifier
@@ -121,6 +128,24 @@ fun SettingsPage() {
             Spacer(Modifier.height(8.dp))
 
             PlatformSettings()
+
+            val units by unitsConfiguration.unitsLive.collectAsState(DistanceUnits.METER)
+
+            SettingsCategory(
+                text = stringResource(MR.strings.settings_category_general)
+            )
+            SettingsSelector(
+                headline = stringResource(MR.strings.settings_units_distance),
+                summary = stringResource(units.label),
+                icon = Icons.Rounded.Straighten,
+                options = DistanceUnits.entries,
+                onOptionSelected = {
+                    unitsConfiguration.setUnits(it)
+                },
+                selection = units,
+                optionsDialogTitle = stringResource(MR.strings.settings_units_distance),
+                stringConverter = { stringResource(it.label) }
+            )
 
             var deleting by remember { mutableStateOf(false) }
 

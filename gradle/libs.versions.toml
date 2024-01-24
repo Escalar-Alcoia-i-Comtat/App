@@ -59,7 +59,8 @@ moko-base = { module = "dev.icerock.moko:resources", version.ref = "moko" }
 moko-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko" }
 moko-graphics = { module = "dev.icerock.moko:graphics", version.ref = "moko-graphics" }
 moko-test = { module = "dev.icerock.moko:resources-test", version.ref = "moko" }
-multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+multiplatformSettings-base = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+multiplatformSettings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 play-appupdate = { module = "com.google.android.play:app-update-ktx", version.ref = "play-appupdate" }

@@ -2,7 +2,15 @@ package utils.unit
 
 data class Feet(
     override val value: Double
-): DistanceUnit
+): ImperialUnit {
+    @Suppress("UNCHECKED_CAST")
+    override fun <U : DistanceUnit> convertTo(units: DistanceUnits): U {
+        return when (units) {
+            DistanceUnits.METER -> toMeter() as U
+            DistanceUnits.FEET -> this as U
+        }
+    }
+}
 
 /**
  * 1 foot equals 0.3048 meters.

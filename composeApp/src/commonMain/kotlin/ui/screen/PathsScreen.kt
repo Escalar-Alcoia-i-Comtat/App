@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cache.ImageCache
 import com.mxalbert.zoomable.Zoomable
+import com.russhwolf.settings.ExperimentalSettingsApi
 import data.Path
 import data.Sector
 import data.generic.color
@@ -56,6 +57,7 @@ import ui.model.AppScreenModel
 import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
 import ui.screen.DataScreen.SidePanelContents
+import utils.unit.meters
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 class PathsScreen(
@@ -164,6 +166,7 @@ class PathsScreen(
     }
 
     @Composable
+    @OptIn(ExperimentalSettingsApi::class)
     override fun ColumnScope.BottomSheetContents(
         child: Path,
         model: DataScreenModel<Sector, Path>,
@@ -196,7 +199,9 @@ class PathsScreen(
                 MetaCard(
                     icon = Icons.Filled.Rope,
                     text = stringResource(MR.strings.path_height),
-                    bigText = with(localUnitsConfiguration) { height.toDouble().asDistanceValue() },
+                    bigText = with(localUnitsConfiguration) {
+                        height.meters.asDistanceValue()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)

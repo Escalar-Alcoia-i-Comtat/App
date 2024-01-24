@@ -8,6 +8,14 @@ enum class DistanceUnits(
     val valueFormat: StringResource,
     val factory: (Double) -> DistanceUnit
 ) {
-    METER(MR.strings.unit_label_meter, MR.strings.unit_value_meter, { Meter(it) }),
-    FEET(MR.strings.unit_label_feet, MR.strings.unit_value_feet, { Feet(it) })
+    METER(
+        MR.strings.unit_label_meter,
+        MR.strings.unit_value_meter,
+        { Meter(it) }
+    ),
+    FEET(
+        MR.strings.unit_label_feet,
+        MR.strings.unit_value_feet,
+        { Feet(it) }
+    )
 }
