@@ -177,10 +177,12 @@ kotlin {
             implementation(libs.sqldelight.coroutines)
 
             // Settings storage
-            implementation(libs.multiplatformSettings)
+            implementation(libs.multiplatformSettings.base)
+            implementation(libs.multiplatformSettings.coroutines)
         }
 
         commonTest.dependencies {
+            implementation(libs.kotlin.test)
             implementation(libs.moko.test)
         }
 

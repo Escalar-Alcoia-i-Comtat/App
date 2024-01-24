@@ -15,4 +15,9 @@ class Area(
 ): DataTypeWithImage {
     // TODO - load zones
     constructor(area: Area): this(area.id, area.timestamp, area.displayName, area.image, area.webUrl, emptyList())
+
+    override fun compareTo(other: DataType): Int {
+        // Sort by displayName
+        return displayName.compareTo(other.displayName)
+    }
 }

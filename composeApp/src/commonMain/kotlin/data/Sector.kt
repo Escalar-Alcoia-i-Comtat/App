@@ -32,4 +32,14 @@ data class Sector(
         sector.parentZoneId,
         emptyList()
     )
+
+    override fun compareTo(other: DataType): Int {
+        return (other as? data.Sector)
+            // If other is a Sector, try to compare by weight, but don't consider empty weights
+            ?.takeUnless { weight.isBlank() || other.weight.isBlank() }
+            ?.let { weight.compareTo(other.weight) }
+            // If they are equal, don't take, and fallback to displayName
+            ?.takeIf { it != 0 }
+            ?: displayName.compareTo(other.displayName)
+    }
 }

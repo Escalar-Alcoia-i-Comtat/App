@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <plural name="path_safes_parabolt">
+        <item quantity="zero">Parabolts</item>
+        <item quantity="other">%d Parabolts</item>
+    </plural>
+    <plural name="path_safes_buril">
+        <item quantity="zero">Burils</item>
+        <item quantity="other">%d Burils</item>
+    </plural>
+    <plural name="path_safes_piton">
+        <item quantity="zero">Piton</item>
+        <item quantity="other">%d Piton</item>
+    </plural>
+    <plural name="path_safes_spit">
+        <item quantity="zero">Spits</item>
+        <item quantity="other">%d Spits</item>
+    </plural>
+    <plural name="path_safes_tensor">
+        <item quantity="zero">Tensors</item>
+        <item quantity="other">%d Tensors</item>
+    </plural>
+</resources>

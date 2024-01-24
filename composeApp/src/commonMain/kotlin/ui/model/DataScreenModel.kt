@@ -15,15 +15,29 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
     private val parentQuery: suspend (id: Long) -> Parent?,
     private val childrenQuery: suspend (parentId: Long) -> List<Children>
 ) : ScreenModel {
+    /**
+     * Whether the children should be ordered automatically upon fetch.
+     * [DataType.compareTo] is used for sorting.
+     */
+    open val sortChildren: Boolean = true
+
     val parent = MutableStateFlow<Parent?>(null)
     val children = MutableStateFlow<List<Children>?>(null)
 
     val notFound = MutableStateFlow(false)
 
+    /**
+     * When not `null`, displays a bottom sheet with the contents desired.
+     */
+    val displayingChild = MutableStateFlow<Children?>(null)
+
     fun load(id: Long) = screenModelScope.launch(Dispatchers.IO) {
         appScreenModel.selection.emit(null)
         val dbChildren = childrenQuery(id)
-        children.emit(dbChildren)
+        children.emit(
+            if (sortChildren) dbChildren.sorted()
+            else dbChildren
+        )
 
         val dbParent = parentQuery(id)
         if (dbParent == null) {
