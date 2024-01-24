@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,7 +45,10 @@ import com.mxalbert.zoomable.Zoomable
 import data.Path
 import data.Sector
 import data.generic.color
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
+import resources.MR
+import ui.composition.LocalUnitsConfiguration
 import ui.icons.ClimbingShoes
 import ui.icons.Rope
 import ui.list.PathListItem
@@ -167,6 +169,8 @@ class PathsScreen(
         model: DataScreenModel<Sector, Path>,
         isModal: Boolean
     ) {
+        val localUnitsConfiguration = LocalUnitsConfiguration.current
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -191,9 +195,8 @@ class PathsScreen(
             child.height?.let { height ->
                 MetaCard(
                     icon = Icons.Filled.Rope,
-                    // TODO: Localization
-                    text = "Height",
-                    bigText = "$height m",
+                    text = stringResource(MR.strings.path_height),
+                    bigText = with(localUnitsConfiguration) { height.toDouble().asDistanceValue() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
@@ -202,8 +205,7 @@ class PathsScreen(
             child.grade?.let { grade ->
                 MetaCard(
                     icon = Icons.Filled.ClimbingShoes,
-                    // TODO: Localization
-                    text = "Grade",
+                    text = stringResource(MR.strings.path_grade),
                     bigText = grade.toString(),
                     bigTextColor = grade.color.current,
                     modifier = Modifier

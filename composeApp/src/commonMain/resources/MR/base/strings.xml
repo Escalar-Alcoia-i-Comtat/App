@@ -72,4 +72,12 @@
     <string name="update_available_dialog_title">Update Available</string>
     <string name="update_available_dialog_message">There\'s a new update available to download.</string>
     <string name="update_available_dialog_message_version">There\'s a new update available to download. You are currently running %s and the latest version is %s.</string>
+
+    <string name="path_height">Height</string>
+    <string name="path_grade">Grade</string>
+
+    <string name="unit_label_meter">Meter</string>
+    <string name="unit_value_meter">%.0f m</string>
+    <string name="unit_label_feet">Feet</string>
+    <string name="unit_value_feet">%.0f ft.</string>
 </resources>

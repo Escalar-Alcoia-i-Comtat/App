@@ -19,4 +19,9 @@ object SettingsKeys {
      * On supported platforms, stores which version should not be notified of new releases.
      */
     const val SKIP_VERSION = "skip_version"
+
+    /**
+     * Stores the preferred distance units to use.
+     */
+    const val DISTANCE_UNITS = "distance_units"
 }
