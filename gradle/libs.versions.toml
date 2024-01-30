@@ -10,7 +10,7 @@ compose = "1.5.4"
 compose-compiler = "1.5.7"
 compose-maps = "4.3.2"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
-compose-plugin = "1.5.11"
+compose-plugin = "1.5.12"
 compose-windowSizeClass = "0.3.2"
 kmpio = "0.1.5"
 kotlin = "1.9.21"
