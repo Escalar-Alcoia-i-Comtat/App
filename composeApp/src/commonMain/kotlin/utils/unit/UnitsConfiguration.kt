@@ -8,9 +8,9 @@ import com.russhwolf.settings.coroutines.getStringFlow
 import com.russhwolf.settings.set
 import database.SettingsKeys
 import database.settings
-import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.jetbrains.compose.resources.stringResource
 
 class UnitsConfiguration {
     fun getUnits(): DistanceUnits {

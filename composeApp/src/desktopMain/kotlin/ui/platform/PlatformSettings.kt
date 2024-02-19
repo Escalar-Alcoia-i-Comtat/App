@@ -15,20 +15,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import dev.icerock.moko.resources.compose.stringResource
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import platform.Updates
 import platform.Updates.Error
-import resources.MR
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 actual fun ColumnScope.PlatformSettings() {
-    SettingsCategory(stringResource(MR.strings.settings_category_updates))
+    SettingsCategory(stringResource(Res.string.settings_category_updates))
 
     var checkingForUpdate by remember { mutableStateOf(false) }
     val updateAvailable by Updates.updateAvailable.collectAsState()
@@ -53,13 +54,13 @@ actual fun ColumnScope.PlatformSettings() {
     updateError?.let { error ->
         AlertDialog(
             onDismissRequest = { Updates.updateError.tryEmit(null) },
-            title = { Text(stringResource(MR.strings.settings_updates_error_title)) },
+            title = { Text(stringResource(Res.string.settings_updates_error_title)) },
             text = {
                 val errorRes = when (error) {
-                    Error.NO_ASSETS -> MR.strings.settings_updates_error_no_assets
-                    Error.RELEASE_NOT_FOUND -> MR.strings.settings_updates_error_not_found
-                    Error.UNKNOWN_OS -> MR.strings.settings_updates_error_unknown_os
-                    Error.INSTALLER_NOT_FOUND -> MR.strings.settings_updates_error_installer_not_found
+                    Error.NO_ASSETS -> Res.string.settings_updates_error_no_assets
+                    Error.RELEASE_NOT_FOUND -> Res.string.settings_updates_error_not_found
+                    Error.UNKNOWN_OS -> Res.string.settings_updates_error_unknown_os
+                    Error.INSTALLER_NOT_FOUND -> Res.string.settings_updates_error_installer_not_found
                 }
                 Text(
                     text = stringResource(errorRes)
@@ -68,27 +69,27 @@ actual fun ColumnScope.PlatformSettings() {
             confirmButton = {
                 TextButton(
                     onClick = { Updates.updateError.tryEmit(null) }
-                ) { Text(stringResource(MR.strings.action_close)) }
+                ) { Text(stringResource(Res.string.action_close)) }
             }
         )
     }
 
     if (updateAvailable || updateAvailableAfterCheck) {
         SettingsRow(
-            headline = stringResource(MR.strings.settings_updates_true_title),
+            headline = stringResource(Res.string.settings_updates_true_title),
             summary = if (!performingUpdate) {
-                stringResource(MR.strings.settings_updates_true_summary)
+                stringResource(Res.string.settings_updates_true_summary)
             } else {
                 downloadProgress?.let { progress ->
                     when (progress) {
                         in 0f..1f -> stringResource(
-                            MR.strings.settings_updates_downloading_progress,
+                            Res.string.settings_updates_downloading_progress,
                             (progress * 100).toInt()
                         )
-                        Updates.DOWNLOAD_PROGRESS_STORING -> stringResource(MR.strings.settings_updates_storing)
+                        Updates.DOWNLOAD_PROGRESS_STORING -> stringResource(Res.string.settings_updates_storing)
                         else -> null
                     }
-                } ?: stringResource(MR.strings.settings_updates_downloading)
+                } ?: stringResource(Res.string.settings_updates_downloading)
             },
             icon = Icons.Outlined.SystemSecurityUpdate,
             enabled = !performingUpdate
@@ -100,12 +101,12 @@ actual fun ColumnScope.PlatformSettings() {
         }
     } else {
         SettingsRow(
-            headline = stringResource(MR.strings.settings_updates_false_title),
+            headline = stringResource(Res.string.settings_updates_false_title),
             summary = stringResource(
                 if (checkingForUpdate)
-                    MR.strings.settings_updates_checking
+                    Res.string.settings_updates_checking
                 else
-                    MR.strings.settings_updates_false_summary
+                    Res.string.settings_updates_false_summary
             ),
             icon = Icons.Outlined.SystemSecurityUpdateGood,
             enabled = !checkingForUpdate

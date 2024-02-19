@@ -29,9 +29,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.PlainTooltipBox
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,9 +59,10 @@ import database.SettingsKeys
 import database.Zone
 import database.database
 import database.settings
-import dev.icerock.moko.resources.compose.stringResource
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import network.connectivityStatus
-import resources.MR
+import org.jetbrains.compose.resources.stringResource
 import search.Filter
 import ui.composition.LocalLifecycleManager
 import ui.dialog.SearchFiltersDialog
@@ -126,11 +130,11 @@ class AppScreen(
             AdaptiveNavigationScaffold(
                 items = listOf(
                     NavigationItem(
-                        label = { stringResource(MR.strings.navigation_explore) },
+                        label = { stringResource(Res.string.navigation_explore) },
                         icon = { Icons.Outlined.Explore }
                     ),
                     NavigationItem(
-                        label = { stringResource(MR.strings.navigation_settings) },
+                        label = { stringResource(Res.string.navigation_settings) },
                         icon = { Icons.Outlined.Settings }
                     )
                 ),
@@ -199,9 +203,13 @@ class AppScreen(
                                     AnimatedVisibility(
                                         visible = !isNetworkConnected
                                     ) {
-                                        PlainTooltipBox(
+                                        TooltipBox(
+                                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                            state = rememberTooltipState(),
                                             tooltip = {
-                                                Text(stringResource(MR.strings.status_network_unavailable))
+                                                PlainTooltip {
+                                                    Text(stringResource(Res.string.status_network_unavailable))
+                                                }
                                             }
                                         ) {
                                             IconButton(
@@ -316,7 +324,7 @@ class AppScreen(
             active = isSearching,
             onActiveChange = { searchModel.isSearching.value = it },
             placeholder = {
-                Text(stringResource(MR.strings.search))
+                Text(stringResource(Res.string.search))
             },
             leadingIcon = {
                 Icon(Icons.Outlined.Search, null)
@@ -338,7 +346,7 @@ class AppScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             if (searchQuery.isBlank()) {
-                Text(stringResource(MR.strings.search_empty))
+                Text(stringResource(Res.string.search_empty))
             } else {
                 LazyColumn {
                     items(

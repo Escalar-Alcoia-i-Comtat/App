@@ -18,9 +18,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import dev.icerock.moko.resources.StringResource
-import dev.icerock.moko.resources.compose.stringResource
-import resources.MR
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.search_filter_areas
+import escalaralcoiaicomtat.composeapp.generated.resources.search_filter_paths
+import escalaralcoiaicomtat.composeapp.generated.resources.search_filter_sectors
+import escalaralcoiaicomtat.composeapp.generated.resources.search_filter_zones
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import search.Filter
 import search.VisibilityFilter
 
@@ -75,10 +79,10 @@ fun SearchFiltersDialog(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         text = {
             LazyColumn {
-                drawFilters(MR.strings.search_filter_areas, areasFilters)
-                drawFilters(MR.strings.search_filter_zones, zonesFilters)
-                drawFilters(MR.strings.search_filter_sectors, sectorsFilters)
-                drawFilters(MR.strings.search_filter_paths, pathsFilters)
+                drawFilters(Res.string.search_filter_areas, areasFilters)
+                drawFilters(Res.string.search_filter_zones, zonesFilters)
+                drawFilters(Res.string.search_filter_sectors, sectorsFilters)
+                drawFilters(Res.string.search_filter_paths, pathsFilters)
             }
         }
     )

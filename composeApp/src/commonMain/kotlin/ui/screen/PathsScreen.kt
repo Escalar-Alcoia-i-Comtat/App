@@ -50,10 +50,11 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import data.Path
 import data.Sector
 import data.generic.color
-import dev.icerock.moko.resources.PluralsResource
-import dev.icerock.moko.resources.compose.stringResource
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
-import resources.MR
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import ui.composition.LocalUnitsConfiguration
 import ui.icons.ClimbingAnchor
 import ui.icons.ClimbingShoes
@@ -62,7 +63,6 @@ import ui.list.PathListItem
 import ui.model.AppScreenModel
 import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
-import ui.platform.pluralResource
 import ui.screen.DataScreen.SidePanelContents
 import utils.unit.meters
 
@@ -110,9 +110,6 @@ class PathsScreen(
                 } ?: CircularProgressIndicator()
             }
 
-            val windowInfo = LocalWindowInfo.current
-            val density = LocalDensity.current
-            val height = with(density) { windowInfo.containerSize.height.toDp() }
             val windowSizeClass = calculateWindowSizeClass()
             val shouldDisplaySidePanel = remember(windowSizeClass) {
                 shouldDisplaySidePanel(windowSizeClass)
@@ -122,7 +119,7 @@ class PathsScreen(
             ) {
                 PathsListView(
                     childrenState,
-                    modifier = Modifier.fillMaxWidth().heightIn(max = height * 0.3f).weight(1f),
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(0.3f).weight(1f),
                     onPathClicked = model.displayingChild::tryEmit
                 )
             }
@@ -209,7 +206,7 @@ class PathsScreen(
             child.height?.let { height ->
                 MetaCard(
                     icon = Icons.Filled.Rope,
-                    text = stringResource(MR.strings.path_height),
+                    text = stringResource(Res.string.path_height),
                     bigText = with(localUnitsConfiguration) {
                         height.meters.asDistanceValue()
                     },
@@ -221,7 +218,7 @@ class PathsScreen(
             child.grade?.let { grade ->
                 MetaCard(
                     icon = Icons.Filled.ClimbingShoes,
-                    text = stringResource(MR.strings.path_grade),
+                    text = stringResource(Res.string.path_grade),
                     bigText = grade.toString(),
                     bigTextColor = grade.color.current,
                     modifier = Modifier
@@ -241,25 +238,28 @@ class PathsScreen(
                 text = if (child.hasAnyTypeCount) {
                     val list = mutableListOf("")
                     @Composable
-                    fun add(amount: UInt?, res: PluralsResource) {
+                    fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
                         amount?.toInt()
-                            ?.let { pluralResource(res, it, it) }
+                            ?.let {
+                                if (it <= 0) stringResource(singleRes)
+                                else stringResource(countRes, it)
+                            }
                             ?.let(list::add)
                     }
-                    add(child.paraboltCount, MR.plurals.path_safes_parabolt)
-                    add(child.burilCount, MR.plurals.path_safes_buril)
-                    add(child.pitonCount, MR.plurals.path_safes_piton)
-                    add(child.spitCount, MR.plurals.path_safes_spit)
-                    add(child.tensorCount, MR.plurals.path_safes_tensor)
+                    add(child.paraboltCount, Res.string.path_safes_parabolts, Res.string.path_safes_parabolts_count)
+                    add(child.burilCount, Res.string.path_safes_burils, Res.string.path_safes_burils_count)
+                    add(child.pitonCount, Res.string.path_safes_pitons, Res.string.path_safes_pitons_count)
+                    add(child.spitCount, Res.string.path_safes_spits, Res.string.path_safes_spits_count)
+                    add(child.tensorCount, Res.string.path_safes_tensors, Res.string.path_safes_tensors_count)
 
                     stringResource(
-                        MR.strings.path_safes_count,
+                        Res.string.path_safes_count,
                         list.joinToString("\n")
                     )
                 } else
-                    stringResource(MR.strings.path_safes_none),
+                    stringResource(Res.string.path_safes_none),
                 bigText = child.stringCount?.toInt()?.let {
-                    stringResource(MR.strings.path_quickdraws, it)
+                    stringResource(Res.string.path_quickdraws, it)
                 }
             )
         }

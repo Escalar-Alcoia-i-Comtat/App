@@ -4,31 +4,35 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
-import dev.icerock.moko.resources.compose.fontFamilyResource
-import resources.MR
+import escalaralcoiaicomtat.composeapp.generated.resources.Jost_Regular
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.Roboto_Regular
+import escalaralcoiaicomtat.composeapp.generated.resources.Rubik_Bold
+import escalaralcoiaicomtat.composeapp.generated.resources.Rubik_Medium
+import org.jetbrains.compose.resources.Font
 
 private val defaultTypography = Typography()
 
 private object Jost {
     val regular: FontFamily
         @Composable
-        get() = fontFamilyResource(MR.fonts.Jost.regular)
+        get() = FontFamily(Font(Res.font.Jost_Regular))
 }
 
 private object Roboto {
     val regular: FontFamily
         @Composable
-        get() = fontFamilyResource(MR.fonts.Roboto.regular)
+        get() = FontFamily(Font(Res.font.Roboto_Regular))
 }
 
 private object Rubik {
     val bold: FontFamily
         @Composable
-        get() = fontFamilyResource(MR.fonts.Rubik.bold)
+        get() = FontFamily(Font(Res.font.Rubik_Bold))
 
     val medium: FontFamily
         @Composable
-        get() = fontFamilyResource(MR.fonts.Rubik.medium)
+        get() = FontFamily(Font(Res.font.Rubik_Medium))
 }
 
 // Set of Material typography styles to start with
