@@ -86,4 +86,15 @@
     <string name="unit_value_meter">%.0f m</string>
     <string name="unit_label_feet">Feet</string>
     <string name="unit_value_feet">%.0f ft.</string>
+
+    <string name="path_safes_parabolts">Parabolts</string>
+    <string name="path_safes_parabolts_count">%d Parabolts</string>
+    <string name="path_safes_burils">Burils</string>
+    <string name="path_safes_burils_count">%d Burils</string>
+    <string name="path_safes_pitons">Pitons</string>
+    <string name="path_safes_pitons_count">%d Parabolts</string>
+    <string name="path_safes_spits">Spits</string>
+    <string name="path_safes_spits_count">%d Spits</string>
+    <string name="path_safes_tensors">Tensors</string>
+    <string name="path_safes_tensors_count">%d Tensors</string>
 </resources>
