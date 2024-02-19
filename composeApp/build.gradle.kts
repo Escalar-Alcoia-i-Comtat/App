@@ -1,7 +1,3 @@
-import Build_gradle.IOSVersion
-import Build_gradle.LinuxVersion
-import Build_gradle.MacOSVersion
-import Build_gradle.WindowsVersion
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
@@ -18,7 +14,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.moko)
     alias(libs.plugins.sqldelight)
 }
 
@@ -113,9 +108,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-
-            export(libs.moko.base)
-            export(libs.moko.graphics) // toUIColor here
         }
     }
 
@@ -133,6 +125,12 @@ kotlin {
     }
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+            }
+        }
+
         commonMain.dependencies {
             // Compose - Base
             @OptIn(ExperimentalComposeLibrary::class)
@@ -149,10 +147,6 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.transitions)
-
-            // Compose - Resources
-            api(libs.moko.base)
-            api(libs.moko.compose)
 
             // Compose - Zoomable
             implementation(libs.zoomable)
@@ -183,7 +177,6 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.moko.test)
         }
 
         val androidMain by getting {
@@ -402,10 +395,6 @@ sqldelight {
             packageName.set("database")
         }
     }
-}
-
-multiplatformResources {
-    multiplatformResourcesPackage = "resources"
 }
 
 buildkonfig {
