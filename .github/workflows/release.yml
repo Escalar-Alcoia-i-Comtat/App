@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew :composeApp:increaseVersionCode :composeApp:bundleRelease :composeApp:assembleRelease
 
       - name: Release AAB & APK
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
@@ -69,7 +69,7 @@ jobs:
         run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
