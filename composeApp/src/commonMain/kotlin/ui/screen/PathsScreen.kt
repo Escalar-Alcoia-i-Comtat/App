@@ -62,6 +62,7 @@ import ui.list.PathListItem
 import ui.model.AppScreenModel
 import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
+import ui.platform.getScreenSize
 import ui.platform.pluralResource
 import ui.screen.DataScreen.SidePanelContents
 import utils.unit.meters
@@ -110,9 +111,7 @@ class PathsScreen(
                 } ?: CircularProgressIndicator()
             }
 
-            val windowInfo = LocalWindowInfo.current
-            val density = LocalDensity.current
-            val height = with(density) { windowInfo.containerSize.height.toDp() }
+            val size = getScreenSize()
             val windowSizeClass = calculateWindowSizeClass()
             val shouldDisplaySidePanel = remember(windowSizeClass) {
                 shouldDisplaySidePanel(windowSizeClass)
@@ -122,7 +121,7 @@ class PathsScreen(
             ) {
                 PathsListView(
                     childrenState,
-                    modifier = Modifier.fillMaxWidth().heightIn(max = height * 0.3f).weight(1f),
+                    modifier = Modifier.fillMaxWidth().heightIn(max = size.height * 0.3f).weight(1f),
                     onPathClicked = model.displayingChild::tryEmit
                 )
             }
