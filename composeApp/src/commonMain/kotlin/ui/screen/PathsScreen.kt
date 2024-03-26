@@ -64,7 +64,6 @@ import ui.model.AppScreenModel
 import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
 import ui.platform.getScreenSize
-import ui.platform.pluralResource
 import ui.screen.DataScreen.SidePanelContents
 import utils.unit.meters
 
