@@ -1,7 +1,8 @@
 package utils.unit
 
-import dev.icerock.moko.resources.StringResource
-import resources.MR
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.StringResource
 
 enum class DistanceUnits(
     val label: StringResource,
@@ -9,13 +10,13 @@ enum class DistanceUnits(
     val factory: (Double) -> DistanceUnit
 ) {
     METER(
-        MR.strings.unit_label_meter,
-        MR.strings.unit_value_meter,
+        Res.string.unit_label_meter,
+        Res.string.unit_value_meter,
         { Meter(it) }
     ),
     FEET(
-        MR.strings.unit_label_feet,
-        MR.strings.unit_value_feet,
+        Res.string.unit_label_feet,
+        Res.string.unit_value_feet,
         { Feet(it) }
     )
 }

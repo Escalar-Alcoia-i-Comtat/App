@@ -15,12 +15,17 @@ import com.russhwolf.settings.set
 import data.EDataType
 import database.SettingsKeys
 import database.settings
-import dev.icerock.moko.resources.compose.stringResource
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.action_skip
+import escalaralcoiaicomtat.composeapp.generated.resources.action_update
+import escalaralcoiaicomtat.composeapp.generated.resources.update_available_dialog_message
+import escalaralcoiaicomtat.composeapp.generated.resources.update_available_dialog_message_version
+import escalaralcoiaicomtat.composeapp.generated.resources.update_available_dialog_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import network.connectivityStatus
+import org.jetbrains.compose.resources.stringResource
 import platform.Updates
-import resources.MR
 import ui.screen.AppScreen
 import ui.theme.AppTheme
 import utils.createStore
@@ -46,22 +51,22 @@ fun App(
         if (updateAvailable) {
             AlertDialog(
                 onDismissRequest = { Updates.updateAvailable.tryEmit(false) },
-                title = { Text(stringResource(MR.strings.update_available_dialog_title)) },
+                title = { Text(stringResource(Res.string.update_available_dialog_title)) },
                 text = {
                     Text(
                         text = latestVersion?.let {
                             stringResource(
-                                MR.strings.update_available_dialog_message_version,
+                                Res.string.update_available_dialog_message_version,
                                 BuildKonfig.VERSION_NAME,
                                 it
                             )
-                        } ?: stringResource(MR.strings.update_available_dialog_message)
+                        } ?: stringResource(Res.string.update_available_dialog_message)
                     )
                 },
                 confirmButton = {
                     TextButton(
                         onClick = { /*TODO*/ }
-                    ) { Text(stringResource(MR.strings.action_update)) }
+                    ) { Text(stringResource(Res.string.action_update)) }
                 },
                 dismissButton = {
                     TextButton(
@@ -69,7 +74,7 @@ fun App(
                             settings[SettingsKeys.SKIP_VERSION] = latestVersion
                             Updates.updateAvailable.tryEmit(false)
                         }
-                    ) { Text(stringResource(MR.strings.action_skip)) }
+                    ) { Text(stringResource(Res.string.action_skip)) }
                 }
             )
         }

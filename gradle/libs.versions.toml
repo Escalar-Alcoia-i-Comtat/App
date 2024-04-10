@@ -1,8 +1,5 @@
 [versions]
-agp = "8.3.1"
-android-compileSdk = "34"
-android-minSdk = "24"
-android-targetSdk = "34"
+agp = "8.2.2"
 androidx-activityCompose = "1.8.2"
 buildkonfig = "0.15.1"
 compose = "1.6.5"
@@ -20,8 +17,6 @@ kotlinx-json = "1.6.3"
 ksoup = "0.1.2"
 ktor = "2.3.10"
 mapbox = "5.8.0"
-moko = "0.23.0"
-moko-graphics = "0.9.0"
 multiplatform-settings = "1.1.1"
 napier = "2.7.1"
 okio = "3.9.0"
@@ -55,10 +50,6 @@ ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 mapbox-core = { module = "com.mapbox.mapboxsdk:mapbox-sdk-core", version.ref = "mapbox" }
 mapbox-services = { module = "com.mapbox.mapboxsdk:mapbox-sdk-services", version.ref = "mapbox" }
-moko-base = { module = "dev.icerock.moko:resources", version.ref = "moko" }
-moko-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko" }
-moko-graphics = { module = "dev.icerock.moko:graphics", version.ref = "moko-graphics" }
-moko-test = { module = "dev.icerock.moko:resources-test", version.ref = "moko" }
 multiplatformSettings-base = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatformSettings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
@@ -82,5 +73,4 @@ buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig"
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-moko = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "moko" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

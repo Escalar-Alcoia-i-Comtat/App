@@ -26,13 +26,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import database.SettingsKeys
 import database.settings
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
-import io.github.aakira.napier.Napier
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
 import platform.IntroScreenPages
-import resources.MR
 import ui.composition.LocalLifecycleManager
 import ui.reusable.IntroPage
 import ui.reusable.icon
@@ -43,27 +43,27 @@ class IntroScreen : Screen {
         *IntroScreenPages.pages,
         {
             IntroPage<Any>(
-                icon = painterResource(MR.images.climbing_color).icon,
-                title = stringResource(MR.strings.intro_1_title),
-                message = stringResource(MR.strings.intro_1_message)
+                icon = painterResource(Res.drawable.climbing_color).icon,
+                title = stringResource(Res.string.intro_1_title),
+                message = stringResource(Res.string.intro_1_message)
             )
         },
         {
             IntroPage<Any>(
-                icon = painterResource(MR.images.climbing_helmet_color).icon,
-                title = stringResource(MR.strings.intro_2_title),
-                message = stringResource(MR.strings.intro_2_message)
+                icon = painterResource(Res.drawable.climbing_helmet_color).icon,
+                title = stringResource(Res.string.intro_2_title),
+                message = stringResource(Res.string.intro_2_message)
             )
         },
         {
             val uriHandler = LocalUriHandler.current
             IntroPage<Any>(
-                icon = painterResource(MR.images.belayer_color).icon,
-                title = stringResource(MR.strings.intro_3_title),
-                message = stringResource(MR.strings.intro_3_message),
+                icon = painterResource(Res.drawable.belayer_color).icon,
+                title = stringResource(Res.string.intro_3_title),
+                message = stringResource(Res.string.intro_3_message),
                 action = object : IntroPage.Action() {
                     override val text: @Composable () -> String = {
-                        stringResource(MR.strings.action_view_video)
+                        stringResource(Res.string.action_view_video)
                     }
 
                     override fun onClick() {
@@ -76,16 +76,16 @@ class IntroScreen : Screen {
         },
         {
             IntroPage<Any>(
-                icon = painterResource(MR.images.kid_color).icon,
-                title = stringResource(MR.strings.intro_4_title),
-                message = stringResource(MR.strings.intro_4_message)
+                icon = painterResource(Res.drawable.kid_color).icon,
+                title = stringResource(Res.string.intro_4_title),
+                message = stringResource(Res.string.intro_4_message)
             )
         },
         {
             IntroPage<Any>(
-                icon = painterResource(MR.images.drawstring_bag_color).icon,
-                title = stringResource(MR.strings.intro_5_title),
-                message = stringResource(MR.strings.intro_5_message)
+                icon = painterResource(Res.drawable.drawstring_bag_color).icon,
+                title = stringResource(Res.string.intro_5_title),
+                message = stringResource(Res.string.intro_5_message)
             )
         }
     )
@@ -116,9 +116,9 @@ class IntroScreen : Screen {
                     }
                 ) {
                     if (pagerState.currentPage + 1 < pages.size)
-                        Icon(Icons.Rounded.ChevronRight, stringResource(MR.strings.action_next))
+                        Icon(Icons.Rounded.ChevronRight, stringResource(Res.string.action_next))
                     else
-                        Icon(Icons.Rounded.Check, stringResource(MR.strings.action_done))
+                        Icon(Icons.Rounded.Check, stringResource(Res.string.action_done))
                 }
             }
         ) { paddingValues ->
@@ -137,7 +137,7 @@ class IntroScreen : Screen {
                         .padding(top = 8.dp, end = 8.dp)
                         .zIndex(1f)
                 ) {
-                    Text(stringResource(MR.strings.action_skip))
+                    Text(stringResource(Res.string.action_skip))
                 }
 
                 HorizontalPager(

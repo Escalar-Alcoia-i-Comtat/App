@@ -20,8 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import dev.icerock.moko.resources.compose.stringResource
-import resources.MR
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 @ExperimentalMaterial3Api
@@ -66,7 +67,7 @@ fun <Type> SettingsSelector(
             },
             confirmButton = {
                 TextButton(onClick = { showingDialog = false }) {
-                    Text(stringResource(MR.strings.action_close))
+                    Text(stringResource(Res.string.action_close))
                 }
             }
         )

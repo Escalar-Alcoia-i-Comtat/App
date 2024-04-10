@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,11 +40,12 @@ import build.BuildKonfig
 import cache.File
 import cache.ImageCache
 import com.russhwolf.settings.ExperimentalSettingsApi
-import dev.icerock.moko.resources.StringResource
-import dev.icerock.moko.resources.compose.stringResource
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import maps.KMZHandler
 import maps.MapsCache
-import resources.MR
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import ui.composition.LocalUnitsConfiguration
 import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
@@ -70,8 +72,8 @@ private fun SettingsCacheRow(
                 // Do not allow dismiss while deleting
                 if (!isDeleting) showingDialog = false
             },
-            title = { Text(stringResource(MR.strings.settings_storage_dialog_title)) },
-            text = { Text(stringResource(MR.strings.settings_storage_dialog_message)) },
+            title = { Text(stringResource(Res.string.settings_storage_dialog_title)) },
+            text = { Text(stringResource(Res.string.settings_storage_dialog_message)) },
             confirmButton = {
                 TextButton(
                     enabled = !isDeleting,
@@ -85,13 +87,13 @@ private fun SettingsCacheRow(
                             showingDialog = false
                         }
                     }
-                ) { Text(stringResource(MR.strings.action_clear)) }
+                ) { Text(stringResource(Res.string.action_clear)) }
             },
             dismissButton = {
                 TextButton(
                     enabled = !isDeleting,
                     onClick = { showingDialog = false }
-                ) { Text(stringResource(MR.strings.action_cancel)) }
+                ) { Text(stringResource(Res.string.action_cancel)) }
             }
         )
     }
@@ -99,7 +101,7 @@ private fun SettingsCacheRow(
     SettingsRow(
         headline = stringResource(title),
         summary = if (cacheSize >= 0)
-            stringResource(MR.strings.settings_storage_size, formatBytes(cacheSize))
+            stringResource(Res.string.settings_storage_size, formatBytes(cacheSize))
         else
             "0KB",
         icon = icon,
@@ -132,10 +134,10 @@ fun SettingsPage() {
             val units by unitsConfiguration.unitsLive.collectAsState(DistanceUnits.METER)
 
             SettingsCategory(
-                text = stringResource(MR.strings.settings_category_general)
+                text = stringResource(Res.string.settings_category_general)
             )
             SettingsSelector(
-                headline = stringResource(MR.strings.settings_units_distance),
+                headline = stringResource(Res.string.settings_units_distance),
                 summary = stringResource(units.label),
                 icon = Icons.Rounded.Straighten,
                 options = DistanceUnits.entries,
@@ -143,32 +145,32 @@ fun SettingsPage() {
                     unitsConfiguration.setUnits(it)
                 },
                 selection = units,
-                optionsDialogTitle = stringResource(MR.strings.settings_units_distance),
+                optionsDialogTitle = stringResource(Res.string.settings_units_distance),
                 stringConverter = { stringResource(it.label) }
             )
 
             var deleting by remember { mutableStateOf(false) }
 
             SettingsCategory(
-                text = stringResource(MR.strings.settings_category_storage)
+                text = stringResource(Res.string.settings_category_storage)
             )
             SettingsCacheRow(
-                MR.strings.settings_storage_images,
+                Res.string.settings_storage_images,
                 Icons.Outlined.PhotoLibrary,
                 ImageCache.imageCacheDirectory,
                 deleting
             ) { deleting = it }
-            Divider()
+            HorizontalDivider()
             SettingsCacheRow(
-                MR.strings.settings_storage_kmz,
+                Res.string.settings_storage_kmz,
                 Icons.Outlined.Route,
                 KMZHandler.kmzCacheDirectory,
                 deleting
             ) { deleting = it }
             MapsCache.tilesCacheDirectory?.let { dir ->
-                Divider()
+                HorizontalDivider()
                 SettingsCacheRow(
-                    MR.strings.settings_storage_maps,
+                    Res.string.settings_storage_maps,
                     Icons.Outlined.Map,
                     dir,
                     deleting
@@ -177,55 +179,55 @@ fun SettingsPage() {
 
             Spacer(Modifier.height(16.dp))
             SettingsCategory(
-                text = stringResource(MR.strings.settings_category_app_info)
+                text = stringResource(Res.string.settings_category_app_info)
             )
             BuildKonfig.VERSION_CODE?.let { versionCode ->
                 SettingsRow(
-                    headline = stringResource(MR.strings.settings_app_info_version_code),
+                    headline = stringResource(Res.string.settings_app_info_version_code),
                     summary = "${BuildKonfig.VERSION_NAME} ($versionCode)",
                     icon = Icons.Outlined.Info
                 )
             } ?: run {
                 SettingsRow(
-                    headline = stringResource(MR.strings.settings_app_info_version),
+                    headline = stringResource(Res.string.settings_app_info_version),
                     summary = BuildKonfig.VERSION_NAME,
                     icon = Icons.Outlined.Info
                 )
             }
-            Divider()
+            HorizontalDivider()
             SettingsRow(
-                headline = stringResource(MR.strings.settings_app_info_build_date),
+                headline = stringResource(Res.string.settings_app_info_build_date),
                 summary = BuildKonfig.BUILD_DATE,
                 icon = Icons.Outlined.Event
             )
 
             Spacer(Modifier.height(16.dp))
             SettingsCategory(
-                text = stringResource(MR.strings.settings_category_links)
+                text = stringResource(Res.string.settings_category_links)
             )
             SettingsRow(
-                headline = stringResource(MR.strings.settings_links_status),
-                summary = stringResource(MR.strings.settings_links_tap),
+                headline = stringResource(Res.string.settings_links_status),
+                summary = stringResource(Res.string.settings_links_tap),
                 icon = Icons.Outlined.Dns
             ) { uriHandler.openUri("https://status.arnyminerz.com/status/escalaralcoiaicomtat") }
-            Divider()
+            HorizontalDivider()
             SettingsRow(
-                headline = stringResource(MR.strings.settings_links_github_app),
-                summary = stringResource(MR.strings.settings_links_tap),
+                headline = stringResource(Res.string.settings_links_github_app),
+                summary = stringResource(Res.string.settings_links_tap),
                 icon = Icons.Outlined.Code
             ) { uriHandler.openUri("https://github.com/Escalar-Alcoia-i-Comtat/App") }
-            Divider()
+            HorizontalDivider()
             SettingsRow(
-                headline = stringResource(MR.strings.settings_links_github_server),
-                summary = stringResource(MR.strings.settings_links_tap),
+                headline = stringResource(Res.string.settings_links_github_server),
+                summary = stringResource(Res.string.settings_links_tap),
                 icon = Icons.Outlined.Dns
             ) { uriHandler.openUri("https://github.com/Escalar-Alcoia-i-Comtat/BackendKotlin") }
-            Divider()
+            HorizontalDivider()
             SettingsRow(
-                headline = stringResource(MR.strings.settings_links_crowdin),
-                summary = stringResource(MR.strings.settings_links_tap),
+                headline = stringResource(Res.string.settings_links_crowdin),
+                summary = stringResource(Res.string.settings_links_tap),
                 icon = Icons.Outlined.Dns,
-                badgeText = stringResource(MR.strings.settings_soon)
+                badgeText = stringResource(Res.string.settings_soon)
             )
         }
     }
