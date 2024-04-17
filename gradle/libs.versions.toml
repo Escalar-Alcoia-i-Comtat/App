@@ -2,7 +2,7 @@
 agp = "8.2.2"
 androidx-activityCompose = "1.8.2"
 buildkonfig = "0.15.1"
-compose = "1.6.5"
+compose = "1.6.6"
 # Check latest at https://developer.android.com/jetpack/androidx/releases/compose-compiler
 compose-compiler = "1.5.11"
 compose-maps = "4.3.3"
