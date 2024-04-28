@@ -5,7 +5,7 @@ buildkonfig = "0.15.1"
 compose = "1.6.5"
 # Check latest at https://developer.android.com/jetpack/androidx/releases/compose-compiler
 compose-compiler = "1.5.11"
-compose-maps = "4.4.0"
+compose-maps = "4.4.1"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.6.2"
 compose-windowSizeClass = "0.5.0"
