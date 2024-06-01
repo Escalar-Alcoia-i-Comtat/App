@@ -1,12 +1,15 @@
+import Build_gradle.IOSVersion
+import Build_gradle.LinuxVersion
+import Build_gradle.MacOSVersion
+import Build_gradle.WindowsVersion
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
-import org.jetbrains.compose.ExperimentalComposeLibrary
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Properties
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -124,6 +127,7 @@ kotlin {
         }
     }
 
+    @Suppress("UnusedPrivateProperty")
     sourceSets {
         all {
             languageSettings {
