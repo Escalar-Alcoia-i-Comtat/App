@@ -11,6 +11,7 @@ import database.settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.stringResource
+import utils.format
 
 class UnitsConfiguration {
     fun getUnits(): DistanceUnits {
@@ -41,7 +42,7 @@ class UnitsConfiguration {
         val valueFormat = units.valueFormat
         val distance = units.factory(this)
         val value = distance.value
-        return stringResource(valueFormat, value)
+        return stringResource(valueFormat).format(value)
     }
 
     @Composable
@@ -52,6 +53,6 @@ class UnitsConfiguration {
         val valueFormat = units.valueFormat
         val distance = units.factory(converted.value)
         val value = distance.value
-        return stringResource(valueFormat, value)
+        return stringResource(valueFormat).format(value)
     }
 }

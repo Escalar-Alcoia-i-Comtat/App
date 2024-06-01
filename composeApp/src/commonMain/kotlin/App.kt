@@ -29,6 +29,7 @@ import platform.Updates
 import ui.screen.AppScreen
 import ui.theme.AppTheme
 import utils.createStore
+import utils.format
 
 val store = CoroutineScope(SupervisorJob()).createStore()
 
@@ -56,10 +57,8 @@ fun App(
                     Text(
                         text = latestVersion?.let {
                             stringResource(
-                                Res.string.update_available_dialog_message_version,
-                                BuildKonfig.VERSION_NAME,
-                                it
-                            )
+                                Res.string.update_available_dialog_message_version
+                            ).format(BuildKonfig.VERSION_NAME, it)
                         } ?: stringResource(Res.string.update_available_dialog_message)
                     )
                 },

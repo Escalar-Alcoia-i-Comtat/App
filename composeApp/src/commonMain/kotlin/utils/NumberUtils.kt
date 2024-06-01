@@ -1,5 +1,6 @@
 package utils
 
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 /**
@@ -44,3 +45,27 @@ private val formatBytesImpl = formatUnits(
 )
 
 fun formatBytes(bytes: Long): String = formatBytesImpl(bytes.toDouble(), 2)
+
+/**
+ * Rounds a double to a given number of decimal positions.
+ * @param decimalPositions The number of decimal positions to round to. If negative, the double is
+ * returned as is.
+ * @return The rounded double.
+ */
+fun Double.round(decimalPositions: Int): Double {
+    if (decimalPositions < 0) return this
+    val factor = 10.0.pow(decimalPositions)
+    return (this * factor).roundToInt() / factor
+}
+
+/**
+ * Rounds a float to a given number of decimal positions.
+ * @param decimalPositions The number of decimal positions to round to. If negative, the float is
+ * returned as is.
+ * @return The rounded float.
+ */
+fun Float.round(decimalPositions: Int): Float {
+    if (decimalPositions < 0) return this
+    val factor = 10f.pow(decimalPositions)
+    return (this * factor).roundToInt() / factor
+}

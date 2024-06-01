@@ -40,8 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cache.ImageCache
@@ -51,7 +49,21 @@ import data.Path
 import data.Sector
 import data.generic.color
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.*
+import escalaralcoiaicomtat.composeapp.generated.resources.path_grade
+import escalaralcoiaicomtat.composeapp.generated.resources.path_height
+import escalaralcoiaicomtat.composeapp.generated.resources.path_quickdraws
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_none
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_pitons
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_pitons_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors_count
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -65,6 +77,7 @@ import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
 import ui.platform.getScreenSize
 import ui.screen.DataScreen.SidePanelContents
+import utils.format
 import utils.unit.meters
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
@@ -244,7 +257,7 @@ class PathsScreen(
                         amount?.toInt()
                             ?.let {
                                 if (it <= 0) stringResource(singleRes)
-                                else stringResource(countRes, it)
+                                else stringResource(countRes).format(it)
                             }
                             ?.let(list::add)
                     }
@@ -254,14 +267,11 @@ class PathsScreen(
                     add(child.spitCount, Res.string.path_safes_spits, Res.string.path_safes_spits_count)
                     add(child.tensorCount, Res.string.path_safes_tensors, Res.string.path_safes_tensors_count)
 
-                    stringResource(
-                        Res.string.path_safes_count,
-                        list.joinToString("\n")
-                    )
+                    stringResource(Res.string.path_safes_count).format(list.joinToString("\n"))
                 } else
                     stringResource(Res.string.path_safes_none),
                 bigText = child.stringCount?.toInt()?.let {
-                    stringResource(Res.string.path_quickdraws, it)
+                    stringResource(Res.string.path_quickdraws).format(it)
                 }
             )
         }

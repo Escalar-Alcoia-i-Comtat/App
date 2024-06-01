@@ -19,7 +19,6 @@ import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -41,7 +40,28 @@ import cache.File
 import cache.ImageCache
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.*
+import escalaralcoiaicomtat.composeapp.generated.resources.action_cancel
+import escalaralcoiaicomtat.composeapp.generated.resources.action_clear
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_app_info_build_date
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_app_info_version
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_app_info_version_code
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_app_info
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_general
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_links
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_storage
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_crowdin
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_github_app
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_github_server
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_status
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_tap
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_soon
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_dialog_message
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_dialog_title
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_images
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_kmz
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_maps
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_size
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_units_distance
 import maps.KMZHandler
 import maps.MapsCache
 import org.jetbrains.compose.resources.StringResource
@@ -51,6 +71,7 @@ import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
 import ui.reusable.settings.SettingsSelector
+import utils.format
 import utils.formatBytes
 import utils.unit.DistanceUnits
 
@@ -101,7 +122,7 @@ private fun SettingsCacheRow(
     SettingsRow(
         headline = stringResource(title),
         summary = if (cacheSize >= 0)
-            stringResource(Res.string.settings_storage_size, formatBytes(cacheSize))
+            stringResource(Res.string.settings_storage_size).format(formatBytes(cacheSize))
         else
             "0KB",
         icon = icon,

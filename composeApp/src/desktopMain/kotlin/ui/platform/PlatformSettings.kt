@@ -16,7 +16,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.*
+import escalaralcoiaicomtat.composeapp.generated.resources.action_close
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_updates
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_checking
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_downloading
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_downloading_progress
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_error_installer_not_found
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_error_no_assets
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_error_not_found
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_error_title
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_error_unknown_os
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_false_summary
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_false_title
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_storing
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_true_summary
+import escalaralcoiaicomtat.composeapp.generated.resources.settings_updates_true_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -83,9 +97,8 @@ actual fun ColumnScope.PlatformSettings() {
                 downloadProgress?.let { progress ->
                     when (progress) {
                         in 0f..1f -> stringResource(
-                            Res.string.settings_updates_downloading_progress,
-                            (progress * 100).toInt()
-                        )
+                            Res.string.settings_updates_downloading_progress
+                        ).format((progress * 100).toInt())
                         Updates.DOWNLOAD_PROGRESS_STORING -> stringResource(Res.string.settings_updates_storing)
                         else -> null
                     }
