@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -61,8 +64,8 @@ abstract class DataScreen<Parent : DataTypeWithImage, ChildrenType : DataType>(
     private val modelFactory: (AppScreenModel) -> DataScreenModel<Parent, ChildrenType>,
     private val subScreenFactory: ((id: Long) -> Screen)?
 ) : DepthScreen(depth) {
-    protected open val sidePathInformationPanelHeight: Dp = 100.dp
-    protected open val sidePathInformationPanelMaxWidth: Dp = 600.dp
+    protected open val sidePathInformationPanelHeight: Dp = 500.dp
+    protected open val sidePathInformationPanelMaxWidth: Dp = 500.dp
 
     /**
      * Checks whether the side panel should be displayed.
@@ -148,11 +151,12 @@ abstract class DataScreen<Parent : DataTypeWithImage, ChildrenType : DataType>(
                                         modifier = Modifier
                                             .widthIn(max = sidePathInformationPanelMaxWidth)
                                             .fillMaxWidth()
-                                            .height(sidePathInformationPanelHeight)
+                                            .heightIn(max = sidePathInformationPanelHeight)
                                             .clip(
                                                 RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                                             )
                                             .background(MaterialTheme.colorScheme.surfaceVariant)
+                                            .verticalScroll(rememberScrollState())
                                     ) {
                                         BottomSheetContents(it, model, false)
                                     }
