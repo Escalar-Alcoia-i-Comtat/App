@@ -1,11 +1,17 @@
 package ui.platform
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import com.fleeksoft.ksoup.Ksoup
@@ -115,38 +121,51 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
         }
     }
 
-    UIKitView(
-        modifier = modifier,
-        factory = {
-            MKMapView().apply {
-                // Disable all gestures
-                zoomEnabled = false
-                scrollEnabled = false
-                pitchEnabled = false
-                rotateEnabled = false
-            }
-        },
-        update = { mapView ->
-            mapData?.let { data ->
-                // Clear all annotations
-                Napier.d { "Removing ${mapView.annotations.size} annotations..." }
-                for (annotation in mapView.annotations) {
-                    mapView.removeAnnotation(annotation as MKAnnotationProtocol)
-                }
+    OutlinedCard(
+        modifier
+    ) {
+        AnimatedContent(mapData) { data ->
+            if (data != null) {
+                UIKitView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = {
+                        MKMapView().apply {
+                            // Disable all gestures
+                            zoomEnabled = false
+                            scrollEnabled = false
+                            pitchEnabled = false
+                            rotateEnabled = false
+                        }
+                    },
+                    update = { mapView ->
+                        // Clear all annotations
+                        Napier.d { "Removing ${mapView.annotations.size} annotations..." }
+                        for (annotation in mapView.annotations) {
+                            mapView.removeAnnotation(annotation as MKAnnotationProtocol)
+                        }
 
-                val points = mutableListOf<Pair<Double, Double>>()
+                        val points = mutableListOf<Pair<Double, Double>>()
 
-                Napier.d { "Loaded ${data.styles.size} styles." }
-                Napier.d { "Drawing ${data.placemarks.size} placemarks..." }
-                for (placemark in data.placemarks) {
-                    placemark.addToPoints(points)
-                    placemark.addToMap(mapView, data.styles)
-                }
+                        Napier.d { "Loaded ${data.styles.size} styles." }
+                        Napier.d { "Drawing ${data.placemarks.size} placemarks..." }
+                        for (placemark in data.placemarks) {
+                            placemark.addToPoints(points)
+                            placemark.addToMap(mapView, data.styles)
+                        }
 
-                regionForPoints(points)?.let {
-                    mapView.setRegion(it)
+                        regionForPoints(points)?.let {
+                            mapView.setRegion(it)
+                        }
+                    }
+                )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
-    )
+    }
 }
