@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Route
@@ -54,7 +55,6 @@ import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_github
 import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_github_server
 import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_status
 import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_tap
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_soon
 import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_dialog_message
 import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_dialog_title
 import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_images
@@ -247,9 +247,8 @@ fun SettingsPage() {
             SettingsRow(
                 headline = stringResource(Res.string.settings_links_crowdin),
                 summary = stringResource(Res.string.settings_links_tap),
-                icon = Icons.Outlined.Dns,
-                badgeText = stringResource(Res.string.settings_soon)
-            )
+                icon = Icons.Outlined.Language
+            ) { uriHandler.openUri("https://crowdin.com/project/escalar-alcoia-i-comtat") }
         }
     }
 }
