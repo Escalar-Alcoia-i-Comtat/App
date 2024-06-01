@@ -59,6 +59,7 @@ enum class SportsGrade : GradeValue {
     UNKNOWN;
 
     override fun toString(): String {
+        if (this == UNKNOWN) return "¿?"
         var string = name
         if (string.startsWith("G")) string = string.substring(1)
         if (string.endsWith("_PLUS")) string = string.substringBeforeLast("_PLUS") + '+'
