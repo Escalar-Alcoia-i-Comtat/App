@@ -14,5 +14,9 @@ jobs:
       - name: Job set up
         uses: ./.github/actions/job-set-up
 
+      - name: Write local.properties
+        shell: bash
+        run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
+
       - name: Run tests
         run: ./gradlew check

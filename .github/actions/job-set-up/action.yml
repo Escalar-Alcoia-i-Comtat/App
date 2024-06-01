@@ -19,7 +19,3 @@ runs:
         java-version: '17'
         java-package: jdk
         cache: 'gradle'
-
-    - name: Write local.properties
-      shell: bash
-      run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties

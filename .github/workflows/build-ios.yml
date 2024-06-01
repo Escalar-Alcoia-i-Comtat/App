@@ -22,6 +22,10 @@ jobs:
       - name: Job set up
         uses: ./.github/actions/job-set-up
 
+      - name: Write local.properties
+        shell: bash
+        run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
+
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
