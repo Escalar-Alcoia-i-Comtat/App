@@ -2,6 +2,7 @@ package data
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TestPath {
@@ -23,5 +24,58 @@ class TestPath {
             .map { it.id }
             .joinToString(",")
         assertEquals("1,2,3,4", string)
+    }
+
+    @Test
+    fun `test hasAnyTypeCount`() {
+        assertFalse { DataTypeGenerator.newPath(paraboltCount = 0u).hasAnyTypeCount }
+        assertTrue { DataTypeGenerator.newPath(paraboltCount = 1u).hasAnyTypeCount }
+        assertFalse { DataTypeGenerator.newPath(burilCount = 0u).hasAnyTypeCount }
+        assertTrue { DataTypeGenerator.newPath(burilCount = 1u).hasAnyTypeCount }
+        assertFalse { DataTypeGenerator.newPath(pitonCount = 0u).hasAnyTypeCount }
+        assertTrue { DataTypeGenerator.newPath(pitonCount = 1u).hasAnyTypeCount }
+        assertFalse { DataTypeGenerator.newPath(spitCount = 0u).hasAnyTypeCount }
+        assertTrue { DataTypeGenerator.newPath(spitCount = 1u).hasAnyTypeCount }
+        assertFalse { DataTypeGenerator.newPath(tensorCount = 0u).hasAnyTypeCount }
+        assertTrue { DataTypeGenerator.newPath(tensorCount = 1u).hasAnyTypeCount }
+    }
+
+    @Test
+    fun `test hasAnyCount`() {
+        assertFalse { DataTypeGenerator.newPath(paraboltCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(paraboltCount = 1u).hasAnyCount }
+        assertFalse { DataTypeGenerator.newPath(burilCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(burilCount = 1u).hasAnyCount }
+        assertFalse { DataTypeGenerator.newPath(pitonCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(pitonCount = 1u).hasAnyCount }
+        assertFalse { DataTypeGenerator.newPath(spitCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(spitCount = 1u).hasAnyCount }
+        assertFalse { DataTypeGenerator.newPath(tensorCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(tensorCount = 1u).hasAnyCount }
+
+        assertFalse { DataTypeGenerator.newPath(paraboltCount = 0u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(paraboltCount = 0u, stringCount = 1u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(paraboltCount = 1u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(paraboltCount = 1u, stringCount = 1u).hasAnyCount }
+
+        assertFalse { DataTypeGenerator.newPath(burilCount = 0u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(burilCount = 0u, stringCount = 1u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(burilCount = 1u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(burilCount = 1u, stringCount = 1u).hasAnyCount }
+
+        assertFalse { DataTypeGenerator.newPath(pitonCount = 0u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(pitonCount = 0u, stringCount = 1u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(pitonCount = 1u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(pitonCount = 1u, stringCount = 1u).hasAnyCount }
+
+        assertFalse { DataTypeGenerator.newPath(spitCount = 0u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(spitCount = 0u, stringCount = 1u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(spitCount = 1u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(spitCount = 1u, stringCount = 1u).hasAnyCount }
+
+        assertFalse { DataTypeGenerator.newPath(tensorCount = 0u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(tensorCount = 0u, stringCount = 1u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(tensorCount = 1u, stringCount = 0u).hasAnyCount }
+        assertTrue { DataTypeGenerator.newPath(tensorCount = 1u, stringCount = 1u).hasAnyCount }
     }
 }

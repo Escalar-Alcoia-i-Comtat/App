@@ -7,6 +7,7 @@ import data.generic.PitchInfo
 import database.Path
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import utils.isNotNullOrZero
 
 @Serializable
 data class Path(
@@ -77,10 +78,13 @@ data class Path(
 
     val grade: GradeValue? get() = gradeValue?.let(GradeValue::fromString)
 
-    val hasAnyTypeCount: Boolean = paraboltCount != null || burilCount != null ||
-        pitonCount != null || spitCount != null || tensorCount != null
+    val hasAnyTypeCount: Boolean = paraboltCount.isNotNullOrZero() ||
+        burilCount.isNotNullOrZero() ||
+        pitonCount.isNotNullOrZero() ||
+        spitCount.isNotNullOrZero() ||
+        tensorCount.isNotNullOrZero()
 
-    val hasAnyCount: Boolean = stringCount != null || hasAnyTypeCount
+    val hasAnyCount: Boolean = stringCount.isNotNullOrZero() || hasAnyTypeCount
 
     override fun compareTo(other: DataType): Int {
         return (other as? data.Path)

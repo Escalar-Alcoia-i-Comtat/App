@@ -69,3 +69,11 @@ fun Float.round(decimalPositions: Int): Float {
     val factor = 10f.pow(decimalPositions)
     return (this * factor).roundToInt() / factor
 }
+
+fun <T> Comparable<T>?.isNullOrZero(): Boolean {
+    return this == null || this == 0 || this == 0f || this == 0.0 || this == 0u || this == 0L
+}
+
+fun <T> Comparable<T>?.isNotNullOrZero(): Boolean {
+    return !isNullOrZero()
+}

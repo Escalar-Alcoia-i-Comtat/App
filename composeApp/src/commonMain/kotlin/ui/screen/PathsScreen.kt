@@ -47,6 +47,7 @@ import com.mxalbert.zoomable.Zoomable
 import com.russhwolf.settings.ExperimentalSettingsApi
 import data.Path
 import data.Sector
+import data.generic.SportsGrade
 import data.generic.color
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
 import escalaralcoiaicomtat.composeapp.generated.resources.path_grade
@@ -230,7 +231,7 @@ class PathsScreen(
                         .padding(vertical = 4.dp)
                 )
             }
-            child.grade?.let { grade ->
+            child.grade?.takeIf { it != SportsGrade.UNKNOWN }?.let { grade ->
                 MetaCard(
                     icon = Icons.Filled.ClimbingShoes,
                     text = stringResource(Res.string.path_grade),
