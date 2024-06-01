@@ -9,8 +9,8 @@ on:
       - '**/*.gradle.kts'
       - '**/*.properties'
       - 'gradle/**'
-      - 'composeApp/src/commonMain/**'
-      - 'composeApp/src/iosMain/**'
+      - 'iosApp/src/commonMain/**'
+      - 'iosApp/src/iosMain/**'
       - 'iosApp/**'
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
           cd iosApp
           
           xcrun xcodebuild \
-            -scheme "composeApp" \
+            -scheme "iosApp" \
             -configuration "Release" \
             -sdk "iphoneos" \
             -parallelizeTargets \
@@ -117,7 +117,7 @@ jobs:
             -exportPath "${RUNNER_TEMP}/Build/Archives/FeedFlow.xcarchive" \
             PRODUCT_BUNDLE_IDENTIFIER="${{ secrets.BUNDLE_ID }}"
       
-          echo "ipa_path=${RUNNER_TEMP}/Build/Archives/composeApp.xcarchive/composeApp.ipa" >> $GITHUB_ENV
+          echo "ipa_path=${RUNNER_TEMP}/Build/Archives/iosApp.xcarchive/iosApp.ipa" >> $GITHUB_ENV
 
       - uses: Apple-Actions/upload-testflight-build@v1
         with:
@@ -130,4 +130,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.os }}
-          path: composeApp/build/compose/binaries/main/**
+          path: iosApp/build/compose/binaries/main/**
