@@ -436,7 +436,7 @@ buildkonfig {
             buildConfigField(INT, "VERSION_CODE", version.versionCode.toString(), nullable = true)
         }
         create("ios") {
-            val version = getVersionForPlatform(Platform.Android)
+            val version = getVersionForPlatform(Platform.IOS)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
 
