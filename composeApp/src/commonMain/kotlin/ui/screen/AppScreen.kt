@@ -60,7 +60,11 @@ import database.Zone
 import database.database
 import database.settings
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.*
+import escalaralcoiaicomtat.composeapp.generated.resources.navigation_explore
+import escalaralcoiaicomtat.composeapp.generated.resources.navigation_settings
+import escalaralcoiaicomtat.composeapp.generated.resources.search
+import escalaralcoiaicomtat.composeapp.generated.resources.search_empty
+import escalaralcoiaicomtat.composeapp.generated.resources.status_network_unavailable
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
 import search.Filter
@@ -332,7 +336,13 @@ class AppScreen(
             trailingIcon = {
                 Row {
                     IconButton(
-                        onClick = { searchModel.query.value = "" }
+                        onClick = {
+                            if (searchModel.query.value.isBlank()) {
+                                searchModel.isSearching.value = false
+                            } else {
+                                searchModel.query.value = ""
+                            }
+                        }
                     ) {
                         Icon(Icons.Rounded.Close, null)
                     }
