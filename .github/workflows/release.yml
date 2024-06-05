@@ -4,9 +4,35 @@ on:
   release:
 
 jobs:
+  update-version-name:
+    name: Update version name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Update version name in version.properties
+        run: sed -i 's:^[ \t]*VERSION_NAME[ \t]*=\([ \t]*.*\)$:VERSION_NAME=${{ github.event.release.name }}:' version.properties
+
+      - name: Update version name for iOS project
+        run: sed -i 's:^[ \t]*MARKETING_VERSION[ \t]*=\([ \t]*.*\)$:\t\t\t\tMARKETING_VERSION = 1.0.0;:' iosApp/iosApp.xcodeproj/project.pbxproj
+
+      - name: Commit version.properties
+        id: commit_version
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Increased Version Code
+          file_pattern: 'version.properties'
+
   build-android:
     name: Build for Android
     runs-on: ubuntu-latest
+
+    needs: update-version-name
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,11 +68,14 @@ jobs:
             ./composeApp/build/outputs/**/*.apk
 
   build-desktop:
+    name: Build for Desktop
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    name: Build for Desktop
+
+    needs: update-version-name
+
     steps:
       - uses: actions/checkout@v4
 
