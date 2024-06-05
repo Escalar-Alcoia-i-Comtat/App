@@ -472,6 +472,51 @@ fun increaseNumberInProperties(key: String) {
     println("Increased $key to $code")
 }
 
+fun updatePListFile(key: String, value: String) {
+    val iosAppRoot = project.rootProject.file("iosApp")
+    val iosApp = File(iosAppRoot, "iosApp")
+    val infoFile = File(iosApp, "Info.plist")
+    val info = infoFile.readLines()
+    val keyLineNumber = info.indexOfFirst { it.contains("<key>$key</key>") }
+    if (keyLineNumber == -1) {
+        System.err.println("Key $key not found in Info.plist file")
+        return
+    }
+    val valueLine = info[keyLineNumber + 1]
+    val regex = "([ \\t]*)<(.+)>(.*)<\\/.+>".toRegex()
+    regex.find(valueLine)?.let {
+        val (indent, type, _) = it.destructured
+        val newValueLine = "$indent<$type>$value</$type>"
+        val newInfo = info.toMutableList()
+        newInfo[keyLineNumber + 1] = newValueLine
+        infoFile.writeText(newInfo.joinToString("\n"))
+    }
+}
+
+fun updateXCodeProjectOption(key: String, value: String) {
+    val iosAppRoot = project.rootProject.file("iosApp")
+    val iosApp = File(iosAppRoot, "iosApp.xcodeproj")
+    val projectFile = File(iosApp, "project.pbxproj")
+    if (!projectFile.exists()) {
+        System.err.println("project.pbxproj file not found")
+        return
+    }
+    val project = projectFile.readLines().map { line ->
+        if (line.contains("$key =")) {
+            val regex = "([ \\t]*)$key = (.+);".toRegex()
+            regex.find(line)?.let {
+                val (indent, _) = it.destructured
+                "$indent$key = $value;"
+            }
+        } else {
+            line
+        }
+    }
+    projectFile.delete()
+    projectFile.createNewFile()
+    projectFile.writeText(project.joinToString("\n"))
+}
+
 val increaseVersionCode = task("increaseVersionCode") {
     doFirst {
         increaseNumberInProperties("VERSION_ANDROID_CODE")
@@ -480,6 +525,19 @@ val increaseVersionCode = task("increaseVersionCode") {
 val increaseLinuxRelease = task("increaseLinuxRelease") {
     doFirst {
         increaseNumberInProperties("VERSION_LIN_RELEASE")
+    }
+}
+val updateIOSVersion = task("updateIOSVersion") {
+    doFirst {
+        val version = properties.getValue("version").toString()
+        val code = properties.getValue("code").toString()
+
+        println("Updating iOS version: $version ($code)")
+
+        updatePListFile("CFBundleShortVersionString", version)
+        updatePListFile("CFBundleVersion", code)
+        updateXCodeProjectOption("MARKETING_VERSION", version)
+        updateXCodeProjectOption("CURRENT_PROJECT_VERSION", code)
     }
 }
 
