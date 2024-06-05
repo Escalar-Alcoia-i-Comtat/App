@@ -18,7 +18,7 @@ jobs:
         uses: ./.github/actions/job-set-up
 
       - name: Update version name and code
-        run: ./gradlew updateIOSVersion -PversionName=${{ github.event.release.name }}
+        run: ./gradlew updateIOSVersion -Pversion=${{ github.event.release.name }}
 
       - name: Commit version.properties
         id: commit_version
