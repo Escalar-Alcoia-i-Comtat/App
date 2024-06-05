@@ -529,15 +529,14 @@ val increaseLinuxRelease = task("increaseLinuxRelease") {
 }
 val updateIOSVersion = task("updateIOSVersion") {
     doFirst {
-        val version = properties.getValue("version").toString()
-        val code = properties.getValue("code").toString()
-
-        println("Updating iOS version: $version ($code)")
-
-        updatePListFile("CFBundleShortVersionString", version)
-        updatePListFile("CFBundleVersion", code)
-        updateXCodeProjectOption("MARKETING_VERSION", version)
-        updateXCodeProjectOption("CURRENT_PROJECT_VERSION", code)
+        properties["version"]?.toString()?.let {
+            updatePListFile("CFBundleShortVersionString", it)
+            updateXCodeProjectOption("MARKETING_VERSION", it)
+        }
+        properties["code"]?.toString()?.let {
+            updatePListFile("CFBundleVersion", it)
+            updateXCodeProjectOption("CURRENT_PROJECT_VERSION", it)
+        }
     }
 }
 
