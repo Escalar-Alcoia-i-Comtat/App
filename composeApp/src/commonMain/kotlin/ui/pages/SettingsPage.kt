@@ -230,7 +230,7 @@ fun SettingsPage() {
                 headline = stringResource(Res.string.settings_links_status),
                 summary = stringResource(Res.string.settings_links_tap),
                 icon = Icons.Outlined.Dns
-            ) { uriHandler.openUri("https://status.arnyminerz.com/status/escalaralcoiaicomtat") }
+            ) { uriHandler.openUri("https://status.escalaralcoiaicomtat.org/status/services") }
             HorizontalDivider()
             SettingsRow(
                 headline = stringResource(Res.string.settings_links_github_app),
