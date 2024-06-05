@@ -25,7 +25,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Increased Version Code
-          file_pattern: 'version.properties'
+          file_pattern: 'version.properties iosApp/iosApp.xcodeproj/project.pbxproj'
 
   build-android:
     name: Build for Android
