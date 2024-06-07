@@ -5,7 +5,7 @@ buildkonfig = "0.15.1"
 compose = "1.6.7"
 # Check latest at https://developer.android.com/jetpack/androidx/releases/compose-compiler
 compose-compiler = "1.5.14"
-compose-maps = "5.0.2"
+compose-maps = "5.0.3"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.6.11"
 compose-ui = "1.6.7"
