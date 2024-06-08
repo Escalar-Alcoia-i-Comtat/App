@@ -26,6 +26,7 @@ fun ZonesScreen(
     DataList(
         parent = area,
         children = zones,
-        onNavigationRequested = { navController?.navigate(Routes.zone(it.id)) }
+        onNavigationRequested = { navController?.navigate(Routes.zone(it.id)) },
+        onNavigateUp = { navController?.navigateUp() }
     )
 }

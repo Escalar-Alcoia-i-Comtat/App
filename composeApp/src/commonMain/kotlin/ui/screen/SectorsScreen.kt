@@ -26,6 +26,7 @@ fun SectorsScreen(
     DataList(
         parent = zone,
         children = sectors,
-        onNavigationRequested = { navController?.navigate(Routes.sector(it.id)) }
+        onNavigationRequested = { navController?.navigate(Routes.sector(it.id)) },
+        onNavigateUp = { navController?.navigateUp() }
     )
 }
