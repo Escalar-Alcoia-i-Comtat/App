@@ -28,7 +28,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -99,6 +102,7 @@ private val sidePathInformationPanelHeight: Dp = 500.dp
 private val sidePathInformationPanelMaxWidth: Dp = 500.dp
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
@@ -117,13 +121,27 @@ fun PathsScreen(
         }
     }
 
-    PathsList(
-        sector,
-        paths,
-        selectedPath,
-        highlightPathId,
-        onPathClicked = viewModel::selectChild
-    )
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { sector?.let { Text(it.displayName) } },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        PathsList(
+            sector,
+            paths,
+            selectedPath,
+            highlightPathId,
+            modifier = Modifier.padding(paddingValues),
+            onPathClicked = viewModel::selectChild
+        )
+    }
 }
 
 @Composable
@@ -133,6 +151,7 @@ fun PathsList(
     paths: List<Path>?,
     selectedPath: Path?,
     highlightPathId: Long?,
+    modifier: Modifier = Modifier,
     onPathClicked: (path: Path?) -> Unit
 ) {
     val windowSizeClass = calculateWindowSizeClass()
@@ -151,7 +170,8 @@ fun PathsList(
                 fadeOut()
             }
             enter togetherWith exit
-        }
+        },
+        modifier = modifier
     ) { parent ->
         if (parent == null) {
             CircularProgressIndicatorBox()
