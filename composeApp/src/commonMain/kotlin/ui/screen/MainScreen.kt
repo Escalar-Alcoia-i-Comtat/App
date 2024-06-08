@@ -22,11 +22,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cash.sqldelight.coroutines.mapToList
 import cache.ImageCache
-import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
 import data.Area
 import database.SettingsKeys
 import database.settings
@@ -39,118 +37,118 @@ import platform.BackHandler
 import sync.DataSync
 import sync.SyncProcess
 import ui.composition.LocalLifecycleManager
+import ui.composition.LocalNavController
 import ui.list.DataCard
 import ui.model.MainScreenModel
+import ui.navigation.Routes
 
-@OptIn(ExperimentalFoundationApi::class)
-object MainScreen: Screen {
-    @Composable
-    override fun Content() {
-        val lifecycleManager = LocalLifecycleManager.current
+@Composable
+fun MainScreen(screenModel: MainScreenModel = viewModel()) {
+    val lifecycleManager = LocalLifecycleManager.current
 
-        val status by DataSync.status
+    val status by DataSync.status
 
-        val screenModel = rememberScreenModel { MainScreenModel() }
+    val areas by screenModel.areas
+        .mapToList(Dispatchers.Default)
+        .collectAsState(emptyList())
 
-        val areas by screenModel.areas
-            .mapToList(Dispatchers.Default)
-            .collectAsState(emptyList())
+    // TODO: when connection is available, and connectionNotAvailableWarning is true, run sync
+    LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                DataSync.start()
 
-        // TODO: when connection is available, and connectionNotAvailableWarning is true, run sync
-        LaunchedEffect(Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    DataSync.start()
-
-                    ImageCache.updateCache()
-                } catch (_: IllegalStateException) {
-                    // There's no Internet connection, check if the data is downloaded
-                    val lastSync = settings.getLongOrNull(SettingsKeys.LAST_SYNC)
-                    if (lastSync != null) {
-                        // At least one sync has occurred, we can safely ignore, and the data will
-                        // be updated when a connection is available
-                        Napier.i { "No connection is available. Won't synchronize." }
-                    } else {
-                        screenModel.showConnectionNotAvailableWarning.emit(true)
-                    }
+                ImageCache.updateCache()
+            } catch (_: IllegalStateException) {
+                // There's no Internet connection, check if the data is downloaded
+                val lastSync = settings.getLongOrNull(SettingsKeys.LAST_SYNC)
+                if (lastSync != null) {
+                    // At least one sync has occurred, we can safely ignore, and the data will
+                    // be updated when a connection is available
+                    Napier.i { "No connection is available. Won't synchronize." }
+                } else {
+                    screenModel.showConnectionNotAvailableWarning.emit(true)
                 }
             }
         }
-
-        BackHandler {
-            lifecycleManager.finish()
-        }
-
-        AnimatedVisibility(
-            visible = areas.isEmpty() && (status is SyncProcess.Status.RUNNING || status == SyncProcess.Status.WAITING),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-
-        AreasList(screenModel, status)
     }
 
-    @Composable
-    fun AreasList(
-        model: MainScreenModel,
-        status: SyncProcess.Status
+    BackHandler {
+        lifecycleManager.finish()
+    }
+
+    AnimatedVisibility(
+        visible = areas.isEmpty() && (status is SyncProcess.Status.RUNNING || status == SyncProcess.Status.WAITING),
+        modifier = Modifier.fillMaxSize()
     ) {
-        val navigator = LocalNavigator.current
-
-        val connectionNotAvailableWarning by model.showConnectionNotAvailableWarning.collectAsState(false)
-
-        val areas by model.areas
-            .mapToList(Dispatchers.Default)
-            .collectAsState(emptyList())
-
-        LazyColumn(
+        Box(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
-            stickyHeader {
-                AnimatedContent(status) { currentStatus ->
-                    if (areas.isNotEmpty() && currentStatus is SyncProcess.Status.RUNNING) {
-                        LinearProgressIndicator(
-                            progress = currentStatus.progress,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    } else if (areas.isNotEmpty() && currentStatus == SyncProcess.Status.WAITING) {
-                        LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+            CircularProgressIndicator()
+        }
+    }
+
+    AreasList(screenModel, status)
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun AreasList(
+    model: MainScreenModel,
+    status: SyncProcess.Status
+) {
+    val navigator = LocalNavController.current
+
+    val connectionNotAvailableWarning by model.showConnectionNotAvailableWarning.collectAsState(
+        false
+    )
+
+    val areas by model.areas
+        .mapToList(Dispatchers.Default)
+        .collectAsState(emptyList())
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        stickyHeader {
+            AnimatedContent(status) { currentStatus ->
+                if (areas.isNotEmpty() && currentStatus is SyncProcess.Status.RUNNING) {
+                    LinearProgressIndicator(
+                        progress = { currentStatus.progress },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else if (areas.isNotEmpty() && currentStatus == SyncProcess.Status.WAITING) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
-
-            if (connectionNotAvailableWarning) item {
-                // TODO: improve this
-                Text("Network not available!")
-            }
-
-            items(
-                contentType = { "area" },
-                key = { it.id },
-                items = areas.sortedBy { it.displayName }
-            ) { area ->
-                DataCard(
-                    item = Area(area),
-                    imageHeight = 200.dp,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .padding(bottom = 12.dp)
-                        .widthIn(max = 600.dp)
-                        .fillMaxWidth()
-                ) { navigator?.push(ZonesScreen(area.id)) }
-            }
-
-            // Add some padding at the end
-            item { Spacer(Modifier.height(8.dp)) }
         }
+
+        if (connectionNotAvailableWarning) item {
+            // TODO: improve this
+            Text("Network not available!")
+        }
+
+        items(
+            contentType = { "area" },
+            key = { it.id },
+            items = areas.sortedBy { it.displayName }
+        ) { area ->
+            DataCard(
+                item = Area(area),
+                imageHeight = 200.dp,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 12.dp)
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth()
+            ) { navigator?.navigate(Routes.area(area.id)) }
+        }
+
+        // Add some padding at the end
+        item { Spacer(Modifier.height(8.dp)) }
     }
 }

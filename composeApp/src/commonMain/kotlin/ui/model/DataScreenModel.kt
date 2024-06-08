@@ -1,7 +1,7 @@
 package ui.model
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import data.DataType
 import data.DataTypeWithImage
 import io.github.aakira.napier.Napier
@@ -11,10 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
-    private val appScreenModel: AppScreenModel,
     private val parentQuery: suspend (id: Long) -> Parent?,
     private val childrenQuery: suspend (parentId: Long) -> List<Children>
-) : ScreenModel {
+) : ViewModel() {
     /**
      * Whether the children should be ordered automatically upon fetch.
      * [DataType.compareTo] is used for sorting.
@@ -24,15 +23,12 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
     val parent = MutableStateFlow<Parent?>(null)
     val children = MutableStateFlow<List<Children>?>(null)
 
-    val notFound = MutableStateFlow(false)
-
     /**
      * When not `null`, displays a bottom sheet with the contents desired.
      */
     val displayingChild = MutableStateFlow<Children?>(null)
 
-    fun load(id: Long) = screenModelScope.launch(Dispatchers.IO) {
-        appScreenModel.selection.emit(null)
+    fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         val dbChildren = childrenQuery(id)
         children.emit(
             if (sortChildren) dbChildren.sorted()
@@ -42,11 +38,10 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
         val dbParent = parentQuery(id)
         if (dbParent == null) {
             Napier.w { "Could not find #$id" }
-            notFound.emit(true)
+            onNotFound()
         } else {
             Napier.d { "Emitting #$id" }
             parent.emit(dbParent)
-            appScreenModel.selection.emit(dbParent)
         }
     }
 }

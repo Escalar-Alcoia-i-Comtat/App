@@ -1,7 +1,7 @@
 package ui.model
 
 import androidx.compose.runtime.mutableStateListOf
-import cafe.adriel.voyager.core.model.ScreenModel
+import androidx.lifecycle.ViewModel
 import database.Area
 import database.Path
 import database.Sector
@@ -9,7 +9,7 @@ import database.Zone
 import kotlinx.coroutines.flow.MutableStateFlow
 import search.Filter
 
-class SearchModel : ScreenModel {
+class SearchModel : ViewModel() {
     val query = MutableStateFlow("")
     val isSearching = MutableStateFlow(false)
 

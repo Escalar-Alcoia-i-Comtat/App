@@ -1,42 +1,38 @@
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import build.BuildKonfig
-import cafe.adriel.voyager.navigator.CurrentScreen
-import cafe.adriel.voyager.navigator.Navigator
-import com.russhwolf.settings.set
+import androidx.compose.runtime.remember
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import data.EDataType
 import database.SettingsKeys
 import database.settings
-import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.action_skip
-import escalaralcoiaicomtat.composeapp.generated.resources.action_update
-import escalaralcoiaicomtat.composeapp.generated.resources.update_available_dialog_message
-import escalaralcoiaicomtat.composeapp.generated.resources.update_available_dialog_message_version
-import escalaralcoiaicomtat.composeapp.generated.resources.update_available_dialog_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import network.connectivityStatus
-import org.jetbrains.compose.resources.stringResource
 import platform.Updates
+import ui.composition.LocalNavController
+import ui.dialog.UpdateAvailableDialog
+import ui.navigation.Routes
 import ui.screen.AppScreen
+import ui.screen.IntroScreen
+import ui.screen.PathsScreen
+import ui.screen.ZonesScreen
 import ui.theme.AppTheme
 import utils.createStore
-import utils.format
 
 val store = CoroutineScope(SupervisorJob()).createStore()
 
 @Composable
 fun App(
-    initial: Pair<EDataType, Long>? = null,
-    modifier: Modifier = Modifier
+    navController: NavHostController = rememberNavController(),
+    initial: Pair<EDataType, Long>? = null
 ) {
     DisposableEffect(Unit) {
         connectivityStatus.start()
@@ -46,43 +42,70 @@ fun App(
         }
     }
 
+    val shownIntro = remember { settings.getBoolean(SettingsKeys.SHOWN_INTRO, false) }
+
     AppTheme {
         val updateAvailable by Updates.updateAvailable.collectAsState()
         val latestVersion by Updates.latestVersion.collectAsState()
         if (updateAvailable) {
-            AlertDialog(
-                onDismissRequest = { Updates.updateAvailable.tryEmit(false) },
-                title = { Text(stringResource(Res.string.update_available_dialog_title)) },
-                text = {
-                    Text(
-                        text = latestVersion?.let {
-                            stringResource(
-                                Res.string.update_available_dialog_message_version
-                            ).format(BuildKonfig.VERSION_NAME, it)
-                        } ?: stringResource(Res.string.update_available_dialog_message)
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = { /*TODO*/ }
-                    ) { Text(stringResource(Res.string.action_update)) }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            settings[SettingsKeys.SKIP_VERSION] = latestVersion
-                            Updates.updateAvailable.tryEmit(false)
-                        }
-                    ) { Text(stringResource(Res.string.action_skip)) }
-                }
-            )
+            UpdateAvailableDialog(latestVersion) {
+                Updates.updateAvailable.tryEmit(false)
+            }
         }
 
-        Navigator(
-            screen = AppScreen(initial)
-        ) {
-            Box(modifier = Modifier.fillMaxSize().then(modifier)) {
-                CurrentScreen()
+        CompositionLocalProvider(LocalNavController provides navController) {
+            NavHost(
+                navController = LocalNavController.current!!,
+                startDestination = if (shownIntro) Routes.ROOT else Routes.INTRO
+            ) {
+                composable(Routes.ROOT) {
+                    AppScreen(initial = initial)
+                }
+                composable(Routes.INTRO) {
+                    IntroScreen()
+                }
+                composable(
+                    route = Routes.ZONES,
+                    arguments = listOf(
+                        navArgument("areaId") { type = NavType.LongType }
+                    )
+                ) { entry ->
+                    val areaId = entry.arguments?.getLong("areaId")
+                    if (areaId == null) {
+                        navController.popBackStack()
+                    } else {
+                        ZonesScreen(areaId)
+                    }
+                }
+                composable(
+                    route = Routes.SECTORS,
+                    arguments = listOf(
+                        navArgument("zoneId") { type = NavType.LongType }
+                    )
+                ) { entry ->
+                    val zoneId = entry.arguments?.getLong("zoneId")
+                    if (zoneId == null) {
+                        navController.popBackStack()
+                    } else {
+                        ZonesScreen(zoneId)
+                    }
+                }
+                composable(
+                    route = Routes.PATHS,
+                    arguments = listOf(
+                        navArgument("sectorId") { type = NavType.LongType },
+                        navArgument("pathId") { type = NavType.LongType }
+                    )
+                ) { entry ->
+                    val sectorId = entry.arguments?.getLong("sectorId")
+                    val pathId = entry.arguments?.getLong("pathId")
+
+                    if (sectorId == null) {
+                        navController.popBackStack()
+                    } else {
+                        PathsScreen(sectorId, pathId)
+                    }
+                }
             }
         }
     }
