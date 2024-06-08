@@ -8,6 +8,8 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -21,17 +23,21 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
      */
     open val sortChildren: Boolean = true
 
-    val parent = MutableStateFlow<Parent?>(null)
-    val children = MutableStateFlow<List<Children>?>(null)
+    val parent: StateFlow<Parent?> get() = _parent.asStateFlow()
+    private val _parent = MutableStateFlow<Parent?>(null)
+
+    val children: StateFlow<List<Children>?> get() = _children.asStateFlow()
+    private val _children = MutableStateFlow<List<Children>?>(null)
 
     /**
      * When not `null`, displays a bottom sheet with the contents desired.
      */
-    val displayingChild = MutableStateFlow<Children?>(null)
+    val displayingChild: StateFlow<Children?> get() = _displayingChild.asStateFlow()
+    private val _displayingChild = MutableStateFlow<Children?>(null)
 
     fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         val dbChildren = childrenQuery(id)
-        children.emit(
+        _children.emit(
             if (sortChildren) dbChildren.sorted()
             else dbChildren
         )
@@ -42,7 +48,11 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
             withContext(Dispatchers.Main) { onNotFound() }
         } else {
             Napier.d { "Emitting #$id" }
-            parent.emit(dbParent)
+            _parent.emit(dbParent)
         }
+    }
+
+    fun selectChild(child: Children?) {
+        _displayingChild.value = child
     }
 }

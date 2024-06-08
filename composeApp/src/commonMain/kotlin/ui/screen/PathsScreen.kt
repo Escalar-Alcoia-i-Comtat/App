@@ -12,7 +12,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -89,7 +88,6 @@ import ui.icons.ClimbingAnchor
 import ui.icons.ClimbingShoes
 import ui.icons.Rope
 import ui.list.PathListItem
-import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
 import ui.platform.getScreenSize
 import ui.reusable.CircularProgressIndicatorBox
@@ -100,7 +98,6 @@ import utils.unit.meters
 private val sidePathInformationPanelHeight: Dp = 500.dp
 private val sidePathInformationPanelMaxWidth: Dp = 500.dp
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PathsScreen(
     sectorId: Long,
@@ -108,11 +105,10 @@ fun PathsScreen(
     viewModel: PathsScreenModel = viewModel()
 ) {
     val navController = LocalNavController.currentOrThrow
-    val windowSizeClass = calculateWindowSizeClass()
 
     val sector by viewModel.parent.collectAsState()
     val paths by viewModel.children.collectAsState()
-    val selectedChild by viewModel.displayingChild.collectAsState()
+    val selectedPath by viewModel.displayingChild.collectAsState()
 
     LaunchedEffect(sectorId) {
         viewModel.load(sectorId) {
@@ -120,6 +116,26 @@ fun PathsScreen(
             navController.navigateUp()
         }
     }
+
+    PathsList(
+        sector,
+        paths,
+        selectedPath,
+        highlightPathId,
+        onPathClicked = viewModel::selectChild
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
+fun PathsList(
+    sector: Sector?,
+    paths: List<Path>?,
+    selectedPath: Path?,
+    highlightPathId: Long?,
+    onPathClicked: (path: Path?) -> Unit
+) {
+    val windowSizeClass = calculateWindowSizeClass()
 
     AnimatedContent(
         targetState = sector,
@@ -154,11 +170,11 @@ fun PathsScreen(
                             paths = paths,
                             highlightPathId = highlightPathId,
                             modifier = Modifier.fillMaxHeight().weight(1f),
-                            onPathClicked = viewModel.displayingChild::tryEmit
+                            onPathClicked = onPathClicked
                         )
 
                         AnimatedContent(
-                            targetState = selectedChild,
+                            targetState = selectedPath,
                             transitionSpec = {
                                 slideInVertically { it } togetherWith slideOutVertically { it }
                             }
@@ -175,17 +191,21 @@ fun PathsScreen(
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
                                         .verticalScroll(rememberScrollState())
                                 ) {
-                                    BottomSheetContents(it, viewModel, false)
+                                    BottomSheetContents(
+                                        it,
+                                        false,
+                                        onDismissRequested = { onPathClicked(null) }
+                                    )
                                 }
                             }
                         }
                     }
                 } else {
-                    selectedChild?.let {
+                    selectedPath?.let {
                         ModalBottomSheet(
-                            onDismissRequest = { viewModel.displayingChild.tryEmit(null) }
+                            onDismissRequest = { onPathClicked(null) }
                         ) {
-                            BottomSheetContents(it, viewModel, true)
+                            BottomSheetContents(it, true) { onPathClicked(null) }
                         }
                     }
                 }
@@ -217,7 +237,7 @@ fun PathsScreen(
                             paths = paths,
                             highlightPathId = highlightPathId,
                             modifier = Modifier.fillMaxWidth().heightIn(max = size.height * 0.3f).weight(1f),
-                            onPathClicked = viewModel.displayingChild::tryEmit
+                            onPathClicked = onPathClicked
                         )
                     }
                 }
@@ -265,10 +285,10 @@ private fun PathsListView(
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
-private fun ColumnScope.BottomSheetContents(
+private fun BottomSheetContents(
     child: Path,
-    model: DataScreenModel<Sector, Path>,
-    isModal: Boolean
+    isModal: Boolean,
+    onDismissRequested: () -> Unit
 ) {
     val localUnitsConfiguration = LocalUnitsConfiguration.current
 
@@ -287,7 +307,7 @@ private fun ColumnScope.BottomSheetContents(
             )
             if (!isModal) {
                 IconButton(
-                    onClick = { model.displayingChild.tryEmit(null) }
+                    onClick = onDismissRequested
                 ) {
                     Icon(Icons.Rounded.Close, null)
                 }
