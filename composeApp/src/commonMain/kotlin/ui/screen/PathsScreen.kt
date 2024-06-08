@@ -361,11 +361,11 @@ private fun BottomSheetContents(
 }
 
 @Composable
-private fun CountMetaCard(child: Path) {
-    if (child.hasAnyCount) {
+private fun CountMetaCard(path: Path) {
+    if (path.hasAnyCount) {
         MetaCard(
             icon = Icons.Filled.ClimbingAnchor,
-            text = if (child.hasAnyTypeCount) {
+            text = if (path.hasAnyTypeCount) {
                 val list = mutableListOf("")
                 @Composable
                 fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
@@ -376,16 +376,16 @@ private fun CountMetaCard(child: Path) {
                         }
                         ?.let(list::add)
                 }
-                add(child.paraboltCount, Res.string.path_safes_parabolts, Res.string.path_safes_parabolts_count)
-                add(child.burilCount, Res.string.path_safes_burils, Res.string.path_safes_burils_count)
-                add(child.pitonCount, Res.string.path_safes_pitons, Res.string.path_safes_pitons_count)
-                add(child.spitCount, Res.string.path_safes_spits, Res.string.path_safes_spits_count)
-                add(child.tensorCount, Res.string.path_safes_tensors, Res.string.path_safes_tensors_count)
+                add(path.paraboltCount, Res.string.path_safes_parabolts, Res.string.path_safes_parabolts_count)
+                add(path.burilCount, Res.string.path_safes_burils, Res.string.path_safes_burils_count)
+                add(path.pitonCount, Res.string.path_safes_pitons, Res.string.path_safes_pitons_count)
+                add(path.spitCount, Res.string.path_safes_spits, Res.string.path_safes_spits_count)
+                add(path.tensorCount, Res.string.path_safes_tensors, Res.string.path_safes_tensors_count)
 
                 stringResource(Res.string.path_safes_count).format(list.joinToString("\n"))
             } else
                 stringResource(Res.string.path_safes_none),
-            bigText = child.stringCount?.toInt()?.let {
+            bigText = path.stringCount?.toInt()?.let {
                 stringResource(Res.string.path_quickdraws).format(it)
             }
         )
