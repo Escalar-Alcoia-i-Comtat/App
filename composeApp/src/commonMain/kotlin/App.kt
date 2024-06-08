@@ -23,6 +23,7 @@ import ui.navigation.Routes
 import ui.screen.AppScreen
 import ui.screen.IntroScreen
 import ui.screen.PathsScreen
+import ui.screen.SectorsScreen
 import ui.screen.ZonesScreen
 import ui.theme.AppTheme
 import utils.createStore
@@ -87,7 +88,7 @@ fun App(
                     if (zoneId == null) {
                         navController.popBackStack()
                     } else {
-                        ZonesScreen(zoneId)
+                        SectorsScreen(zoneId)
                     }
                 }
                 composable(
