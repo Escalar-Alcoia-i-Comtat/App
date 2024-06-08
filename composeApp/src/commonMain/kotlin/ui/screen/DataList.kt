@@ -1,11 +1,6 @@
 package ui.screen
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,22 +28,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataType> DataList(
     children: List<ChildrenType>?,
     onNavigationRequested: (ChildrenType) -> Unit
 ) {
-    AnimatedContent(
-        targetState = parent,
-        transitionSpec = {
-            val enter = if (initialState == null) {
-                slideInHorizontally { it }
-            } else {
-                fadeIn()
-            }
-            val exit = if (targetState == null) {
-                slideOutHorizontally { -it }
-            } else {
-                fadeOut()
-            }
-            enter togetherWith exit
-        }
-    ) { data ->
+    AnimatedContent(parent) { data ->
         if (data == null) {
             CircularProgressIndicatorBox()
         } else {
