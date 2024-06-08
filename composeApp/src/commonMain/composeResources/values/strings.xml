@@ -13,6 +13,7 @@
     <string name="action_skip">Skip</string>
     <string name="action_update">Update</string>
     <string name="action_view_video">View Video</string>
+    <string name="action_tap_to_see_more">Tap to know more</string>
 
     <string name="search">Search...</string>
     <string name="search_empty">Start typing to get results</string>
@@ -22,15 +23,15 @@
     <string name="search_filter_paths">Paths</string>
 
     <string name="intro_1_title">Welcome to Escalar Alcoià i Comtat</string>
-    <string name="intro_1_message">There\'s some important information you need to know before using the app. Slide to the right or press the bottom right button to continue.</string>
+    <string name="intro_1_message">There's some important information you need to know before using the app. Slide to the right or press the bottom right button to continue.</string>
     <string name="intro_2_title">Attention!</string>
     <string name="intro_2_message">Climbing is a sport considered risky, everyone who practices it has to worry about its knowledge and correct execution. From this web-guide, we are not responsible for any type of accident. Nor are we responsible for the equipment in the climbing areas, named here.</string>
     <string name="intro_3_title">Know your material</string>
-    <string name="intro_3_message">Make sure you properly know how to use the material you are using. Most accidents occur because of bad usages of the safety material. Here\'s a video where it\'s explained how to use the Grigri from Pezl: one of the most commonly used belaying equipment.</string>
+    <string name="intro_3_message">Make sure you properly know how to use the material you are using. Most accidents occur because of bad usages of the safety material. Here's a video where it's explained how to use the Grigri from Pezl: one of the most commonly used belaying equipment.</string>
     <string name="intro_4_title">Take care of children</string>
-    <string name="intro_4_message">If you climb with your children, make sure it\'s safe for them. Use proper equipment, warn them about the hazards of climbing, and make sure they are well informed. Each sector has information to make sure there\'s a safe place to stay.</string>
+    <string name="intro_4_message">If you climb with your children, make sure it's safe for them. Use proper equipment, warn them about the hazards of climbing, and make sure they are well informed. Each sector has information to make sure there's a safe place to stay.</string>
     <string name="intro_5_title">Enjoy!</string>
-    <string name="intro_5_message">You are ready to access the app! Don\'t hesitate in contacting us if you find any data wrong or inaccurate.</string>
+    <string name="intro_5_message">You are ready to access the app! Don't hesitate in contacting us if you find any data wrong or inaccurate.</string>
 
     <string name="settings_category_general">General Configuration</string>
     <string name="settings_units_distance">Distance Units</string>
@@ -67,19 +68,20 @@
     <string name="settings_updates_downloading_progress">Downloading... %d%%</string>
     <string name="settings_updates_storing">Storing...</string>
     <string name="settings_updates_error_title">Could not download update</string>
-    <string name="settings_updates_error_no_assets">The release doesn\'t have any assets. It might be too soon to download, please wait a bit and try again later.</string>
+    <string name="settings_updates_error_no_assets">The release doesn't have any assets. It might be too soon to download, please wait a bit and try again later.</string>
     <string name="settings_updates_error_not_found">Could not find the release file for the current platform.</string>
     <string name="settings_updates_error_unknown_os">The current operating system could not be determined.</string>
     <string name="settings_updates_error_installer_not_found">The installer for the current operating system was not found.</string>
 
     <string name="update_available_dialog_title">Update Available</string>
-    <string name="update_available_dialog_message">There\'s a new update available to download.</string>
-    <string name="update_available_dialog_message_version">There\'s a new update available to download. You are currently running %s and the latest version is %s.</string>
+    <string name="update_available_dialog_message">There's a new update available to download.</string>
+    <string name="update_available_dialog_message_version">There's a new update available to download. You are currently running %s and the latest version is %s.</string>
 
     <string name="path_height">Height</string>
     <string name="path_grade">Grade</string>
+    <string name="path_quickdraws_title">You must bring at least</string>
     <string name="path_quickdraws">%d Quickdraws</string>
-    <string name="path_safes_none">We don\'t have more information about the safes installed in the path.</string>
+    <string name="path_safes_none">We don't have more information about the safes installed in the path.</string>
     <string name="path_safes_count">The path has the following safes installed:</string>
     <string name="path_builder_message">This path was built %s.</string>
     <string name="path_re_builder_message">This path was re-built %s.</string>
@@ -115,4 +117,6 @@
     <string name="ending_lanyard">Lanyard</string>
     <string name="ending_walking">Walking</string>
     <string name="ending_rappel">Walking</string>
+
+    <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">More Info</string>
 </resources>

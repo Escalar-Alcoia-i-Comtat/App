@@ -11,6 +11,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -29,7 +30,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.SwipeDownAlt
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +44,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -47,7 +52,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,13 +74,22 @@ import data.Sector
 import data.generic.SportsGrade
 import data.generic.color
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.action_close
+import escalaralcoiaicomtat.composeapp.generated.resources.action_tap_to_see_more
+import escalaralcoiaicomtat.composeapp.generated.resources.dialog_more_information
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_date
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_message
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_name
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_name_date
+import escalaralcoiaicomtat.composeapp.generated.resources.path_ending
 import escalaralcoiaicomtat.composeapp.generated.resources.path_grade
 import escalaralcoiaicomtat.composeapp.generated.resources.path_height
 import escalaralcoiaicomtat.composeapp.generated.resources.path_quickdraws
+import escalaralcoiaicomtat.composeapp.generated.resources.path_quickdraws_title
+import escalaralcoiaicomtat.composeapp.generated.resources.path_re_builder_message
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils_count
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_count
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_none
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts_count
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_pitons
@@ -88,6 +105,7 @@ import org.jetbrains.compose.resources.stringResource
 import ui.composition.LocalNavController
 import ui.composition.LocalUnitsConfiguration
 import ui.icons.ClimbingAnchor
+import ui.icons.ClimbingHelmet
 import ui.icons.ClimbingShoes
 import ui.icons.Rope
 import ui.list.PathListItem
@@ -176,7 +194,8 @@ fun PathsList(
         if (parent == null) {
             CircularProgressIndicatorBox()
         } else {
-            val shouldDisplaySidePanel = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+            val shouldDisplaySidePanel =
+                windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
             Row(
                 modifier = Modifier.fillMaxSize()
@@ -256,7 +275,8 @@ fun PathsList(
                         PathsListView(
                             paths = paths,
                             highlightPathId = highlightPathId,
-                            modifier = Modifier.fillMaxWidth().heightIn(max = size.height * 0.3f).weight(1f),
+                            modifier = Modifier.fillMaxWidth().heightIn(max = size.height * 0.3f)
+                                .weight(1f),
                             onPathClicked = onPathClicked
                         )
                     }
@@ -357,6 +377,73 @@ private fun BottomSheetContents(
             )
         }
         CountMetaCard(child)
+        child.ending?.let { ending ->
+            MetaCard(
+                icon = Icons.Filled.SwipeDownAlt,
+                text = stringResource(Res.string.path_ending),
+                bigText = stringResource(ending.displayName),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            )
+        }
+        if (child.builder != null || !child.reBuilders.isNullOrEmpty()) {
+            val name = child.builder?.name
+            val date = child.builder?.date
+            val reBuilders = child.reBuilders
+
+            val text = StringBuilder()
+            if (name != null || date != null) {
+                text.appendLine(
+                    stringResource(Res.string.path_builder_message).format(
+                        if (name != null && date != null) {
+                            stringResource(Res.string.path_builder_name_date).format(name, date)
+                        } else if (name == null && date != null) {
+                            stringResource(Res.string.path_builder_date).format(date)
+                        } else if (name != null && date == null) {
+                            stringResource(Res.string.path_builder_name).format(name)
+                        } else {
+                            "" // never reached
+                        }
+                    )
+                )
+            }
+            reBuilders?.forEach { builder ->
+                text.appendLine(
+                    stringResource(Res.string.path_re_builder_message).format(
+                        if (builder.name != null && builder.date != null) {
+                            stringResource(Res.string.path_builder_name_date)
+                                .format(builder.name, builder.date)
+                        } else if (builder.name == null && builder.date != null) {
+                            stringResource(Res.string.path_builder_date)
+                                .format(builder.date)
+                        } else if (builder.name != null && builder.date == null) {
+                            stringResource(Res.string.path_builder_name)
+                                .format(builder.name)
+                        } else {
+                            "" // never reached
+                        }
+                    )
+                )
+            }
+
+            MetaCard(
+                icon = Icons.Filled.ClimbingHelmet,
+                text = text.toString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            )
+        }
+    }
+    child.description?.takeIf { child.showDescription }?.let { description ->
+        MetaCard(
+            icon = Icons.Filled.Description,
+            text = description,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
     }
 }
 
@@ -365,28 +452,54 @@ private fun CountMetaCard(path: Path) {
     if (path.hasAnyCount) {
         MetaCard(
             icon = Icons.Filled.ClimbingAnchor,
-            text = if (path.hasAnyTypeCount) {
-                val list = mutableListOf("")
+            text = stringResource(Res.string.path_quickdraws_title),
+            bigText = path.stringCount?.toInt()?.let {
+                stringResource(Res.string.path_quickdraws).format(it)
+            },
+            dialogText = if (path.hasAnyTypeCount) {
+                val list = mutableListOf(
+                    stringResource(Res.string.path_safes_count)
+                )
+
                 @Composable
                 fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
                     amount?.toInt()
+                        ?.takeIf { it > 0 }
                         ?.let {
                             if (it <= 0) stringResource(singleRes)
                             else stringResource(countRes).format(it)
                         }
                         ?.let(list::add)
                 }
-                add(path.paraboltCount, Res.string.path_safes_parabolts, Res.string.path_safes_parabolts_count)
-                add(path.burilCount, Res.string.path_safes_burils, Res.string.path_safes_burils_count)
-                add(path.pitonCount, Res.string.path_safes_pitons, Res.string.path_safes_pitons_count)
-                add(path.spitCount, Res.string.path_safes_spits, Res.string.path_safes_spits_count)
-                add(path.tensorCount, Res.string.path_safes_tensors, Res.string.path_safes_tensors_count)
+                add(
+                    amount = path.paraboltCount,
+                    singleRes = Res.string.path_safes_parabolts,
+                    countRes = Res.string.path_safes_parabolts_count
+                )
+                add(
+                    amount = path.burilCount,
+                    singleRes = Res.string.path_safes_burils,
+                    countRes = Res.string.path_safes_burils_count
+                )
+                add(
+                    amount = path.pitonCount,
+                    singleRes = Res.string.path_safes_pitons,
+                    countRes = Res.string.path_safes_pitons_count
+                )
+                add(
+                    amount = path.spitCount,
+                    singleRes = Res.string.path_safes_spits,
+                    countRes = Res.string.path_safes_spits_count
+                )
+                add(
+                    amount = path.tensorCount,
+                    singleRes = Res.string.path_safes_tensors,
+                    countRes = Res.string.path_safes_tensors_count
+                )
 
-                stringResource(Res.string.path_safes_count).format(list.joinToString("\n"))
-            } else
-                stringResource(Res.string.path_safes_none),
-            bigText = path.stringCount?.toInt()?.let {
-                stringResource(Res.string.path_quickdraws).format(it)
+                list.joinToString("\n")
+            } else {
+                null
             }
         )
     }
@@ -399,9 +512,28 @@ private fun MetaCard(
     modifier: Modifier = Modifier,
     iconContentDescription: String? = null,
     bigText: String? = null,
-    bigTextColor: Color = Color.Unspecified
+    bigTextColor: Color = Color.Unspecified,
+    dialogText: String? = null
 ) {
-    OutlinedCard(modifier) {
+    var showingDialog by remember { mutableStateOf(false) }
+    if (showingDialog && dialogText != null) {
+        AlertDialog(
+            onDismissRequest = { showingDialog = false },
+            title = { Text(stringResource(Res.string.dialog_more_information)) },
+            text = { Text(dialogText) },
+            confirmButton = {
+                TextButton(onClick = { showingDialog = false }) {
+                    Text(stringResource(Res.string.action_close))
+                }
+            }
+        )
+    }
+
+    OutlinedCard(
+        modifier = Modifier
+            .clickable(enabled = dialogText != null) { showingDialog = true }
+            .then(modifier)
+    ) {
         Row {
             Icon(
                 imageVector = icon,
@@ -428,6 +560,14 @@ private fun MetaCard(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge
+                    )
+                }
+                if (dialogText != null) {
+                    Text(
+                        text = stringResource(Res.string.action_tap_to_see_more),
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
