@@ -80,7 +80,13 @@
     <string name="path_grade">Grade</string>
     <string name="path_quickdraws">%d Quickdraws</string>
     <string name="path_safes_none">We don\'t have more information about the safes installed in the path.</string>
-    <string name="path_safes_count">The path has the following safes installed.</string>
+    <string name="path_safes_count">The path has the following safes installed:</string>
+    <string name="path_builder_message">This path was built %s.</string>
+    <string name="path_re_builder_message">This path was re-built %s.</string>
+    <string name="path_builder_name">by %s</string>
+    <string name="path_builder_date">on %s</string>
+    <string name="path_builder_name_date">by %s on %s</string>
+    <string name="path_ending">Path Ending</string>
 
     <string name="unit_label_meter">Meter</string>
     <string name="unit_value_meter">%.0f m</string>
@@ -97,4 +103,16 @@
     <string name="path_safes_spits_count">%d Spits</string>
     <string name="path_safes_tensors">Tensors</string>
     <string name="path_safes_tensors_count">%d Tensors</string>
+
+    <string name="ending_none">None</string>
+    <string name="ending_plate">Plate</string>
+    <string name="ending_plate_ring">Plate &amp; Ring</string>
+    <string name="ending_plate_lanyard">Plate &amp; Lanyard</string>
+    <string name="ending_plate_carabiner">Plate &amp; Carabiner</string>
+    <string name="ending_chain_ring">Chain &amp; Ring</string>
+    <string name="ending_chain_carabiner">Chain &amp; Carabiner</string>
+    <string name="ending_piton">Piton</string>
+    <string name="ending_lanyard">Lanyard</string>
+    <string name="ending_walking">Walking</string>
+    <string name="ending_rappel">Walking</string>
 </resources>
