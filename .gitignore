@@ -18,3 +18,4 @@ captures
 **/*.aab
 **/*.apk
 keystore.jks
+.kotlin
