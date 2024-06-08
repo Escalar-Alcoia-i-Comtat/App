@@ -10,10 +10,12 @@ import java.util.Calendar
 import java.util.Properties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
@@ -93,13 +95,9 @@ fun <VersionType : PlatformVersion> getVersionForPlatform(platform: Platform<Ver
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+
+    androidTarget()
 
     jvm("desktop")
 
@@ -114,13 +112,6 @@ kotlin {
         }
     }
 
-    targets.all {
-        compilations.all {
-            compilerOptions.configure {
-                freeCompilerArgs.add("-Xexpect-actual-classes")
-            }
-        }
-    }
     targets.withType<KotlinNativeTarget> {
         binaries.all {
             freeCompilerArgs += "-Xadd-light-debug=enable"
@@ -459,6 +450,13 @@ buildkonfig {
             val version = getVersionForPlatform(Platform.Windows)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
+    }
+}
+
+// Disable the warning for expect/actual classes
+tasks.withType(KotlinCompilationTask::class.java) {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
 
