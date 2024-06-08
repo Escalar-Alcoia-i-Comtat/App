@@ -6,9 +6,11 @@ compose = "1.6.7"
 # Check latest at https://developer.android.com/jetpack/androidx/releases/compose-compiler
 compose-compiler = "1.5.14"
 compose-maps = "5.0.3"
+compose-navigation = "2.7.0-alpha07"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.6.11"
 compose-ui = "1.6.7"
+compose-viewModel = "2.8.0"
 compose-windowSizeClass = "0.5.0"
 kmpio = "0.1.6"
 kotlin = "2.0.0"
@@ -25,13 +27,14 @@ play-appupdate = "2.1.0"
 play-instantapps = "18.1.0"
 semver = "2.0.0"
 sqldelight = "2.0.2"
-voyager = "1.0.0"
 zoomable = "1.6.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-maps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-maps" }
 compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-maps" }
+compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
+compose-viewModel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewModel" }
 compose-windowSizeClass = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "compose-windowSizeClass" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
@@ -62,9 +65,6 @@ sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", ver
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
-voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
-voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
-voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
 
 [plugins]

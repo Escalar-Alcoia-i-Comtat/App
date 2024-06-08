@@ -1,40 +1,43 @@
 package ui.model
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import data.DataType
 import data.DataTypeWithImage
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
-    private val appScreenModel: AppScreenModel,
     private val parentQuery: suspend (id: Long) -> Parent?,
     private val childrenQuery: suspend (parentId: Long) -> List<Children>
-) : ScreenModel {
+) : ViewModel() {
     /**
      * Whether the children should be ordered automatically upon fetch.
      * [DataType.compareTo] is used for sorting.
      */
     open val sortChildren: Boolean = true
 
-    val parent = MutableStateFlow<Parent?>(null)
-    val children = MutableStateFlow<List<Children>?>(null)
+    val parent: StateFlow<Parent?> get() = _parent.asStateFlow()
+    private val _parent = MutableStateFlow<Parent?>(null)
 
-    val notFound = MutableStateFlow(false)
+    val children: StateFlow<List<Children>?> get() = _children.asStateFlow()
+    private val _children = MutableStateFlow<List<Children>?>(null)
 
     /**
      * When not `null`, displays a bottom sheet with the contents desired.
      */
-    val displayingChild = MutableStateFlow<Children?>(null)
+    val displayingChild: StateFlow<Children?> get() = _displayingChild.asStateFlow()
+    private val _displayingChild = MutableStateFlow<Children?>(null)
 
-    fun load(id: Long) = screenModelScope.launch(Dispatchers.IO) {
-        appScreenModel.selection.emit(null)
+    fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         val dbChildren = childrenQuery(id)
-        children.emit(
+        _children.emit(
             if (sortChildren) dbChildren.sorted()
             else dbChildren
         )
@@ -42,11 +45,14 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
         val dbParent = parentQuery(id)
         if (dbParent == null) {
             Napier.w { "Could not find #$id" }
-            notFound.emit(true)
+            withContext(Dispatchers.Main) { onNotFound() }
         } else {
             Napier.d { "Emitting #$id" }
-            parent.emit(dbParent)
-            appScreenModel.selection.emit(dbParent)
+            _parent.emit(dbParent)
         }
+    }
+
+    fun selectChild(child: Children?) {
+        _displayingChild.value = child
     }
 }

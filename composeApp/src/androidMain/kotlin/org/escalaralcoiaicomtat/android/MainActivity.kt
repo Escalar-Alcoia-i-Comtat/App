@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
         val initial = computeInitial()
         setContent {
-            App(initial)
+            App(initial = initial)
         }
     }
 

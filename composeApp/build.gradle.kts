@@ -138,9 +138,10 @@ kotlin {
             implementation(libs.compose.windowSizeClass)
 
             // Compose - Navigation
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.screenmodel)
-            implementation(libs.voyager.transitions)
+            implementation(libs.compose.navigation)
+
+            // Compose - View Model
+            implementation(libs.compose.viewModel)
 
             // Compose - Zoomable
             implementation(libs.zoomable)

@@ -1,9 +1,17 @@
 package ui.screen
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,32 +24,40 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cache.ImageCache
 import com.mxalbert.zoomable.Zoomable
 import com.russhwolf.settings.ExperimentalSettingsApi
@@ -65,257 +81,354 @@ import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits_count
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors
 import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors_count
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import ui.composition.LocalNavController
 import ui.composition.LocalUnitsConfiguration
 import ui.icons.ClimbingAnchor
 import ui.icons.ClimbingShoes
 import ui.icons.Rope
 import ui.list.PathListItem
-import ui.model.AppScreenModel
-import ui.model.DataScreenModel
 import ui.model.PathsScreenModel
 import ui.platform.getScreenSize
-import ui.screen.DataScreen.SidePanelContents
+import ui.reusable.CircularProgressIndicatorBox
+import utils.currentOrThrow
 import utils.format
 import utils.unit.meters
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
-class PathsScreen(
-    id: Long,
-    private val highlightPathId: Long? = null
-) : DataScreen<Sector, Path>(
-    id = id,
-    depth = @Suppress("MagicNumber") 3,
-    { PathsScreenModel(it) },
-    null
+private val sidePathInformationPanelHeight: Dp = 500.dp
+private val sidePathInformationPanelMaxWidth: Dp = 500.dp
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun PathsScreen(
+    sectorId: Long,
+    highlightPathId: Long?,
+    viewModel: PathsScreenModel = viewModel()
 ) {
-    override fun shouldDisplaySidePanel(windowSizeClass: WindowSizeClass): Boolean {
-        return windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
-    }
+    val navController = LocalNavController.currentOrThrow
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Composable
-    override fun ContentView(
-        parentState: Sector,
-        childrenState: List<Path>?,
-        appScreenModel: AppScreenModel,
-        model: DataScreenModel<Sector, Path>
-    ) {
-        // Cast the model as the correct type
-        model as PathsScreenModel
+    val sector by viewModel.parent.collectAsState()
+    val paths by viewModel.children.collectAsState()
+    val selectedPath by viewModel.displayingChild.collectAsState()
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Zoomable(
-                modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds()
-            ) {
-                val image by ImageCache.collectStateOf(parentState.image)
-
-                image?.let { bitmap ->
-                    Image(
-                        bitmap = bitmap,
-                        contentDescription = parentState.displayName,
-                        modifier = Modifier
-                            .aspectRatio(bitmap.width.toFloat() / bitmap.height.toFloat())
-                            .fillMaxSize()
-                    )
-                } ?: CircularProgressIndicator()
-            }
-
-            val size = getScreenSize()
-            val windowSizeClass = calculateWindowSizeClass()
-            val shouldDisplaySidePanel = remember(windowSizeClass) {
-                shouldDisplaySidePanel(windowSizeClass)
-            }
-            AnimatedVisibility(
-                visible = !shouldDisplaySidePanel
-            ) {
-                PathsListView(
-                    childrenState,
-                    modifier = Modifier.fillMaxWidth().heightIn(max = size.height * 0.3f).weight(1f),
-                    onPathClicked = model.displayingChild::tryEmit
-                )
-            }
+    LaunchedEffect(sectorId) {
+        viewModel.load(sectorId) {
+            Napier.w { "Could not find sector with id $sectorId" }
+            navController.navigateUp()
         }
     }
 
-    override val SidePanel: SidePanelContents<Sector, Path> =
-        SidePanelContents { _, childrenState, _, model ->
-            // Cast the model as the correct type
-            model as PathsScreenModel
-
-            PathsListView(
-                childrenState,
-                modifier = Modifier.fillMaxHeight().weight(1f),
-                onPathClicked = model.displayingChild::tryEmit
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { sector?.let { Text(it.displayName) } },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                    }
+                }
             )
         }
-
-    @Composable
-    private fun PathsListView(
-        childrenState: List<Path>?,
-        modifier: Modifier = Modifier,
-        onPathClicked: (path: Path) -> Unit
-    ) {
-        val scope = rememberCoroutineScope()
-        val listState = rememberLazyListState()
-
-        LaunchedEffect(highlightPathId, childrenState) {
-            if (highlightPathId == null) return@LaunchedEffect
-            if (childrenState == null) return@LaunchedEffect
-            val index = childrenState.indexOfFirst { it.id == highlightPathId }
-            if (index < 0) return@LaunchedEffect
-            scope.launch { listState.animateScrollToItem(index) }
-        }
-
-        LazyColumn(
-            modifier = modifier,
-            state = listState,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(childrenState ?: emptyList()) { path ->
-                PathListItem(
-                    path,
-                    modifier = Modifier
-                        .widthIn(max = 600.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    highlight = highlightPathId == path.id
-                ) { onPathClicked(path) }
-            }
-        }
+    ) { paddingValues ->
+        PathsList(
+            sector,
+            paths,
+            selectedPath,
+            highlightPathId,
+            modifier = Modifier.padding(paddingValues),
+            onPathClicked = viewModel::selectChild
+        )
     }
+}
 
-    @Composable
-    @OptIn(ExperimentalSettingsApi::class)
-    override fun ColumnScope.BottomSheetContents(
-        child: Path,
-        model: DataScreenModel<Sector, Path>,
-        isModal: Boolean
-    ) {
-        val localUnitsConfiguration = LocalUnitsConfiguration.current
+@Composable
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
+fun PathsList(
+    sector: Sector?,
+    paths: List<Path>?,
+    selectedPath: Path?,
+    highlightPathId: Long?,
+    modifier: Modifier = Modifier,
+    onPathClicked: (path: Path?) -> Unit
+) {
+    val windowSizeClass = calculateWindowSizeClass()
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
+    AnimatedContent(
+        targetState = sector,
+        transitionSpec = {
+            val enter = if (initialState == null) {
+                slideInHorizontally { it }
+            } else {
+                fadeIn()
+            }
+            val exit = if (targetState == null) {
+                slideOutHorizontally { -it }
+            } else {
+                fadeOut()
+            }
+            enter togetherWith exit
+        },
+        modifier = modifier
+    ) { parent ->
+        if (parent == null) {
+            CircularProgressIndicatorBox()
+        } else {
+            val shouldDisplaySidePanel = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxSize()
             ) {
-                Text(
-                    text = child.displayName,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(1f)
-                )
-                if (!isModal) {
-                    IconButton(
-                        onClick = { model.displayingChild.tryEmit(null) }
+                if (shouldDisplaySidePanel) {
+                    Column(
+                        modifier = Modifier.fillMaxHeight().weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(Icons.Rounded.Close, null)
-                    }
-                }
-            }
-            child.height?.let { height ->
-                MetaCard(
-                    icon = Icons.Filled.Rope,
-                    text = stringResource(Res.string.path_height),
-                    bigText = with(localUnitsConfiguration) {
-                        height.meters.asDistanceValue()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-            }
-            child.grade?.takeIf { it != SportsGrade.UNKNOWN }?.let { grade ->
-                MetaCard(
-                    icon = Icons.Filled.ClimbingShoes,
-                    text = stringResource(Res.string.path_grade),
-                    bigText = grade.toString(),
-                    bigTextColor = grade.color.current,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-            }
-            CountMetaCard(child)
-        }
-    }
+                        PathsListView(
+                            paths = paths,
+                            highlightPathId = highlightPathId,
+                            modifier = Modifier.fillMaxHeight().weight(1f),
+                            onPathClicked = onPathClicked
+                        )
 
-    @Composable
-    private fun CountMetaCard(child: Path) {
-        if (child.hasAnyCount) {
-            MetaCard(
-                icon = Icons.Filled.ClimbingAnchor,
-                text = if (child.hasAnyTypeCount) {
-                    val list = mutableListOf("")
-                    @Composable
-                    fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
-                        amount?.toInt()
-                            ?.let {
-                                if (it <= 0) stringResource(singleRes)
-                                else stringResource(countRes).format(it)
+                        AnimatedContent(
+                            targetState = selectedPath,
+                            transitionSpec = {
+                                slideInVertically { it } togetherWith slideOutVertically { it }
                             }
-                            ?.let(list::add)
+                        ) {
+                            if (it != null) {
+                                Column(
+                                    modifier = Modifier
+                                        .widthIn(max = sidePathInformationPanelMaxWidth)
+                                        .fillMaxWidth()
+                                        .heightIn(max = sidePathInformationPanelHeight)
+                                        .clip(
+                                            RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                                        )
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .verticalScroll(rememberScrollState())
+                                ) {
+                                    BottomSheetContents(
+                                        it,
+                                        false,
+                                        onDismissRequested = { onPathClicked(null) }
+                                    )
+                                }
+                            }
+                        }
                     }
-                    add(child.paraboltCount, Res.string.path_safes_parabolts, Res.string.path_safes_parabolts_count)
-                    add(child.burilCount, Res.string.path_safes_burils, Res.string.path_safes_burils_count)
-                    add(child.pitonCount, Res.string.path_safes_pitons, Res.string.path_safes_pitons_count)
-                    add(child.spitCount, Res.string.path_safes_spits, Res.string.path_safes_spits_count)
-                    add(child.tensorCount, Res.string.path_safes_tensors, Res.string.path_safes_tensors_count)
-
-                    stringResource(Res.string.path_safes_count).format(list.joinToString("\n"))
-                } else
-                    stringResource(Res.string.path_safes_none),
-                bigText = child.stringCount?.toInt()?.let {
-                    stringResource(Res.string.path_quickdraws).format(it)
+                } else {
+                    selectedPath?.let {
+                        ModalBottomSheet(
+                            onDismissRequest = { onPathClicked(null) }
+                        ) {
+                            BottomSheetContents(it, true) { onPathClicked(null) }
+                        }
+                    }
                 }
-            )
-        }
-    }
-
-    @Composable
-    fun MetaCard(
-        icon: ImageVector,
-        text: String,
-        modifier: Modifier = Modifier,
-        iconContentDescription: String? = null,
-        bigText: String? = null,
-        bigTextColor: Color = Color.Unspecified
-    ) {
-        OutlinedCard(modifier) {
-            Row {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = iconContentDescription,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(48.dp)
-                )
                 Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 12.dp)
-                        .padding(vertical = 8.dp)
+                    modifier = Modifier.fillMaxHeight().weight(1f)
                 ) {
-                    Text(
-                        text = text,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    bigText?.let { text ->
-                        Text(
-                            text = text,
-                            color = bigTextColor,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.titleLarge
+                    Zoomable(
+                        modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds()
+                    ) {
+                        val image by ImageCache.collectStateOf(parent.image)
+
+                        image?.let { bitmap ->
+                            Image(
+                                bitmap = bitmap,
+                                contentDescription = parent.displayName,
+                                modifier = Modifier
+                                    .aspectRatio(bitmap.width.toFloat() / bitmap.height.toFloat())
+                                    .fillMaxSize()
+                            )
+                        } ?: CircularProgressIndicator()
+                    }
+
+                    val size = getScreenSize()
+
+                    AnimatedVisibility(
+                        visible = !shouldDisplaySidePanel
+                    ) {
+                        PathsListView(
+                            paths = paths,
+                            highlightPathId = highlightPathId,
+                            modifier = Modifier.fillMaxWidth().heightIn(max = size.height * 0.3f).weight(1f),
+                            onPathClicked = onPathClicked
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun PathsListView(
+    paths: List<Path>?,
+    highlightPathId: Long?,
+    modifier: Modifier = Modifier,
+    onPathClicked: (path: Path) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(highlightPathId, paths) {
+        if (highlightPathId == null) return@LaunchedEffect
+        if (paths == null) return@LaunchedEffect
+        val index = paths.indexOfFirst { it.id == highlightPathId }
+        if (index < 0) return@LaunchedEffect
+        scope.launch { listState.animateScrollToItem(index) }
+    }
+
+    LazyColumn(
+        modifier = modifier,
+        state = listState,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(paths ?: emptyList()) { path ->
+            PathListItem(
+                path = path,
+                modifier = Modifier
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                highlight = highlightPathId == path.id
+            ) { onPathClicked(path) }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalSettingsApi::class)
+private fun BottomSheetContents(
+    child: Path,
+    isModal: Boolean,
+    onDismissRequested: () -> Unit
+) {
+    val localUnitsConfiguration = LocalUnitsConfiguration.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = child.displayName,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            if (!isModal) {
+                IconButton(
+                    onClick = onDismissRequested
+                ) {
+                    Icon(Icons.Rounded.Close, null)
+                }
+            }
+        }
+        child.height?.let { height ->
+            MetaCard(
+                icon = Icons.Filled.Rope,
+                text = stringResource(Res.string.path_height),
+                bigText = with(localUnitsConfiguration) {
+                    height.meters.asDistanceValue()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            )
+        }
+        child.grade?.takeIf { it != SportsGrade.UNKNOWN }?.let { grade ->
+            MetaCard(
+                icon = Icons.Filled.ClimbingShoes,
+                text = stringResource(Res.string.path_grade),
+                bigText = grade.toString(),
+                bigTextColor = grade.color.current,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            )
+        }
+        CountMetaCard(child)
+    }
+}
+
+@Composable
+private fun CountMetaCard(child: Path) {
+    if (child.hasAnyCount) {
+        MetaCard(
+            icon = Icons.Filled.ClimbingAnchor,
+            text = if (child.hasAnyTypeCount) {
+                val list = mutableListOf("")
+                @Composable
+                fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
+                    amount?.toInt()
+                        ?.let {
+                            if (it <= 0) stringResource(singleRes)
+                            else stringResource(countRes).format(it)
+                        }
+                        ?.let(list::add)
+                }
+                add(child.paraboltCount, Res.string.path_safes_parabolts, Res.string.path_safes_parabolts_count)
+                add(child.burilCount, Res.string.path_safes_burils, Res.string.path_safes_burils_count)
+                add(child.pitonCount, Res.string.path_safes_pitons, Res.string.path_safes_pitons_count)
+                add(child.spitCount, Res.string.path_safes_spits, Res.string.path_safes_spits_count)
+                add(child.tensorCount, Res.string.path_safes_tensors, Res.string.path_safes_tensors_count)
+
+                stringResource(Res.string.path_safes_count).format(list.joinToString("\n"))
+            } else
+                stringResource(Res.string.path_safes_none),
+            bigText = child.stringCount?.toInt()?.let {
+                stringResource(Res.string.path_quickdraws).format(it)
+            }
+        )
+    }
+}
+
+@Composable
+private fun MetaCard(
+    icon: ImageVector,
+    text: String,
+    modifier: Modifier = Modifier,
+    iconContentDescription: String? = null,
+    bigText: String? = null,
+    bigTextColor: Color = Color.Unspecified
+) {
+    OutlinedCard(modifier) {
+        Row {
+            Icon(
+                imageVector = icon,
+                contentDescription = iconContentDescription,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(48.dp)
+            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 12.dp)
+                    .padding(vertical = 8.dp)
+            ) {
+                Text(
+                    text = text,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                bigText?.let { text ->
+                    Text(
+                        text = text,
+                        color = bigTextColor,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
             }
         }
