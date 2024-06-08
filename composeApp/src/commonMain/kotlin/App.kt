@@ -1,6 +1,5 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -15,7 +14,7 @@ import database.SettingsKeys
 import database.settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import network.connectivityStatus
+import network.ConnectivityStatusObserver
 import platform.Updates
 import ui.composition.LocalNavController
 import ui.dialog.UpdateAvailableDialog
@@ -35,13 +34,7 @@ fun App(
     navController: NavHostController = rememberNavController(),
     initial: Pair<EDataType, Long>? = null
 ) {
-    DisposableEffect(Unit) {
-        connectivityStatus.start()
-
-        onDispose {
-            connectivityStatus.stop()
-        }
-    }
+    ConnectivityStatusObserver()
 
     val shownIntro = remember { settings.getBoolean(SettingsKeys.SHOWN_INTRO, false) }
 

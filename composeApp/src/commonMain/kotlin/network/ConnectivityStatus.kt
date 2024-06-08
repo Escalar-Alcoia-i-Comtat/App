@@ -1,5 +1,7 @@
 package network
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -21,4 +23,18 @@ expect class ConnectivityStatus() {
     fun stop()
 
     fun getStatus(success: (Boolean) -> Unit)
+}
+
+/**
+ * Observes the connectivity status and updates [ConnectivityStatus.isNetworkConnected] accordingly.
+ */
+@Composable
+fun ConnectivityStatusObserver() {
+    DisposableEffect(Unit) {
+        connectivityStatus.start()
+
+        onDispose {
+            connectivityStatus.stop()
+        }
+    }
 }
