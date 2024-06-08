@@ -11,6 +11,7 @@
     <string name="action_skip">Omet</string>
     <string name="action_update">Actualitza</string>
     <string name="action_view_video">Veure Vídeo</string>
+    <string name="action_tap_to_see_more">Toca per saber més</string>
     <string name="search">Cerca...</string>
     <string name="search_empty">Comenceu a escriure per mostrar resultats</string>
     <string name="search_filter_areas">Àrees</string>
@@ -66,9 +67,16 @@
     <string name="update_available_dialog_message_version">Hi ha una nova actualització disponible per descarregar. Actualment esteu executant %s i l\'última versió és %s.</string>
     <string name="path_height">Altura</string>
     <string name="path_grade">Grau</string>
+    <string name="path_quickdraws_title">Cal que portis com a mínim</string>
     <string name="path_quickdraws">%d Express</string>
     <string name="path_safes_none">No tenim informació addicional sobre els segurs instal·lats a la via.</string>
-    <string name="path_safes_count">La via té els següents segurs instal·lats.</string>
+    <string name="path_safes_count">La via té els següents segurs instal·lats:</string>
+    <string name="path_builder_message">Aquesta via va ser equipada %s.</string>
+    <string name="path_re_builder_message">Aquesta via va ser reequipada %s.</string>
+    <string name="path_builder_name">per %s</string>
+    <string name="path_builder_date">en %s</string>
+    <string name="path_builder_name_date">per %s en %s</string>
+    <string name="path_ending">Reunió</string>
     <string name="unit_label_meter">Metre</string>
     <string name="unit_value_meter">%.0f m</string>
     <string name="unit_label_feet">Peus</string>
@@ -83,4 +91,16 @@
     <string name="path_safes_spits_count">%d Espits</string>
     <string name="path_safes_tensors">Tensors</string>
     <string name="path_safes_tensors_count">%d Tensors</string>
+    <string name="ending_none">Cap</string>
+    <string name="ending_plate">Placa</string>
+    <string name="ending_plate_ring">Placa i Argolla</string>
+    <string name="ending_plate_lanyard">Placa i Cordí</string>
+    <string name="ending_plate_carabiner">Placa i Mosquetó</string>
+    <string name="ending_chain_ring">Cadena i Argolla</string>
+    <string name="ending_chain_carabiner">Cadena i Mosquetó</string>
+    <string name="ending_piton">Claus</string>
+    <string name="ending_lanyard">Cordí</string>
+    <string name="ending_walking">Caminant</string>
+    <string name="ending_rappel">Rappel</string>
+    <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">Més informació</string>
 </resources>

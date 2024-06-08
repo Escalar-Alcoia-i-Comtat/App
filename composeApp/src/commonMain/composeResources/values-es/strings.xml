@@ -11,6 +11,7 @@
     <string name="action_skip">Saltar</string>
     <string name="action_update">Actualizar</string>
     <string name="action_view_video">Ver Vídeo</string>
+    <string name="action_tap_to_see_more">Pulsa para saber más</string>
     <string name="search">Buscar...</string>
     <string name="search_empty">Empieza a escribir para obtener resultados</string>
     <string name="search_filter_areas">Áreas</string>
@@ -66,9 +67,16 @@
     <string name="update_available_dialog_message_version">Hay una nueva actualización disponible para descargar. Actualmente estás ejecutando %s y la última versión es %s.</string>
     <string name="path_height">Altura</string>
     <string name="path_grade">Grado</string>
+    <string name="path_quickdraws_title">Debes traer al menos</string>
     <string name="path_quickdraws">%d Express</string>
     <string name="path_safes_none">No tenemos más información sobre los seguros instalados en la vía.</string>
-    <string name="path_safes_count">La vía tiene los siguientes seguros instalados.</string>
+    <string name="path_safes_count">La vía tiene los siguientes seguros instalados:</string>
+    <string name="path_builder_message">Esta vía fue equipada %s.</string>
+    <string name="path_re_builder_message">Esta vía fue reequipada %s.</string>
+    <string name="path_builder_name">por %s</string>
+    <string name="path_builder_date">en %s</string>
+    <string name="path_builder_name_date">por %s en %s</string>
+    <string name="path_ending">Reunión</string>
     <string name="unit_label_meter">Metro</string>
     <string name="unit_value_meter">%.0f m</string>
     <string name="unit_label_feet">Pies</string>
@@ -83,4 +91,16 @@
     <string name="path_safes_spits_count">%d Spits</string>
     <string name="path_safes_tensors">Tensores</string>
     <string name="path_safes_tensors_count">%d Tensores</string>
+    <string name="ending_none">Ninguna</string>
+    <string name="ending_plate">Placa</string>
+    <string name="ending_plate_ring">Placa y Argolla</string>
+    <string name="ending_plate_lanyard">Placa y Cordino</string>
+    <string name="ending_plate_carabiner">Placa y Mosquetón</string>
+    <string name="ending_chain_ring">Cadena y argolla</string>
+    <string name="ending_chain_carabiner">Cadena y Mosquetón</string>
+    <string name="ending_piton">Clavos</string>
+    <string name="ending_lanyard">Cordino</string>
+    <string name="ending_walking">A pie</string>
+    <string name="ending_rappel">Rappel</string>
+    <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">Más información</string>
 </resources>
