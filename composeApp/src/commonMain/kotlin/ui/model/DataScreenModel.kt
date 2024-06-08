@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
     private val parentQuery: suspend (id: Long) -> Parent?,
@@ -38,7 +39,7 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
         val dbParent = parentQuery(id)
         if (dbParent == null) {
             Napier.w { "Could not find #$id" }
-            onNotFound()
+            withContext(Dispatchers.Main) { onNotFound() }
         } else {
             Napier.d { "Emitting #$id" }
             parent.emit(dbParent)
