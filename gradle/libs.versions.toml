@@ -11,7 +11,7 @@ compose-plugin = "1.6.11"
 compose-ui = "1.6.7"
 compose-windowSizeClass = "0.5.0"
 kmpio = "0.1.6"
-kotlin = "1.9.24"
+kotlin = "2.0.0"
 kotlinx = "1.8.1"
 kotlinx-datetime = "0.6.0"
 kotlinx-json = "1.7.0"
@@ -71,6 +71,7 @@ zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable"
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
