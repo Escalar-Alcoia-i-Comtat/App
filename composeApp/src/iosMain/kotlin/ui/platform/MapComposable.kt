@@ -1,9 +1,7 @@
 package ui.platform
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,10 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import com.fleeksoft.ksoup.Ksoup
+import data.generic.LatLng
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -33,6 +31,7 @@ import platform.MapKit.MKCoordinateSpanMake
 import platform.MapKit.MKMapTypeSatellite
 import platform.MapKit.MKMapView
 import ui.reusable.CircularProgressIndicatorBox
+import utils.calculateCentralPoint
 
 data class MapData(
     val placemarks: List<Placemark>,
@@ -62,53 +61,19 @@ private suspend inline fun loadKMZ(
     )
 }
 
-fun transform(c: Pair<Double, Double>): Pair<Double, Double> {
-    return if (c.second < 0) {
-        c.first to (360 + c.second)
-    } else {
-        c
-    }
-}
-
-fun inverseTransform(c: Pair<Double, Double>): Pair<Double, Double> {
-    return if (c.second > 180) {
-        c.first to (-360 + c.second)
-    } else {
-        c
-    }
-}
-
 @ExperimentalForeignApi
-fun regionForPoints(coordinates: List<Pair<Double, Double>>): CValue<MKCoordinateRegion>? {
-    return if (coordinates.isEmpty()) {
+fun regionForPoints(coordinates: List<LatLng>): CValue<MKCoordinateRegion>? {
+    val center = calculateCentralPoint(coordinates)
+
+    return if (center == null) {
         null
-    } else if (coordinates.size == 1) {
-        val center = coordinates[0]
-
-        MKCoordinateRegionMake(
-            CLLocationCoordinate2DMake(center.first, center.second),
-            MKCoordinateSpanMake(1.0, 1.0)
-        )
     } else {
-        val transformed = coordinates.map(::transform)
-        val minLat = transformed.minOf { it.first }
-        val maxLat = transformed.maxOf { it.first }
-        val minLon = transformed.minOf { it.second }
-        val maxLon = transformed.maxOf { it.second }
-
-        val latitudeDelta = maxLat - minLat
-        val longitudeDelta = maxLon - minLon
-        val span = MKCoordinateSpanMake(
-            latitudeDelta,
-            longitudeDelta
+        val (centerPoint, delta) = center
+        Napier.i { "Center is on $centerPoint" }
+        MKCoordinateRegionMake(
+            CLLocationCoordinate2DMake(centerPoint.latitude, centerPoint.longitude),
+            MKCoordinateSpanMake(delta.latitude, delta.longitude)
         )
-        val center = inverseTransform(
-            (maxLat - latitudeDelta / 2) to (maxLon - longitudeDelta / 2)
-        )
-
-        val (lat, lon) = center
-        Napier.i { "Center is on ${lat},${lon}" }
-        MKCoordinateRegionMake(CLLocationCoordinate2DMake(lat, lon), span)
     }
 }
 
@@ -145,7 +110,7 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
                             mapView.removeAnnotation(annotation as MKAnnotationProtocol)
                         }
 
-                        val points = mutableListOf<Pair<Double, Double>>()
+                        val points = mutableListOf<LatLng>()
 
                         Napier.d { "Loaded ${data.styles.size} styles." }
                         Napier.d { "Drawing ${data.placemarks.size} placemarks..." }

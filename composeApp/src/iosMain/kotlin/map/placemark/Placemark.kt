@@ -1,6 +1,7 @@
 package map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
+import data.generic.LatLng
 import map.style.Style
 import platform.MapKit.MKMapView
 
@@ -21,7 +22,7 @@ interface Placemark {
     val description: String?
     val styleUrl: String?
 
-    fun addToPoints(list: MutableList<Pair<Double, Double>>)
+    fun addToPoints(list: MutableList<LatLng>)
 
     fun addToMap(mapView: MKMapView, styles: List<Style>)
 }

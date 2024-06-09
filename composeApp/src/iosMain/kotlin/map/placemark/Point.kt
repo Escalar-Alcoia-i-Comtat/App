@@ -1,6 +1,7 @@
 package map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
+import data.generic.LatLng
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.ExperimentalForeignApi
 import map.parser.PlacemarkParser
@@ -33,15 +34,14 @@ data class Point(
         }
     }
 
-    val latitude: Double = coordinates.split(',')[0].toDouble()
-    val longitude: Double = coordinates.split(',')[1].toDouble()
+    val latitude: Double = coordinates.split(',')[1].toDouble()
+    val longitude: Double = coordinates.split(',')[0].toDouble()
 
+    val latLng: LatLng = LatLng(latitude, longitude)
     val coordinate = CLLocationCoordinate2DMake(latitude, longitude)
 
-    override fun addToPoints(list: MutableList<Pair<Double, Double>>) {
-        list.add(
-            latitude to longitude
-        )
+    override fun addToPoints(list: MutableList<LatLng>) {
+        list.add(latLng)
     }
 
     @ExperimentalForeignApi
