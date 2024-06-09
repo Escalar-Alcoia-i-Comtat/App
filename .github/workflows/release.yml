@@ -20,11 +20,8 @@ jobs:
       - name: Write local.properties
         run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
 
-      - name: Update iOS files version name
-        run: ./gradlew updateIOSVersion -Pversion=${{ github.event.release.name }}
-
-      - name: Update general version name
-        run: ./gradlew updateVersionName -Pversion=${{ github.event.release.name }}
+      - name: Update version name
+        run: ./gradlew updateIOSVersion updateVersionName -Pversion=${{ github.event.release.name }}
 
       - name: Commit version.properties
         id: commit_version
