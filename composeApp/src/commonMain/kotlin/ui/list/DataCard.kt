@@ -83,7 +83,7 @@ fun <T: DataTypeWithImage> DataCard(
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
-            } ?: progress?.let { CircularProgressIndicator(it) } ?: CircularProgressIndicator()
+            } ?: progress?.let { CircularProgressIndicator({ it }) } ?: CircularProgressIndicator()
 
             Row(
                 modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart),
