@@ -387,7 +387,7 @@ private fun BottomSheetContents(
                     .padding(vertical = 4.dp)
             )
         }
-        if (child.builder != null || !child.reBuilders.isNullOrEmpty()) {
+        if (child.builder != null || child.reBuilders?.isNotEmpty() == true) {
             val name = child.builder?.name
             val date = child.builder?.date
             val reBuilders = child.reBuilders

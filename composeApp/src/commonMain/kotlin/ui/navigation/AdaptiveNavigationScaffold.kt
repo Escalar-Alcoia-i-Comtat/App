@@ -49,6 +49,7 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3WindowSizeClassApi
 fun AdaptiveNavigationScaffold(
     items: List<NavigationItem>,
+    modifier: Modifier = Modifier,
     initialPage: Int = 0,
     userScrollEnabled: Boolean = true,
     navigationBarVisible: Boolean = true,
@@ -74,6 +75,7 @@ fun AdaptiveNavigationScaffold(
     }
 
     PermanentNavigationDrawer(
+        modifier = modifier,
         drawerContent = {
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded) {
                 AnimatedVisibility(navigationBarVisible) {

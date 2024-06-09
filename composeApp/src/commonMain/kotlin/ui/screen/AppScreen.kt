@@ -37,6 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.EDataType
 import database.Area
@@ -81,6 +87,15 @@ fun AppScreen(
     val paths by database.pathQueries.getAll().collectAsStateList()
 
     AdaptiveNavigationScaffold(
+        modifier = Modifier
+            .onPreviewKeyEvent { event ->
+                if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
+                    searchModel.search()
+                    true
+                } else {
+                    false
+                }
+            },
         items = listOf(
             NavigationItem(
                 label = { stringResource(Res.string.navigation_explore) },
@@ -92,13 +107,32 @@ fun AppScreen(
             )
         ),
         topBar = {
+            val searchQuery by searchModel.query.collectAsState("")
             val isSearching by searchModel.isSearching.collectAsState(false)
 
             AnimatedContent(
                 targetState = isSearching
             ) { searching ->
                 if (searching) {
-                    SearchBarLogic(areas, zones, sectors, paths, searchModel)
+                    SearchBarLogic(
+                        areas,
+                        zones,
+                        sectors,
+                        paths,
+                        searchQuery,
+                        isSearching,
+                        searchModel.filterAreas,
+                        searchModel.filteredAreas,
+                        searchModel.filterZones,
+                        searchModel.filteredZones,
+                        searchModel.filterSectors,
+                        searchModel.filteredSectors,
+                        searchModel.filterPaths,
+                        searchModel.filteredPaths,
+                        searchModel::search,
+                        searchModel::dismiss,
+                        searchModel::search
+                    )
                 } else {
                     CenterAlignedTopAppBar(
                         title = { Text("Escalar Alcoià i Comtat") },
@@ -124,7 +158,7 @@ fun AppScreen(
                                 }
                             }
                             IconButton(
-                                onClick = { searchModel.isSearching.value = true },
+                                onClick = searchModel::search,
                                 enabled = areas.isNotEmpty()
                             ) {
                                 Icon(Icons.Rounded.Search, null)
@@ -152,17 +186,21 @@ fun SearchBarLogic(
     zones: List<Zone>,
     sectors: List<Sector>,
     paths: List<Path>,
-    searchModel: SearchModel
+    searchQuery: String,
+    isSearching: Boolean,
+    filterAreas: SnapshotStateList<Filter<Any>>,
+    filteredAreas: SnapshotStateList<Area?>,
+    filterZones: SnapshotStateList<Filter<Any>>,
+    filteredZones: SnapshotStateList<Zone?>,
+    filterSectors: SnapshotStateList<Filter<Any>>,
+    filteredSectors: SnapshotStateList<Sector?>,
+    filterPaths: SnapshotStateList<Filter<Any>>,
+    filteredPaths: SnapshotStateList<Path?>,
+    onSearchRequested: () -> Unit,
+    onSearchDismissed: () -> Unit,
+    onSearchQuery: (String) -> Unit
 ) {
     val navController = LocalNavController.current
-
-    val searchQuery by searchModel.query.collectAsState("")
-    val isSearching by searchModel.isSearching.collectAsState(false)
-
-    val filterAreas = searchModel.filterAreas
-    val filterZones = searchModel.filterZones
-    val filterSectors = searchModel.filterSectors
-    val filterPaths = searchModel.filterPaths
 
     fun <Type : Any> filter(
         list: List<Type>,
@@ -182,19 +220,15 @@ fun SearchBarLogic(
         }
     }
 
-    val filteredAreas = searchModel.filteredAreas
     LaunchedEffect(areas, filterAreas, searchQuery) {
         filter(areas, filteredAreas, Area::displayName, filterAreas)
     }
-    val filteredZones = searchModel.filteredZones
     LaunchedEffect(zones, filterZones, searchQuery) {
         filter(zones, filteredZones, Zone::displayName, filterZones)
     }
-    val filteredSectors = searchModel.filteredSectors
     LaunchedEffect(sectors, filterSectors, searchQuery) {
         filter(sectors, filteredSectors, Sector::displayName, filterSectors)
     }
-    val filteredPaths = searchModel.filteredPaths
     LaunchedEffect(paths, filterPaths, searchQuery) {
         filter(paths, filteredPaths, Path::displayName, filterPaths)
     }
@@ -212,10 +246,12 @@ fun SearchBarLogic(
 
     SearchBar(
         query = searchQuery,
-        onQueryChange = { searchModel.query.value = it },
+        onQueryChange = onSearchQuery,
         onSearch = {},
         active = isSearching,
-        onActiveChange = { searchModel.isSearching.value = it },
+        onActiveChange = {
+            if (it) onSearchRequested() else onSearchDismissed()
+        },
         placeholder = {
             Text(stringResource(Res.string.search))
         },
@@ -226,10 +262,10 @@ fun SearchBarLogic(
             Row {
                 IconButton(
                     onClick = {
-                        if (searchModel.query.value.isBlank()) {
-                            searchModel.isSearching.value = false
+                        if (searchQuery.isBlank()) {
+                            onSearchDismissed()
                         } else {
-                            searchModel.query.value = ""
+                            onSearchQuery("")
                         }
                     }
                 ) {
@@ -257,7 +293,7 @@ fun SearchBarLogic(
                         supportingContent = { Text("Area") },
                         modifier = Modifier.clickable {
                             navController?.navigate(Routes.area(area.id))
-                            searchModel.dismiss()
+                            onSearchDismissed()
                         }
                     )
                 }
@@ -270,7 +306,7 @@ fun SearchBarLogic(
                         supportingContent = { Text("Zone") },
                         modifier = Modifier.clickable {
                             navController?.navigate(Routes.zone(zone.id))
-                            searchModel.dismiss()
+                            onSearchDismissed()
                         }
                     )
                 }
@@ -283,7 +319,7 @@ fun SearchBarLogic(
                         supportingContent = { Text("Sector") },
                         modifier = Modifier.clickable {
                             navController?.navigate(Routes.sector(sector.id))
-                            searchModel.dismiss()
+                            onSearchDismissed()
                         }
                     )
                 }
@@ -296,7 +332,7 @@ fun SearchBarLogic(
                         supportingContent = { Text("Path") },
                         modifier = Modifier.clickable {
                             navController?.navigate(Routes.sector(path.parentSectorId, path.id))
-                            searchModel.dismiss()
+                            onSearchDismissed()
                         }
                     )
                 }
