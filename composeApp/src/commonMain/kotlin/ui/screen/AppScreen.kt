@@ -70,7 +70,7 @@ import utils.unaccent
 )
 @Composable
 fun AppScreen(
-    searchModel: SearchModel = viewModel<SearchModel>(),
+    searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     initial: Pair<EDataType, Long>? = null
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()

@@ -12,7 +12,7 @@ import ui.navigation.Routes
 @Composable
 fun SectorsScreen(
     zoneId: Long,
-    viewModel: SectorsScreenModel = viewModel()
+    viewModel: SectorsScreenModel = viewModel { SectorsScreenModel() }
 ) {
     val navController = LocalNavController.current
 

@@ -43,7 +43,9 @@ import ui.model.MainScreenModel
 import ui.navigation.Routes
 
 @Composable
-fun MainScreen(screenModel: MainScreenModel = viewModel()) {
+fun MainScreen(
+    screenModel: MainScreenModel = viewModel { MainScreenModel() }
+) {
     val lifecycleManager = LocalLifecycleManager.current
 
     val status by DataSync.status

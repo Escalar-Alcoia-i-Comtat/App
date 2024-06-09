@@ -124,7 +124,7 @@ private val sidePathInformationPanelMaxWidth: Dp = 500.dp
 fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
-    viewModel: PathsScreenModel = viewModel()
+    viewModel: PathsScreenModel = viewModel { PathsScreenModel() }
 ) {
     val navController = LocalNavController.currentOrThrow
 
