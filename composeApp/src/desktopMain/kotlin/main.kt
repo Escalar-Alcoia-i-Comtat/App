@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import platform.Updates
 import platform.backEventReceiver
+import ui.state.keyEventsFlow
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
@@ -42,7 +43,11 @@ fun main() = application {
             this::class.java.getResourceAsStream("/icon.svg")!!,
             density
         ),
-        onCloseRequest = ::exitApplication
+        onCloseRequest = ::exitApplication,
+        onPreviewKeyEvent = {
+            keyEventsFlow.value = it
+            true
+        }
     ) {
         AppRoot(
             modifier = Modifier

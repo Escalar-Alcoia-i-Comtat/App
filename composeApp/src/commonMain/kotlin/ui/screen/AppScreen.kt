@@ -37,11 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.EDataType
@@ -67,6 +68,7 @@ import ui.navigation.NavigationItem
 import ui.navigation.Routes
 import ui.pages.SettingsPage
 import ui.state.collectAsStateList
+import ui.state.keyEventsFlow
 import utils.unaccent
 
 @OptIn(
@@ -86,16 +88,18 @@ fun AppScreen(
     val sectors by database.sectorQueries.getAll().collectAsStateList()
     val paths by database.pathQueries.getAll().collectAsStateList()
 
+    val keyEvent by keyEventsFlow.collectAsState(null)
+    LaunchedEffect(keyEvent) {
+        val event = keyEvent ?: return@LaunchedEffect
+
+        if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
+            searchModel.search()
+        } else if (event.key == Key.Escape && event.type == KeyEventType.KeyUp) {
+            searchModel.dismiss()
+        }
+    }
+
     AdaptiveNavigationScaffold(
-        modifier = Modifier
-            .onPreviewKeyEvent { event ->
-                if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
-                    searchModel.search()
-                    true
-                } else {
-                    false
-                }
-            },
         items = listOf(
             NavigationItem(
                 label = { stringResource(Res.string.navigation_explore) },
@@ -179,8 +183,9 @@ fun AppScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
+@Suppress("LongParameterList")
 fun SearchBarLogic(
     areas: List<Area>,
     zones: List<Zone>,
@@ -201,6 +206,11 @@ fun SearchBarLogic(
     onSearchQuery: (String) -> Unit
 ) {
     val navController = LocalNavController.current
+
+    val focusRequester = remember { FocusRequester() }
+
+    // Focus the search bar when it is shown
+    LaunchedEffect(isSearching) { if (isSearching) focusRequester.requestFocus() }
 
     fun <Type : Any> filter(
         list: List<Type>,
@@ -249,15 +259,9 @@ fun SearchBarLogic(
         onQueryChange = onSearchQuery,
         onSearch = {},
         active = isSearching,
-        onActiveChange = {
-            if (it) onSearchRequested() else onSearchDismissed()
-        },
-        placeholder = {
-            Text(stringResource(Res.string.search))
-        },
-        leadingIcon = {
-            Icon(Icons.Outlined.Search, null)
-        },
+        onActiveChange = { if (it) onSearchRequested() else onSearchDismissed() },
+        placeholder = { Text(stringResource(Res.string.search)) },
+        leadingIcon = { Icon(Icons.Outlined.Search, null) },
         trailingIcon = {
             Row {
                 IconButton(
@@ -278,7 +282,9 @@ fun SearchBarLogic(
                 }
             }
         },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
     ) {
         if (searchQuery.isBlank()) {
             Text(stringResource(Res.string.search_empty))
