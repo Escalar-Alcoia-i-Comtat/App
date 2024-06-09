@@ -3,6 +3,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,9 +31,10 @@ import utils.createStore
 val store = CoroutineScope(SupervisorJob()).createStore()
 
 @Composable
-fun App(
+fun AppRoot(
     navController: NavHostController = rememberNavController(),
-    initial: Pair<EDataType, Long>? = null
+    initial: Pair<EDataType, Long>? = null,
+    modifier: Modifier = Modifier
 ) {
     ConnectivityStatusObserver()
 
@@ -50,7 +52,8 @@ fun App(
         CompositionLocalProvider(LocalNavController provides navController) {
             NavHost(
                 navController = LocalNavController.current!!,
-                startDestination = if (shownIntro) Routes.ROOT else Routes.INTRO
+                startDestination = if (shownIntro) Routes.ROOT else Routes.INTRO,
+                modifier = modifier
             ) {
                 composable(Routes.ROOT) {
                     AppScreen(initial = initial)

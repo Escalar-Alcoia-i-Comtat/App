@@ -44,7 +44,7 @@ fun main() = application {
         ),
         onCloseRequest = ::exitApplication
     ) {
-        App(
+        AppRoot(
             modifier = Modifier
                 .onPointerEvent(PointerEventType.Press) {
                     if (it.button == PointerButton.Back) CoroutineScope(Dispatchers.IO).launch {
@@ -58,5 +58,5 @@ fun main() = application {
 @Preview
 @Composable
 fun AppDesktopPreview() {
-    App()
+    AppRoot()
 }

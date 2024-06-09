@@ -1,6 +1,6 @@
 package org.escalaralcoiaicomtat.android
 
-import App
+import AppRoot
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
         val initial = computeInitial()
         setContent {
-            App(initial = initial)
+            AppRoot(initial = initial)
         }
     }
 
@@ -144,5 +144,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+    AppRoot()
 }
