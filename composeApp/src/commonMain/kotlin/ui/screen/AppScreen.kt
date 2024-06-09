@@ -67,8 +67,8 @@ import ui.navigation.AdaptiveNavigationScaffold
 import ui.navigation.NavigationItem
 import ui.navigation.Routes
 import ui.pages.SettingsPage
+import ui.state.LaunchedKeyEvent
 import ui.state.collectAsStateList
-import ui.state.keyEventsFlow
 import utils.unaccent
 
 @OptIn(
@@ -88,14 +88,15 @@ fun AppScreen(
     val sectors by database.sectorQueries.getAll().collectAsStateList()
     val paths by database.pathQueries.getAll().collectAsStateList()
 
-    val keyEvent by keyEventsFlow.collectAsState(null)
-    LaunchedEffect(keyEvent) {
-        val event = keyEvent ?: return@LaunchedEffect
-
+    LaunchedKeyEvent { event ->
         if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
             searchModel.search()
+            true
         } else if (event.key == Key.Escape && event.type == KeyEventType.KeyUp) {
             searchModel.dismiss()
+            true
+        } else {
+            false
         }
     }
 

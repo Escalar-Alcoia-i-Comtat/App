@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import platform.Updates
 import platform.backEventReceiver
-import ui.state.keyEventsFlow
+import ui.state.KeyEventCollector
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
@@ -44,10 +44,7 @@ fun main() = application {
             density
         ),
         onCloseRequest = ::exitApplication,
-        onPreviewKeyEvent = {
-            keyEventsFlow.value = it
-            true
-        }
+        onPreviewKeyEvent = { KeyEventCollector.emit(it) }
     ) {
         AppRoot(
             modifier = Modifier
