@@ -542,7 +542,16 @@ val updateVersionName = task("updateVersionName") {
     doFirst {
         val version = properties.getValue("version").toString()
         updateProperties("version.properties") {
+            // Store the full version name for general
             setProperty("VERSION_NAME", version)
+            // Android, iOS and Linux support suffixes (such as -beta01)
+            setProperty("VERSION_ANDROID", version)
+            setProperty("VERSION_IOS", version)
+            setProperty("VERSION_LIN", version)
+            // Windows and MacOS do not support suffixes
+            val stripped = version.substringBefore('-')
+            setProperty("VERSION_WIN", stripped)
+            setProperty("VERSION_MAC", stripped)
         }
     }
 }
