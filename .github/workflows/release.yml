@@ -20,15 +20,18 @@ jobs:
       - name: Write local.properties
         run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
 
-      - name: Update version name and code
+      - name: Update iOS files version name
         run: ./gradlew updateIOSVersion -Pversion=${{ github.event.release.name }}
+
+      - name: Update general version name
+        run: ./gradlew updateVersionName -Pversion=${{ github.event.release.name }}
 
       - name: Commit version.properties
         id: commit_version
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Increased Version Code
-          file_pattern: 'project.pbxproj Info.plist'
+          file_pattern: 'version.properties project.pbxproj Info.plist'
 
   build-android:
     name: Build for Android

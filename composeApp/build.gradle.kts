@@ -538,6 +538,14 @@ val updateIOSVersion = task("updateIOSVersion") {
         }
     }
 }
+val updateVersionName = task("updateVersionName") {
+    doFirst {
+        val version = properties.getValue("version").toString()
+        updateProperties("version.properties") {
+            setProperty("VERSION_NAME", version)
+        }
+    }
+}
 
 tasks.findByName("bundleRelease")?.dependsOn?.add(increaseVersionCode)
 tasks.findByName("packageDeb")?.dependsOn?.add(increaseLinuxRelease)
