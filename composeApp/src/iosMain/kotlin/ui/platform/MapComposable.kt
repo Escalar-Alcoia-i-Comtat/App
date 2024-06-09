@@ -30,7 +30,9 @@ import platform.MapKit.MKAnnotationProtocol
 import platform.MapKit.MKCoordinateRegion
 import platform.MapKit.MKCoordinateRegionMake
 import platform.MapKit.MKCoordinateSpanMake
+import platform.MapKit.MKMapTypeSatellite
 import platform.MapKit.MKMapView
+import ui.reusable.CircularProgressIndicatorBox
 
 data class MapData(
     val placemarks: List<Placemark>,
@@ -116,20 +118,19 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
     var mapData by remember { mutableStateOf<MapData?>(null) }
 
     LaunchedEffect(kmzUUID) {
-        if (kmzUUID != null) CoroutineScope(Dispatchers.IO).launch {
+        if (kmzUUID != null && mapData == null) CoroutineScope(Dispatchers.IO).launch {
             loadKMZ(kmzUUID) { mapData = it }
         }
     }
 
-    OutlinedCard(
-        modifier
-    ) {
+    OutlinedCard(modifier) {
         AnimatedContent(mapData) { data ->
             if (data != null) {
                 UIKitView(
                     modifier = Modifier.fillMaxSize(),
                     factory = {
                         MKMapView().apply {
+                            mapType = MKMapTypeSatellite
                             // Disable all gestures
                             zoomEnabled = false
                             scrollEnabled = false
@@ -159,12 +160,7 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
                     }
                 )
             } else {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                CircularProgressIndicatorBox()
             }
         }
     }
