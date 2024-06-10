@@ -68,7 +68,7 @@
     <string name="path_height">Altura</string>
     <string name="path_grade">Grau</string>
     <string name="path_quickdraws_title">Cal que portis com a mínim</string>
-    <string name="path_quickdraws">%d Express</string>
+    <string name="path_quickdraws">%s Quickdraws</string>
     <string name="path_safes_none">No tenim informació addicional sobre els segurs instal·lats a la via.</string>
     <string name="path_safes_count">La via té els següents segurs instal·lats:</string>
     <string name="path_builder_message">Aquesta via va ser equipada %s.</string>
