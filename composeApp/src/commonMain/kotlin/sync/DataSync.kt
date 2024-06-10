@@ -46,10 +46,10 @@ object DataSync : SyncProcess() {
         mutableStatus.value = Status.RUNNING.Indeterminate
 
         Napier.d { "Fetching tree from server..." }
-        val areas = Backend.tree()
-        val zones = areas.flatMap { it.zones }
-        val sectors = zones.flatMap { it.sectors }
-        val paths = sectors.flatMap { it.paths }
+        val areas = Backend.tree().map { Preprocessors.areaPreprocessor(it) }
+        val zones = areas.flatMap { it.zones }.map { Preprocessors.zonePreprocessor(it) }
+        val sectors = zones.flatMap { it.sectors }.map { Preprocessors.sectorPreprocessor(it) }
+        val paths = sectors.flatMap { it.paths }.map { Preprocessors.pathPreprocessor(it) }
 
         Napier.d { "Got ${areas.size} areas. Adding them into the database..." }
         database.transaction {
