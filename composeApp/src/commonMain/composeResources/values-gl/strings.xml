@@ -68,7 +68,7 @@
     <string name="path_height">Height</string>
     <string name="path_grade">Grade</string>
     <string name="path_quickdraws_title">You must bring at least</string>
-    <string name="path_quickdraws">%d Quickdraws</string>
+    <string name="path_quickdraws">%s Quickdraws</string>
     <string name="path_safes_none">We don\'t have more information about the safes installed in the path.</string>
     <string name="path_safes_count">The path has the following safes installed:</string>
     <string name="path_builder_message">This path was built %s.</string>
