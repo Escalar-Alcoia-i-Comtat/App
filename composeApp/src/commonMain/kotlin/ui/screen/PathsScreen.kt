@@ -62,7 +62,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -387,6 +392,7 @@ private fun BottomSheetContents(
                     .padding(vertical = 4.dp)
             )
         }
+        // TODO: blank string must be converted to null
         if (child.builder != null || child.reBuilders?.isNotEmpty() == true) {
             val name = child.builder?.name
             val date = child.builder?.date
@@ -454,50 +460,57 @@ private fun CountMetaCard(path: Path) {
             icon = Icons.Filled.ClimbingAnchor,
             text = stringResource(Res.string.path_quickdraws_title),
             bigText = path.stringCount?.toInt()?.let {
-                stringResource(Res.string.path_quickdraws).format(it)
+                stringResource(Res.string.path_quickdraws)
+                    .format(if (it <= 0) "¿?" else it.toString())
             },
             dialogText = if (path.hasAnyTypeCount) {
-                val list = mutableListOf(
-                    stringResource(Res.string.path_safes_count)
-                )
+                buildAnnotatedString {
+                    appendLine(stringResource(Res.string.path_safes_count))
 
-                @Composable
-                fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
-                    amount?.toInt()
-                        ?.takeIf { it > 0 }
-                        ?.let {
-                            if (it <= 0) stringResource(singleRes)
-                            else stringResource(countRes).format(it)
-                        }
-                        ?.let(list::add)
+                    @Composable
+                    fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
+                        amount?.toInt()
+                            ?.takeIf { it > 0 }
+                            ?.let {
+                                if (it <= 1 || it >= Int.MAX_VALUE) stringResource(singleRes)
+                                else stringResource(countRes).format(it)
+                            }
+                            ?.let { line ->
+                                append('•')
+                                append(' ')
+                                withStyle(
+                                    SpanStyle(fontWeight = FontWeight.Bold)
+                                ) {
+                                    appendLine(line)
+                                }
+                            }
+                    }
+                    add(
+                        amount = path.paraboltCount,
+                        singleRes = Res.string.path_safes_parabolts,
+                        countRes = Res.string.path_safes_parabolts_count
+                    )
+                    add(
+                        amount = path.burilCount,
+                        singleRes = Res.string.path_safes_burils,
+                        countRes = Res.string.path_safes_burils_count
+                    )
+                    add(
+                        amount = path.pitonCount,
+                        singleRes = Res.string.path_safes_pitons,
+                        countRes = Res.string.path_safes_pitons_count
+                    )
+                    add(
+                        amount = path.spitCount,
+                        singleRes = Res.string.path_safes_spits,
+                        countRes = Res.string.path_safes_spits_count
+                    )
+                    add(
+                        amount = path.tensorCount,
+                        singleRes = Res.string.path_safes_tensors,
+                        countRes = Res.string.path_safes_tensors_count
+                    )
                 }
-                add(
-                    amount = path.paraboltCount,
-                    singleRes = Res.string.path_safes_parabolts,
-                    countRes = Res.string.path_safes_parabolts_count
-                )
-                add(
-                    amount = path.burilCount,
-                    singleRes = Res.string.path_safes_burils,
-                    countRes = Res.string.path_safes_burils_count
-                )
-                add(
-                    amount = path.pitonCount,
-                    singleRes = Res.string.path_safes_pitons,
-                    countRes = Res.string.path_safes_pitons_count
-                )
-                add(
-                    amount = path.spitCount,
-                    singleRes = Res.string.path_safes_spits,
-                    countRes = Res.string.path_safes_spits_count
-                )
-                add(
-                    amount = path.tensorCount,
-                    singleRes = Res.string.path_safes_tensors,
-                    countRes = Res.string.path_safes_tensors_count
-                )
-
-                list.joinToString("\n")
             } else {
                 null
             }
@@ -513,7 +526,7 @@ private fun MetaCard(
     iconContentDescription: String? = null,
     bigText: String? = null,
     bigTextColor: Color = Color.Unspecified,
-    dialogText: String? = null
+    dialogText: AnnotatedString? = null
 ) {
     var showingDialog by remember { mutableStateOf(false) }
     if (showingDialog && dialogText != null) {
