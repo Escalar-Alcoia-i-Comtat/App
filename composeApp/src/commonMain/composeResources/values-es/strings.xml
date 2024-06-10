@@ -68,7 +68,7 @@
     <string name="path_height">Altura</string>
     <string name="path_grade">Grado</string>
     <string name="path_quickdraws_title">Debes traer al menos</string>
-    <string name="path_quickdraws">%d Express</string>
+    <string name="path_quickdraws">%s Quickdraws</string>
     <string name="path_safes_none">No tenemos más información sobre los seguros instalados en la vía.</string>
     <string name="path_safes_count">La vía tiene los siguientes seguros instalados:</string>
     <string name="path_builder_message">Esta vía fue equipada %s.</string>
