@@ -3,7 +3,6 @@ package map.placemark
 import com.fleeksoft.ksoup.nodes.Element
 import data.generic.LatLng
 import io.github.aakira.napier.Napier
-import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.interpretCPointer
 import kotlinx.cinterop.objcPtr
@@ -32,7 +31,7 @@ data class Polygon(
                     .text()
                     .split(" ")
                     .map { it.trim().split(',') }
-                    .map { LatLng(it[0].toDouble(), it[1].toDouble()) }
+                    .map { LatLng(it[1].toDouble(), it[0].toDouble()) }
 
                 Polygon(
                     style.getElementsByTag("name").first()!!.text(),
