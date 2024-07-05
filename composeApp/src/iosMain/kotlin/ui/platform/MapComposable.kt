@@ -14,7 +14,6 @@ import androidx.compose.ui.interop.UIKitView
 import com.fleeksoft.ksoup.Ksoup
 import data.generic.LatLng
 import io.github.aakira.napier.Napier
-import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,16 +21,12 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import map.placemark.Placemark
 import map.style.Style
+import map.utils.coordinateRegionOf
 import maps.KMZHandler
-import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKAnnotationProtocol
-import platform.MapKit.MKCoordinateRegion
-import platform.MapKit.MKCoordinateRegionMake
-import platform.MapKit.MKCoordinateSpanMake
 import platform.MapKit.MKMapTypeSatellite
 import platform.MapKit.MKMapView
 import ui.reusable.CircularProgressIndicatorBox
-import utils.calculateCentralPoint
 
 data class MapData(
     val placemarks: List<Placemark>,
@@ -59,22 +54,6 @@ private suspend inline fun loadKMZ(
     onDocumentLoaded(
         MapData(placemarks, styles)
     )
-}
-
-@ExperimentalForeignApi
-fun regionForPoints(coordinates: List<LatLng>): CValue<MKCoordinateRegion>? {
-    val center = calculateCentralPoint(coordinates)
-
-    return if (center == null) {
-        null
-    } else {
-        val (centerPoint, delta) = center
-        Napier.i { "Center is on $centerPoint" }
-        MKCoordinateRegionMake(
-            CLLocationCoordinate2DMake(centerPoint.latitude, centerPoint.longitude),
-            MKCoordinateSpanMake(delta.latitude, delta.longitude)
-        )
-    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -119,7 +98,8 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
                             placemark.addToMap(mapView, data.styles)
                         }
 
-                        regionForPoints(points)?.let {
+                        Napier.d { "Points: $points" }
+                        coordinateRegionOf(points).let {
                             mapView.setRegion(it)
                         }
                     }
