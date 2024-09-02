@@ -27,7 +27,7 @@ play-appupdate = "2.1.0"
 play-instantapps = "18.1.0"
 semver = "2.0.0"
 sqldelight = "2.0.2"
-zoomable = "1.6.1"
+zoomable = "1.6.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
