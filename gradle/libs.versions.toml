@@ -6,7 +6,7 @@ compose = "1.6.7"
 # Check latest at https://developer.android.com/jetpack/androidx/releases/compose-compiler
 compose-compiler = "1.5.14"
 compose-maps = "6.1.2"
-compose-navigation = "2.7.0-alpha07"
+compose-navigation = "2.8.0-dev1840"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.6.11"
 compose-ui = "1.7.1"
