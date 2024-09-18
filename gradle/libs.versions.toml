@@ -1,5 +1,5 @@
 [versions]
-agp = "8.6.0"
+agp = "8.6.1"
 androidx-activityCompose = "1.9.2"
 buildkonfig = "0.15.2"
 compose = "1.6.7"
