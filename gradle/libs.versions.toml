@@ -3,7 +3,7 @@ agp = "8.5.2"
 androidx-activityCompose = "1.9.2"
 buildkonfig = "0.15.2"
 compose-maps = "6.1.2"
-compose-navigation = "2.8.0-alpha10"
+compose-navigation = "2.8.0-dev1883"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.6.11"
 compose-ui = "1.7.3"
