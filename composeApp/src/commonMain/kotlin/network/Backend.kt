@@ -15,6 +15,8 @@ import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.charsets.Charsets
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import network.response.DataResponse
 import network.response.ErrorResponse
@@ -53,8 +55,9 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend inline fun <reified DataType: DataResponseType> decodeBody(
-        response: HttpResponse
+    private suspend fun <DataType : DataResponseType> decodeBody(
+        response: HttpResponse,
+        deserializer: DeserializationStrategy<DataType>,
     ): DataType {
         return try {
             val url = response.request.url
@@ -66,7 +69,7 @@ object Backend {
             }*/
 
             if (status in 200..299) {
-                DataResponse.decode<DataType>(body).also {
+                DataResponse.decode(body, deserializer).also {
                     Napier.d(tag = "Backend") {
                         "Server responded successfully to ${response.request.url}. Status: $status"
                     }
@@ -102,9 +105,10 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend inline fun <reified DataType: DataResponseType> get(
+    private suspend fun <DataType : DataResponseType> get(
+        deserializer: DeserializationStrategy<DataType>,
         vararg pathComponents: String,
-        noinline progress: (suspend (current: Long, total: Long) -> Unit)? = null
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): DataType {
         var length: Long = 0
         progress?.invoke(0, length)
@@ -121,7 +125,7 @@ object Backend {
             }
         }
         progress?.invoke(length, length)
-        return decodeBody(response)
+        return decodeBody(response, deserializer)
     }
 
     /**
@@ -138,7 +142,7 @@ object Backend {
     suspend fun tree(
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): List<Area> {
-        return get<AreasData>("tree", progress = progress).areas
+        return get(AreasData.serializer(), "tree", progress = progress).areas
     }
 
     /**
@@ -158,26 +162,6 @@ object Backend {
         uuid: String,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): FileRequestData {
-        return get("file", uuid, progress = progress)
-    }
-
-    /**
-     * Requests the data of multiple files with the given UUIDs.
-     * An exception may be thrown if at least one file was not found in the server.
-     *
-     * @param uuids The UUIDs of the files to fetch.
-     * @param progress If not null, will be called with the progress of the request.
-     *
-     * @return The data of the file requested.
-     *
-     * @throws ServerException If the server responded with an exception, or the body of the body of
-     * the response didn't match a [DataResponse].
-     * @throws IllegalStateException If the server gave a response that could not be handled.
-     */
-    suspend fun requestFiles(
-        uuids: List<String>,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): List<FileRequestData> {
-        return get("file", uuids.joinToString(","), progress = progress)
+        return get(FileRequestData.serializer(), "file", uuid, progress = progress)
     }
 }

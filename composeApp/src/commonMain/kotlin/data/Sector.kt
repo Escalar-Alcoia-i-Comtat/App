@@ -10,6 +10,7 @@ data class Sector(
     override val timestamp: Long,
     @SerialName("display_name") override val displayName: String,
     override val image: String,
+    val gpx: String? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
     @SerialName("walking_time") val walkingTime: Long? = null,
@@ -19,7 +20,7 @@ data class Sector(
     val paths: List<Path>
 ): DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
-        return (other as? data.Sector)
+        return (other as? Sector)
             // If other is a Sector, try to compare by weight, but don't consider empty weights
             ?.takeUnless { weight.isBlank() || other.weight.isBlank() }
             ?.let { weight.compareTo(other.weight) }
