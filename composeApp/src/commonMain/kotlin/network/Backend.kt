@@ -1,5 +1,6 @@
 package network
 
+import build.BuildKonfig
 import data.Area
 import exception.ServerException
 import io.github.aakira.napier.Napier
@@ -38,7 +39,11 @@ object Backend {
         }
     }
 
-    private const val baseUrl = "https://backend.escalaralcoiaicomtat.org"
+    private val baseUrl = BuildKonfig.BASE_URL ?: "https://backend.escalaralcoiaicomtat.org"
+
+    init {
+        Napier.i { "Base URL: $baseUrl" }
+    }
 
     /**
      * If the request was successful, extracts a [DataResponse] with type [DataType] from its body.

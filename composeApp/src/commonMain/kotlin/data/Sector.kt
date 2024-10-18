@@ -11,7 +11,7 @@ data class Sector(
     @SerialName("display_name") override val displayName: String,
     override val image: String,
     @SerialName("kids_apt") val kidsApt: Boolean,
-    val weight: String,
+    val weight: String = "",
     @SerialName("walking_time") val walkingTime: Long? = null,
     override val point: LatLng? = null,
     @SerialName("sun_time") val sunTime: String?,

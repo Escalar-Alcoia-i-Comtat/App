@@ -396,6 +396,7 @@ buildkonfig {
     val localProperties = readProperties("local.properties")
 
     defaultConfigs {
+        buildConfigField(STRING, "BASE_URL", System.getenv("BASE_URL"), nullable = true)
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
 
         val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
