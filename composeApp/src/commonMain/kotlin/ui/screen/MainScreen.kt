@@ -23,15 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import app.cash.sqldelight.coroutines.mapToList
 import cache.ImageCache
-import data.Area
 import database.SettingsKeys
 import database.settings
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import platform.BackHandler
 import sync.DataSync
@@ -41,6 +38,7 @@ import ui.composition.LocalNavController
 import ui.list.DataCard
 import ui.model.MainScreenModel
 import ui.navigation.Routes
+import utils.IO
 
 @Composable
 fun MainScreen(
@@ -50,9 +48,7 @@ fun MainScreen(
 
     val status by DataSync.status
 
-    val areas by screenModel.areas
-        .mapToList(Dispatchers.Default)
-        .collectAsState(emptyList())
+    val areas by screenModel.areas.collectAsState(emptyList())
 
     // TODO: when connection is available, and connectionNotAvailableWarning is true, run sync
     LaunchedEffect(Unit) {
@@ -80,7 +76,7 @@ fun MainScreen(
     }
 
     AnimatedVisibility(
-        visible = areas.isEmpty() && (status is SyncProcess.Status.RUNNING || status == SyncProcess.Status.WAITING),
+        visible = areas.isNullOrEmpty() && (status is SyncProcess.Status.RUNNING || status == SyncProcess.Status.WAITING),
         modifier = Modifier.fillMaxSize()
     ) {
         Box(
@@ -106,9 +102,7 @@ private fun AreasList(
         false
     )
 
-    val areas by model.areas
-        .mapToList(Dispatchers.Default)
-        .collectAsState(emptyList())
+    val areas by model.areas.collectAsState(emptyList())
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -116,12 +110,12 @@ private fun AreasList(
     ) {
         stickyHeader {
             AnimatedContent(status) { currentStatus ->
-                if (areas.isNotEmpty() && currentStatus is SyncProcess.Status.RUNNING) {
+                if (!areas.isNullOrEmpty() && currentStatus is SyncProcess.Status.RUNNING) {
                     LinearProgressIndicator(
                         progress = { currentStatus.progress },
                         modifier = Modifier.fillMaxWidth()
                     )
-                } else if (areas.isNotEmpty() && currentStatus == SyncProcess.Status.WAITING) {
+                } else if (!areas.isNullOrEmpty() && currentStatus == SyncProcess.Status.WAITING) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -137,10 +131,10 @@ private fun AreasList(
         items(
             contentType = { "area" },
             key = { it.id },
-            items = areas.sortedBy { it.displayName }
+            items = areas?.sortedBy { it.displayName } ?: emptyList()
         ) { area ->
             DataCard(
-                item = Area(area),
+                item = area,
                 imageHeight = 200.dp,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)

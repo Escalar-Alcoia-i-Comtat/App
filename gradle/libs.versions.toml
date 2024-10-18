@@ -1,6 +1,6 @@
 [versions]
 agp = "8.5.2"
-androidx-activityCompose = "1.9.2"
+androidx-activityCompose = "1.9.3"
 buildkonfig = "0.15.2"
 compose-maps = "6.1.2"
 compose-navigation = "2.8.0-alpha10"
@@ -14,17 +14,16 @@ kotlin = "2.0.21"
 kotlinx = "1.9.0"
 kotlinx-datetime = "0.6.1"
 kotlinx-json = "1.7.3"
+kotlinx-io = "0.5.4"
 ksoup = "0.1.9"
 ktor = "3.0.0"
 mapbox = "5.8.0"
 multiplatform-settings = "1.2.0"
 napier = "2.7.1"
-okio = "3.9.1"
 play-appupdate = "2.1.0"
 play-instantapps = "18.1.0"
 semver = "2.0.0"
-sqldelight = "2.0.2"
-zoomable = "1.6.2"
+zoomable = "1.7.0-SNAPSHOT"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -41,6 +40,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlinx-serialization-json =  { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
@@ -53,15 +53,11 @@ mapbox-core = { module = "com.mapbox.mapboxsdk:mapbox-sdk-core", version.ref = "
 mapbox-services = { module = "com.mapbox.mapboxsdk:mapbox-sdk-services", version.ref = "mapbox" }
 multiplatformSettings-base = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatformSettings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+multiplatformSettings-makeObservable = { module = "com.russhwolf:multiplatform-settings-make-observable", version.ref = "multiplatform-settings" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 play-appupdate = { module = "com.google.android.play:app-update-ktx", version.ref = "play-appupdate" }
 play-instantapps = { module = "com.google.android.gms:play-services-instantapps", version.ref = "play-instantapps" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
-sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
-sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
-sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
-sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
 
 [plugins]
@@ -72,4 +68,3 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

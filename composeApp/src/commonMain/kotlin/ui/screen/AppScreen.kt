@@ -45,12 +45,12 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cache.DataCache
+import data.Area
 import data.EDataType
-import database.Area
-import database.Path
-import database.Sector
-import database.Zone
-import database.database
+import data.Path
+import data.Sector
+import data.Zone
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
 import escalaralcoiaicomtat.composeapp.generated.resources.navigation_explore
 import escalaralcoiaicomtat.composeapp.generated.resources.navigation_settings
@@ -68,7 +68,6 @@ import ui.navigation.NavigationItem
 import ui.navigation.Routes
 import ui.pages.SettingsPage
 import ui.state.LaunchedKeyEvent
-import ui.state.collectAsStateList
 import utils.unaccent
 
 @OptIn(
@@ -83,10 +82,10 @@ fun AppScreen(
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
-    val areas by database.areaQueries.getAll().collectAsStateList()
-    val zones by database.zoneQueries.getAll().collectAsStateList()
-    val sectors by database.sectorQueries.getAll().collectAsStateList()
-    val paths by database.pathQueries.getAll().collectAsStateList()
+    val areas by DataCache.Areas.flow().collectAsState(emptyList())
+    val zones by DataCache.Zones.flow().collectAsState(emptyList())
+    val sectors by DataCache.Sectors.flow().collectAsState(emptyList())
+    val paths by DataCache.Paths.flow().collectAsState(emptyList())
 
     LaunchedKeyEvent { event ->
         if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
@@ -164,7 +163,7 @@ fun AppScreen(
                             }
                             IconButton(
                                 onClick = searchModel::search,
-                                enabled = areas.isNotEmpty()
+                                enabled = !areas.isNullOrEmpty()
                             ) {
                                 Icon(Icons.Rounded.Search, null)
                             }
@@ -188,10 +187,10 @@ fun AppScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
 fun SearchBarLogic(
-    areas: List<Area>,
-    zones: List<Zone>,
-    sectors: List<Sector>,
-    paths: List<Path>,
+    areas: List<Area>?,
+    zones: List<Zone>?,
+    sectors: List<Sector>?,
+    paths: List<Path>?,
     searchQuery: String,
     isSearching: Boolean,
     filterAreas: SnapshotStateList<Filter<Any>>,
@@ -214,11 +213,12 @@ fun SearchBarLogic(
     LaunchedEffect(isSearching) { if (isSearching) focusRequester.requestFocus() }
 
     fun <Type : Any> filter(
-        list: List<Type>,
+        list: List<Type>?,
         filteredList: SnapshotStateList<Type?>,
         name: (Type) -> String,
         filters: List<Filter<Any>>
     ) {
+        if (list == null) return
         for ((index, item) in list.withIndex()) {
             val passesFilters = filters.all { it.show(item) }
             val passesQuery = name(item).unaccent().contains(searchQuery.unaccent(), true)
@@ -255,6 +255,7 @@ fun SearchBarLogic(
         )
     }
 
+    // FIXME: Fix deprecated usage of SearchBar
     SearchBar(
         query = searchQuery,
         onQueryChange = onSearchQuery,

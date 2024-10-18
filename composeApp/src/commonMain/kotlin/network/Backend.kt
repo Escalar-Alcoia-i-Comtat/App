@@ -110,6 +110,7 @@ object Backend {
                 .also { Napier.v("GET :: $it") }
         ) {
             onDownload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onDownload
                 length = contentLength
                 progress?.invoke(bytesSentTotal, contentLength)
             }

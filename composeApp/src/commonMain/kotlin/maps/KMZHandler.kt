@@ -5,8 +5,7 @@ import cache.storageProvider
 import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.util.toByteArray
+import io.ktor.client.statement.bodyAsBytes
 import network.Backend
 import network.createHttpClient
 import platform.ZipFileHandler
@@ -59,13 +58,14 @@ object KMZHandler {
             val url = request.download.replace("http:", "https:")
             val response = client.get(url) {
                 onDownload { bytesSentTotal, contentLength ->
+                    contentLength ?: return@onDownload
                     progress?.invoke(bytesSentTotal, contentLength)
                 }
             }
             if (response.status.value !in 200 until 300) {
                 error("Server responded with a non-valid answer to $url")
             }
-            val bytes = response.bodyAsChannel().toByteArray()
+            val bytes = response.bodyAsBytes()
             file.write(bytes)
             hashFile.write(request.hash.encodeToByteArray())
         }

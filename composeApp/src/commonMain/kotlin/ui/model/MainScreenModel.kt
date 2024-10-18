@@ -1,8 +1,7 @@
 package ui.model
 
 import androidx.lifecycle.ViewModel
-import app.cash.sqldelight.coroutines.asFlow
-import database.database
+import cache.DataCache
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainScreenModel : ViewModel() {
@@ -13,5 +12,5 @@ class MainScreenModel : ViewModel() {
      */
     val showConnectionNotAvailableWarning = MutableStateFlow(false)
 
-    val areas = database.areaQueries.getAll().asFlow()
+    val areas = DataCache.Areas.flow()
 }

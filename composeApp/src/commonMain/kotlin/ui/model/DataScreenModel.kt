@@ -2,20 +2,23 @@ package ui.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cache.DataCache
+import cache.DataCache.Paths.findByParent
 import data.DataType
 import data.DataTypeWithImage
+import data.DataTypeWithParent
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import utils.IO
 
-abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
-    private val parentQuery: suspend (id: Long) -> Parent?,
-    private val childrenQuery: suspend (parentId: Long) -> List<Children>
+abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWithParent>(
+    private val parentCache: DataCache.Cache<Parent>,
+    private val childrenCache: DataCache.Cache<Children>
 ) : ViewModel() {
     /**
      * Whether the children should be ordered automatically upon fetch.
@@ -36,13 +39,13 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataType>(
     private val _displayingChild = MutableStateFlow<Children?>(null)
 
     fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        val dbChildren = childrenQuery(id)
+        val dbChildren = childrenCache.findByParent(id)
         _children.emit(
             if (sortChildren) dbChildren.sorted()
             else dbChildren
         )
 
-        val dbParent = parentQuery(id)
+        val dbParent = parentCache.get(id)
         if (dbParent == null) {
             Napier.w { "Could not find #$id" }
             withContext(Dispatchers.Main) { onNotFound() }

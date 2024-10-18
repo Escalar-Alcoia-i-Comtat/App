@@ -9,7 +9,9 @@ import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Properties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -19,7 +21,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.sqldelight)
 }
 
 fun readProperties(fileName: String): Properties {
@@ -97,9 +98,29 @@ fun <VersionType : PlatformVersion> getVersionForPlatform(platform: Platform<Ver
 kotlin {
     jvmToolchain(17)
 
-    androidTarget()
-
     jvm("desktop")
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "composeApp"
+        browser {
+            val rootDirPath = project.rootDir.path
+            val projectDirPath = project.projectDir.path
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(rootDirPath)
+                        add(projectDirPath)
+                    }
+                }
+            }
+        }
+        binaries.executable()
+    }
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -159,15 +180,13 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
 
-            // Okio
-            implementation(libs.okio)
-
-            // SQLDelight
-            implementation(libs.sqldelight.coroutines)
+            // KotlinX IO
+            implementation(libs.kotlinx.io)
 
             // Settings storage
             implementation(libs.multiplatformSettings.base)
             implementation(libs.multiplatformSettings.coroutines)
+            implementation(libs.multiplatformSettings.makeObservable)
         }
 
         commonTest.dependencies {
@@ -193,9 +212,6 @@ kotlin {
                 // KotlinX coroutines
                 implementation(libs.kotlinx.coroutines.android)
 
-                // SQLDelight
-                implementation(libs.sqldelight.driver.android)
-
                 // Instant Apps Support
                 implementation(libs.play.instantapps)
 
@@ -217,9 +233,6 @@ kotlin {
                 // Ktor client
                 implementation(libs.ktor.client.darwin)
 
-                // SQLDelight
-                implementation(libs.sqldelight.driver.native)
-
                 // KmpIO (only used for zip)
                 implementation(libs.kmpio)
 
@@ -236,9 +249,6 @@ kotlin {
 
                 // Ktor client
                 implementation(libs.ktor.client.java)
-
-                // SQLDelight
-                implementation(libs.sqldelight.driver.sqlite)
 
                 // XML Parsing
                 implementation(libs.ksoup)
@@ -380,14 +390,6 @@ compose.desktop {
     }
 }
 
-sqldelight {
-    databases {
-        create("Database") {
-            packageName.set("database")
-        }
-    }
-}
-
 buildkonfig {
     packageName = "build"
 
@@ -395,7 +397,6 @@ buildkonfig {
 
     defaultConfigs {
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
-        buildConfigField(STRING, "GITHUB_TOKEN", localProperties.getProperty("GITHUB_TOKEN"))
 
         val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
         buildConfigField(STRING, "VERSION_NAME", defaultVersion.versionName)

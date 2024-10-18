@@ -2,7 +2,7 @@ package search
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import database.Sector
+import data.Sector
 
 sealed class KidsAptFilter(value: Boolean) : Filter<Sector>(value) {
     data object KidsApt : KidsAptFilter(true)

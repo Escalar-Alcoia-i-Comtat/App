@@ -1,7 +1,6 @@
 package data
 
 import data.generic.LatLng
-import database.Sector
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,21 +17,7 @@ data class Sector(
     @SerialName("sun_time") val sunTime: String?,
     @SerialName("zone_id") val parentZoneId: Long,
     val paths: List<Path>
-): DataTypeWithImage, DataTypeWithPoint {
-    constructor(sector: Sector): this(
-        sector.id,
-        sector.timestamp,
-        sector.displayName,
-        sector.image,
-        sector.kidsApt,
-        sector.weight,
-        sector.walkingTime,
-        sector.point,
-        sector.sunTime,
-        sector.parentZoneId,
-        emptyList()
-    )
-
+): DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return (other as? data.Sector)
             // If other is a Sector, try to compare by weight, but don't consider empty weights
@@ -42,4 +27,6 @@ data class Sector(
             ?.takeIf { it != 0 }
             ?: displayName.compareTo(other.displayName)
     }
+
+    override fun getParentId(): Long = parentZoneId
 }

@@ -1,5 +1,6 @@
 package cache
 
-import okio.FileSystem
+import kotlinx.io.files.FileSystem
+import kotlinx.io.files.SystemFileSystem
 
-actual val fileSystem: FileSystem get() = FileSystem.SYSTEM
+actual val fileSystem: FileSystem get() = SystemFileSystem

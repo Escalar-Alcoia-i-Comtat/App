@@ -3,9 +3,7 @@ package platform
 import cache.File
 import cache.fileSystem
 import io.github.aakira.napier.Napier
-import okio.Path.Companion.toPath
-import okio.buffer
-import okio.openZip
+import kotlin.io.path.Path
 
 actual object ZipFileHandler {
     /**
@@ -14,7 +12,7 @@ actual object ZipFileHandler {
     actual suspend fun unzip(file: File, dir: File) {
         if (!dir.exists()) dir.mkdirs()
         Napier.d { "Extracting $file into $dir..." }
-        val path = file.path.toPath()
+        val path = Path(file.path)
         val zipFileSystem = fileSystem.openZip(path)
         for (zipPath in zipFileSystem.listRecursively("/".toPath())) {
             val target = File(dir, zipPath.toString())

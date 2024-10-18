@@ -15,14 +15,14 @@ import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.util.toByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import network.Backend
 import network.response.data.FileRequestData
+import utils.IO
 
 object ImageCache {
     private val client = HttpClient()
@@ -49,7 +49,7 @@ object ImageCache {
     private suspend fun validateCachedFile(
         fileRequest: FileRequestData,
         enforceHttps: Boolean = true,
-        onProgressUpdate: (suspend (current: Long, max: Long) -> Unit)? = null
+        onProgressUpdate: (suspend (current: Long, max: Long?) -> Unit)? = null
     ): ByteArray? {
         val uuid = fileRequest.uuid
         val file = imageCacheDirectory + uuid
@@ -72,7 +72,7 @@ object ImageCache {
 
             val bytes = client.get(url) {
                 onDownload(onProgressUpdate)
-            }.bodyAsChannel().toByteArray()
+            }.bodyAsBytes()
             file.write(bytes)
             hashFile.write(fileRequest.hash.encodeToByteArray())
 
@@ -118,7 +118,7 @@ object ImageCache {
     @Composable
     fun collectStateOf(
         uuid: String,
-        onProgressUpdate: (suspend (current: Long, max: Long) -> Unit)? = null
+        onProgressUpdate: (suspend (current: Long, max: Long?) -> Unit)? = null
     ): State<ImageBitmap?> {
         val state: MutableState<ImageBitmap?> = remember { mutableStateOf(null) }
 
