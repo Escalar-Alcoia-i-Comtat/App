@@ -21,8 +21,6 @@ expect class ConnectivityStatus() {
     fun start()
 
     fun stop()
-
-    fun getStatus(success: (Boolean) -> Unit)
 }
 
 /**
