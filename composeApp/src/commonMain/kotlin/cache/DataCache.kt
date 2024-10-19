@@ -5,7 +5,6 @@ import com.russhwolf.settings.coroutines.toFlowSettings
 import com.russhwolf.settings.set
 import data.Area
 import data.DataType
-import data.DataTypeWithImage
 import data.DataTypeWithParent
 import data.Path
 import data.Sector
@@ -17,7 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import utils.IO
 
@@ -27,7 +27,9 @@ object DataCache {
 
     private val json = Json
 
-    sealed class Cache<T: DataType> {
+    sealed class Cache<T: DataType>(
+        private val serializer: KSerializer<T>
+    ) {
         @Volatile
         private var list: List<T>? = null
 
@@ -35,19 +37,19 @@ object DataCache {
 
         suspend fun list(): List<T>? = mutex.withPermit {
             return list ?: settings.getStringOrNull(key)
-                ?.let { json.decodeFromString<List<T>>(it) }
+                ?.let { json.decodeFromString(ListSerializer(serializer), it) }
                 .also { list = it }
         }
 
         fun flow() = settings.toFlowSettings(Dispatchers.IO)
             .getStringOrNullFlow(key)
-            .map { str -> str?.let { json.decodeFromString<List<T>>(it) } }
+            .map { str -> str?.let { json.decodeFromString(ListSerializer(serializer), it) } }
 
         suspend fun get(id: Long): T? = list()?.find { it.id == id }
 
         suspend fun insert(value: T) = mutex.withPermit {
             list = (list ?: emptyList()) + value
-            settings[key] = json.encodeToString(list)
+            settings[key] = json.encodeToString(ListSerializer(serializer), list!!)
         }
 
         suspend fun update(value: T) = mutex.withPermit {
@@ -61,26 +63,26 @@ object DataCache {
                 }
             }
             check(found) { "${value::class.simpleName}#${value.id} not found. Could not update." }
-            settings[key] = json.encodeToString(list)
+            settings[key] = json.encodeToString(ListSerializer(serializer), list!!)
         }
 
         suspend fun <T: DataTypeWithParent> Cache<T>.findByParent(parentId: Long): List<T> =
             list()?.filter { it.getParentId() == parentId } ?: emptyList()
     }
 
-    data object Areas: Cache<Area>() {
+    data object Areas: Cache<Area>(Area.serializer()) {
         override val key = SettingsKeys.AREAS
     }
 
-    data object Zones: Cache<Zone>() {
+    data object Zones: Cache<Zone>(Zone.serializer()) {
         override val key = SettingsKeys.ZONES
     }
 
-    data object Sectors: Cache<Sector>() {
+    data object Sectors: Cache<Sector>(Sector.serializer()) {
         override val key = SettingsKeys.SECTORS
     }
 
-    data object Paths: Cache<Path>() {
+    data object Paths: Cache<Path>(Path.serializer()) {
         override val key = SettingsKeys.PATHS
     }
 }

@@ -16,7 +16,6 @@ import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.charsets.Charsets
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import network.response.DataResponse
 import network.response.ErrorResponse
