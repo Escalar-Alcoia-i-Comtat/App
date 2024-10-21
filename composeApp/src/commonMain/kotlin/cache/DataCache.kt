@@ -49,7 +49,8 @@ object DataCache {
 
         suspend fun insert(value: T) = mutex.withPermit {
             list = (list ?: emptyList()) + value
-            settings[key] = json.encodeToString(ListSerializer(serializer), list!!)
+            val str = json.encodeToString(ListSerializer(serializer), list!!)
+            settings[key] = str
         }
 
         suspend fun update(value: T) = mutex.withPermit {
@@ -63,7 +64,8 @@ object DataCache {
                 }
             }
             check(found) { "${value::class.simpleName}#${value.id} not found. Could not update." }
-            settings[key] = json.encodeToString(ListSerializer(serializer), list!!)
+            val str = json.encodeToString(ListSerializer(serializer), list!!)
+            settings[key] = str
         }
 
         suspend fun <T: DataTypeWithParent> Cache<T>.findByParent(parentId: Long): List<T> =

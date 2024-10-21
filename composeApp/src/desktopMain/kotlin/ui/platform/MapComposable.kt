@@ -29,8 +29,8 @@ import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.util.toByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -155,12 +155,13 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
                         Napier.v { "Fetching map image ($imageUid): $imageUrl" }
                         val result = httpClient.get(imageUrl) {
                             onDownload { bytesSentTotal, contentLength ->
+                                contentLength ?: return@onDownload
                                 Napier.v { "Map image download progress: $bytesSentTotal / $contentLength" }
                                 loadingProgress = (bytesSentTotal.toDouble() / contentLength.toDouble()).toFloat()
                             }
                         }
                         if (result.status.value in 200..299) {
-                            val bytes = result.bodyAsChannel().toByteArray()
+                            val bytes = result.bodyAsBytes()
                             mapImage = bytes
                             imageFile.write(bytes)
                         } else {
@@ -186,6 +187,6 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-        } ?: loadingProgress?.let { CircularProgressIndicator(it) } ?: CircularProgressIndicator()
+        } ?: loadingProgress?.let { CircularProgressIndicator(progress = { it }) } ?: CircularProgressIndicator()
     }
 }
