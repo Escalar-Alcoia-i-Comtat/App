@@ -433,7 +433,12 @@ buildkonfig {
         }
 
         create("desktop") {
-            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties!!.getProperty("MAPBOX_ACCESS_TOKEN"), nullable = true)
+            buildConfigField(
+                STRING,
+                "MAPBOX_ACCESS_TOKEN",
+                localProperties?.getProperty("MAPBOX_ACCESS_TOKEN") ?: System.getenv("MAPBOX_ACCESS_TOKEN"),
+                nullable = true
+            )
             buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "true")
         }
         create("macos") {

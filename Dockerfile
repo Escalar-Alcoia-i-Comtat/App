@@ -5,6 +5,7 @@ COPY . /app
 
 # Maps not necessary on web, just set empty string
 ENV MAPS_API_KEY=''
+ENV MAPBOX_ACCESS_TOKEN=''
 
 RUN ./gradlew wasmJsBrowserDistribution --no-daemon --no-build-cache
 
