@@ -33,6 +33,10 @@ jobs:
 
       # TODO: Version updating
 
+      - name: Write local.properties
+        shell: bash
+        run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
+
       # If the event is a release, build and push the release image, tagging it as latest and the release tag
       - name: Build and push release
         uses: docker/build-push-action@v6
