@@ -31,9 +31,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Update version.txt
-        if: ${{ github.event_name == 'release' }}
-        run: echo ${{ github.event.release.tag_name }} > ./package/version.txt
+      # TODO: Version updating
 
       # If the event is a release, build and push the release image, tagging it as latest and the release tag
       - name: Build and push release
