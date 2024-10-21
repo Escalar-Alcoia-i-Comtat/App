@@ -1,11 +1,8 @@
 package platform
 
 import cache.File
-import cache.fileSystem
 import io.github.aakira.napier.Napier
-import okio.Path.Companion.toPath
-import okio.buffer
-import okio.openZip
+import kotlinx.io.files.SystemFileSystem
 
 actual object ZipFileHandler {
     /**
@@ -14,7 +11,7 @@ actual object ZipFileHandler {
     actual suspend fun unzip(file: File, dir: File) {
         Napier.d { "Extracting $file into $dir..." }
         val path = file.path.toPath()
-        val zipFileSystem = fileSystem.openZip(path)
+        val zipFileSystem = SystemFileSystem.openZip(path)
         val files = zipFileSystem.listRecursively("/".toPath())
         Napier.d { "There are ${files.count()} files in the ZIP file." }
         for (zipPath in files) {

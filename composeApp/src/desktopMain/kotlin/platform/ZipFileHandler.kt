@@ -1,9 +1,9 @@
 package platform
 
 import cache.File
-import cache.fileSystem
 import io.github.aakira.napier.Napier
 import kotlin.io.path.Path
+import kotlinx.io.files.SystemFileSystem
 
 actual object ZipFileHandler {
     /**
@@ -13,7 +13,7 @@ actual object ZipFileHandler {
         if (!dir.exists()) dir.mkdirs()
         Napier.d { "Extracting $file into $dir..." }
         val path = Path(file.path)
-        val zipFileSystem = fileSystem.openZip(path)
+        val zipFileSystem = SystemFileSystem.openZip(path)
         for (zipPath in zipFileSystem.listRecursively("/".toPath())) {
             val target = File(dir, zipPath.toString())
             if (target.exists()) continue

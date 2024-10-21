@@ -62,6 +62,7 @@ import org.jetbrains.compose.resources.stringResource
 import search.Filter
 import ui.composition.LocalNavController
 import ui.dialog.SearchFiltersDialog
+import ui.model.AppScreenModel
 import ui.model.SearchModel
 import ui.navigation.AdaptiveNavigationScaffold
 import ui.navigation.NavigationItem
@@ -77,15 +78,16 @@ import utils.unaccent
 )
 @Composable
 fun AppScreen(
+    appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     initial: Pair<EDataType, Long>? = null
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
-    val areas by DataCache.Areas.flow().collectAsState(emptyList())
-    val zones by DataCache.Zones.flow().collectAsState(emptyList())
-    val sectors by DataCache.Sectors.flow().collectAsState(emptyList())
-    val paths by DataCache.Paths.flow().collectAsState(emptyList())
+    val areas by appScreenModel.areas.collectAsState(emptyList())
+    val zones by appScreenModel.zones.collectAsState(emptyList())
+    val sectors by appScreenModel.sectors.collectAsState(emptyList())
+    val paths by appScreenModel.paths.collectAsState(emptyList())
 
     LaunchedKeyEvent { event ->
         if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
@@ -174,7 +176,7 @@ fun AppScreen(
         }
     ) { page ->
         when (page) {
-            0 -> MainScreen()
+            0 -> MainScreen(areas)
 
             1 -> SettingsPage()
 

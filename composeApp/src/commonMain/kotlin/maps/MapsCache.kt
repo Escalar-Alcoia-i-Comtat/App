@@ -1,7 +1,5 @@
 package maps
 
-import cache.File
+import cache.CacheContainer
 
-expect object MapsCache {
-    val tilesCacheDirectory: File?
-}
+expect object MapsCache : CacheContainer

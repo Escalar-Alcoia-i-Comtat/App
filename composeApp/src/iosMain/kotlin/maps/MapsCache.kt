@@ -1,7 +1,5 @@
 package maps
 
-import cache.File
+import cache.CacheContainer
 
-actual object MapsCache {
-    actual val tilesCacheDirectory: File? = null
-}
+actual object MapsCache : CacheContainer("\u0000")

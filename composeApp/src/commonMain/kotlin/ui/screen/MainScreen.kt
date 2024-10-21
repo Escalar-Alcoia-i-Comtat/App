@@ -17,13 +17,15 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import cache.ImageCache
+import data.Area
 import database.SettingsKeys
 import database.settings
 import io.github.aakira.napier.Napier
@@ -36,19 +38,18 @@ import sync.SyncProcess
 import ui.composition.LocalLifecycleManager
 import ui.composition.LocalNavController
 import ui.list.DataCard
-import ui.model.MainScreenModel
 import ui.navigation.Routes
 import utils.IO
 
 @Composable
 fun MainScreen(
-    screenModel: MainScreenModel = viewModel { MainScreenModel() }
+    areas: List<Area>?
 ) {
     val lifecycleManager = LocalLifecycleManager.current
 
     val status by DataSync.status
 
-    val areas by screenModel.areas.collectAsState(emptyList())
+    var showConnectionNotAvailableWarning by remember { mutableStateOf(false) }
 
     // TODO: when connection is available, and connectionNotAvailableWarning is true, run sync
     LaunchedEffect(Unit) {
@@ -65,7 +66,7 @@ fun MainScreen(
                     // be updated when a connection is available
                     Napier.i { "No connection is available. Won't synchronize." }
                 } else {
-                    screenModel.showConnectionNotAvailableWarning.emit(true)
+                    showConnectionNotAvailableWarning = true
                 }
             }
         }
@@ -87,22 +88,17 @@ fun MainScreen(
         }
     }
 
-    AreasList(screenModel, status)
+    AreasList(areas, showConnectionNotAvailableWarning, status)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AreasList(
-    model: MainScreenModel,
+    areas: List<Area>?,
+    connectionNotAvailableWarning: Boolean,
     status: SyncProcess.Status
 ) {
     val navigator = LocalNavController.current
-
-    val connectionNotAvailableWarning by model.showConnectionNotAvailableWarning.collectAsState(
-        false
-    )
-
-    val areas by model.areas.collectAsState(emptyList())
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

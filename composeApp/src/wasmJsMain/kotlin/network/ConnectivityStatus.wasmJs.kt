@@ -3,6 +3,7 @@ package network
 import kotlinx.browser.window
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withTimeout
 import org.w3c.dom.events.Event
 
 actual class ConnectivityStatus actual constructor() {
@@ -18,7 +19,12 @@ actual class ConnectivityStatus actual constructor() {
      * @throws TimeoutCancellationException If the waiting has timed out.
      */
     actual suspend fun await(timeout: Long): Boolean {
-        TODO("Not yet implemented")
+        withTimeout(timeout) {
+            while (!isNetworkConnected.value) {
+                // Wait until the network is connected
+            }
+        }
+        return isNetworkConnected.value
     }
 
     actual fun start() {

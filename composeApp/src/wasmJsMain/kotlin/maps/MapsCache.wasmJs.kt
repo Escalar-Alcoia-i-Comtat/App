@@ -1,10 +1,5 @@
 package maps
 
-import cache.File
-import cache.storageProvider
+import cache.CacheContainer
 
-actual object MapsCache {
-    actual val tilesCacheDirectory: File? by lazy {
-        storageProvider.cacheDirectory + "maps"
-    }
-}
+actual object MapsCache : CacheContainer("maps")
