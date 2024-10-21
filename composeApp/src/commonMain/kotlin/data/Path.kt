@@ -4,7 +4,6 @@ import data.generic.Builder
 import data.generic.Ending
 import data.generic.GradeValue
 import data.generic.PitchInfo
-import database.Path
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import utils.isNotNullOrZero
@@ -46,36 +45,7 @@ data class Path(
     val images: List<String>? = null,
 
     @SerialName("sector_id") val parentSectorId: Long
-) : DataType {
-    constructor(path: Path) : this(
-        path.id,
-        path.timestamp,
-        path.displayName,
-        path.sketchId,
-        path.height,
-        path.grade,
-        path.ending,
-        path.pitches,
-        path.stringCount,
-        path.paraboltCount,
-        path.burilCount,
-        path.pitonCount,
-        path.spitCount,
-        path.tensorCount,
-        path.nutRequired,
-        path.friendRequired,
-        path.lanyardRequired,
-        path.nailRequired,
-        path.pitonRequired,
-        path.stapesRequired,
-        path.showDescription,
-        path.description,
-        path.builder,
-        path.reBuilders,
-        path.images,
-        path.parentSectorId
-    )
-
+) : DataType, DataTypeWithParent {
     val grade: GradeValue? get() = gradeValue?.let(GradeValue::fromString)
 
     val hasAnyTypeCount: Boolean = paraboltCount.isNotNullOrZero() ||
@@ -94,4 +64,6 @@ data class Path(
             ?.takeIf { it != 0 }
             ?: displayName.compareTo(other.displayName)
     }
+
+    override fun getParentId(): Long = parentSectorId
 }

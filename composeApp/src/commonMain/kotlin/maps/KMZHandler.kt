@@ -1,21 +1,18 @@
 package maps
 
+import cache.CacheContainer
 import cache.File
-import cache.storageProvider
 import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.util.toByteArray
+import io.ktor.client.statement.bodyAsBytes
 import network.Backend
-import network.createHttpClient
 import platform.ZipFileHandler
 
-object KMZHandler {
-    private val client = createHttpClient()
+object KMZHandler : CacheContainer("kmz") {
 
-    val kmzCacheDirectory: File by lazy {
-        storageProvider.cacheDirectory + "kmz"
+    init {
+        Napier.d { "Initializing KMZHandler..." }
     }
 
     /**
@@ -27,14 +24,20 @@ object KMZHandler {
      * @param progress If desired, gives updates to the download progress.
      *
      * @return The contents of the KMZ file.
+     *
+     * @throws UnsupportedOperationException If the current platform does not support file system operations.
      */
     private suspend fun download(
         uuid: String,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): File {
-        kmzCacheDirectory.mkdirs()
+        if (!cacheSupported) {
+            throw UnsupportedOperationException("KMZHandler :: Cache is not supported in this platform")
+        }
 
-        val file = File(kmzCacheDirectory, uuid)
+        cacheDirectory.mkdirs()
+
+        val file = File(cacheDirectory, uuid)
         val hashFile = File(file.path + "_hash")
         val request = Backend.requestFile(uuid, progress)
 
@@ -59,13 +62,14 @@ object KMZHandler {
             val url = request.download.replace("http:", "https:")
             val response = client.get(url) {
                 onDownload { bytesSentTotal, contentLength ->
+                    contentLength ?: return@onDownload
                     progress?.invoke(bytesSentTotal, contentLength)
                 }
             }
             if (response.status.value !in 200 until 300) {
                 error("Server responded with a non-valid answer to $url")
             }
-            val bytes = response.bodyAsChannel().toByteArray()
+            val bytes = response.bodyAsBytes()
             file.write(bytes)
             hashFile.write(request.hash.encodeToByteArray())
         }
@@ -108,7 +112,7 @@ object KMZHandler {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): File {
         val kmzFile = download(uuid, progress)
-        val dataDir = File(kmzCacheDirectory, "${uuid}_data")
+        val dataDir = File(cacheDirectory, "${uuid}_data")
         if (dataDir.exists()) dataDir.delete()
         ZipFileHandler.unzip(kmzFile, dataDir)
         if (replaceImagePaths) replaceImages(dataDir)

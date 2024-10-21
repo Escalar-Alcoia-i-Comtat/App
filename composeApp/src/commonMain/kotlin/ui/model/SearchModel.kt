@@ -2,10 +2,10 @@ package ui.model
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import database.Area
-import database.Path
-import database.Sector
-import database.Zone
+import data.Area
+import data.Path
+import data.Sector
+import data.Zone
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

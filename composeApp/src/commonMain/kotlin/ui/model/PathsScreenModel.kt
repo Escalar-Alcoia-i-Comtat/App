@@ -1,10 +1,13 @@
 package ui.model
 
+import cache.DataCache.Areas.allPaths
+import cache.DataCache.Areas.allSectors
 import data.Path
 import data.Sector
-import database.database
 
 class PathsScreenModel : DataScreenModel<Sector, Path>(
-    parentQuery = { id -> database.sectorQueries.get(id).executeAsOneOrNull()?.let { Sector(it) } },
-    childrenQuery = { id -> database.pathQueries.getAllByParent(id).executeAsList().map { Path(it) } }
+    childrenListAccessor = { parentId ->
+        allPaths()?.filter { it.getParentId() == parentId } ?: emptyList()
+    },
+    parentListAccessor = { id -> allSectors()?.find { it.id == id } }
 )

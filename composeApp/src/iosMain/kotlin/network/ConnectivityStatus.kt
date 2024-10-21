@@ -75,16 +75,6 @@ actual class ConnectivityStatus {
         Napier.d("Stopped")
     }
 
-    actual fun getStatus(success: (Boolean) -> Unit) {
-        CoroutineScope(Dispatchers.Default).launch {
-            isNetworkConnected.collect { status ->
-                withContext(Dispatchers.Main) {
-                    success(status)
-                }
-            }
-        }
-    }
-
     /**
      * Locks the current thread until the connectivity status is started, or [timeout] milliseconds
      * have passed.

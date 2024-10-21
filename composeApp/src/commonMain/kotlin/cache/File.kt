@@ -1,9 +1,9 @@
 package cache
 
-import okio.Path
-import okio.Path.Companion.toPath
-import okio.buffer
-import okio.use
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readByteArray
 
 class File(
     val path: String
@@ -19,7 +19,7 @@ class File(
      */
     val name = path.split(PATH_SEPARATOR).last()
 
-    private val _path: Path = path.toPath()
+    private val _path: Path = Path(path)
 
     constructor(file: File, path: String) : this(
         file.path.removeSuffix(PATH_SEPARATOR.toString()) +
@@ -51,31 +51,39 @@ class File(
 
     override fun toString(): String = path
 
-    val isDirectory: Boolean get() = fileSystem.metadataOrNull(_path)?.isDirectory ?: false
+    val isDirectory: Boolean get() = SystemFileSystem.metadataOrNull(_path)?.isDirectory ?: false
 
     val parent: File get() = File(path.substringBeforeLast('/'))
 
-    fun write(bytes: ByteArray) {
-        fileSystem.sink(_path).use { sink ->
-            sink.buffer().use { bufferedSink ->
+    /**
+     * Writes the given [bytes] to the file. If [createParent] is true, it will create the parent
+     * directories if they don't exist.
+     *
+     * @param bytes The bytes to write to the file.
+     * @param createParent If true, it will create the parent directories if they don't exist.
+     */
+    fun write(bytes: ByteArray, createParent: Boolean = true) {
+        if (createParent) parent.mkdirs()
+        SystemFileSystem.sink(_path).use { sink ->
+            sink.buffered().use { bufferedSink ->
                 bufferedSink.write(bytes)
             }
         }
     }
 
     fun readAllBytes(): ByteArray {
-        return fileSystem.source(_path).use { source -> source.buffer().readByteArray() }
+        return SystemFileSystem.source(_path).use { source -> source.buffered().readByteArray() }
     }
 
-    fun exists(): Boolean = fileSystem.exists(_path)
+    fun exists(): Boolean = SystemFileSystem.exists(_path)
 
     fun delete() {
-        if (isDirectory) fileSystem.deleteRecursively(_path)
-        else fileSystem.delete(_path)
+        if (isDirectory) SystemFileSystem.deleteRecursively(_path)
+        else SystemFileSystem.delete(_path)
     }
 
     fun mkdirs() {
-        fileSystem.createDirectories(_path)
+        SystemFileSystem.createDirectories(_path)
     }
 
     /**
@@ -85,7 +93,7 @@ class File(
         if (!exists()) return null
         if (!isDirectory) return null
 
-        val files: List<Path>? = fileSystem.listOrNull(_path)
+        val files: List<Path>? = if (exists()) SystemFileSystem.list(_path).toList() else null
         return files?.map { it.asFile }
     }
 
@@ -104,7 +112,7 @@ class File(
                 size += it.size() ?: 0L
             }
         } else {
-            size += fileSystem.metadata(_path).size ?: 0L
+            size += SystemFileSystem.metadataOrNull(_path)?.size ?: 0L
         }
         return size
     }

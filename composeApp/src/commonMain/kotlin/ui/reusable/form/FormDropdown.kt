@@ -8,6 +8,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -46,7 +47,7 @@ fun <T : Any> FormDropdown(
         OutlinedTextField(
             value = selection?.let { toString(it) } ?: "",
             onValueChange = { },
-            enabled = false,
+            enabled = false, // TODO: Verify whether this should be true and read-only false
             colors = OutlinedTextFieldDefaults.colors(
                 disabledBorderColor = foregroundColor,
                 disabledContainerColor = MaterialTheme.colorScheme.background,
@@ -73,7 +74,7 @@ fun <T : Any> FormDropdown(
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             },
-            modifier = modifier.menuAnchor(),
+            modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
             maxLines = 1,
             singleLine = true
         )

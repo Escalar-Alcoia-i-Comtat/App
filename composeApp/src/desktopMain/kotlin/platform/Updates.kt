@@ -10,10 +10,11 @@ import io.github.z4kn4fein.semver.toVersionOrNull
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
-import io.ktor.util.toByteArray
+import io.ktor.utils.io.copyTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -81,17 +82,18 @@ actual object Updates {
     val updateError: MutableStateFlow<Error?> = MutableStateFlow(null)
 
     private suspend fun getVersions(): List<Release>? {
+        Napier.v { "Fetching versions from GitHub..." }
         val result = client.get(
             "https://api.github.com/repos/Escalar-Alcoia-i-Comtat/App/releases"
         ) {
             header(HttpHeaders.Accept, "application/vnd.github+json")
             header("X-GitHub-Api-Version" , "2022-11-28")
-            header(HttpHeaders.Authorization, BuildKonfig.GITHUB_TOKEN)
         }
         if (result.status.value !in 200..299) {
             Napier.w { "Could not check for updates. Error: ${result.status}" }
             return null
         }
+        Napier.v { "Got data from GitHub, decoding..." }
         val rawResponse = result.bodyAsText()
         val jsonElement = json.decodeFromString<JsonElement>(rawResponse)
         val list = jsonElement.jsonArray
@@ -119,7 +121,12 @@ actual object Updates {
      */
     suspend fun checkForUpdates(): Boolean? {
         Napier.d { "Checking for updates..." }
-        val updates = getVersions() ?: return null
+        val updates = try {
+            getVersions() ?: return null
+        } catch (e: Exception) {
+            Napier.e(e) { "Could not check for updates." }
+            return null
+        }
         val versions = updates.joinToString(", ") { it.tagName }
         Napier.d { "Available versions: $versions" }
         val latestVersion = updates.last().tagName.toVersion()
@@ -200,6 +207,7 @@ actual object Updates {
 
         val result = client.get(asset.browserDownloadUrl) {
             onDownload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onDownload
                 downloadProgress.emit(
                     (bytesSentTotal.toDouble() / contentLength.toDouble()).toFloat()
                 )
@@ -207,8 +215,8 @@ actual object Updates {
         }
         downloadProgress.emit(DOWNLOAD_PROGRESS_STORING)
         val installerFile = File.createTempFile("eaic", "installer")
-        val bytes = result.bodyAsChannel().toByteArray()
-        installerFile.outputStream().use { it.write(bytes) }
+        val channel = result.bodyAsChannel()
+        installerFile.outputStream().use { channel.copyTo(it.channel) }
 
         runInstaller(osType, installerFile)
 

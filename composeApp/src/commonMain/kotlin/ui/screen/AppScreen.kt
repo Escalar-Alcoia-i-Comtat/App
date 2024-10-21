@@ -21,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
@@ -45,30 +46,31 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cache.DataCache
+import data.Area
 import data.EDataType
-import database.Area
-import database.Path
-import database.Sector
-import database.Zone
-import database.database
+import data.Path
+import data.Sector
+import data.Zone
 import escalaralcoiaicomtat.composeapp.generated.resources.Res
 import escalaralcoiaicomtat.composeapp.generated.resources.navigation_explore
 import escalaralcoiaicomtat.composeapp.generated.resources.navigation_settings
 import escalaralcoiaicomtat.composeapp.generated.resources.search
 import escalaralcoiaicomtat.composeapp.generated.resources.search_empty
 import escalaralcoiaicomtat.composeapp.generated.resources.status_network_unavailable
+import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
 import search.Filter
 import ui.composition.LocalNavController
 import ui.dialog.SearchFiltersDialog
+import ui.model.AppScreenModel
 import ui.model.SearchModel
 import ui.navigation.AdaptiveNavigationScaffold
 import ui.navigation.NavigationItem
 import ui.navigation.Routes
 import ui.pages.SettingsPage
 import ui.state.LaunchedKeyEvent
-import ui.state.collectAsStateList
 import utils.unaccent
 
 @OptIn(
@@ -78,15 +80,19 @@ import utils.unaccent
 )
 @Composable
 fun AppScreen(
+    appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     initial: Pair<EDataType, Long>? = null
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
-    val areas by database.areaQueries.getAll().collectAsStateList()
-    val zones by database.zoneQueries.getAll().collectAsStateList()
-    val sectors by database.sectorQueries.getAll().collectAsStateList()
-    val paths by database.pathQueries.getAll().collectAsStateList()
+    val areas by appScreenModel.areas.collectAsState(emptyList())
+
+    val syncStatus by appScreenModel.syncStatus.collectAsState()
+
+    LaunchedEffect(areas) {
+        Napier.i { "There are ${areas?.size} areas loaded" }
+    }
 
     LaunchedKeyEvent { event ->
         if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
@@ -121,9 +127,6 @@ fun AppScreen(
                 if (searching) {
                     SearchBarLogic(
                         areas,
-                        zones,
-                        sectors,
-                        paths,
                         searchQuery,
                         isSearching,
                         searchModel.filterAreas,
@@ -164,7 +167,7 @@ fun AppScreen(
                             }
                             IconButton(
                                 onClick = searchModel::search,
-                                enabled = areas.isNotEmpty()
+                                enabled = !areas.isNullOrEmpty()
                             ) {
                                 Icon(Icons.Rounded.Search, null)
                             }
@@ -175,7 +178,7 @@ fun AppScreen(
         }
     ) { page ->
         when (page) {
-            0 -> MainScreen()
+            0 -> MainScreen(areas, syncStatus)
 
             1 -> SettingsPage()
 
@@ -188,10 +191,7 @@ fun AppScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
 fun SearchBarLogic(
-    areas: List<Area>,
-    zones: List<Zone>,
-    sectors: List<Sector>,
-    paths: List<Path>,
+    areas: List<Area>?,
     searchQuery: String,
     isSearching: Boolean,
     filterAreas: SnapshotStateList<Filter<Any>>,
@@ -214,11 +214,12 @@ fun SearchBarLogic(
     LaunchedEffect(isSearching) { if (isSearching) focusRequester.requestFocus() }
 
     fun <Type : Any> filter(
-        list: List<Type>,
+        list: List<Type>?,
         filteredList: SnapshotStateList<Type?>,
         name: (Type) -> String,
         filters: List<Filter<Any>>
     ) {
+        if (list == null) return
         for ((index, item) in list.withIndex()) {
             val passesFilters = filters.all { it.show(item) }
             val passesQuery = name(item).unaccent().contains(searchQuery.unaccent(), true)
@@ -230,6 +231,10 @@ fun SearchBarLogic(
             }
         }
     }
+
+    val zones = areas?.flatMap { it.zones }
+    val sectors = zones?.flatMap { it.sectors }
+    val paths = sectors?.flatMap { it.paths }
 
     LaunchedEffect(areas, filterAreas, searchQuery) {
         filter(areas, filteredAreas, Area::displayName, filterAreas)
@@ -256,36 +261,37 @@ fun SearchBarLogic(
     }
 
     SearchBar(
-        query = searchQuery,
-        onQueryChange = onSearchQuery,
-        onSearch = {},
-        active = isSearching,
-        onActiveChange = { if (it) onSearchRequested() else onSearchDismissed() },
-        placeholder = { Text(stringResource(Res.string.search)) },
-        leadingIcon = { Icon(Icons.Outlined.Search, null) },
-        trailingIcon = {
-            Row {
-                IconButton(
-                    onClick = {
-                        if (searchQuery.isBlank()) {
-                            onSearchDismissed()
-                        } else {
-                            onSearchQuery("")
+        inputField = {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQuery,
+                placeholder = { Text(stringResource(Res.string.search)) },
+                leadingIcon = { Icon(Icons.Outlined.Search, null) },
+                trailingIcon = {
+                    Row {
+                        IconButton(
+                            onClick = {
+                                if (searchQuery.isBlank()) {
+                                    onSearchDismissed()
+                                } else {
+                                    onSearchQuery("")
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Rounded.Close, null)
+                        }
+                        IconButton(
+                            onClick = { showingFiltersDialog = true }
+                        ) {
+                            Icon(Icons.Rounded.FilterAlt, null)
                         }
                     }
-                ) {
-                    Icon(Icons.Rounded.Close, null)
-                }
-                IconButton(
-                    onClick = { showingFiltersDialog = true }
-                ) {
-                    Icon(Icons.Rounded.FilterAlt, null)
-                }
-            }
+                },
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
+            )
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester)
+        expanded = isSearching,
+        onExpandedChange = { if (it) onSearchRequested() else onSearchDismissed() },
     ) {
         if (searchQuery.isBlank()) {
             Text(stringResource(Res.string.search_empty))

@@ -60,6 +60,7 @@ fun <T: DataTypeWithImage> DataCard(
 
         var progress by remember { mutableStateOf<Float?>(null) }
         val image by ImageCache.collectStateOf(item.image) { current, max ->
+            max ?: return@collectStateOf
             progress = if (current == max) {
                 null
             } else {

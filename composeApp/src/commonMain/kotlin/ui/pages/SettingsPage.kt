@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import build.BuildKonfig
+import cache.CacheContainer
 import cache.File
 import cache.ImageCache
 import com.russhwolf.settings.ExperimentalSettingsApi
@@ -80,10 +81,16 @@ import utils.unit.DistanceUnits
 private fun SettingsCacheRow(
     title: StringResource,
     icon: ImageVector,
-    directory: File,
+    container: CacheContainer,
     isDeleting: Boolean,
+    includeDivider: Boolean = true,
     onDeletingStatusChanged: (Boolean) -> Unit
 ) {
+    if (!container.cacheSupported) {
+        return
+    }
+
+    val directory = container.cacheDirectory
     var cacheSize by remember { mutableLongStateOf(directory.size() ?: 0L) }
     var showingDialog by remember { mutableStateOf(false) }
 
@@ -128,6 +135,10 @@ private fun SettingsCacheRow(
         icon = icon,
         enabled = !isDeleting
     ) { showingDialog = true }
+
+    if (includeDivider) {
+        HorizontalDivider()
+    }
 }
 
 @Composable
@@ -178,25 +189,22 @@ fun SettingsPage() {
             SettingsCacheRow(
                 Res.string.settings_storage_images,
                 Icons.Outlined.PhotoLibrary,
-                ImageCache.imageCacheDirectory,
+                ImageCache,
                 deleting
             ) { deleting = it }
-            HorizontalDivider()
             SettingsCacheRow(
                 Res.string.settings_storage_kmz,
                 Icons.Outlined.Route,
-                KMZHandler.kmzCacheDirectory,
+                KMZHandler,
                 deleting
             ) { deleting = it }
-            MapsCache.tilesCacheDirectory?.let { dir ->
-                HorizontalDivider()
-                SettingsCacheRow(
-                    Res.string.settings_storage_maps,
-                    Icons.Outlined.Map,
-                    dir,
-                    deleting
-                ) { deleting = it }
-            }
+            SettingsCacheRow(
+                Res.string.settings_storage_maps,
+                Icons.Outlined.Map,
+                MapsCache,
+                deleting,
+                includeDivider = false
+            ) { deleting = it }
 
             Spacer(Modifier.height(16.dp))
             SettingsCategory(

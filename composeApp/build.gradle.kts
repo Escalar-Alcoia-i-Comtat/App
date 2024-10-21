@@ -2,6 +2,7 @@ import Build_gradle.IOSVersion
 import Build_gradle.LinuxVersion
 import Build_gradle.MacOSVersion
 import Build_gradle.WindowsVersion
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
@@ -9,7 +10,9 @@ import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Properties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -19,7 +22,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.sqldelight)
 }
 
 fun readProperties(fileName: String): Properties {
@@ -97,9 +99,29 @@ fun <VersionType : PlatformVersion> getVersionForPlatform(platform: Platform<Ver
 kotlin {
     jvmToolchain(17)
 
-    androidTarget()
-
     jvm("desktop")
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "composeApp"
+        browser {
+            val rootDirPath = project.rootDir.path
+            val projectDirPath = project.projectDir.path
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(rootDirPath)
+                        add(projectDirPath)
+                    }
+                }
+            }
+        }
+        binaries.executable()
+    }
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -159,15 +181,13 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
 
-            // Okio
-            implementation(libs.okio)
-
-            // SQLDelight
-            implementation(libs.sqldelight.coroutines)
+            // KotlinX IO
+            implementation(libs.kotlinx.io)
 
             // Settings storage
             implementation(libs.multiplatformSettings.base)
             implementation(libs.multiplatformSettings.coroutines)
+            implementation(libs.multiplatformSettings.makeObservable)
         }
 
         commonTest.dependencies {
@@ -193,9 +213,6 @@ kotlin {
                 // KotlinX coroutines
                 implementation(libs.kotlinx.coroutines.android)
 
-                // SQLDelight
-                implementation(libs.sqldelight.driver.android)
-
                 // Instant Apps Support
                 implementation(libs.play.instantapps)
 
@@ -217,9 +234,6 @@ kotlin {
                 // Ktor client
                 implementation(libs.ktor.client.darwin)
 
-                // SQLDelight
-                implementation(libs.sqldelight.driver.native)
-
                 // KmpIO (only used for zip)
                 implementation(libs.kmpio)
 
@@ -236,9 +250,6 @@ kotlin {
 
                 // Ktor client
                 implementation(libs.ktor.client.java)
-
-                // SQLDelight
-                implementation(libs.sqldelight.driver.sqlite)
 
                 // XML Parsing
                 implementation(libs.ksoup)
@@ -380,22 +391,15 @@ compose.desktop {
     }
 }
 
-sqldelight {
-    databases {
-        create("Database") {
-            packageName.set("database")
-        }
-    }
-}
-
 buildkonfig {
     packageName = "build"
 
     val localProperties = readProperties("local.properties")
 
     defaultConfigs {
+        buildConfigField(STRING, "BASE_URL", System.getenv("BASE_URL"), nullable = true)
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
-        buildConfigField(STRING, "GITHUB_TOKEN", localProperties.getProperty("GITHUB_TOKEN"))
+        buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "false")
 
         val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
         buildConfigField(STRING, "VERSION_NAME", defaultVersion.versionName)
@@ -428,22 +432,20 @@ buildkonfig {
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
 
-        fun TargetConfigDsl.commonDesktop() {
-            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties.getProperty("MAPBOX_ACCESS_TOKEN"))
+        create("desktop") {
+            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties.getProperty("MAPBOX_ACCESS_TOKEN"), nullable = true)
+            buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "true")
         }
         create("macos") {
-            commonDesktop()
             val version = getVersionForPlatform(Platform.MacOS)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
         create("linux") {
-            commonDesktop()
             val version = getVersionForPlatform(Platform.Linux)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
             buildConfigField(INT, "VERSION_CODE", version.versionCode.toString(), nullable = true)
         }
         create("mingw") {
-            commonDesktop()
             val version = getVersionForPlatform(Platform.Windows)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
