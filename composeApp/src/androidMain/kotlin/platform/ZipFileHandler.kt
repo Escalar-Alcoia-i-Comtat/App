@@ -11,8 +11,7 @@ actual object ZipFileHandler {
      */
     actual suspend fun unzip(file: File, dir: File) {
         Napier.d { "Extracting $file into $dir..." }
-        Napier.d { "Extracting $file into $dir..." }
-        UnzipUtils.unzip(file.asJavaFile, dir.asJavaFile.path)
+        UnzipUtils.unzip(file.asJavaFile, dir.asJavaFile)
         Napier.d { "Extraction complete!" }
     }
 }

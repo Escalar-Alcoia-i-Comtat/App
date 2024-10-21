@@ -1,8 +1,7 @@
 package utils
 
-import java.io.BufferedOutputStream
+import io.github.aakira.napier.Napier
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.util.zip.ZipFile
@@ -18,25 +17,24 @@ object UnzipUtils {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun unzip(zipFilePath: File, destDirectory: String) {
-        File(destDirectory).run {
-            if (!exists()) {
-                mkdirs()
-            }
+    fun unzip(zipFilePath: File, destDirectory: File) {
+        if (!destDirectory.exists()) {
+            destDirectory.mkdirs()
         }
 
         ZipFile(zipFilePath).use { zip ->
             zip.entries().asSequence().forEach { entry ->
                 zip.getInputStream(entry).use { input ->
-                    val filePath = destDirectory + File.separator + entry.name
+                    val file = File(destDirectory, entry.name)
 
                     if (!entry.isDirectory) {
                         // if the entry is a file, extracts it
-                        extractFile(input, filePath)
+                        Napier.d { "Extracting file: ${file.relativeTo(destDirectory)}" }
+                        extractFile(input, file)
                     } else {
                         // if the entry is a directory, make the directory
-                        val dir = File(filePath)
-                        dir.mkdir()
+                        file.mkdir()
+                        Napier.d { "Making dir: ${file.relativeTo(destDirectory)}" }
                     }
                 }
             }
@@ -46,18 +44,19 @@ object UnzipUtils {
     /**
      * Extracts a zip entry (file entry)
      * @param inputStream
-     * @param destFilePath
+     * @param destFile
      * @throws IOException
      */
     @Throws(IOException::class)
-    private fun extractFile(inputStream: InputStream, destFilePath: String) {
-        val bos = BufferedOutputStream(FileOutputStream(destFilePath))
-        val bytesIn = ByteArray(BUFFER_SIZE)
-        var read: Int
-        while (inputStream.read(bytesIn).also { read = it } != -1) {
-            bos.write(bytesIn, 0, read)
+    private fun extractFile(inputStream: InputStream, destFile: File) {
+        destFile.parentFile?.mkdirs()
+        destFile.outputStream().buffered().use { bos ->
+            val bytesIn = ByteArray(BUFFER_SIZE)
+            var read: Int
+            while (inputStream.read(bytesIn).also { read = it } != -1) {
+                bos.write(bytesIn, 0, read)
+            }
         }
-        bos.close()
     }
 
     /**
