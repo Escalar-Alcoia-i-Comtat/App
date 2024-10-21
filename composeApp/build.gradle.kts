@@ -24,10 +24,10 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-fun readProperties(fileName: String): Properties {
+fun readProperties(fileName: String): Properties? {
     val propsFile = project.rootProject.file(fileName)
     if (!propsFile.exists()) {
-        throw GradleException("$fileName doesn't exist")
+        return null
     }
     if (!propsFile.canRead()) {
         throw GradleException("Cannot read $fileName")
@@ -39,7 +39,7 @@ fun readProperties(fileName: String): Properties {
 
 inline fun updateProperties(fileName: String, block: Properties.() -> Unit) {
     val propsFile = project.rootProject.file(fileName)
-    val props = readProperties(propsFile.name)
+    val props = readProperties(propsFile.name)!!
     block(props)
     propsFile.outputStream().use {
         val date = LocalDateTime.now()
@@ -71,7 +71,7 @@ sealed class Platform<VersionType : PlatformVersion> {
 }
 
 fun <VersionType : PlatformVersion> getVersionForPlatform(platform: Platform<VersionType>?): VersionType {
-    val versionProperties = readProperties("version.properties")
+    val versionProperties = readProperties("version.properties")!!
 
     fun getAndReplaceVersion(key: String): String {
         val versionName = versionProperties.getProperty("VERSION_NAME")
@@ -286,7 +286,7 @@ android {
         versionCode = version.versionCode
 
         val localProperties = readProperties("local.properties")
-        resValue("string", "maps_api_key", localProperties.getProperty("MAPS_API_KEY"))
+        resValue("string", "maps_api_key", localProperties!!.getProperty("MAPS_API_KEY"))
     }
     buildFeatures {
         compose = true
@@ -433,7 +433,7 @@ buildkonfig {
         }
 
         create("desktop") {
-            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties.getProperty("MAPBOX_ACCESS_TOKEN"), nullable = true)
+            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties!!.getProperty("MAPBOX_ACCESS_TOKEN"), nullable = true)
             buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "true")
         }
         create("macos") {
