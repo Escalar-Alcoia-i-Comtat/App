@@ -17,6 +17,7 @@ import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsBytes
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -172,32 +173,36 @@ object ImageCache : CacheContainer("images") {
 
             Napier.v(tag = "ImageCache-$uuid") { "$file" }
 
-            val job = CoroutineScope(Dispatchers.IO).launch {
-                if (file.exists()) {
-                    Napier.d(tag = "ImageCache-$uuid") { "Already cached, sending bytes..." }
-                    val bytes = file.readAllBytes()
-                    state.value = bytes.decodeImage()
-                }
+            val job = try {
+                CoroutineScope(Dispatchers.IO).launch {
+                    if (file.exists()) {
+                        Napier.d(tag = "ImageCache-$uuid") { "Already cached, sending bytes..." }
+                        val bytes = file.readAllBytes()
+                        state.value = bytes.decodeImage()
+                    }
 
-                if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
-                    try {
-                        Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
-                        val fileRequest = Backend.requestFile(uuid, onProgressUpdate)
-                        validateCachedFile(fileRequest, onProgressUpdate = onProgressUpdate)?.let { bytes ->
-                            state.value = bytes.decodeImage()
-                        }
+                    if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
+                        try {
+                            Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
+                            val fileRequest = Backend.requestFile(uuid, onProgressUpdate)
+                            validateCachedFile(fileRequest, onProgressUpdate = onProgressUpdate)?.let { bytes ->
+                                state.value = bytes.decodeImage()
+                            }
 
-                        alreadyFetchedUpdate = true
-                    } catch (e: Exception) {
-                        Napier.w(throwable = e, tag = "ImageCache-$uuid") {
-                            "Could not get file metadata."
+                            alreadyFetchedUpdate = true
+                        } catch (e: Exception) {
+                            Napier.w(throwable = e, tag = "ImageCache-$uuid") {
+                                "Could not get file metadata."
+                            }
                         }
                     }
                 }
+            } catch (_: CancellationException) {
+                null
             }
 
             onDispose {
-                job.cancel(
+                job?.cancel(
                     UserLeftScreenException("Stopped loading image $uuid.")
                 )
             }
