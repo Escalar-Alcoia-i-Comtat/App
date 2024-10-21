@@ -1,0 +1,9 @@
+.fleet
+.github
+.git
+.gradle
+.idea
+.kotlin
+.run
+build
+crowdin.yml
