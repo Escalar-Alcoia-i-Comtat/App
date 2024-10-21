@@ -286,7 +286,7 @@ android {
         versionCode = version.versionCode
 
         val localProperties = readProperties("local.properties")
-        resValue("string", "maps_api_key", localProperties!!.getProperty("MAPS_API_KEY"))
+        resValue("string", "maps_api_key", localProperties?.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY"))
     }
     buildFeatures {
         compose = true
