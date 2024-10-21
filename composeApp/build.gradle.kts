@@ -2,6 +2,7 @@ import Build_gradle.IOSVersion
 import Build_gradle.LinuxVersion
 import Build_gradle.MacOSVersion
 import Build_gradle.WindowsVersion
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
@@ -398,6 +399,7 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(STRING, "BASE_URL", System.getenv("BASE_URL"), nullable = true)
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
+        buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "false")
 
         val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
         buildConfigField(STRING, "VERSION_NAME", defaultVersion.versionName)
@@ -430,22 +432,20 @@ buildkonfig {
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
 
-        fun TargetConfigDsl.commonDesktop() {
-            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties.getProperty("MAPBOX_ACCESS_TOKEN"))
+        create("desktop") {
+            buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties.getProperty("MAPBOX_ACCESS_TOKEN"), nullable = true)
+            buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "true")
         }
         create("macos") {
-            commonDesktop()
             val version = getVersionForPlatform(Platform.MacOS)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
         create("linux") {
-            commonDesktop()
             val version = getVersionForPlatform(Platform.Linux)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
             buildConfigField(INT, "VERSION_CODE", version.versionCode.toString(), nullable = true)
         }
         create("mingw") {
-            commonDesktop()
             val version = getVersionForPlatform(Platform.Windows)
             buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }

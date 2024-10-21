@@ -2,8 +2,6 @@ package ui.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cache.DataCache
-import cache.DataCache.Paths.findByParent
 import data.DataType
 import data.DataTypeWithImage
 import data.DataTypeWithParent
@@ -17,8 +15,8 @@ import kotlinx.coroutines.withContext
 import utils.IO
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWithParent>(
-    private val parentCache: DataCache.Cache<Parent>,
-    private val childrenCache: DataCache.Cache<Children>
+    private val childrenListAccessor: suspend (parentId: Long) -> List<Children>,
+    private val parentListAccessor: suspend (id: Long) -> Parent?
 ) : ViewModel() {
     /**
      * Whether the children should be ordered automatically upon fetch.
@@ -39,13 +37,13 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
     private val _displayingChild = MutableStateFlow<Children?>(null)
 
     fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        val dbChildren = childrenCache.findByParent(id)
+        val dbChildren = childrenListAccessor(id)
         _children.emit(
             if (sortChildren) dbChildren.sorted()
             else dbChildren
         )
 
-        val dbParent = parentCache.get(id)
+        val dbParent = parentListAccessor(id)
         if (dbParent == null) {
             Napier.w { "Could not find #$id" }
             withContext(Dispatchers.Main) { onNotFound() }

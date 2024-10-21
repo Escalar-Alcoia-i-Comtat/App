@@ -55,7 +55,15 @@ class File(
 
     val parent: File get() = File(path.substringBeforeLast('/'))
 
-    fun write(bytes: ByteArray) {
+    /**
+     * Writes the given [bytes] to the file. If [createParent] is true, it will create the parent
+     * directories if they don't exist.
+     *
+     * @param bytes The bytes to write to the file.
+     * @param createParent If true, it will create the parent directories if they don't exist.
+     */
+    fun write(bytes: ByteArray, createParent: Boolean = true) {
+        if (createParent) parent.mkdirs()
         SystemFileSystem.sink(_path).use { sink ->
             sink.buffered().use { bufferedSink ->
                 bufferedSink.write(bytes)

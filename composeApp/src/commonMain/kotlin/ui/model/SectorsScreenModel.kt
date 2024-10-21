@@ -1,10 +1,13 @@
 package ui.model
 
-import cache.DataCache
+import cache.DataCache.Areas.allSectors
+import cache.DataCache.Areas.allZones
 import data.Sector
 import data.Zone
 
 class SectorsScreenModel : DataScreenModel<Zone, Sector>(
-    parentCache = DataCache.Zones,
-    childrenCache = DataCache.Sectors,
+    childrenListAccessor = { parentId ->
+        allSectors()?.filter { it.getParentId() == parentId } ?: emptyList()
+    },
+    parentListAccessor = { id -> allZones()?.find { it.id == id } }
 )

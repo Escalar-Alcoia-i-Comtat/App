@@ -4,6 +4,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.until
@@ -39,9 +41,9 @@ abstract class SyncProcess {
         data object FINISHED: Status()
     }
 
-    protected val mutableStatus: MutableState<Status> = mutableStateOf(Status.WAITING)
+    protected val mutableStatus: MutableStateFlow<Status> = MutableStateFlow(Status.WAITING)
 
-    val status: State<Status> get() = mutableStatus
+    val status: Flow<Status> get() = mutableStatus
 
     /**
      * When called should perform the synchronization process desired.

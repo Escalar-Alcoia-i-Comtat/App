@@ -17,6 +17,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,11 +44,10 @@ import utils.IO
 
 @Composable
 fun MainScreen(
-    areas: List<Area>?
+    areas: List<Area>?,
+    syncStatus: SyncProcess.Status?
 ) {
     val lifecycleManager = LocalLifecycleManager.current
-
-    val status by DataSync.status
 
     var showConnectionNotAvailableWarning by remember { mutableStateOf(false) }
 
@@ -77,7 +77,7 @@ fun MainScreen(
     }
 
     AnimatedVisibility(
-        visible = areas.isNullOrEmpty() && (status is SyncProcess.Status.RUNNING || status == SyncProcess.Status.WAITING),
+        visible = areas.isNullOrEmpty() && (syncStatus is SyncProcess.Status.RUNNING || syncStatus == SyncProcess.Status.WAITING),
         modifier = Modifier.fillMaxSize()
     ) {
         Box(
@@ -88,7 +88,7 @@ fun MainScreen(
         }
     }
 
-    AreasList(areas, showConnectionNotAvailableWarning, status)
+    AreasList(areas, showConnectionNotAvailableWarning, syncStatus)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -96,7 +96,7 @@ fun MainScreen(
 private fun AreasList(
     areas: List<Area>?,
     connectionNotAvailableWarning: Boolean,
-    status: SyncProcess.Status
+    status: SyncProcess.Status?
 ) {
     val navigator = LocalNavController.current
 
