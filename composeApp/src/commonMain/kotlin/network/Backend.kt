@@ -21,6 +21,7 @@ import network.response.DataResponse
 import network.response.ErrorResponse
 import network.response.data.AreasData
 import network.response.data.DataResponseType
+import network.response.data.FileListRequestData
 import network.response.data.FileRequestData
 
 /**
@@ -156,11 +157,15 @@ object Backend {
      * @throws ServerException If the server responded with an exception, or the body of the body of
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
+     * @throws NoSuchElementException If the server did not provide the file requested.
      */
     suspend fun requestFile(
         uuid: String,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): FileRequestData {
-        return get(FileRequestData.serializer(), "file", uuid, progress = progress)
+        Napier.d { "Requesting file $uuid to server...." }
+        return get(FileListRequestData.serializer(), "file", uuid, progress = progress)
+            .files
+            .first()
     }
 }

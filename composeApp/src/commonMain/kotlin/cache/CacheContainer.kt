@@ -11,6 +11,11 @@ import network.createHttpClient
 abstract class CacheContainer(name: String) {
     protected val client = createHttpClient()
 
+    /**
+     * The directory where the cache will be stored.
+     *
+     * @throws UnsupportedOperationException If the current platform does not support file system operations.
+     */
     val cacheDirectory: File by lazy { storageProvider.cacheDirectory + name }
 
     val cacheSupported: Boolean = try {

@@ -24,11 +24,17 @@ object KMZHandler : CacheContainer("kmz") {
      * @param progress If desired, gives updates to the download progress.
      *
      * @return The contents of the KMZ file.
+     *
+     * @throws UnsupportedOperationException If the current platform does not support file system operations.
      */
     private suspend fun download(
         uuid: String,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): File {
+        if (!cacheSupported) {
+            throw UnsupportedOperationException("KMZHandler :: Cache is not supported in this platform")
+        }
+
         cacheDirectory.mkdirs()
 
         val file = File(cacheDirectory, uuid)

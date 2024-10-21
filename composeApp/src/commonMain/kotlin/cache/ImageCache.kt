@@ -105,6 +105,10 @@ object ImageCache : CacheContainer("images") {
      * necessary.
      */
     suspend fun updateCache() {
+        if (!cacheSupported) {
+            Napier.i(tag = "ImageCache-updates") { "Cache not supported. Ignoring..." }
+            return
+        }
         if (!cacheDirectory.exists()) {
             // There isn't any file cached, just ignore
             Napier.i(tag = "ImageCache-updates") { "There isn't any cached image. Ignoring..." }
