@@ -25,12 +25,10 @@ import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.api.staticmap.v1.models.StaticPolylineAnnotation
 import com.mapbox.geojson.Point
 import com.mapbox.geojson.utils.PolylineUtils
-import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsBytes
-import io.ktor.client.statement.bodyAsChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -41,6 +39,7 @@ import map.MapData
 import map.kmz.KMZLoader
 import map.placemark.Polygon
 import network.createHttpClient
+import org.jetbrains.compose.resources.decodeToImageBitmap
 
 private val httpClient = createHttpClient()
 
@@ -182,7 +181,7 @@ actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
     ) {
         mapImage?.let {
             Image(
-                bitmap = it.decodeImage(),
+                bitmap = it.decodeToImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

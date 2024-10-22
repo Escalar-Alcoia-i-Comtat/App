@@ -10,9 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import cache.ImageCache.cacheDirectory
 import exception.UserLeftScreenException
-import image.decodeImage
 import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
@@ -23,8 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import network.Backend
-import network.createHttpClient
 import network.response.data.FileRequestData
+import org.jetbrains.compose.resources.decodeToImageBitmap
 import utils.IO
 
 object ImageCache : CacheContainer("images") {
@@ -178,7 +176,7 @@ object ImageCache : CacheContainer("images") {
                     if (file.exists()) {
                         Napier.d(tag = "ImageCache-$uuid") { "Already cached, sending bytes..." }
                         val bytes = file.readAllBytes()
-                        state.value = bytes.decodeImage()
+                        state.value = bytes.decodeToImageBitmap()
                     }
 
                     if (!file.exists() || !alreadyFetchedUpdate) launch(Dispatchers.IO) {
@@ -186,7 +184,7 @@ object ImageCache : CacheContainer("images") {
                             Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
                             val fileRequest = Backend.requestFile(uuid, onProgressUpdate)
                             validateCachedFile(fileRequest, onProgressUpdate = onProgressUpdate)?.let { bytes ->
-                                state.value = bytes.decodeImage()
+                                state.value = bytes.decodeToImageBitmap()
                             }
 
                             alreadyFetchedUpdate = true
@@ -221,7 +219,7 @@ object ImageCache : CacheContainer("images") {
                     Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
                     val fileRequest = Backend.requestFile(uuid, onProgressUpdate)
                     val fileBytes = validateCachedFile(fileRequest, onProgressUpdate = onProgressUpdate)
-                    state.value = fileBytes?.decodeImage()
+                    state.value = fileBytes?.decodeToImageBitmap()
                 } catch (e: Exception) {
                     Napier.w(throwable = e, tag = "ImageCache-$uuid") {
                         "Could not get file metadata."
