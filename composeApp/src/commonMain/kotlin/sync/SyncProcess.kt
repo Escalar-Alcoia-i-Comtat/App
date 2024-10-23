@@ -1,11 +1,10 @@
 package sync
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.until
@@ -13,7 +12,7 @@ import kotlinx.datetime.until
 /**
  * Provides a template for objects to define synchronization routines.
  */
-abstract class SyncProcess {
+abstract class SyncProcess <Result> {
     sealed class Status {
         data object WAITING: Status()
         open class RUNNING(
@@ -42,18 +41,22 @@ abstract class SyncProcess {
     }
 
     protected val mutableStatus: MutableStateFlow<Status> = MutableStateFlow(Status.WAITING)
+    val status: SharedFlow<Status> get() = mutableStatus.asSharedFlow()
 
-    val status: Flow<Status> get() = mutableStatus
+    private val mutableResult = MutableStateFlow<Result?>(null)
+    val result: Flow<Result?> get() = mutableResult.asSharedFlow()
 
     /**
      * When called should perform the synchronization process desired.
      */
-    protected abstract suspend fun synchronize()
+    protected abstract suspend fun synchronize(): Result
 
     suspend fun start() {
         val start = Clock.System.now()
 
-        synchronize()
+        val result = synchronize()
+        Napier.v { "Emitting result..." }
+        mutableResult.emit(result)
 
         val end = Clock.System.now()
 

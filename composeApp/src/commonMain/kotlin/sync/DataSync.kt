@@ -1,44 +1,45 @@
 package sync
 
-import cache.DataCache
 import com.russhwolf.settings.set
+import data.Area
+import data.Path
+import data.Sector
+import data.Zone
 import database.SettingsKeys
 import database.settings
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import network.Backend
-import network.connectivityStatus
 
-object DataSync : SyncProcess() {
+object DataSync : SyncProcess<List<Area>>() {
     /**
      * Synchronizes the data from the server with the local database.
      *
      * @throws IllegalStateException If there's not a valid network connection available.
      */
     override suspend fun synchronize() = try {
-        Napier.i { "Waiting until a network is available" }
-        if (!connectivityStatus.await(10_000)) {
-            error("Network is not available. Won't fetch server")
-        }
-
         Napier.i { "Running data synchronization..." }
         mutableStatus.tryEmit(Status.RUNNING.Indeterminate)
 
         Napier.d { "Fetching tree from server..." }
         val areas = Backend.tree()
 
-        Napier.d { "Got ${areas.size} areas. Adding them into the database..." }
+        Napier.d { "Got ${areas.size} areas" }
 
-        DataCache.Areas.insertOrUpdate(areas) { progress, max ->
-            mutableStatus.tryEmit(Status.RUNNING(progress / max.toFloat()))
-        }
-        Napier.i { "All data synchronized with server." }
+        settings[SettingsKeys.LAST_SYNC] = Clock.System.now().toEpochMilliseconds()
 
-        settings.set(SettingsKeys.LAST_SYNC, Clock.System.now().toEpochMilliseconds())
+        areas
     } catch (e: Exception) {
         Napier.e(throwable = e) { "Could not synchronize with server." }
         throw e
     } finally {
         mutableStatus.value = Status.FINISHED
     }
+
+    val areas: Flow<List<Area>?> get() = result
+    val zones: Flow<List<Zone>?> get() = result.map { areas -> areas?.flatMap { it.zones } }
+    val sectors: Flow<List<Sector>?> get() = zones.map { zones -> zones?.flatMap { it.sectors } }
+    val paths: Flow<List<Path>?> get() = sectors.map { sectors -> sectors?.flatMap { it.paths } }
 }

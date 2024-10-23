@@ -26,6 +26,8 @@ import com.mapbox.api.staticmap.v1.models.StaticPolylineAnnotation
 import com.mapbox.geojson.Point
 import com.mapbox.geojson.utils.PolylineUtils
 import io.github.aakira.napier.Napier
+import io.ktor.client.plugins.cache.HttpCache
+import io.ktor.client.plugins.cache.storage.FileStorage
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsBytes
@@ -40,8 +42,14 @@ import map.kmz.KMZLoader
 import map.placemark.Polygon
 import network.createHttpClient
 import org.jetbrains.compose.resources.decodeToImageBitmap
+import utils.asJavaFile
 
-private val httpClient = createHttpClient()
+private val httpClient = createHttpClient {
+    install(HttpCache) {
+        val cacheFile = storageProvider.cacheDirectory + "map_cache"
+        publicStorage(FileStorage(cacheFile.asJavaFile))
+    }
+}
 
 private const val POLYLINE_PRECISION = 5
 

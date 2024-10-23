@@ -5,15 +5,18 @@ import data.Area
 import exception.ServerException
 import io.github.aakira.napier.Napier
 import io.ktor.client.call.NoTransformationFoundException
+import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.charsets.Charsets
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
@@ -23,6 +26,7 @@ import network.response.data.AreasData
 import network.response.data.DataResponseType
 import network.response.data.FileListRequestData
 import network.response.data.FileRequestData
+import platform.httpCacheStorage
 
 /**
  * Allows running requests to the application backend.
@@ -38,6 +42,16 @@ object Backend {
             json(
                 json = json
             )
+        }
+        install(HttpCache) {
+            val storage = try {
+                httpCacheStorage("backend")
+            } catch (_: UnsupportedOperationException) {
+                null
+            }
+            if (storage != null) {
+                publicStorage(storage)
+            }
         }
     }
 
@@ -159,6 +173,7 @@ object Backend {
      * @throws IllegalStateException If the server gave a response that could not be handled.
      * @throws NoSuchElementException If the server did not provide the file requested.
      */
+    @Deprecated("Do not request file, use downloads with conditional headers")
     suspend fun requestFile(
         uuid: String,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
@@ -167,5 +182,35 @@ object Backend {
         return get(FileListRequestData.serializer(), "file", uuid, progress = progress)
             .files
             .first()
+    }
+
+    /**
+     * Downloads a file with the given UUID.
+     * An exception may be thrown if the file was not found in the server.
+     * @param uuid The UUID of the file to fetch.
+     * @param progress If not null, will be called with the progress of the request.
+     * @return A channel with the data of the file requested.
+     */
+    suspend fun downloadFile(
+        uuid: String,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): ByteReadChannel {
+        Napier.d { "Downloading file $uuid from server...." }
+        var length: Long = 0
+        progress?.invoke(0, length)
+        val response = client.get(
+            URLBuilder(baseUrl)
+                .appendPathSegments("download", uuid)
+                .build()
+                .also { Napier.v("GET :: $it") }
+        ) {
+            onDownload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onDownload
+                length = contentLength
+                progress?.invoke(bytesSentTotal, contentLength)
+            }
+        }
+        progress?.invoke(length, length)
+        return response.bodyAsChannel()
     }
 }

@@ -15,8 +15,6 @@ import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Map
-import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material3.AlertDialog
@@ -38,33 +36,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import build.BuildKonfig
 import cache.CacheContainer
-import cache.File
-import cache.ImageCache
 import com.russhwolf.settings.ExperimentalSettingsApi
-import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.action_cancel
-import escalaralcoiaicomtat.composeapp.generated.resources.action_clear
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_app_info_build_date
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_app_info_version
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_app_info_version_code
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_app_info
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_general
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_links
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_category_storage
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_crowdin
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_github_app
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_github_server
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_status
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_links_tap
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_dialog_message
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_dialog_title
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_images
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_kmz
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_maps
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_storage_size
-import escalaralcoiaicomtat.composeapp.generated.resources.settings_units_distance
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import maps.KMZHandler
-import maps.MapsCache
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ui.composition.LocalUnitsConfiguration
@@ -186,24 +160,18 @@ fun SettingsPage() {
             SettingsCategory(
                 text = stringResource(Res.string.settings_category_storage)
             )
-            SettingsCacheRow(
+            // TODO: Support ktor cache
+            /*SettingsCacheRow(
                 Res.string.settings_storage_images,
                 Icons.Outlined.PhotoLibrary,
                 ImageCache,
                 deleting
-            ) { deleting = it }
+            ) { deleting = it }*/
             SettingsCacheRow(
                 Res.string.settings_storage_kmz,
                 Icons.Outlined.Route,
                 KMZHandler,
                 deleting
-            ) { deleting = it }
-            SettingsCacheRow(
-                Res.string.settings_storage_maps,
-                Icons.Outlined.Map,
-                MapsCache,
-                deleting,
-                includeDivider = false
             ) { deleting = it }
 
             Spacer(Modifier.height(16.dp))
