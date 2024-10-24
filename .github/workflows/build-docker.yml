@@ -31,15 +31,6 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      # TODO: Version updating
-
-      # If the event is a release, build and push the release image, tagging it as latest and the release tag
-      - name: Build and push release
-        uses: docker/build-push-action@v6
-        if: ${{ github.event_name == 'release' }}
-        with:
-          push: true
-          tags: arnyminerz/escalaralcoiaicomtat-web:latest,arnyminerz/escalaralcoiaicomtat-web:${{ github.event.release.tag_name }}
       # Otherwise, build and push the development image, tagging it as development
       - name: Build and push development
         uses: docker/build-push-action@v6
