@@ -12,22 +12,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.Area
-import database.SettingsKeys
-import database.settings
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,28 +36,14 @@ import utils.IO
 @Composable
 fun MainScreen(
     areas: List<Area>?,
-    syncStatus: SyncProcess.Status?
+    syncStatus: SyncProcess.Status?,
+    scrollToId: Long? = null
 ) {
     val lifecycleManager = LocalLifecycleManager.current
 
-    var showConnectionNotAvailableWarning by remember { mutableStateOf(false) }
-
-    // TODO: when connection is available, and connectionNotAvailableWarning is true, run sync
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                DataSync.start()
-            } catch (_: IllegalStateException) {
-                // There's no Internet connection, check if the data is downloaded
-                val lastSync = settings.getLongOrNull(SettingsKeys.LAST_SYNC)
-                if (lastSync != null) {
-                    // At least one sync has occurred, we can safely ignore, and the data will
-                    // be updated when a connection is available
-                    Napier.i { "No connection is available. Won't synchronize." }
-                } else {
-                    showConnectionNotAvailableWarning = true
-                }
-            }
+            DataSync.start()
         }
     }
 
@@ -84,19 +63,28 @@ fun MainScreen(
         }
     }
 
-    AreasList(areas, showConnectionNotAvailableWarning, syncStatus)
+    AreasList(areas, syncStatus, scrollToId)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AreasList(
     areas: List<Area>?,
-    connectionNotAvailableWarning: Boolean,
-    status: SyncProcess.Status?
+    status: SyncProcess.Status?,
+    scrollToId: Long? = null
 ) {
     val navigator = LocalNavController.current
+    val state = rememberLazyListState()
+
+    LaunchedEffect(scrollToId) {
+        scrollToId ?: return@LaunchedEffect
+
+        val index = areas?.indexOfFirst { it.id == scrollToId } ?: return@LaunchedEffect
+        state.animateScrollToItem(index)
+    }
 
     LazyColumn(
+        state = state,
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -113,11 +101,6 @@ private fun AreasList(
                     )
                 }
             }
-        }
-
-        if (connectionNotAvailableWarning) item {
-            // TODO: improve this
-            Text("Network not available!")
         }
 
         items(

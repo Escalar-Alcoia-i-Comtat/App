@@ -98,7 +98,17 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    private fun computeInitial(): Pair<EDataType, Long>? {
+    /**
+     * Computes the initial route based on the intent data.
+     *
+     * The intent data is expected to be in the form of `https://domain.tld/{type}/{id}` where
+     * `{type}` is one of `area`, `zone`, `sector` and `{id}` is the identifier of the entity.
+     *
+     * Note that paths are not supported.
+     *
+     * @return The initial route or `null` if the intent data is not valid.
+     */
+    private fun computeInitial(): EDataType? {
         val action: String? = intent?.action
         val data: Uri? = intent?.data
         val path: List<String>? = data?.pathSegments
@@ -106,18 +116,12 @@ class MainActivity : ComponentActivity() {
         Napier.i { "Action: $action, data: $data" }
 
         return if (action == Intent.ACTION_VIEW && path != null) {
-            val type = when (path.firstOrNull()) {
-                "area" -> EDataType.AREA
-                "zone" -> EDataType.ZONE
-                "sector" -> EDataType.SECTOR
-                "path" -> EDataType.PATH
+            val id = path.getOrNull(1)?.toLongOrNull() ?: return null
+             when (path.firstOrNull()) {
+                "area" -> EDataType.Area(id)
+                "zone" -> EDataType.Zone(id)
+                "sector" -> EDataType.Sector(id)
                 else -> null
-            }
-            val id = path.getOrNull(1)?.toLongOrNull()
-            if (type != null && id != null) {
-                type to id
-            } else {
-                null
             }
         } else {
             null
