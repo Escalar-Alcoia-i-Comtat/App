@@ -1,13 +1,13 @@
 package ui.model
 
-import cache.DataCache.Areas.allAreas
-import cache.DataCache.Areas.allZones
 import data.Area
 import data.Zone
+import kotlinx.coroutines.flow.first
+import sync.DataSync
 
 class ZonesScreenModel : DataScreenModel<Area, Zone>(
     childrenListAccessor = { parentId ->
-        allZones()?.filter { it.getParentId() == parentId } ?: emptyList()
+        DataSync.zones.first()?.filter { it.getParentId() == parentId } ?: emptyList()
     },
-    parentListAccessor = { id -> allAreas()?.find { it.id == id } }
+    parentListAccessor = { id -> DataSync.areas.first()?.find { it.id == id } }
 )

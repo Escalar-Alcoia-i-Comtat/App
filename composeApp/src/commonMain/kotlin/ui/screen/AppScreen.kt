@@ -46,22 +46,17 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.lifecycle.viewmodel.compose.viewModel
-import cache.DataCache
 import data.Area
 import data.EDataType
 import data.Path
 import data.Sector
 import data.Zone
-import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.navigation_explore
-import escalaralcoiaicomtat.composeapp.generated.resources.navigation_settings
-import escalaralcoiaicomtat.composeapp.generated.resources.search
-import escalaralcoiaicomtat.composeapp.generated.resources.search_empty
-import escalaralcoiaicomtat.composeapp.generated.resources.status_network_unavailable
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
 import search.Filter
+import sync.SyncProcess
 import ui.composition.LocalNavController
 import ui.dialog.SearchFiltersDialog
 import ui.model.AppScreenModel
@@ -88,7 +83,7 @@ fun AppScreen(
 
     val areas by appScreenModel.areas.collectAsState(emptyList())
 
-    val syncStatus by appScreenModel.syncStatus.collectAsState()
+    val syncStatus by appScreenModel.syncStatus.collectAsState(SyncProcess.Status.WAITING)
 
     LaunchedEffect(areas) {
         Napier.i { "There are ${areas?.size} areas loaded" }

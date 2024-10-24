@@ -4,6 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
+actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmzUUID: String?) {
     // TODO: Not yet implemented
 }

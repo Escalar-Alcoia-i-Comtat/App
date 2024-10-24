@@ -1,13 +1,13 @@
 package ui.model
 
-import cache.DataCache.Areas.allPaths
-import cache.DataCache.Areas.allSectors
 import data.Path
 import data.Sector
+import kotlinx.coroutines.flow.first
+import sync.DataSync
 
 class PathsScreenModel : DataScreenModel<Sector, Path>(
     childrenListAccessor = { parentId ->
-        allPaths()?.filter { it.getParentId() == parentId } ?: emptyList()
+        DataSync.paths.first()?.filter { it.getParentId() == parentId } ?: emptyList()
     },
-    parentListAccessor = { id -> allSectors()?.find { it.id == id } }
+    parentListAccessor = { id -> DataSync.sectors.first()?.find { it.id == id } }
 )

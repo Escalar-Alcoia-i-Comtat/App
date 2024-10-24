@@ -1,15 +1,24 @@
 package cache
 
 import io.github.aakira.napier.Napier
+import io.ktor.client.plugins.cache.HttpCache
 import network.createHttpClient
+import platform.httpCacheStorage
 
 /**
  * A container for caching data.
  *
  * @param name The name of the cache container. If `\u0000` is used, caching will be blocked.
  */
-abstract class CacheContainer(name: String) {
-    protected val client = createHttpClient()
+@Deprecated("Use ktor cache")
+abstract class CacheContainer(private val name: String) {
+    protected val client by lazy {
+        createHttpClient {
+            install(HttpCache) {
+                configureHttpClientCache()
+            }
+        }
+    }
 
     /**
      * The directory where the cache will be stored.
@@ -32,5 +41,25 @@ abstract class CacheContainer(name: String) {
     } catch (_: NullPointerException) {
         Napier.w(tag = this::class.simpleName) { "FileSystem is not available in the current platform." }
         false
+    }
+
+    /**
+     * Configures the cache for the HTTP client.
+     * If [cacheSupported] is `true`, [cacheDirectory] will be used for cache.
+     * Otherwise an in-memory cache will be used.
+     */
+    private fun HttpCache.Config.configureHttpClientCache() {
+        val storage = if (cacheSupported) {
+            try {
+                httpCacheStorage(name)
+            } catch (_: UnsupportedOperationException) {
+                null
+            }
+        } else {
+            null
+        }
+        if (storage != null) {
+            publicStorage(storage)
+        }
     }
 }
