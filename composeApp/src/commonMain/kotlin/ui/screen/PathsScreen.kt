@@ -91,7 +91,6 @@ import ui.icons.ClimbingShoes
 import ui.icons.Rope
 import ui.list.PathListItem
 import ui.model.PathsScreenModel
-import ui.platform.getScreenSize
 import ui.reusable.CircularProgressIndicatorBox
 import utils.currentOrThrow
 import utils.format
@@ -248,15 +247,14 @@ fun PathsList(
                         } ?: CircularProgressIndicator()
                     }
 
-                    val size = getScreenSize()
-
                     AnimatedVisibility(
                         visible = !shouldDisplaySidePanel
                     ) {
                         PathsListView(
                             paths = paths,
                             highlightPathId = highlightPathId,
-                            modifier = Modifier.fillMaxWidth().heightIn(max = size.height * 0.3f)
+                            modifier = Modifier.fillMaxWidth()
+                                .fillMaxHeight(0.3f)
                                 .weight(1f),
                             onPathClicked = onPathClicked
                         )

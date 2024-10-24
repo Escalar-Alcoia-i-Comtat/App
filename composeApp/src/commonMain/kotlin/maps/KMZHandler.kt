@@ -1,6 +1,8 @@
 package maps
 
+import cache.File
 import cache.ZipFile
+import cache.storageProvider
 import io.github.aakira.napier.Napier
 import io.ktor.utils.io.readBuffer
 import network.Backend
@@ -16,11 +18,14 @@ object KMZHandler {
         for (match in matches) {
             val path = match.value.substring("<href>".length).substringBeforeLast("</href>")
             // Check if already replaced
-            if (path.startsWith('/')) continue
+            if (path.startsWith("data:")) continue
 
-            val file = zipFile.read(path)
-            if (file != null) {
-                data = data.replace(match.value, "<href>$file</href>")
+            val fileData = zipFile.read(path)
+            val dir = File(storageProvider.cacheDirectory, "map-icons").also { it.mkdirs() }
+            val file = File(dir, path.replace("/", "_"))
+            if (fileData != null) {
+                if (!file.exists()) { file.write(fileData) }
+                data = data.replace(match.value, "<href>${file.path}</href>")
                 Napier.v { "Replaced icon $path" }
             } else {
                 Napier.v { "Got a non existing icon (${path}): $file" }
