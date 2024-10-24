@@ -12,7 +12,8 @@ import ui.navigation.Routes
 @Composable
 fun ZonesScreen(
     areaId: Long,
-    viewModel: ZonesScreenModel = viewModel { ZonesScreenModel() }
+    viewModel: ZonesScreenModel = viewModel { ZonesScreenModel() },
+    scrollToId: Long? = null
 ) {
     val navController = LocalNavController.current
 
@@ -26,6 +27,7 @@ fun ZonesScreen(
     DataList(
         parent = area,
         children = zones,
+        scrollToId = scrollToId,
         onNavigationRequested = { navController?.navigate(Routes.zone(it.id)) },
         onNavigateUp = { navController?.navigateUp() }
     )

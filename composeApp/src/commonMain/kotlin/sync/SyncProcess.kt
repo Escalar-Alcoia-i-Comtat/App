@@ -1,7 +1,6 @@
 package sync
 
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -44,7 +43,7 @@ abstract class SyncProcess <Result> {
     val status: SharedFlow<Status> get() = mutableStatus.asSharedFlow()
 
     private val mutableResult = MutableStateFlow<Result?>(null)
-    val result: Flow<Result?> get() = mutableResult.asSharedFlow()
+    val result: SharedFlow<Result?> get() = mutableResult.asSharedFlow()
 
     /**
      * When called should perform the synchronization process desired.

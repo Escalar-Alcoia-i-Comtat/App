@@ -47,7 +47,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.Area
-import data.EDataType
 import data.Path
 import data.Sector
 import data.Zone
@@ -77,7 +76,7 @@ import utils.unaccent
 fun AppScreen(
     appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
-    initial: Pair<EDataType, Long>? = null
+    scrollToId: Long? = null
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
@@ -173,7 +172,7 @@ fun AppScreen(
         }
     ) { page ->
         when (page) {
-            0 -> MainScreen(areas, syncStatus)
+            0 -> MainScreen(areas, syncStatus, scrollToId)
 
             1 -> SettingsPage()
 
