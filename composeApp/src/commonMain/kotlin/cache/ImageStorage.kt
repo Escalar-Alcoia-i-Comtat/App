@@ -15,7 +15,7 @@ import network.Backend
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import utils.IO
 
-object ImageCache {
+object ImageStorage {
 
     @Composable
     fun collectStateOf(

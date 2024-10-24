@@ -19,9 +19,9 @@ object DataSync : SyncProcess<List<Area>>() {
      *
      * @throws IllegalStateException If there's not a valid network connection available.
      */
-    override suspend fun synchronize() = try {
+    override suspend fun synchronize(): List<Area> = try {
         Napier.i { "Running data synchronization..." }
-        mutableStatus.tryEmit(Status.RUNNING.Indeterminate)
+        mutableStatus.emit(Status.RUNNING.Indeterminate)
 
         Napier.d { "Fetching tree from server..." }
         val areas = Backend.tree()
@@ -35,7 +35,7 @@ object DataSync : SyncProcess<List<Area>>() {
         Napier.e(throwable = e) { "Could not synchronize with server." }
         throw e
     } finally {
-        mutableStatus.value = Status.FINISHED
+        mutableStatus.emit(Status.FINISHED)
     }
 
     val areas: Flow<List<Area>?> get() = result

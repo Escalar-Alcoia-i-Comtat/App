@@ -116,7 +116,7 @@ private suspend inline fun loadKMZ(
     crossinline onMoveCameraRequested: (CameraUpdate) -> Unit
 ) {
     val kml = KMZHandler.load(kmzUUID)
-    kml.readAllBytes().inputStream().use { stream ->
+    kml.read("doc.xml")!!.inputStream().use { stream ->
         val layer = KmlLayer(googleMap, stream, context).also(onKmlLayerLoaded)
         withContext(Dispatchers.Main) {
             layer.addLayerToMap()
@@ -155,6 +155,7 @@ private suspend inline fun loadKMZ(
 @OptIn(MapsComposeExperimentalApi::class)
 @SuppressLint("PotentialBehaviorOverride")
 actual fun MapComposable(
+    viewModel: MapViewModel,
     modifier: Modifier,
     kmzUUID: String?
 ) {

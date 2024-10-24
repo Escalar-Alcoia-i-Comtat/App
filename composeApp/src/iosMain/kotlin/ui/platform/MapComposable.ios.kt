@@ -58,7 +58,7 @@ private suspend inline fun loadKMZ(
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun MapComposable(modifier: Modifier, kmzUUID: String?) {
+actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmzUUID: String?) {
     var mapData by remember { mutableStateOf<MapData?>(null) }
 
     LaunchedEffect(kmzUUID) {

@@ -9,11 +9,12 @@ import maps.KMZHandler
 
 object KMZLoader {
     suspend inline fun loadKMZ(
-        kmzUUID: String,
-        onDocumentLoaded: (data: MapData) -> Unit
-    ) {
+        kmzUUID: String
+    ): MapData {
         val kmlFile = KMZHandler.load(kmzUUID, replaceImagePaths = false)
-        val kmlString = kmlFile.readAllBytes().decodeToString()
+        Napier.d { "KMZ file is ready. Reading KML..." }
+        val kmlString = kmlFile.read("doc.kml")?.decodeToString()
+            ?: throw IllegalStateException("KML file not found in KMZ")
         val xml = Ksoup.parse(kmlString)
         val document = xml.root().getElementsByTag("Document")[0]
         val styles = document.getElementsByTag("Style")
@@ -25,8 +26,6 @@ object KMZLoader {
                 folder.getElementsByTag("Placemark").map { Placemark.parse(it) }
             }
             .filterNotNull()
-        onDocumentLoaded(
-            MapData(placemarks, styles)
-        )
+        return MapData(placemarks, styles)
     }
 }

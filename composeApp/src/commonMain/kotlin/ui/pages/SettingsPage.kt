@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,7 +37,6 @@ import build.BuildKonfig
 import cache.CacheContainer
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import maps.KMZHandler
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ui.composition.LocalUnitsConfiguration
@@ -167,12 +165,12 @@ fun SettingsPage() {
                 ImageCache,
                 deleting
             ) { deleting = it }*/
-            SettingsCacheRow(
+            /*SettingsCacheRow(
                 Res.string.settings_storage_kmz,
                 Icons.Outlined.Route,
                 KMZHandler,
                 deleting
-            ) { deleting = it }
+            ) { deleting = it }*/
 
             Spacer(Modifier.height(16.dp))
             SettingsCategory(

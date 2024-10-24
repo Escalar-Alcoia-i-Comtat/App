@@ -1,18 +1,16 @@
 package platform
 
-import cache.File
+import cache.ZipFile
 import io.github.aakira.napier.Napier
-import utils.UnzipUtils
-import utils.asJavaFile
+import kotlinx.io.Buffer
+import utils.MemoryUnzipUtils
 
 actual object ZipFileHandler {
     /**
-     * Extracts the zip file stored at [file] into the given directory ([dir]).
+     * Extracts a zip file into memory.
      */
-    actual suspend fun unzip(file: File, dir: File) {
-        if (!dir.exists()) dir.mkdirs()
-        Napier.d { "Extracting $file into $dir..." }
-        UnzipUtils.unzip(file.asJavaFile, dir.asJavaFile.path)
-        Napier.d { "Extraction complete!" }
+    actual suspend fun unzip(zipData: Buffer): ZipFile {
+        Napier.d { "Extracting zip into memory..." }
+        return MemoryUnzipUtils.unzip(zipData).also { Napier.d { "Extraction complete!" } }
     }
 }

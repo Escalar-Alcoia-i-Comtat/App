@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cache.ImageCache
+import cache.ImageStorage
 import data.DataTypeWithImage
 import data.DataTypeWithPoint
 import data.DataTypeWithPoints
@@ -59,7 +59,7 @@ fun <T: DataTypeWithImage> DataCard(
         )
 
         var progress by remember { mutableStateOf<Float?>(null) }
-        val image by ImageCache.collectStateOf(item.image) { current, max ->
+        val image by ImageStorage.collectStateOf(item.image) { current, max ->
             max ?: return@collectStateOf
             progress = if (current == max) {
                 null
