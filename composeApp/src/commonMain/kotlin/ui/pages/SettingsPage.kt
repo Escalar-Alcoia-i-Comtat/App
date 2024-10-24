@@ -16,102 +16,25 @@ import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.rounded.Straighten
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import build.BuildKonfig
-import cache.CacheContainer
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ui.composition.LocalUnitsConfiguration
 import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
 import ui.reusable.settings.SettingsSelector
-import utils.format
-import utils.formatBytes
 import utils.unit.DistanceUnits
-
-@Composable
-@ExperimentalMaterial3Api
-private fun SettingsCacheRow(
-    title: StringResource,
-    icon: ImageVector,
-    container: CacheContainer,
-    isDeleting: Boolean,
-    includeDivider: Boolean = true,
-    onDeletingStatusChanged: (Boolean) -> Unit
-) {
-    if (!container.cacheSupported) {
-        return
-    }
-
-    val directory = container.cacheDirectory
-    var cacheSize by remember { mutableLongStateOf(directory.size() ?: 0L) }
-    var showingDialog by remember { mutableStateOf(false) }
-
-    if (showingDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                // Do not allow dismiss while deleting
-                if (!isDeleting) showingDialog = false
-            },
-            title = { Text(stringResource(Res.string.settings_storage_dialog_title)) },
-            text = { Text(stringResource(Res.string.settings_storage_dialog_message)) },
-            confirmButton = {
-                TextButton(
-                    enabled = !isDeleting,
-                    onClick = {
-                        onDeletingStatusChanged(true)
-                        try {
-                            directory.delete()
-                            cacheSize = directory.size() ?: 0L
-                        } finally {
-                            onDeletingStatusChanged(false)
-                            showingDialog = false
-                        }
-                    }
-                ) { Text(stringResource(Res.string.action_clear)) }
-            },
-            dismissButton = {
-                TextButton(
-                    enabled = !isDeleting,
-                    onClick = { showingDialog = false }
-                ) { Text(stringResource(Res.string.action_cancel)) }
-            }
-        )
-    }
-
-    SettingsRow(
-        headline = stringResource(title),
-        summary = if (cacheSize >= 0)
-            stringResource(Res.string.settings_storage_size).format(formatBytes(cacheSize))
-        else
-            "0KB",
-        icon = icon,
-        enabled = !isDeleting
-    ) { showingDialog = true }
-
-    if (includeDivider) {
-        HorizontalDivider()
-    }
-}
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSettingsApi::class)
@@ -152,25 +75,6 @@ fun SettingsPage() {
                 optionsDialogTitle = stringResource(Res.string.settings_units_distance),
                 stringConverter = { stringResource(it.label) }
             )
-
-            var deleting by remember { mutableStateOf(false) }
-
-            SettingsCategory(
-                text = stringResource(Res.string.settings_category_storage)
-            )
-            // TODO: Support ktor cache
-            /*SettingsCacheRow(
-                Res.string.settings_storage_images,
-                Icons.Outlined.PhotoLibrary,
-                ImageCache,
-                deleting
-            ) { deleting = it }*/
-            /*SettingsCacheRow(
-                Res.string.settings_storage_kmz,
-                Icons.Outlined.Route,
-                KMZHandler,
-                deleting
-            ) { deleting = it }*/
 
             Spacer(Modifier.height(16.dp))
             SettingsCategory(
