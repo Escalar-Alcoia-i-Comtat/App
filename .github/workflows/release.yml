@@ -14,22 +14,34 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Job set up
-        uses: ./.github/actions/job-set-up
-
-      - name: Write local.properties
-        run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Update version name
-        run: ./gradlew updateIOSVersion updateVersionName -Pversion=${{ github.event.release.name }}
+        run: python ./scripts/updateVersionName.py --name=${{ github.event.release.name }}
 
-      - name: Commit version.properties
+      - name: Commit modified version files
         id: commit_version
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Increased Version Code
+          commit_message: 'Updated Version'
+          file_pattern: 'composeApp/version.properties iosApp/iosApp.xcodeproj/project.pbxproj iosApp/iosApp/Info.plist'
           branch: master
-          file_pattern: 'version.properties iosApp/iosApp.xcodeproj/project.pbxproj iosApp/iosApp/Info.plist'
+          push_options: '--force'
+
+      - name: Increase version code
+        id: increase_version_code
+        run: python ./scripts/increaseVersionCode.py
+
+      - name: Commit modified version code file
+        id: commit_version_code
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Updated Version Code'
+          file_pattern: 'composeApp/version.properties'
+          branch: master
+          push_options: '--force'
 
   build-android:
     name: Build for Android
