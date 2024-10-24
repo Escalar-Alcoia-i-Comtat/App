@@ -21,15 +21,6 @@ jobs:
       - name: Update version name
         run: python ./scripts/updateVersionName.py --name=${{ github.event.release.name }}
 
-      - name: Commit modified version files
-        id: commit_version
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: 'Updated Version'
-          file_pattern: 'version.properties iosApp/iosApp.xcodeproj/project.pbxproj iosApp/iosApp/Info.plist'
-          branch: master
-          push_options: '--force'
-
       - name: Increase version code
         id: increase_version_code
         run: python ./scripts/increaseVersionCode.py
@@ -38,10 +29,9 @@ jobs:
         id: commit_version_code
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'Updated Version Code'
-          file_pattern: 'version.properties'
+          commit_message: 'Updated Version'
+          file_pattern: 'version.properties iosApp/iosApp.xcodeproj/project.pbxproj iosApp/iosApp/Info.plist'
           branch: master
-          push_options: '--force'
 
   build-android:
     name: Build for Android
