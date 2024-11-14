@@ -5,7 +5,7 @@ buildkonfig = "0.15.2"
 compose-maps = "6.2.1"
 compose-navigation = "2.8.0-alpha10"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
-compose-plugin = "1.7.1"
+compose-plugin = "1.8.0+check"
 compose-ui = "1.7.5"
 compose-viewModel = "2.8.4"
 compose-windowSizeClass = "0.5.0"
