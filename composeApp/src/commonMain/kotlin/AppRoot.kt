@@ -14,7 +14,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import data.EDataType
 import database.SettingsKeys
 import database.settings
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +28,7 @@ import sync.DataSync
 import ui.composition.LocalAnimatedContentScope
 import ui.composition.LocalSharedTransitionScope
 import ui.dialog.UpdateAvailableDialog
+import ui.navigation.Destination
 import ui.navigation.Destinations
 import ui.navigation.navigateBack
 import ui.navigation.navigateTo
@@ -47,7 +47,7 @@ val store = CoroutineScope(SupervisorJob()).createStore()
 @Composable
 fun AppRoot(
     navController: NavHostController = rememberNavController(),
-    initial: EDataType? = null,
+    startDestination: Destination? = null,
     modifier: Modifier = Modifier
 ) {
     ConnectivityStatusObserver()
@@ -75,7 +75,7 @@ fun AppRoot(
             NavigationController(
                 navController = navController,
                 shownIntro = shownIntro,
-                initial = initial,
+                startDestination = startDestination,
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -88,31 +88,18 @@ fun SharedTransitionScope.NavigationController(
     navController: NavHostController,
     shownIntro: Boolean,
     modifier: Modifier = Modifier,
-    initial: EDataType? = null
+    startDestination: Destination? = null
 ) {
-    val startDestination = remember(shownIntro, initial) {
-        if (!shownIntro) {
-            Destinations.Intro
-        } else if (initial == null) {
-            Destinations.Root
-        } else {
-            when (initial) {
-                is EDataType.Area -> Destinations.Area(initial.id)
-                is EDataType.Zone -> Destinations.Zone(initial.id)
-                is EDataType.Sector -> Destinations.Sector(initial.id)
-                is EDataType.Path -> Destinations.Sector(initial.sectorId, initial.id)
-            }
-        }
+    val initial = remember {
+        if (!shownIntro) Destinations.Intro else startDestination ?: Destinations.Root
     }
-    LaunchedEffect(startDestination) {
-        onNavigate(startDestination)
-    }
+    LaunchedEffect(initial) { onNavigate(initial) }
     PlatformNavHandler(navController)
 
     CompositionLocalProvider(LocalSharedTransitionScope provides this) {
         NavHost(
             navController = navController,
-            startDestination = startDestination,
+            startDestination = initial,
             modifier = modifier
         ) {
             composable<Destinations.Root> {
@@ -127,7 +114,7 @@ fun SharedTransitionScope.NavigationController(
                         onSectorRequested = { sectorId, pathId ->
                             navController.navigateTo(Destinations.Sector(sectorId, pathId))
                         },
-                        scrollToId = initial?.id
+                        scrollToId = initial.id
                     )
                 }
             }

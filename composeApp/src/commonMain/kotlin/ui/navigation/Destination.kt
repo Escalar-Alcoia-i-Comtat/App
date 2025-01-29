@@ -10,4 +10,7 @@ sealed interface Destination {
 
     @Transient
     val path: String
+
+    @Transient
+    val id: Long?
 }
