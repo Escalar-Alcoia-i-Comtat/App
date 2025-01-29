@@ -83,7 +83,6 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import ui.composition.LocalNavController
 import ui.composition.LocalUnitsConfiguration
 import ui.icons.ClimbingAnchor
 import ui.icons.ClimbingHelmet
@@ -104,10 +103,9 @@ private val sidePathInformationPanelMaxWidth: Dp = 500.dp
 fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
+    onBackRequested: () -> Unit,
     viewModel: PathsScreenModel = viewModel { PathsScreenModel() }
 ) {
-    val navController = LocalNavController.currentOrThrow
-
     val sector by viewModel.parent.collectAsState()
     val paths by viewModel.children.collectAsState()
     val selectedPath by viewModel.displayingChild.collectAsState()
@@ -115,7 +113,7 @@ fun PathsScreen(
     LaunchedEffect(sectorId) {
         viewModel.load(sectorId) {
             Napier.w { "Could not find sector with id $sectorId" }
-            navController.navigateUp()
+            onBackRequested()
         }
     }
 
@@ -124,7 +122,7 @@ fun PathsScreen(
             CenterAlignedTopAppBar(
                 title = { sector?.let { Text(it.displayName) } },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = onBackRequested) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
                     }
                 }

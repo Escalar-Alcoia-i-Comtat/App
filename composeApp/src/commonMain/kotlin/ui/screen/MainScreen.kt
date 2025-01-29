@@ -28,15 +28,14 @@ import platform.BackHandler
 import sync.DataSync
 import sync.SyncProcess
 import ui.composition.LocalLifecycleManager
-import ui.composition.LocalNavController
 import ui.list.DataCard
-import ui.navigation.Routes
 import utils.IO
 
 @Composable
 fun MainScreen(
     areas: List<Area>?,
     syncStatus: SyncProcess.Status?,
+    onAreaRequested: (areaId: Long) -> Unit,
     scrollToId: Long? = null
 ) {
     val lifecycleManager = LocalLifecycleManager.current
@@ -63,7 +62,7 @@ fun MainScreen(
         }
     }
 
-    AreasList(areas, syncStatus, scrollToId)
+    AreasList(areas, syncStatus, onAreaRequested, scrollToId)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -71,9 +70,9 @@ fun MainScreen(
 private fun AreasList(
     areas: List<Area>?,
     status: SyncProcess.Status?,
+    onAreaRequested: (areaId: Long) -> Unit,
     scrollToId: Long? = null
 ) {
-    val navigator = LocalNavController.current
     val state = rememberLazyListState()
 
     LaunchedEffect(scrollToId) {
@@ -116,7 +115,7 @@ private fun AreasList(
                     .padding(bottom = 12.dp)
                     .widthIn(max = 600.dp)
                     .fillMaxWidth()
-            ) { navigator?.navigate(Routes.area(area.id)) }
+            ) { onAreaRequested(area.id) }
         }
 
         // Add some padding at the end

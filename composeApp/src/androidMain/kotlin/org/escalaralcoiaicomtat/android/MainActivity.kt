@@ -17,9 +17,10 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import data.EDataType
 import io.github.aakira.napier.Napier
 import platform.Updates
+import ui.navigation.Destination
+import ui.navigation.Destinations
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -61,9 +62,9 @@ class MainActivity : ComponentActivity() {
 
         instance = this
 
-        val initial = computeInitial()
+        val startDestination = computeStartDestination()
         setContent {
-            AppRoot(initial = initial)
+            AppRoot(startDestination = startDestination)
         }
     }
 
@@ -106,9 +107,9 @@ class MainActivity : ComponentActivity() {
      *
      * Note that paths are not supported.
      *
-     * @return The initial route or `null` if the intent data is not valid.
+     * @return The initial destination or `null` if the intent data is not valid.
      */
-    private fun computeInitial(): EDataType? {
+    private fun computeStartDestination(): Destination? {
         val action: String? = intent?.action
         val data: Uri? = intent?.data
         val path: List<String>? = data?.pathSegments
@@ -118,9 +119,9 @@ class MainActivity : ComponentActivity() {
         return if (action == Intent.ACTION_VIEW && path != null) {
             val id = path.getOrNull(1)?.toLongOrNull() ?: return null
              when (path.firstOrNull()) {
-                "area" -> EDataType.Area(id)
-                "zone" -> EDataType.Zone(id)
-                "sector" -> EDataType.Sector(id)
+                "area" -> Destinations.Area(id)
+                "zone" -> Destinations.Zone(id)
+                "sector" -> Destinations.Sector(id)
                 else -> null
             }
         } else {
