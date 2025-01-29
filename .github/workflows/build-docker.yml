@@ -11,6 +11,9 @@ on:
       - '**/*.gradle.kts'
       - '*.properties'
       - 'gradle/**'
+  release:
+    types:
+      - released
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -31,10 +34,19 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      # Otherwise, build and push the development image, tagging it as development
+      - name: Build and push production
+        uses: docker/build-push-action@v6
+        if: ${{ github.event_name == 'release' }}
+        with:
+          push: true
+          tags: arnyminerz/escalaralcoiaicomtat-web:latest
+          build-args: |
+            BASE_URL=https://escalaralcoiaicomtat.com
       - name: Build and push development
         uses: docker/build-push-action@v6
         if: ${{ github.event_name != 'release' }}
         with:
           push: true
           tags: arnyminerz/escalaralcoiaicomtat-web:development
+          build-args: |
+            BASE_URL=https://escalaralcoiaicomtat.com
