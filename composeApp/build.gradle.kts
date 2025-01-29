@@ -97,7 +97,7 @@ fun <VersionType : PlatformVersion> getVersionForPlatform(platform: Platform<Ver
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(23)
 
     jvm("desktop")
 
@@ -316,8 +316,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_23
+        targetCompatibility = JavaVersion.VERSION_23
     }
 
     dependencies {
