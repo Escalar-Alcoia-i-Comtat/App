@@ -5,15 +5,14 @@ import Build_gradle.WindowsVersion
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
-import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
-import java.time.LocalDateTime
-import java.util.Calendar
-import java.util.Properties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import java.time.LocalDateTime
+import java.util.Calendar
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -108,7 +107,7 @@ kotlin {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                outputFileName = "composeApp.js"
+                outputFileName = "webApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
@@ -116,6 +115,7 @@ kotlin {
                         add(projectDirPath)
                     }
                 }
+                configDirectory = File(project.rootDir, "webpack.config.d")
             }
         }
         binaries.executable()
