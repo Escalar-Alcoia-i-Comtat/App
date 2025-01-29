@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,12 +22,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import network.ConnectivityStatusObserver
+import platform.PlatformNavHandler
 import platform.Updates
+import platform.onNavigate
 import sync.DataSync
 import ui.composition.LocalAnimatedContentScope
 import ui.composition.LocalSharedTransitionScope
 import ui.dialog.UpdateAvailableDialog
 import ui.navigation.Destinations
+import ui.navigation.navigateBack
+import ui.navigation.navigateTo
 import ui.screen.AppScreen
 import ui.screen.IntroScreen
 import ui.screen.PathsScreen
@@ -101,6 +104,10 @@ fun SharedTransitionScope.NavigationController(
             }
         }
     }
+    LaunchedEffect(startDestination) {
+        onNavigate(startDestination)
+    }
+    PlatformNavHandler(navController)
 
     CompositionLocalProvider(LocalSharedTransitionScope provides this) {
         NavHost(
@@ -112,13 +119,13 @@ fun SharedTransitionScope.NavigationController(
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     AppScreen(
                         onAreaRequested = { areaId ->
-                            navController.navigate(Destinations.Area(areaId))
+                            navController.navigateTo(Destinations.Area(areaId))
                         },
                         onZoneRequested = { zoneId ->
-                            navController.navigate(Destinations.Zone(zoneId))
+                            navController.navigateTo(Destinations.Zone(zoneId))
                         },
                         onSectorRequested = { sectorId, pathId ->
-                            navController.navigate(Destinations.Sector(sectorId, pathId))
+                            navController.navigateTo(Destinations.Sector(sectorId, pathId))
                         },
                         scrollToId = initial?.id
                     )
@@ -127,10 +134,7 @@ fun SharedTransitionScope.NavigationController(
             composable<Destinations.Intro> {
                 IntroScreen(
                     onIntroFinished = {
-                        navController.navigate(
-                            Destinations.Root,
-                            NavOptions.Builder().setLaunchSingleTop(true).build()
-                        )
+                        navController.navigateTo(Destinations.Root, true)
                     }
                 )
             }
@@ -139,8 +143,8 @@ fun SharedTransitionScope.NavigationController(
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     ZonesScreen(
                         areaId = route.areaId,
-                        onBackRequested = { navController.navigateUp() },
-                        onZoneRequested = { navController.navigate(Destinations.Zone(it)) }
+                        onBackRequested = { navController.navigateBack() },
+                        onZoneRequested = { navController.navigateTo(Destinations.Zone(it)) }
                     )
                 }
             }
@@ -149,8 +153,8 @@ fun SharedTransitionScope.NavigationController(
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     SectorsScreen(
                         zoneId = route.zoneId,
-                        onBackRequested = { navController.navigateUp() },
-                        onSectorRequested = { navController.navigate(Destinations.Sector(it)) }
+                        onBackRequested = { navController.navigateBack() },
+                        onSectorRequested = { navController.navigateTo(Destinations.Sector(it)) }
                     )
                 }
             }
@@ -160,7 +164,7 @@ fun SharedTransitionScope.NavigationController(
                     PathsScreen(
                         sectorId = route.sectorId,
                         highlightPathId = route.pathId,
-                        onBackRequested = { navController.navigateUp() },
+                        onBackRequested = { navController.navigateBack() },
                     )
                 }
             }
