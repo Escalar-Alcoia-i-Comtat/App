@@ -1,5 +1,5 @@
 # Stage 1: Cache Gradle dependencies
-FROM gradle:latest AS cache
+FROM gradle:jdk23-alpine AS cache
 RUN mkdir -p /home/gradle/cache_home
 ENV GRADLE_USER_HOME=/home/gradle/cache_home
 COPY build.gradle.kts gradle.properties /home/gradle/app/
@@ -19,7 +19,7 @@ WORKDIR /home/gradle/app
 RUN gradle clean kotlinUpgradeYarnLock build -i --stacktrace
 
 # Stage 2: Build Application
-FROM gradle:latest AS build
+FROM gradle:jdk23-alpine AS build
 
 ARG BASE_URL
 RUN export BASE_URL=$BASE_URL
