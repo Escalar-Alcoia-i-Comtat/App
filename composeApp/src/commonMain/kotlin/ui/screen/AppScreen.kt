@@ -50,19 +50,22 @@ import data.Area
 import data.Path
 import data.Sector
 import data.Zone
-import escalaralcoiaicomtat.composeapp.generated.resources.*
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.navigation_explore
+import escalaralcoiaicomtat.composeapp.generated.resources.navigation_settings
+import escalaralcoiaicomtat.composeapp.generated.resources.search
+import escalaralcoiaicomtat.composeapp.generated.resources.search_empty
+import escalaralcoiaicomtat.composeapp.generated.resources.status_network_unavailable
 import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
 import search.Filter
 import sync.SyncProcess
-import ui.composition.LocalNavController
 import ui.dialog.SearchFiltersDialog
 import ui.model.AppScreenModel
 import ui.model.SearchModel
 import ui.navigation.AdaptiveNavigationScaffold
 import ui.navigation.NavigationItem
-import ui.navigation.Routes
 import ui.pages.SettingsPage
 import ui.state.LaunchedKeyEvent
 import utils.unaccent
@@ -74,6 +77,9 @@ import utils.unaccent
 )
 @Composable
 fun AppScreen(
+    onAreaRequested: (areaId: Long) -> Unit,
+    onZoneRequested: (zoneId: Long) -> Unit,
+    onSectorRequested: (sectorId: Long, pathId: Long?) -> Unit,
     appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     scrollToId: Long? = null
@@ -133,7 +139,10 @@ fun AppScreen(
                         searchModel.filteredPaths,
                         searchModel::search,
                         searchModel::dismiss,
-                        searchModel::search
+                        searchModel::search,
+                        onAreaRequested,
+                        onZoneRequested,
+                        onSectorRequested
                     )
                 } else {
                     CenterAlignedTopAppBar(
@@ -172,7 +181,7 @@ fun AppScreen(
         }
     ) { page ->
         when (page) {
-            0 -> MainScreen(areas, syncStatus, scrollToId)
+            0 -> MainScreen(areas, syncStatus, onAreaRequested, scrollToId)
 
             1 -> SettingsPage()
 
@@ -198,10 +207,11 @@ fun SearchBarLogic(
     filteredPaths: SnapshotStateList<Path?>,
     onSearchRequested: () -> Unit,
     onSearchDismissed: () -> Unit,
-    onSearchQuery: (String) -> Unit
+    onSearchQuery: (String) -> Unit,
+    onAreaRequested: (areaId: Long) -> Unit,
+    onZoneRequested: (zoneId: Long) -> Unit,
+    onSectorRequested: (sectorId: Long, pathId: Long?) -> Unit,
 ) {
-    val navController = LocalNavController.current
-
     val focusRequester = remember { FocusRequester() }
 
     // Focus the search bar when it is shown
@@ -299,7 +309,7 @@ fun SearchBarLogic(
                         headlineContent = { Text(area.displayName) },
                         supportingContent = { Text("Area") },
                         modifier = Modifier.clickable {
-                            navController?.navigate(Routes.area(area.id))
+                            onAreaRequested(area.id)
                             onSearchDismissed()
                         }
                     )
@@ -312,7 +322,7 @@ fun SearchBarLogic(
                         headlineContent = { Text(zone.displayName) },
                         supportingContent = { Text("Zone") },
                         modifier = Modifier.clickable {
-                            navController?.navigate(Routes.zone(zone.id))
+                            onZoneRequested(zone.id)
                             onSearchDismissed()
                         }
                     )
@@ -325,7 +335,7 @@ fun SearchBarLogic(
                         headlineContent = { Text(sector.displayName) },
                         supportingContent = { Text("Sector") },
                         modifier = Modifier.clickable {
-                            navController?.navigate(Routes.sector(sector.id))
+                            onSectorRequested(sector.id, null)
                             onSearchDismissed()
                         }
                     )
@@ -338,7 +348,7 @@ fun SearchBarLogic(
                         headlineContent = { Text(path.displayName) },
                         supportingContent = { Text("Path") },
                         modifier = Modifier.clickable {
-                            navController?.navigate(Routes.sector(path.parentSectorId, path.id))
+                            onSectorRequested(path.parentSectorId, path.id)
                             onSearchDismissed()
                         }
                     )

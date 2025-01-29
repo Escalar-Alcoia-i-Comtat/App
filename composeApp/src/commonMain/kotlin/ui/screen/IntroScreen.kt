@@ -1,6 +1,5 @@
 package ui.screen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -49,8 +48,6 @@ import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
 import platform.IntroScreenPages
 import ui.composition.LocalLifecycleManager
-import ui.composition.LocalNavController
-import ui.navigation.Routes
 import ui.reusable.IntroPage
 import ui.reusable.icon
 
@@ -105,10 +102,8 @@ private val pages: List<@Composable () -> Unit> = listOfNotNull(
     }
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun IntroScreen() {
-    val navigator = LocalNavController.current
+fun IntroScreen(onIntroFinished: () -> Unit) {
     val lifecycleManager = LocalLifecycleManager.current
 
     val scope = rememberCoroutineScope()
@@ -125,7 +120,7 @@ fun IntroScreen() {
                 onClick = {
                     if (pagerState.currentPage + 1 >= pages.size) {
                         settings.putBoolean(SettingsKeys.SHOWN_INTRO, true)
-                        navigator?.navigate(Routes.ROOT)
+                        onIntroFinished()
                     } else scope.launch {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
@@ -146,7 +141,7 @@ fun IntroScreen() {
             TextButton(
                 onClick = {
                     settings.putBoolean(SettingsKeys.SHOWN_INTRO, true)
-                    navigator?.navigate(Routes.ROOT)
+                    onIntroFinished()
                 },
                 modifier = Modifier
                     .align(Alignment.TopEnd)

@@ -10,11 +10,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import data.EDataType
 import database.SettingsKeys
 import database.settings
@@ -26,10 +26,9 @@ import network.ConnectivityStatusObserver
 import platform.Updates
 import sync.DataSync
 import ui.composition.LocalAnimatedContentScope
-import ui.composition.LocalNavController
 import ui.composition.LocalSharedTransitionScope
 import ui.dialog.UpdateAvailableDialog
-import ui.navigation.Routes
+import ui.navigation.Destinations
 import ui.screen.AppScreen
 import ui.screen.IntroScreen
 import ui.screen.PathsScreen
@@ -90,76 +89,79 @@ fun SharedTransitionScope.NavigationController(
 ) {
     val startDestination = remember(shownIntro, initial) {
         if (!shownIntro) {
-            Routes.INTRO
+            Destinations.Intro
         } else if (initial == null) {
-            Routes.ROOT
+            Destinations.Root
         } else {
             when (initial) {
-                is EDataType.Area -> Routes.area(initial.id)
-                is EDataType.Zone -> Routes.zone(initial.id)
-                is EDataType.Sector -> Routes.sector(initial.id)
-                is EDataType.Path -> Routes.sector(initial.sectorId, initial.id)
+                is EDataType.Area -> Destinations.Area(initial.id)
+                is EDataType.Zone -> Destinations.Zone(initial.id)
+                is EDataType.Sector -> Destinations.Sector(initial.id)
+                is EDataType.Path -> Destinations.Sector(initial.sectorId, initial.id)
             }
         }
     }
 
-    CompositionLocalProvider(
-        LocalNavController provides navController,
-        LocalSharedTransitionScope provides this
-    ) {
+    CompositionLocalProvider(LocalSharedTransitionScope provides this) {
         NavHost(
-            navController = LocalNavController.current!!,
+            navController = navController,
             startDestination = startDestination,
             modifier = modifier
         ) {
-            composable(Routes.ROOT) {
+            composable<Destinations.Root> {
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                    AppScreen(scrollToId = initial?.id)
+                    AppScreen(
+                        onAreaRequested = { areaId ->
+                            navController.navigate(Destinations.Area(areaId))
+                        },
+                        onZoneRequested = { zoneId ->
+                            navController.navigate(Destinations.Zone(zoneId))
+                        },
+                        onSectorRequested = { sectorId, pathId ->
+                            navController.navigate(Destinations.Sector(sectorId, pathId))
+                        },
+                        scrollToId = initial?.id
+                    )
                 }
             }
-            composable(Routes.INTRO) {
-                IntroScreen()
-            }
-            composable(
-                route = Routes.ZONES,
-                arguments = listOf(
-                    navArgument("areaId") { type = NavType.LongType }
+            composable<Destinations.Intro> {
+                IntroScreen(
+                    onIntroFinished = {
+                        navController.navigate(
+                            Destinations.Root,
+                            NavOptions.Builder().setLaunchSingleTop(true).build()
+                        )
+                    }
                 )
-            ) { entry ->
-                val areaId = entry.arguments?.getLong("areaId")
-                if (areaId == null) {
-                    navController.popBackStack()
-                } else CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                    ZonesScreen(areaId)
+            }
+            composable<Destinations.Area> { navBackStackEntry ->
+                val route = navBackStackEntry.toRoute<Destinations.Area>()
+                CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                    ZonesScreen(
+                        areaId = route.areaId,
+                        onBackRequested = { navController.navigateUp() },
+                        onZoneRequested = { navController.navigate(Destinations.Zone(it)) }
+                    )
                 }
             }
-            composable(
-                route = Routes.SECTORS,
-                arguments = listOf(
-                    navArgument("zoneId") { type = NavType.LongType }
-                )
-            ) { entry ->
-                val zoneId = entry.arguments?.getLong("zoneId")
-                if (zoneId == null) {
-                    navController.popBackStack()
-                } else CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                    SectorsScreen(zoneId)
+            composable<Destinations.Zone> { navBackStackEntry ->
+                val route = navBackStackEntry.toRoute<Destinations.Zone>()
+                CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                    SectorsScreen(
+                        zoneId = route.zoneId,
+                        onBackRequested = { navController.navigateUp() },
+                        onSectorRequested = { navController.navigate(Destinations.Sector(it)) }
+                    )
                 }
             }
-            composable(
-                route = Routes.PATHS,
-                arguments = listOf(
-                    navArgument("sectorId") { type = NavType.LongType },
-                    navArgument("pathId") { type = NavType.LongType }
-                )
-            ) { entry ->
-                val sectorId = entry.arguments?.getLong("sectorId")
-                val pathId = entry.arguments?.getLong("pathId")
-
-                if (sectorId == null) {
-                    navController.popBackStack()
-                } else CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                    PathsScreen(sectorId, pathId)
+            composable<Destinations.Sector> { navBackStackEntry ->
+                val route = navBackStackEntry.toRoute<Destinations.Sector>()
+                CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                    PathsScreen(
+                        sectorId = route.sectorId,
+                        highlightPathId = route.pathId,
+                        onBackRequested = { navController.navigateUp() },
+                    )
                 }
             }
         }

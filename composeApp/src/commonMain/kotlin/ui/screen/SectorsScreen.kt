@@ -5,30 +5,28 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ui.composition.LocalNavController
 import ui.model.SectorsScreenModel
-import ui.navigation.Routes
 
 @Composable
 fun SectorsScreen(
     zoneId: Long,
+    onBackRequested: () -> Unit,
+    onSectorRequested: (sectorId: Long) -> Unit,
     viewModel: SectorsScreenModel = viewModel { SectorsScreenModel() },
     scrollToId: Long? = null
 ) {
-    val navController = LocalNavController.current
-
     val zone by viewModel.parent.collectAsState()
     val sectors by viewModel.children.collectAsState()
 
     LaunchedEffect(zoneId) {
-        viewModel.load(zoneId) { navController?.navigateUp() }
+        viewModel.load(zoneId, onBackRequested)
     }
 
     DataList(
         parent = zone,
         children = sectors,
         scrollToId = scrollToId,
-        onNavigationRequested = { navController?.navigate(Routes.sector(it.id)) },
-        onNavigateUp = { navController?.navigateUp() }
+        onNavigationRequested = { onSectorRequested(it.id) },
+        onNavigateUp = onBackRequested
     )
 }
