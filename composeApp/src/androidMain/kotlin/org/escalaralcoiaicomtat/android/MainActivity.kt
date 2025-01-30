@@ -102,26 +102,26 @@ class MainActivity : ComponentActivity() {
     /**
      * Computes the initial route based on the intent data.
      *
-     * The intent data is expected to be in the form of `https://domain.tld/{type}/{id}` where
-     * `{type}` is one of `area`, `zone`, `sector` and `{id}` is the identifier of the entity.
-     *
-     * Note that paths are not supported.
+     * The intent data is expected to be in the form of:
+     * ```
+     * https://domain.tld/{areaId?}/{zoneId?}/{sectorId?}?path={pathId?}
+     * ```
      *
      * @return The initial destination or `null` if the intent data is not valid.
      */
     private fun computeStartDestination(): Destination? {
         val action: String? = intent?.action
         val data: Uri? = intent?.data
-        val path: List<String>? = data?.pathSegments
+        val pathSegments: List<Long>? = data?.pathSegments?.map(String::toLongOrNull)?.filterNotNull()
+        val pathId = data?.getQueryParameter("path")?.toLongOrNull()
 
         Napier.i { "Action: $action, data: $data" }
 
-        return if (action == Intent.ACTION_VIEW && path != null) {
-            val id = path.getOrNull(1)?.toLongOrNull() ?: return null
-             when (path.firstOrNull()) {
-                "area" -> Destinations.Area(id)
-                "zone" -> Destinations.Zone(id)
-                "sector" -> Destinations.Sector(id)
+        return if (action == Intent.ACTION_VIEW && !pathSegments.isNullOrEmpty()) {
+            when (pathSegments.size) {
+                1 -> Destinations.Area(pathSegments[0])
+                2 -> Destinations.Zone(pathSegments[0], pathSegments[1])
+                3 -> Destinations.Sector(pathSegments[0], pathSegments[1], pathSegments[2], pathId)
                 else -> null
             }
         } else {

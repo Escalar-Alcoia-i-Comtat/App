@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import platform.BackHandler
 import ui.model.SectorsScreenModel
 
 @Composable
@@ -21,6 +22,8 @@ fun SectorsScreen(
     LaunchedEffect(zoneId) {
         viewModel.load(zoneId, onBackRequested)
     }
+
+    BackHandler(onBack = onBackRequested)
 
     DataList(
         parent = zone,

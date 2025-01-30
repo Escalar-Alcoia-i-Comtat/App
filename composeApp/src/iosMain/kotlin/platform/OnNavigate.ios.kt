@@ -2,7 +2,7 @@ package platform
 
 import ui.navigation.Destination
 
-actual fun <T : Destination> onNavigate(destination: T, isSingleTop: Boolean) {
+actual fun <T : Destination> onNavigate(destination: T) {
     // nothing
 }
 

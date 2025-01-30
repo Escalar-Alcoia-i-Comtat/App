@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import network.ConnectivityStatusObserver
 import platform.PlatformNavHandler
 import platform.Updates
+import platform.initialDestination
 import platform.onNavigate
 import sync.DataSync
 import ui.composition.LocalAnimatedContentScope
@@ -30,7 +31,6 @@ import ui.composition.LocalSharedTransitionScope
 import ui.dialog.UpdateAvailableDialog
 import ui.navigation.Destination
 import ui.navigation.Destinations
-import ui.navigation.navigateBack
 import ui.navigation.navigateTo
 import ui.screen.AppScreen
 import ui.screen.IntroScreen
@@ -93,7 +93,7 @@ fun SharedTransitionScope.NavigationController(
     val initial = remember {
         if (!shownIntro) Destinations.Intro else startDestination ?: Destinations.Root
     }
-    LaunchedEffect(initial) { onNavigate(initial) }
+    LaunchedEffect(initial) { initialDestination(initial) }
     PlatformNavHandler(navController)
 
     CompositionLocalProvider(LocalSharedTransitionScope provides this) {
@@ -103,55 +103,65 @@ fun SharedTransitionScope.NavigationController(
             modifier = modifier
         ) {
             composable<Destinations.Root> {
+                LaunchedEffect(Unit) { onNavigate(Destinations.Root) }
+
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     AppScreen(
                         onAreaRequested = { areaId ->
                             navController.navigateTo(Destinations.Area(areaId))
                         },
-                        onZoneRequested = { zoneId ->
-                            navController.navigateTo(Destinations.Zone(zoneId))
+                        onZoneRequested = { parentAreaId, zoneId ->
+                            navController.navigateTo(Destinations.Zone(parentAreaId, zoneId))
                         },
-                        onSectorRequested = { sectorId, pathId ->
-                            navController.navigateTo(Destinations.Sector(sectorId, pathId))
+                        onSectorRequested = { parentAreaId, parentZoneId, sectorId, pathId ->
+                            navController.navigateTo(Destinations.Sector(parentAreaId, parentZoneId, sectorId, pathId))
                         },
                         scrollToId = initial.id
                     )
                 }
             }
             composable<Destinations.Intro> {
+                LaunchedEffect(Unit) { onNavigate(Destinations.Intro) }
+
                 IntroScreen(
                     onIntroFinished = {
-                        navController.navigateTo(Destinations.Root, true)
+                        navController.navigateTo(Destinations.Root)
                     }
                 )
             }
             composable<Destinations.Area> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Area>()
+                LaunchedEffect(Unit) { onNavigate(route) }
+
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     ZonesScreen(
                         areaId = route.areaId,
-                        onBackRequested = { navController.navigateBack() },
-                        onZoneRequested = { navController.navigateTo(Destinations.Zone(it)) }
+                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onZoneRequested = { navController.navigateTo(route.down(it)) }
                     )
                 }
             }
             composable<Destinations.Zone> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Zone>()
+                LaunchedEffect(Unit) { onNavigate(route) }
+
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     SectorsScreen(
                         zoneId = route.zoneId,
-                        onBackRequested = { navController.navigateBack() },
-                        onSectorRequested = { navController.navigateTo(Destinations.Sector(it)) }
+                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onSectorRequested = { navController.navigateTo(route.down(it)) }
                     )
                 }
             }
             composable<Destinations.Sector> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Sector>()
+                LaunchedEffect(Unit) { onNavigate(route) }
+
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     PathsScreen(
                         sectorId = route.sectorId,
                         highlightPathId = route.pathId,
-                        onBackRequested = { navController.navigateBack() },
+                        onBackRequested = { navController.navigateTo(route.up()) },
                     )
                 }
             }
