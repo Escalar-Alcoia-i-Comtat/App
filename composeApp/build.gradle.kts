@@ -268,7 +268,7 @@ kotlin {
 android {
     namespace = "org.escalaralcoiaicomtat.android"
 
-    compileSdk = 34
+    compileSdk = 35
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -277,7 +277,7 @@ android {
     defaultConfig {
         applicationId = "org.escalaralcoiaicomtat.android"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
 
         val version = getVersionForPlatform(Platform.Android)
 
