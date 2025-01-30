@@ -3,7 +3,7 @@ package platform
 import kotlinx.browser.window
 import ui.navigation.Destination
 
-actual fun <T : Destination> onNavigate(destination: T, isSingleTop: Boolean) {
+actual fun <T : Destination> onNavigate(destination: T) {
     window.history.pushState(destination.name.toJsString(), destination.name, destination.path)
 }
 

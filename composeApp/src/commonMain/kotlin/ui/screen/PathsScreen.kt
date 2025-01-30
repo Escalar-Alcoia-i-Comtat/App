@@ -78,11 +78,36 @@ import data.Path
 import data.Sector
 import data.generic.SportsGrade
 import data.generic.color
-import escalaralcoiaicomtat.composeapp.generated.resources.*
+import escalaralcoiaicomtat.composeapp.generated.resources.Res
+import escalaralcoiaicomtat.composeapp.generated.resources.action_close
+import escalaralcoiaicomtat.composeapp.generated.resources.action_tap_to_see_more
+import escalaralcoiaicomtat.composeapp.generated.resources.dialog_more_information
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_date
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_message
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_name
+import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_name_date
+import escalaralcoiaicomtat.composeapp.generated.resources.path_ending
+import escalaralcoiaicomtat.composeapp.generated.resources.path_grade
+import escalaralcoiaicomtat.composeapp.generated.resources.path_height
+import escalaralcoiaicomtat.composeapp.generated.resources.path_quickdraws
+import escalaralcoiaicomtat.composeapp.generated.resources.path_quickdraws_title
+import escalaralcoiaicomtat.composeapp.generated.resources.path_re_builder_message
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_pitons
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_pitons_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits_count
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors
+import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors_count
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import platform.BackHandler
 import ui.composition.LocalUnitsConfiguration
 import ui.icons.ClimbingAnchor
 import ui.icons.ClimbingHelmet
@@ -91,7 +116,6 @@ import ui.icons.Rope
 import ui.list.PathListItem
 import ui.model.PathsScreenModel
 import ui.reusable.CircularProgressIndicatorBox
-import utils.currentOrThrow
 import utils.format
 import utils.unit.meters
 
@@ -116,6 +140,8 @@ fun PathsScreen(
             onBackRequested()
         }
     }
+
+    BackHandler(onBack = onBackRequested)
 
     Scaffold(
         topBar = {

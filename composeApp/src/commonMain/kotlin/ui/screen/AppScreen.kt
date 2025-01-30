@@ -59,8 +59,10 @@ import escalaralcoiaicomtat.composeapp.generated.resources.status_network_unavai
 import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
+import platform.BackHandler
 import search.Filter
 import sync.SyncProcess
+import ui.composition.LocalLifecycleManager
 import ui.dialog.SearchFiltersDialog
 import ui.model.AppScreenModel
 import ui.model.SearchModel
@@ -78,8 +80,8 @@ import utils.unaccent
 @Composable
 fun AppScreen(
     onAreaRequested: (areaId: Long) -> Unit,
-    onZoneRequested: (zoneId: Long) -> Unit,
-    onSectorRequested: (sectorId: Long, pathId: Long?) -> Unit,
+    onZoneRequested: (parentAreaId: Long, zoneId: Long) -> Unit,
+    onSectorRequested: (parentAreaId: Long, parentZoneId: Long, sectorId: Long, pathId: Long?) -> Unit,
     appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     scrollToId: Long? = null
@@ -105,6 +107,9 @@ fun AppScreen(
             false
         }
     }
+
+    val lifecycleManager = LocalLifecycleManager.current
+    BackHandler { lifecycleManager.finish() }
 
     AdaptiveNavigationScaffold(
         items = listOf(
@@ -209,8 +214,8 @@ fun SearchBarLogic(
     onSearchDismissed: () -> Unit,
     onSearchQuery: (String) -> Unit,
     onAreaRequested: (areaId: Long) -> Unit,
-    onZoneRequested: (zoneId: Long) -> Unit,
-    onSectorRequested: (sectorId: Long, pathId: Long?) -> Unit,
+    onZoneRequested: (parentAreaId: Long, zoneId: Long) -> Unit,
+    onSectorRequested: (parentAreaId: Long, parentZoneId: Long, sectorId: Long, pathId: Long?) -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -322,7 +327,7 @@ fun SearchBarLogic(
                         headlineContent = { Text(zone.displayName) },
                         supportingContent = { Text("Zone") },
                         modifier = Modifier.clickable {
-                            onZoneRequested(zone.id)
+                            onZoneRequested(zone.parentAreaId, zone.id)
                             onSearchDismissed()
                         }
                     )
@@ -331,11 +336,12 @@ fun SearchBarLogic(
                     items = filteredSectors
                 ) { sector ->
                     if (sector == null) return@items
+                    val zone = zones?.find { it.id == sector.parentZoneId } ?: return@items
                     ListItem(
                         headlineContent = { Text(sector.displayName) },
                         supportingContent = { Text("Sector") },
                         modifier = Modifier.clickable {
-                            onSectorRequested(sector.id, null)
+                            onSectorRequested(zone.parentAreaId, sector.parentZoneId, sector.id, null)
                             onSearchDismissed()
                         }
                     )
@@ -344,11 +350,13 @@ fun SearchBarLogic(
                     items = filteredPaths
                 ) { path ->
                     if (path == null) return@items
+                    val sector = sectors?.find { it.id == path.parentSectorId } ?: return@items
+                    val zone = zones.find { it.id == sector.parentZoneId } ?: return@items
                     ListItem(
                         headlineContent = { Text(path.displayName) },
                         supportingContent = { Text("Path") },
                         modifier = Modifier.clickable {
-                            onSectorRequested(path.parentSectorId, path.id)
+                            onSectorRequested(zone.parentAreaId, sector.parentZoneId, path.parentSectorId, path.id)
                             onSearchDismissed()
                         }
                     )

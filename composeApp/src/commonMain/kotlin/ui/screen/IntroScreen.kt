@@ -104,15 +104,12 @@ private val pages: List<@Composable () -> Unit> = listOfNotNull(
 
 @Composable
 fun IntroScreen(onIntroFinished: () -> Unit) {
-    val lifecycleManager = LocalLifecycleManager.current
-
     val scope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState { pages.size }
 
-    BackHandler {
-        lifecycleManager.finish()
-    }
+    val lifecycleManager = LocalLifecycleManager.current
+    BackHandler { lifecycleManager.finish() }
 
     Scaffold(
         floatingActionButton = {
