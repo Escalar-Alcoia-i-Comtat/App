@@ -36,12 +36,9 @@ jobs:
         shell: bash
         run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
 
-      - name: Build AAB
-        id: build_aab
+      - name: Build WASM Distribution
+        id: build
         env:
-          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
-          KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           BASE_URL: https://escalaralcoiaicomtat.com
         run: ./gradlew :composeApp:wasmJsBrowserDistribution --no-daemon
 
