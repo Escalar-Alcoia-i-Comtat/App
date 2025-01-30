@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import network.ConnectivityStatusObserver
-import platform.PlatformNavHandler
 import platform.Updates
 import platform.initialDestination
 import platform.onNavigate
@@ -94,7 +93,6 @@ fun SharedTransitionScope.NavigationController(
         if (!shownIntro) Destinations.Intro else startDestination ?: Destinations.Root
     }
     LaunchedEffect(initial) { initialDestination(initial) }
-    PlatformNavHandler(navController)
 
     CompositionLocalProvider(LocalSharedTransitionScope provides this) {
         NavHost(
