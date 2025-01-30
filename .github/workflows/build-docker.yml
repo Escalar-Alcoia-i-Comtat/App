@@ -6,8 +6,8 @@ on:
       - master
     paths:
       - '.github/workflows/build-docker.yml'
-      - 'composeApp/commonMain/**'
-      - 'composeApp/wasmJsMain/**'
+      - 'composeApp/src/commonMain/**'
+      - 'composeApp/src/wasmJsMain/**'
       - '**/*.gradle.kts'
       - '*.properties'
       - 'gradle/**'
