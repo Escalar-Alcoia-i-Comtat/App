@@ -55,7 +55,8 @@ object Backend {
         }
     }
 
-    private val baseUrl = BuildKonfig.BASE_URL ?: "https://backend.escalaralcoiaicomtat.org"
+    const val BASE_URL_FALLBACK = "https://backend.escalaralcoiaicomtat.org"
+    private val baseUrl = BuildKonfig.BASE_URL ?: BASE_URL_FALLBACK
 
     init {
         Napier.i { "Base URL: $baseUrl" }

@@ -2,6 +2,7 @@
 agp = "8.8.0"
 androidx-activityCompose = "1.10.0"
 buildkonfig = "0.15.2"
+coil = "3.0.4"
 compose-maps = "6.4.2"
 compose-navigation = "2.8.0-alpha12"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
@@ -27,6 +28,8 @@ zoomable = "1.7.0-SNAPSHOT"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 compose-maps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-maps" }
 compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-maps" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
