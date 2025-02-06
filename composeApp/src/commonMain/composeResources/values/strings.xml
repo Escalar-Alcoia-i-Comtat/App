@@ -77,6 +77,9 @@
     <string name="update_available_dialog_message">There's a new update available to download.</string>
     <string name="update_available_dialog_message_version">There's a new update available to download. You are currently running %s and the latest version is %s.</string>
 
+    <string name="zone_information_title">Zone Information</string>
+    <string name="zone_information_location">Zone Location</string>
+
     <string name="path_height">Height</string>
     <string name="path_grade">Grade</string>
     <string name="path_quickdraws_title">You must bring at least</string>

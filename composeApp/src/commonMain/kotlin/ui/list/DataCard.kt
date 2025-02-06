@@ -95,7 +95,10 @@ fun <T: DataTypeWithImage> DataCard(
                     for (point in item.points) {
                         SmallFloatingActionButton(
                             onClick = { launchPoint(point.location, item.displayName) },
-                            modifier = Modifier.padding(bottom = 4.dp).size(32.dp)
+                            modifier = Modifier
+                                .padding(bottom = 4.dp)
+                                .padding(horizontal = 4.dp)
+                                .size(32.dp)
                         ) {
                             Icon(point.iconVector, null)
                         }

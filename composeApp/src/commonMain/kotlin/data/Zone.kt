@@ -23,4 +23,12 @@ data class Zone(
     }
 
     override fun getParentId(): Long = parentAreaId
+
+    /**
+     * Checks whether the zone has any metadata to display.
+     * @return `true` if either [point] is not null, or [points] is not empty.
+     */
+    fun hasAnyMetadata(): Boolean {
+        return point != null || points.isNotEmpty()
+    }
 }
