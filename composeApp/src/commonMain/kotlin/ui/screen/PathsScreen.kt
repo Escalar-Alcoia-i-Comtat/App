@@ -241,6 +241,16 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
                     onClick = { launchUrl(gpxDownloadUrl) }
                 )
             }
+
+            for (track in sector.tracks.orEmpty()) {
+                MetaCard(
+                    icon = track.type.icon,
+                    text = stringResource(Res.string.sector_track_external_title, track.type.displayName),
+                    message = stringResource(Res.string.sector_track_external_description),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    onClick = { launchUrl(track.url) }
+                )
+            }
         }
     }
 }
