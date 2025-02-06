@@ -28,7 +28,7 @@ data class Zone(
      * Checks whether the zone has any metadata to display.
      * @return `true` if either [point] is not null, or [points] is not empty.
      */
-    fun hasAnyMetadata(): Boolean {
-        return point != null || points.isNotEmpty()
+    override fun hasAnyMetadata(): Boolean {
+        return super.hasAnyMetadata() || points.isNotEmpty()
     }
 }

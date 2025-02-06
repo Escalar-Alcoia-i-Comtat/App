@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -82,59 +83,8 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (data is Zone) {
-                        item(key = data.id, contentType = "zone-map") {
-                            MapComposable(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .padding(bottom = 8.dp)
-                                    .widthIn(max = 600.dp)
-                                    .height(180.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .shadow(3.dp),
-                                kmzUUID = data.kmzUUID
-                            )
-                        }
-                        if (data.hasAnyMetadata()) {
-                            item(key = "title", contentType = "zone-metadata") {
-                                Text(
-                                    text = stringResource(Res.string.zone_information_title),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)
-                                )
-                            }
-                            if (data.point != null) {
-                                item(key = "point", contentType = "zone-metadata") {
-                                    LocationCard(
-                                        icon = Icons.Default.OutlinedFlag,
-                                        title = stringResource(Res.string.zone_information_location),
-                                        point = data.point,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                                    ) { launchPoint(data.point, data.displayName) }
-                                }
-                            }
-                            items(
-                                items = data.points,
-                                key = { "point-${it.hashCode()}" },
-                                contentType = { "zone-metadata" }
-                            ) { point ->
-                                LocationCard(
-                                    icon = point.iconVector,
-                                    title = point.label,
-                                    point = point.location,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                ) { launchPoint(point.location, point.label) }
-                            }
-                            item { Spacer(Modifier.height(12.dp)) }
-                        }
-                    }
+                    if (data is Zone) display(data)
+
                     if (children != null) {
                         items(
                             items = children,
@@ -155,5 +105,59 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                 }
             }
         }
+    }
+}
+
+private fun LazyListScope.display(zone: Zone) {
+    item(key = zone.id, contentType = "zone-map") {
+        MapComposable(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp)
+                .widthIn(max = 600.dp)
+                .height(180.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .shadow(3.dp),
+            kmzUUID = zone.kmzUUID
+        )
+    }
+    if (zone.hasAnyMetadata()) {
+        item(key = "title", contentType = "zone-metadata") {
+            Text(
+                text = stringResource(Res.string.zone_information_title),
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+        }
+        if (zone.point != null) {
+            item(key = "point", contentType = "zone-metadata") {
+                LocationCard(
+                    icon = Icons.Default.OutlinedFlag,
+                    title = stringResource(Res.string.zone_information_location),
+                    point = zone.point,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) { launchPoint(zone.point, zone.displayName) }
+            }
+        }
+        items(
+            items = zone.points,
+            key = { "point-${it.hashCode()}" },
+            contentType = { "zone-metadata" }
+        ) { point ->
+            LocationCard(
+                icon = point.iconVector,
+                title = point.label,
+                point = point.location,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) { launchPoint(point.location, point.label) }
+        }
+        item { Spacer(Modifier.height(12.dp)) }
     }
 }

@@ -32,4 +32,12 @@ data class Sector(
     }
 
     override fun getParentId(): Long = parentZoneId
+
+    /**
+     * Checks whether the zone has any metadata to display.
+     * @return `true` if either [point] is not null, or [tracks] is not null or empty.
+     */
+    override fun hasAnyMetadata(): Boolean {
+        return super.hasAnyMetadata() || !tracks.isNullOrEmpty()
+    }
 }
