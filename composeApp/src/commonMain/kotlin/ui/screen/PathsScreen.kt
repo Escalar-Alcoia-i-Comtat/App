@@ -434,9 +434,7 @@ private fun BottomSheetContents(
             MetaCard(
                 icon = Icons.Filled.ClimbingHelmet,
                 text = text.toString(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -446,7 +444,8 @@ private fun BottomSheetContents(
             text = description,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp)
         )
     }
 }
@@ -551,12 +550,12 @@ private fun MetaCard(
                 contentDescription = iconContentDescription,
                 modifier = Modifier
                     .padding(8.dp)
-                    .size(48.dp)
+                    .size(36.dp)
             )
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 12.dp)
+                    .padding(start = 4.dp, end = 12.dp)
                     .padding(vertical = 8.dp)
             ) {
                 Text(
