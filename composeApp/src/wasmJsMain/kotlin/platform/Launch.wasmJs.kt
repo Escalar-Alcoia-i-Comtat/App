@@ -20,3 +20,15 @@ actual fun launchPoint(point: LatLng, label: String?): Boolean {
 
     return window.open(url, "_blank")?.also(Window::focus) != null
 }
+
+/**
+ * Opens the given [url] in the default browser.
+ *
+ * @param url The address to launch.
+ *
+ * @return `true` if the point was launched successfully. `false` if there was an error, or the url
+ * could not be launched for any reason.
+ */
+actual fun launchUrl(url: String): Boolean {
+    return window.open(url, "_blank")?.also(Window::focus) != null
+}

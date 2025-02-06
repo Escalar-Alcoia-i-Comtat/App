@@ -30,8 +30,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.SwipeDownAlt
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -78,36 +82,15 @@ import data.Path
 import data.Sector
 import data.generic.SportsGrade
 import data.generic.color
-import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.action_close
-import escalaralcoiaicomtat.composeapp.generated.resources.action_tap_to_see_more
-import escalaralcoiaicomtat.composeapp.generated.resources.dialog_more_information
-import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_date
-import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_message
-import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_name
-import escalaralcoiaicomtat.composeapp.generated.resources.path_builder_name_date
-import escalaralcoiaicomtat.composeapp.generated.resources.path_ending
-import escalaralcoiaicomtat.composeapp.generated.resources.path_grade
-import escalaralcoiaicomtat.composeapp.generated.resources.path_height
-import escalaralcoiaicomtat.composeapp.generated.resources.path_quickdraws
-import escalaralcoiaicomtat.composeapp.generated.resources.path_quickdraws_title
-import escalaralcoiaicomtat.composeapp.generated.resources.path_re_builder_message
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_burils_count
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_count
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_parabolts_count
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_pitons
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_pitons_count
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_spits_count
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors
-import escalaralcoiaicomtat.composeapp.generated.resources.path_safes_tensors_count
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
+import platform.launchPoint
+import platform.launchUrl
 import ui.composition.LocalUnitsConfiguration
 import ui.icons.ClimbingAnchor
 import ui.icons.ClimbingHelmet
@@ -123,7 +106,6 @@ private val sidePathInformationPanelHeight: Dp = 500.dp
 private val sidePathInformationPanelMaxWidth: Dp = 500.dp
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
@@ -143,6 +125,31 @@ fun PathsScreen(
 
     BackHandler(onBack = onBackRequested)
 
+    PathsScreen(
+        sector,
+        paths,
+        selectedPath,
+        highlightPathId,
+        onBackRequested,
+        viewModel::selectChild
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun PathsScreen(
+    sector: Sector?,
+    paths: List<Path>?,
+    selectedPath: Path?,
+    highlightPathId: Long?,
+    onBackRequested: () -> Unit,
+    onPathClicked: (path: Path?) -> Unit
+) {
+    var showingBottomSheet by remember { mutableStateOf(false) }
+    if (showingBottomSheet && sector != null) {
+        SectorInformationBottomSheet(sector) { showingBottomSheet = false }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -150,6 +157,16 @@ fun PathsScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackRequested) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { showingBottomSheet = true }
+                    ) {
+                        Icon(
+                            Icons.Outlined.Info,
+                            stringResource(Res.string.sector_information_title)
+                        )
                     }
                 }
             )
@@ -161,8 +178,70 @@ fun PathsScreen(
             selectedPath,
             highlightPathId,
             modifier = Modifier.padding(paddingValues),
-            onPathClicked = viewModel::selectChild
+            onPathClicked = onPathClicked
         )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+                .padding(bottom = 16.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.sector_information_title),
+                style = MaterialTheme.typography.titleLarge
+            )
+            MetaCard(
+                icon = sector.sunTime.icon(),
+                text = sector.sunTime.label(),
+                message = sector.sunTime.message(),
+                modifier = Modifier.padding(vertical = 4.dp),
+            )
+            sector.point?.let { point ->
+                MetaCard(
+                    icon = Icons.Default.LocationOn,
+                    text = stringResource(Res.string.sector_information_location),
+                    message = "${point.latitude}, ${point.longitude}",
+                    modifier = Modifier.padding(vertical = 4.dp),
+                ) { launchPoint(point, sector.displayName) }
+            }
+
+            val gpxDownloadUrl = sector.getGPXDownloadURL()
+            if (sector.walkingTime != null) {
+                MetaCard(
+                    icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+                    text = stringResource(Res.string.sector_walking_time),
+                    message = pluralStringResource(
+                        Res.plurals.sector_walking_time,
+                        sector.walkingTime.toInt(),
+                        sector.walkingTime
+                    ) + (gpxDownloadUrl?.let {
+                        // If there's a GPX, add the info text
+                        "\n\n" + stringResource(Res.string.sector_track_description)
+                    } ?: ""),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    onClick = gpxDownloadUrl?.let { gpx ->
+                        { launchUrl(gpx) }
+                    }
+                )
+            } else if (gpxDownloadUrl != null) {
+                MetaCard(
+                    icon = Icons.Default.Route,
+                    text = stringResource(Res.string.sector_track_title),
+                    message = stringResource(Res.string.sector_track_description),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    onClick = { launchUrl(gpxDownloadUrl) }
+                )
+            }
+        }
     }
 }
 
@@ -390,11 +469,11 @@ private fun BottomSheetContents(
                     .padding(vertical = 4.dp)
             )
         }
-        // TODO: blank string must be converted to null
-        if (child.builder != null || child.reBuilders?.isNotEmpty() == true) {
-            val name = child.builder?.name
-            val date = child.builder?.date
-            val reBuilders = child.reBuilders
+        val pathBuilder = child.builder?.orNull()
+        val pathReBuilders = child.reBuilders?.mapNotNull { it.orNull() }
+        if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) {
+            val name = pathBuilder?.name
+            val date = pathBuilder?.date
 
             val text = StringBuilder()
             if (name != null || date != null) {
@@ -412,7 +491,7 @@ private fun BottomSheetContents(
                     )
                 )
             }
-            reBuilders?.forEach { builder ->
+            pathReBuilders?.forEach { builder ->
                 text.appendLine(
                     stringResource(Res.string.path_re_builder_message).format(
                         if (builder.name != null && builder.date != null) {
@@ -523,7 +602,9 @@ private fun MetaCard(
     iconContentDescription: String? = null,
     bigText: String? = null,
     bigTextColor: Color = Color.Unspecified,
-    dialogText: AnnotatedString? = null
+    dialogText: AnnotatedString? = null,
+    message: String? = null,
+    onClick: (() -> Unit)? = null
 ) {
     var showingDialog by remember { mutableStateOf(false) }
     if (showingDialog && dialogText != null) {
@@ -541,7 +622,15 @@ private fun MetaCard(
 
     OutlinedCard(
         modifier = Modifier
-            .clickable(enabled = dialogText != null) { showingDialog = true }
+            .clickable(
+                enabled = dialogText != null || onClick != null
+            ) {
+                if (dialogText != null) {
+                    showingDialog = true
+                } else if (onClick != null) {
+                    onClick()
+                }
+            }
             .then(modifier)
     ) {
         Row {
@@ -578,6 +667,13 @@ private fun MetaCard(
                         modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center
+                    )
+                }
+                if (message != null) {
+                    Text(
+                        text = message,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }

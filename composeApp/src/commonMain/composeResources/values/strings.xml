@@ -80,6 +80,24 @@
     <string name="zone_information_title">Zone Information</string>
     <string name="zone_information_location">Zone Location</string>
 
+    <string name="sector_information_title">Sector Information</string>
+    <string name="sector_information_location">Sector Location</string>
+    <string name="sector_walking_time">Walking Time</string>
+    <plurals name="sector_walking_time">
+        <item quantity="one">It takes approximately %1$d minute by foot from the parking to the sector.</item>
+        <item quantity="other">It takes approximately %1$d minutes by foot from the parking to the sector.</item>
+    </plurals>
+    <string name="sector_sun_none_label">No Sun</string>
+    <string name="sector_sun_none_description">This sector is on the shade all day.</string>
+    <string name="sector_sun_morning_label">Sun in the Mornings</string>
+    <string name="sector_sun_morning_description">This sector is sunny on the mornings and shady on the afternoon.</string>
+    <string name="sector_sun_afternoon_label">Sun in the Afternoons</string>
+    <string name="sector_sun_afternoon_description">This sector is sunny on the afternoon and shady on the morning.</string>
+    <string name="sector_sun_all_label">Sun all day</string>
+    <string name="sector_sun_all_description">This sector is sunny all day-long.</string>
+    <string name="sector_track_title">GPX Track</string>
+    <string name="sector_track_description">Tap to download the GPX track to use with an external application.</string>
+
     <string name="path_height">Height</string>
     <string name="path_grade">Grade</string>
     <string name="path_quickdraws_title">You must bring at least</string>

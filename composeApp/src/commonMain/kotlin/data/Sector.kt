@@ -2,6 +2,7 @@ package data
 
 import data.generic.ExternalTrack
 import data.generic.LatLng
+import data.generic.SunTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,7 +18,7 @@ data class Sector(
     val weight: String = "",
     @SerialName("walking_time") val walkingTime: Long? = null,
     override val point: LatLng? = null,
-    @SerialName("sun_time") val sunTime: String?,
+    @SerialName("sun_time") val sunTime: SunTime,
     @SerialName("zone_id") val parentZoneId: Long,
     val paths: List<Path>
 ): DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
@@ -32,6 +33,10 @@ data class Sector(
     }
 
     override fun getParentId(): Long = parentZoneId
+
+    fun getGPXDownloadURL(): String? = gpx?.let {
+        "https://backend.escalaralcoiaicomtat.org/download/$it"
+    }
 
     /**
      * Checks whether the zone has any metadata to display.
