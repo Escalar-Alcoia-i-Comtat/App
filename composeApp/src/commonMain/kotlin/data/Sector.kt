@@ -1,5 +1,6 @@
 package data
 
+import data.generic.ExternalTrack
 import data.generic.LatLng
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -11,6 +12,7 @@ data class Sector(
     @SerialName("display_name") override val displayName: String,
     override val image: String,
     val gpx: String? = null,
+    val tracks: List<ExternalTrack>? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
     @SerialName("walking_time") val walkingTime: Long? = null,
