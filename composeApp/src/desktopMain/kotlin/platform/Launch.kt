@@ -1,11 +1,6 @@
 package platform
 
 import data.generic.LatLng
-import io.github.aakira.napier.Napier
-import java.awt.Desktop
-import java.io.IOException
-import java.net.URI
-import java.net.URISyntaxException
 
 /**
  * Shows the given [point] in an external application.
@@ -19,26 +14,5 @@ import java.net.URISyntaxException
 actual fun launchPoint(point: LatLng, label: String?): Boolean {
     val url = "https://www.google.com/maps/@${point.latitude},${point.longitude},15z"
 
-    return if (Desktop.isDesktopSupported()) {
-        val desktop = Desktop.getDesktop()
-        try {
-            desktop.browse(URI(url))
-            true
-        } catch (e: IOException) {
-            Napier.e(throwable = e) { "Could not launch point url." }
-            false
-        } catch (e: URISyntaxException) {
-            Napier.e(throwable = e) { "Could not launch point url." }
-            false
-        }
-    } else {
-        val runtime = Runtime.getRuntime()
-        try {
-            runtime.exec("xdg-open $url")
-            true
-        } catch (e: IOException) {
-            Napier.e(throwable = e) { "Could not launch point url." }
-            false
-        }
-    }
+    return launchUrl(url)
 }
