@@ -31,6 +31,10 @@
     <string name="settings_category_general">Configuració General</string>
     <string name="settings_units_distance">Unitats de Distància</string>
     <string name="settings_category_app_info">Informació de l\'aplicació</string>
+    <string name="settings_app_info_last_sync_title">Synchronized Data</string>
+    <string name="settings_app_info_last_sync_never">Never synchronized</string>
+    <string name="settings_app_info_last_sync_no_cause">Last synchronization: %1$s</string>
+    <string name="settings_app_info_last_sync_message">Last synchronization: %1$s. Cause: %2$s</string>
     <string name="settings_app_info_version">Versió de l\'Aplicació</string>
     <string name="settings_app_info_version_code">Versió de l\'Aplicació i Codi</string>
     <string name="settings_app_info_build_date">Data de Compilació</string>
