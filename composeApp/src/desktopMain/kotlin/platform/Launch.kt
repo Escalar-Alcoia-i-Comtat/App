@@ -1,6 +1,8 @@
 package platform
 
 import data.generic.LatLng
+import io.ktor.http.URLBuilder
+import io.ktor.http.appendPathSegments
 
 /**
  * Shows the given [point] in an external application.
@@ -12,7 +14,9 @@ import data.generic.LatLng
  * launched for any reason.
  */
 actual fun launchPoint(point: LatLng, label: String?): Boolean {
-    val url = "https://www.google.com/maps/@${point.latitude},${point.longitude},15z"
+    val url = URLBuilder("https://www.google.com")
+        .appendPathSegments("maps", "@${point.latitude},${point.longitude},15z")
+        .build()
 
     return launchUrl(url)
 }
