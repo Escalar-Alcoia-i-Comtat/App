@@ -11,7 +11,7 @@ import kotlinx.datetime.until
 /**
  * Provides a template for objects to define synchronization routines.
  */
-abstract class SyncProcess<Result> {
+abstract class SyncProcess {
     sealed class Status {
         data object WAITING : Status()
         open class RUNNING(
@@ -41,20 +41,34 @@ abstract class SyncProcess<Result> {
     protected val mutableStatus: MutableStateFlow<Status> = MutableStateFlow(Status.WAITING)
     val status: SharedFlow<Status> get() = mutableStatus.asSharedFlow()
 
-    private val mutableResult = MutableStateFlow<Result?>(null)
-    val result: SharedFlow<Result?> get() = mutableResult.asSharedFlow()
+    interface SyncContext {
+        val arguments: Map<String, Any>
+
+        fun getString(key: String): String? = if (!arguments.containsKey(key)) {
+            null
+        } else {
+            arguments[key] as? String
+        }
+    }
 
     /**
      * When called should perform the synchronization process desired.
      */
-    protected abstract suspend fun synchronize(): Result
+    protected abstract suspend fun SyncContext.synchronize()
 
-    suspend fun start() {
+    suspend fun start(arguments: Map<String, Any?>? = null) {
         val start = Clock.System.now()
 
-        val result = synchronize()
-        Napier.v { "Emitting result..." }
-        mutableResult.emit(result)
+        val args = arguments.orEmpty()
+            .toList()
+            .mapNotNull { (key, value) -> value?.let { key to value } }
+            .toMap()
+
+        with(
+            object : SyncContext {
+                override val arguments: Map<String, Any> = args
+            }
+        ) { synchronize() }
 
         val end = Clock.System.now()
 

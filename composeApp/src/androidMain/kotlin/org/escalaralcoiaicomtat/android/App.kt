@@ -3,12 +3,12 @@ package org.escalaralcoiaicomtat.android
 import android.app.Application
 import cache.StorageProvider
 import cache.storageProvider
-import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import database.getDatabaseBuilder
 import database.roomDatabaseBuilder
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import push.PushNotifications
 
 class App: Application() {
     override fun onCreate() {
@@ -26,7 +26,7 @@ class App: Application() {
         roomDatabaseBuilder = getDatabaseBuilder(this)
 
         // Configure Push Notifications
-        NotifierManager.initialize(
+        PushNotifications.initialize(
             configuration = NotificationPlatformConfiguration.Android(
                 notificationIconResId = R.drawable.ic_launcher_foreground,
                 showPushNotification = false

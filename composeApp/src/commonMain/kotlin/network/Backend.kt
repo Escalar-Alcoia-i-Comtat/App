@@ -2,6 +2,9 @@ package network
 
 import build.BuildKonfig
 import data.Area
+import data.Path
+import data.Sector
+import data.Zone
 import exception.ServerException
 import io.github.aakira.napier.Napier
 import io.ktor.client.call.NoTransformationFoundException
@@ -23,10 +26,14 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import network.response.DataResponse
 import network.response.ErrorResponse
+import network.response.data.AreaData
 import network.response.data.AreasData
 import network.response.data.DataResponseType
 import network.response.data.FileListRequestData
 import network.response.data.FileRequestData
+import network.response.data.PathData
+import network.response.data.SectorData
+import network.response.data.ZoneData
 import platform.httpCacheStorage
 
 /**
@@ -71,10 +78,10 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend fun <DataType : DataResponseType> decodeBody(
+    private suspend fun <DT : DataResponseType> decodeBody(
         response: HttpResponse,
-        deserializer: DeserializationStrategy<DataType>,
-    ): DataType {
+        deserializer: DeserializationStrategy<DT>,
+    ): DT {
         return try {
             val url = response.request.url
             val status = response.status.value
@@ -112,7 +119,8 @@ object Backend {
     /**
      * Runs an HTTP GET request to the backend server, at the given path.
      *
-     * @param pathComponents The components of the path to request.
+     * @param pathComponents The components of the path to request. If not [String], will be
+     * converted into one automatically using the class's `toString` function.
      * @param progress If not null, will be called with the progress of the request.
      *
      * @return The response given by the server, of the type desired.
@@ -121,16 +129,16 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend fun <DataType : DataResponseType> get(
-        deserializer: DeserializationStrategy<DataType>,
-        vararg pathComponents: String,
+    private suspend fun <DT : DataResponseType> get(
+        deserializer: DeserializationStrategy<DT>,
+        vararg pathComponents: Any,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): DataType {
+    ): DT {
         var length: Long = 0
         progress?.invoke(0, length)
         val response = client.get(
             URLBuilder(baseUrl)
-                .appendPathSegments(*pathComponents)
+                .appendPathSegments(pathComponents.map { it.toString() })
                 .build()
                 .also { Napier.v("GET :: $it") }
         ) {
@@ -142,6 +150,38 @@ object Backend {
         }
         progress?.invoke(length, length)
         return decodeBody(response, deserializer)
+    }
+
+    /**
+     * Runs an HTTP GET request to the backend server, at the given path.
+     *
+     * If the server responds with error code `2` (_The requested data was not found_), the function
+     * returns `null`.
+     * Any other error will be thrown.
+     *
+     * @param pathComponents The components of the path to request. If not [String], will be
+     * converted into one automatically using the class's `toString` function.
+     * @param progress If not null, will be called with the progress of the request.
+     *
+     * @return The response given by the server, of the type desired.
+     *
+     * @throws ServerException If the server responded with an exception, or the body of the body of
+     * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
+     */
+    private suspend fun <DT : DataResponseType> getOrNull(
+        deserializer: DeserializationStrategy<DT>,
+        vararg pathComponents: Any,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): DT? {
+        try {
+            return get(deserializer, *pathComponents, progress = progress)
+        } catch (e: ServerException) {
+            if (e.code == 2) { // The requested data was not found.
+                return null
+            }
+            throw e
+        }
     }
 
     /**
@@ -159,6 +199,34 @@ object Backend {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): List<Area> {
         return get(AreasData.serializer(), "tree", progress = progress).areas
+    }
+
+    suspend fun area(
+        id: Int,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): Area? {
+        return getOrNull(AreaData.serializer(), "area", id, progress = progress)?.asArea()
+    }
+
+    suspend fun zone(
+        id: Int,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): Zone? {
+        return getOrNull(ZoneData.serializer(), "zone", id, progress = progress)?.asZone()
+    }
+
+    suspend fun sector(
+        id: Int,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): Sector? {
+        return getOrNull(SectorData.serializer(), "sector", id, progress = progress)?.asSector()
+    }
+
+    suspend fun path(
+        id: Int,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): Path? {
+        return getOrNull(PathData.serializer(), "path", id, progress = progress)?.asPath()
     }
 
     /**

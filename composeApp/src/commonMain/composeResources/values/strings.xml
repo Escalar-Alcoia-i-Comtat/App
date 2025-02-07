@@ -37,6 +37,10 @@
     <string name="settings_units_distance">Distance Units</string>
 
     <string name="settings_category_app_info">Application Information</string>
+    <string name="settings_app_info_last_sync_title">Synchronized Data</string>
+    <string name="settings_app_info_last_sync_never">Never synchronized</string>
+    <string name="settings_app_info_last_sync_no_cause">Last synchronization: %1$s</string>
+    <string name="settings_app_info_last_sync_message">Last synchronization: %1$s. Cause: %2$s</string>
     <string name="settings_app_info_version">App Version</string>
     <string name="settings_app_info_version_code">App Version and Code</string>
     <string name="settings_app_info_build_date">Build Date</string>

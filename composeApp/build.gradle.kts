@@ -200,9 +200,6 @@ kotlin {
             implementation(libs.multiplatformSettings.base)
             implementation(libs.multiplatformSettings.coroutines)
             implementation(libs.multiplatformSettings.makeObservable)
-
-            // Push Notifications
-            implementation(libs.kmpnotifier)
         }
 
         commonTest.dependencies {
@@ -219,8 +216,17 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
+        val pushMain by creating {
             dependsOn(platformMain)
+
+            dependencies {
+                // Push Notifications
+                implementation(libs.kmpnotifier)
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(pushMain)
 
             dependencies {
                 implementation(libs.androidx.activity.compose)
@@ -250,7 +256,7 @@ kotlin {
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
-            dependsOn(platformMain)
+            dependsOn(pushMain)
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)

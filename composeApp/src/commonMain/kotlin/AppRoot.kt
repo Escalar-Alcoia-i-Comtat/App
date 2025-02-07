@@ -55,7 +55,7 @@ fun AppRoot(
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            DataSync.start()
+            DataSync.start(DataSync.Cause.Scheduled)
         }
     }
 
