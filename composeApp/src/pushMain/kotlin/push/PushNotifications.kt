@@ -4,7 +4,12 @@ import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.PayloadData
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import sync.DataSync
 
 object PushNotifications {
     private const val TOPIC_CREATED = "created"
@@ -30,12 +35,16 @@ object PushNotifications {
                 val type = data[DATA_TYPE] as? String ?: return
                 val idStr = data[DATA_ID] as? String ?: return
                 val id = idStr.toIntOrNull() ?: return
-                // TODO: Synchronize specific data
-                when (type) {
-                    TYPE_AREA -> {}
-                    TYPE_ZONE -> {}
-                    TYPE_SECTOR -> {}
-                    TYPE_PATH -> {}
+                val dataType = when (type) {
+                    TYPE_AREA -> DataSync.DataType.Area
+                    TYPE_ZONE -> DataSync.DataType.Zone
+                    TYPE_SECTOR -> DataSync.DataType.Sector
+                    TYPE_PATH -> DataSync.DataType.Path
+                    else -> return Napier.e { "Received a push notification with an unknown type: $type" }
+                }
+                CoroutineScope(Dispatchers.IO).launch {
+                    Napier.i { "Scheduling sync for $dataType..." }
+                    DataSync.start(DataSync.Cause.Push, dataType to id)
                 }
             }
         })
