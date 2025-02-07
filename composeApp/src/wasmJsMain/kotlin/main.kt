@@ -1,3 +1,4 @@
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import cache.StorageProvider
@@ -11,6 +12,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.w3c.dom.get
 import org.w3c.dom.url.URLSearchParams
+import ui.Locales
 import ui.navigation.Destination
 import ui.navigation.Destinations
 
@@ -35,6 +37,11 @@ fun main() {
     val startDestination = getStartDestinationFromSession()
 
     ComposeViewport(document.body!!) {
+        LaunchedEffect(Unit) {
+            val lang = window.navigator.language
+            document.body?.lang = Locales.valueOf(lang)
+        }
+
         AppRoot(startDestination = startDestination)
     }
 }
