@@ -19,10 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cache.ImageStorage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import data.DataTypeWithImage
 import data.DataTypeWithPoint
 import platform.launchPoint
@@ -56,16 +55,6 @@ fun <T: DataTypeWithImage> DataCard(
             fontSize = 20.sp
         )
 
-        var progress by remember { mutableStateOf<Float?>(null) }
-        val image by ImageStorage.collectStateOf(item.image) { current, max ->
-            max ?: return@collectStateOf
-            progress = if (current == max) {
-                null
-            } else {
-                (current.toDouble() / max).toFloat()
-            }
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,16 +62,27 @@ fun <T: DataTypeWithImage> DataCard(
                 .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
-            image?.let { bitmap ->
-                Image(
-                    bitmap = bitmap,
-                    contentDescription = item.displayName,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            } ?: progress?.let { CircularProgressIndicator({ it }) } ?: CircularProgressIndicator()
+            val painter = rememberAsyncImagePainter(item.imageUrl())
+            val state by painter.state.collectAsState()
+            when (state) {
+                is AsyncImagePainter.State.Empty,
+                is AsyncImagePainter.State.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is AsyncImagePainter.State.Success -> {
+                    Image(
+                        painter = painter,
+                        contentDescription = item.displayName,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                is AsyncImagePainter.State.Error -> {
+                    // Show some error UI.
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart),

@@ -15,6 +15,7 @@ import network.Backend
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import utils.IO
 
+@Deprecated("Use Coil instead")
 object ImageStorage {
 
     @Composable

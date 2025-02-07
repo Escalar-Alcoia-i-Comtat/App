@@ -170,6 +170,10 @@ kotlin {
             // Compose - Zoomable
             implementation(libs.zoomable)
 
+            // Coil
+            implementation(libs.coil.compose)
+            implementation(libs.coil.ktor3)
+
             // Logging library
             implementation(libs.napier)
 
