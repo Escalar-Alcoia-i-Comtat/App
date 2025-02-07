@@ -1,22 +1,14 @@
 package sync
 
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import com.russhwolf.settings.set
 import data.Area
-import data.Path
-import data.Sector
-import data.Zone
+import database.DatabaseInterface
 import database.SettingsKeys
 import database.settings
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
 import network.Backend
 
-@OptIn(ExperimentalSettingsApi::class)
 object DataSync : SyncProcess<List<Area>>() {
     /**
      * Synchronizes the data from the server with the local database.
@@ -31,18 +23,18 @@ object DataSync : SyncProcess<List<Area>>() {
         val areas = Backend.tree()
         Napier.d { "Got ${areas.size} areas" }
 
-        val zones = areas.flatMap { it.zones }
-        val sectors = zones.flatMap { it.sectors }
-        val paths = sectors.flatMap { it.paths }
+        @Suppress("DEPRECATION") val zones = areas.flatMap { it.zones }
+        @Suppress("DEPRECATION") val sectors = zones.flatMap { it.sectors }
+        @Suppress("DEPRECATION") val paths = sectors.flatMap { it.paths }
 
         Napier.d { "Saving areas..." }
-        settings[SettingsKeys.AREAS] = Json.encodeToString(ListSerializer(Area.serializer()), areas)
+        DatabaseInterface.areas().updateOrInsert(areas)
         Napier.d { "Saving zones..." }
-        settings[SettingsKeys.ZONES] = Json.encodeToString(ListSerializer(Zone.serializer()), zones)
+        DatabaseInterface.zones().updateOrInsert(zones)
         Napier.d { "Saving sectors..." }
-        settings[SettingsKeys.SECTORS] = Json.encodeToString(ListSerializer(Sector.serializer()), sectors)
+        DatabaseInterface.sectors().updateOrInsert(sectors)
         Napier.d { "Saving paths..." }
-        settings[SettingsKeys.PATHS] = Json.encodeToString(ListSerializer(Path.serializer()), paths)
+        DatabaseInterface.paths().updateOrInsert(paths)
 
         settings[SettingsKeys.LAST_SYNC] = Clock.System.now().toEpochMilliseconds()
 
@@ -54,20 +46,8 @@ object DataSync : SyncProcess<List<Area>>() {
         mutableStatus.emit(Status.FINISHED)
     }
 
-    val areas = settings.getStringOrNullFlow(SettingsKeys.AREAS)
-        .map { json ->
-            json?.let { Json.decodeFromString(ListSerializer(Area.serializer()), it) }
-        }
-    val zones = settings.getStringOrNullFlow(SettingsKeys.ZONES)
-        .map { json ->
-            json?.let { Json.decodeFromString(ListSerializer(Zone.serializer()), it) }
-        }
-    val sectors = settings.getStringOrNullFlow(SettingsKeys.SECTORS)
-        .map { json ->
-            json?.let { Json.decodeFromString(ListSerializer(Sector.serializer()), it) }
-        }
-    val paths = settings.getStringOrNullFlow(SettingsKeys.PATHS)
-        .map { json ->
-            json?.let { Json.decodeFromString(ListSerializer(Path.serializer()), it) }
-        }
+    val areas = DatabaseInterface.areas().allLive()
+    val zones = DatabaseInterface.zones().allLive()
+    val sectors = DatabaseInterface.sectors().allLive()
+    val paths = DatabaseInterface.paths().allLive()
 }

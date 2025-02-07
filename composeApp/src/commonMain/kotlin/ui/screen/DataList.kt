@@ -128,8 +128,9 @@ private fun LazyListScope.display(zone: Zone) {
                 text = stringResource(Res.string.zone_information_title),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .widthIn(max = 600.dp)
                     .fillMaxWidth()
-                    .padding(8.dp)
             )
         }
         if (zone.point != null) {
@@ -139,8 +140,9 @@ private fun LazyListScope.display(zone: Zone) {
                     title = stringResource(Res.string.zone_information_location),
                     point = zone.point,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .widthIn(max = 600.dp)
+                        .fillMaxWidth()
                 ) { launchPoint(zone.point, zone.displayName) }
             }
         }
@@ -154,8 +156,9 @@ private fun LazyListScope.display(zone: Zone) {
                 title = point.label,
                 point = point.location,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth()
             ) { launchPoint(point.location, point.label) }
         }
         item { Spacer(Modifier.height(12.dp)) }
