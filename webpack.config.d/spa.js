@@ -1,7 +1,8 @@
 config.devServer = {
     ...config.devServer,
-    historyApiFallback: {
-        index: '/',
-        disableDotRule: true,
-    },
+    historyApiFallback: true,
+};
+config.output = {
+    ...config.output,
+    publicPath: '/',
 };
