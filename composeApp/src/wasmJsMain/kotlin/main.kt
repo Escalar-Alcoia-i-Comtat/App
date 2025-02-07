@@ -3,8 +3,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import cache.StorageProvider
 import cache.storageProvider
-import com.mmk.kmpnotifier.notification.NotifierManager
-import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.browser.document
@@ -24,13 +22,6 @@ fun main() {
     Napier.base(DebugAntilog())
 
     storageProvider = StorageProvider()
-
-    // Configure Push Notifications
-    NotifierManager.initialize(
-        NotificationPlatformConfiguration.Web(
-            askNotificationPermissionOnStart = false,
-        )
-    )
 
     calculateStartDestination()?.let { startDestination ->
         // If startDestination is not null, it means that the current path is not root. Right now, even

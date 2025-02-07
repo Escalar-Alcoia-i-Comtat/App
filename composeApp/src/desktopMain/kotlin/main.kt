@@ -9,8 +9,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import cache.StorageProvider
 import cache.storageProvider
-import com.mmk.kmpnotifier.notification.NotifierManager
-import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import database.getDatabaseBuilder
 import database.roomDatabaseBuilder
 import escalaralcoiaicomtat.composeapp.generated.resources.*
@@ -35,13 +33,6 @@ fun main() = application {
     CoroutineScope(Dispatchers.IO).launch {
         Updates.checkForUpdates()
     }
-
-    // Configure Push Notifications
-    NotifierManager.initialize(
-        NotificationPlatformConfiguration.Desktop(
-            showPushNotification = false,
-        )
-    )
 
     Window(
         title = "Escalar Alcoià i Comtat",
