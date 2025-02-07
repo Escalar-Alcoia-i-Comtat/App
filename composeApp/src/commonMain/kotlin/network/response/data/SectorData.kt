@@ -1,10 +1,8 @@
 package network.response.data
 
 import data.Sector
-import data.Zone
 import data.generic.ExternalTrack
 import data.generic.LatLng
-import data.generic.Point
 import data.generic.SunTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

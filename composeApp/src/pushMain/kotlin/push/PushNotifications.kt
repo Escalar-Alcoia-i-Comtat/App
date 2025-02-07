@@ -5,7 +5,6 @@ import com.mmk.kmpnotifier.notification.PayloadData
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.runBlocking
-import network.Backend
 
 object PushNotifications {
     private const val TOPIC_CREATED = "created"
@@ -31,8 +30,12 @@ object PushNotifications {
                 val type = data[DATA_TYPE] as? String ?: return
                 val idStr = data[DATA_ID] as? String ?: return
                 val id = idStr.toIntOrNull() ?: return
+                // TODO: Synchronize specific data
                 when (type) {
-                    TYPE_AREA -> Backend.area(id)
+                    TYPE_AREA -> {}
+                    TYPE_ZONE -> {}
+                    TYPE_SECTOR -> {}
+                    TYPE_PATH -> {}
                 }
             }
         })

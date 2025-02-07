@@ -1,12 +1,9 @@
 package network.response.data
 
 import data.Path
-import data.Zone
 import data.generic.Builder
 import data.generic.Ending
-import data.generic.LatLng
 import data.generic.PitchInfo
-import data.generic.Point
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

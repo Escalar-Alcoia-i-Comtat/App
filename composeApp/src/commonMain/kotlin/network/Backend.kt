@@ -71,7 +71,7 @@ object Backend {
     }
 
     /**
-     * If the request was successful, extracts a [DataResponse] with type [DataType] from its body.
+     * If the request was successful, extracts a [DataResponse] with type [DT] from its body.
      * Otherwise extracts the error given, and throws it as a [ServerException].
      *
      * @throws ServerException If the server responded with an exception, or the body of the body of

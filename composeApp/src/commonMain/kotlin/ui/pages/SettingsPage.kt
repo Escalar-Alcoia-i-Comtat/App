@@ -33,7 +33,6 @@ import database.SettingsKeys
 import database.settings
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
@@ -117,13 +116,13 @@ fun SettingsPage() {
                         ?.let { cause ->
                             stringResource(
                                 Res.string.settings_app_info_last_sync_message,
-                                localDateTime.toString(),
+                                localDateTime,
                                 cause.name
                             )
                         }
                         ?: stringResource(
                             Res.string.settings_app_info_last_sync_no_cause,
-                            localDateTime.toString()
+                            localDateTime
                         )
                 } ?: stringResource(Res.string.settings_app_info_last_sync_never),
                 icon = Icons.Outlined.Info
