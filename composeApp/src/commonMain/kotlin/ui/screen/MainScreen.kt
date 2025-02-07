@@ -21,37 +21,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.Area
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import platform.BackHandler
-import sync.DataSync
 import sync.SyncProcess
 import ui.composition.LocalLifecycleManager
 import ui.list.DataCard
-import utils.IO
 
 @Composable
 fun MainScreen(
-    areas: List<Area>?,
+    areas: List<Area>,
     syncStatus: SyncProcess.Status?,
     onAreaRequested: (areaId: Long) -> Unit,
     scrollToId: Long? = null
 ) {
     val lifecycleManager = LocalLifecycleManager.current
 
-    LaunchedEffect(Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            DataSync.start()
-        }
-    }
-
     BackHandler {
         lifecycleManager.finish()
     }
 
     AnimatedVisibility(
-        visible = areas.isNullOrEmpty() && (syncStatus is SyncProcess.Status.RUNNING || syncStatus == SyncProcess.Status.WAITING),
+        visible = areas.isEmpty() && (syncStatus is SyncProcess.Status.RUNNING || syncStatus == SyncProcess.Status.WAITING),
         modifier = Modifier.fillMaxSize()
     ) {
         Box(

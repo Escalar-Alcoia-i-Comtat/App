@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.runBlocking
 
 /**
  * Set to true when the user has made the "back" gesture.
@@ -21,8 +20,8 @@ actual fun BackHandler(enabled: Boolean, onBack: () -> Unit) {
             onBack()
             // Set back to false
             synchronized(backEventReceiver) {
-                if (backEventReceiver.value) runBlocking {
-                    backEventReceiver.emit(false)
+                if (backEventReceiver.value) {
+                    backEventReceiver.tryEmit(false)
                 }
             }
         }

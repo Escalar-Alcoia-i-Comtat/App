@@ -11,13 +11,13 @@ import kotlinx.datetime.until
 /**
  * Provides a template for objects to define synchronization routines.
  */
-abstract class SyncProcess <Result> {
+abstract class SyncProcess<Result> {
     sealed class Status {
-        data object WAITING: Status()
+        data object WAITING : Status()
         open class RUNNING(
             val progress: Float
-        ): Status() {
-            data object Indeterminate: RUNNING(-1f)
+        ) : Status() {
+            data object Indeterminate : RUNNING(-1f)
 
             val isIndeterminate: Boolean = progress < 0f
 
@@ -27,16 +27,15 @@ abstract class SyncProcess <Result> {
 
                 other as RUNNING
 
-                if (progress != other.progress) return false
-
-                return true
+                return progress == other.progress
             }
 
             override fun hashCode(): Int {
                 return progress.hashCode()
             }
         }
-        data object FINISHED: Status()
+
+        data object FINISHED : Status()
     }
 
     protected val mutableStatus: MutableStateFlow<Status> = MutableStateFlow(Status.WAITING)

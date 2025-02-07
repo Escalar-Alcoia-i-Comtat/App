@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import cache.StorageProvider
@@ -35,7 +34,6 @@ fun main() = application {
         Updates.checkForUpdates()
     }
 
-    val density = LocalDensity.current
     Window(
         title = "Escalar Alcoià i Comtat",
         icon = painterResource(Res.drawable.icon),
@@ -45,8 +43,8 @@ fun main() = application {
         AppRoot(
             modifier = Modifier
                 .onPointerEvent(PointerEventType.Press) {
-                    if (it.button == PointerButton.Back) CoroutineScope(Dispatchers.IO).launch {
-                        backEventReceiver.emit(true)
+                    if (it.button == PointerButton.Back) {
+                        backEventReceiver.tryEmit(true)
                     }
                 }
         )
