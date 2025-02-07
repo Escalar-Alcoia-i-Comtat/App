@@ -2,6 +2,7 @@ package database.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import data.Sector
 import data.generic.ExternalTrack
@@ -11,6 +12,7 @@ import database.appDatabase
 import kotlinx.datetime.Instant
 
 @Entity(
+    indices = [Index("parentZoneId", unique = true)],
     foreignKeys = [
         ForeignKey(
             entity = ZoneEntity::class,

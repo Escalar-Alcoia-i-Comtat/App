@@ -2,6 +2,7 @@ package database.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import data.Zone
 import data.generic.LatLng
@@ -10,6 +11,7 @@ import database.appDatabase
 import kotlinx.datetime.Instant
 
 @Entity(
+    indices = [Index("parentAreaId", unique = true)],
     foreignKeys = [
         ForeignKey(
             entity = AreaEntity::class,

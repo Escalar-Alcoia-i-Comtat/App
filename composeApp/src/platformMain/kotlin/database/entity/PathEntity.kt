@@ -2,6 +2,7 @@ package database.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import data.Path
 import data.generic.Builder
@@ -10,6 +11,7 @@ import data.generic.PitchInfo
 import kotlinx.datetime.Instant
 
 @Entity(
+    indices = [Index("parentSectorId", unique = true)],
     foreignKeys = [
         ForeignKey(
             entity = SectorEntity::class,
