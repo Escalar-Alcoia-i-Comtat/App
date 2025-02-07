@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.buildkonfig)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.gms)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
@@ -133,6 +134,11 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+
+            export(libs.kmpnotifier)
+
+            // Room - Required when using NativeSQLiteDriver
+            linkerOpts.add("-lsqlite3")
         }
     }
 
@@ -194,6 +200,9 @@ kotlin {
             implementation(libs.multiplatformSettings.base)
             implementation(libs.multiplatformSettings.coroutines)
             implementation(libs.multiplatformSettings.makeObservable)
+
+            // Push Notifications
+            implementation(libs.kmpnotifier)
         }
 
         commonTest.dependencies {

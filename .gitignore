@@ -19,3 +19,4 @@ captures
 **/*.apk
 keystore.jks
 .kotlin
+google-services.json
