@@ -17,6 +17,8 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.mmk.kmpnotifier.extensions.onCreateOrOnNewIntent
+import com.mmk.kmpnotifier.notification.NotifierManager
 import io.github.aakira.napier.Napier
 import platform.Updates
 import ui.navigation.Destination
@@ -62,6 +64,9 @@ class MainActivity : ComponentActivity() {
 
         instance = this
 
+        // Send intent to handle notifications
+        NotifierManager.onCreateOrOnNewIntent(intent)
+
         val startDestination = computeStartDestination()
         setContent {
             AppRoot(startDestination = startDestination)
@@ -96,6 +101,13 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         instance = null
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        // Send intent to handle notifications
+        NotifierManager.onCreateOrOnNewIntent(intent)
     }
 
 

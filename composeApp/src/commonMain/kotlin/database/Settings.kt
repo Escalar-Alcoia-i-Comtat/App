@@ -8,7 +8,12 @@ object SettingsKeys {
     /**
      * The timestamp of the moment the last synchronization was run.
      */
-    const val LAST_SYNC = "last_sync"
+    const val LAST_SYNC_TIME = "last_sync_time"
+
+    /**
+     * The cause that triggered the last synchronization.
+     */
+    const val LAST_SYNC_CAUSE = "last_sync_cause"
 
     /**
      * Whether the intro screen has been shown or not.

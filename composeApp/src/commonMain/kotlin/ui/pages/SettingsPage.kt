@@ -27,8 +27,16 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import build.BuildKonfig
 import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.coroutines.getLongOrNullFlow
+import com.russhwolf.settings.coroutines.getStringOrNullFlow
+import database.SettingsKeys
+import database.settings
 import escalaralcoiaicomtat.composeapp.generated.resources.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
+import sync.DataSync
 import ui.composition.LocalUnitsConfiguration
 import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
@@ -41,6 +49,11 @@ import utils.unit.DistanceUnits
 fun SettingsPage() {
     val uriHandler = LocalUriHandler.current
     val unitsConfiguration = LocalUnitsConfiguration.current
+
+    val lastSyncTime by settings.getLongOrNullFlow(SettingsKeys.LAST_SYNC_TIME)
+        .collectAsState(null)
+    val lastSyncCause by settings.getStringOrNullFlow(SettingsKeys.LAST_SYNC_CAUSE)
+        .collectAsState(null)
 
     Column(
         modifier = Modifier
@@ -79,6 +92,40 @@ fun SettingsPage() {
             Spacer(Modifier.height(16.dp))
             SettingsCategory(
                 text = stringResource(Res.string.settings_category_app_info)
+            )
+            SettingsRow(
+                headline = stringResource(Res.string.settings_app_info_last_sync_title),
+                summary = lastSyncTime?.let { time ->
+                    val localDateTime = Instant.fromEpochMilliseconds(time)
+                        .toLocalDateTime(TimeZone.currentSystemDefault())
+                        .let {
+                            StringBuilder()
+                                .append(it.year)
+                                .append('/')
+                                .append(it.monthNumber.toString().padStart(2, '0'))
+                                .append('/')
+                                .append(it.dayOfMonth.toString().padStart(2, '0'))
+                                .append(' ')
+                                .append(it.hour.toString().padStart(2, '0'))
+                                .append(':')
+                                .append(it.minute.toString().padStart(2, '0'))
+                                .toString()
+                        }
+                    lastSyncCause
+                        ?.let { cause -> DataSync.Cause.entries.find { it.name == cause } }
+                        ?.let { cause ->
+                            stringResource(
+                                Res.string.settings_app_info_last_sync_message,
+                                localDateTime,
+                                cause.name
+                            )
+                        }
+                        ?: stringResource(
+                            Res.string.settings_app_info_last_sync_no_cause,
+                            localDateTime
+                        )
+                } ?: stringResource(Res.string.settings_app_info_last_sync_never),
+                icon = Icons.Outlined.Info
             )
             BuildKonfig.VERSION_CODE?.let { versionCode ->
                 SettingsRow(
