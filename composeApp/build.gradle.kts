@@ -21,6 +21,8 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 fun readProperties(fileName: String): Properties? {
@@ -194,8 +196,18 @@ kotlin {
             implementation(libs.kotlin.test)
         }
 
-        val androidMain by getting {
+        val platformMain by creating {
             dependsOn(commonMain.get())
+
+            dependencies {
+                // Room
+                implementation(libs.room.bundledSqlite)
+                implementation(libs.room.runtime)
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(platformMain)
 
             dependencies {
                 implementation(libs.androidx.activity.compose)
@@ -225,7 +237,7 @@ kotlin {
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
-            dependsOn(commonMain.get())
+            dependsOn(platformMain)
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
@@ -243,7 +255,7 @@ kotlin {
         }
 
         val desktopMain by getting {
-            dependsOn(commonMain.get())
+            dependsOn(platformMain)
 
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -263,6 +275,22 @@ kotlin {
             }
         }
     }
+}
+
+dependencies {
+    implementation(libs.androidx.room.ktx)
+    debugImplementation(compose.uiTooling)
+
+    // Room Compilers
+    add("kspCommonMainMetadata", libs.room.compiler)
+
+    add("kspAndroid", libs.room.compiler)
+
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+
+    add("kspDesktop", libs.room.compiler)
 }
 
 android {
@@ -389,6 +417,10 @@ compose.desktop {
             }
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 buildkonfig {

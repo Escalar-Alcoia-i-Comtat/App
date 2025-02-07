@@ -6,16 +6,12 @@ import data.DataType
 import data.DataTypeWithImage
 import data.DataTypeWithParent
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
-import sync.DataSync
 import utils.IO
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWithParent>(
@@ -41,23 +37,6 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
     private val _displayingChild = MutableStateFlow<Children?>(null)
 
     fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        // Wait for the data to be available for up to 5 seconds.
-        withTimeout(5_000) {
-            try {
-                Napier.d { "Waiting for data to be available" }
-                launch {
-                    DataSync.areas.collect { areasList ->
-                        if (areasList != null) {
-                            Napier.d { "Data is available" }
-                            cancel("Data is available")
-                        }
-                    }
-                }.join()
-            } catch (_: CancellationException) {
-                // load was correct
-            }
-        }
-
         val dbChildren = childrenListAccessor(id)
         _children.emit(
             if (sortChildren) dbChildren.sorted()

@@ -20,6 +20,14 @@ data class Sector(
     override val point: LatLng? = null,
     @SerialName("sun_time") val sunTime: SunTime,
     @SerialName("zone_id") val parentZoneId: Long,
+
+    @Deprecated(
+        "Should not be accessed, may be empty at any moment. Used just for fetching from server.",
+        replaceWith = ReplaceWith(
+            "DatabaseInterface.paths().all().filter { it.parentSectorId == this.id }",
+            "database.DatabaseInterface"
+        )
+    )
     val paths: List<Path>
 ): DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {

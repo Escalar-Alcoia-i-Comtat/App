@@ -10,6 +10,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import cache.StorageProvider
 import cache.storageProvider
+import database.getDatabaseBuilder
+import database.roomDatabaseBuilder
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -27,6 +29,7 @@ fun main() = application {
     Napier.base(DebugAntilog())
 
     storageProvider = StorageProvider()
+    roomDatabaseBuilder = getDatabaseBuilder()
 
     CoroutineScope(Dispatchers.IO).launch {
         Updates.checkForUpdates()

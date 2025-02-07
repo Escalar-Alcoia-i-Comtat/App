@@ -50,12 +50,7 @@ import data.Area
 import data.Path
 import data.Sector
 import data.Zone
-import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.navigation_explore
-import escalaralcoiaicomtat.composeapp.generated.resources.navigation_settings
-import escalaralcoiaicomtat.composeapp.generated.resources.search
-import escalaralcoiaicomtat.composeapp.generated.resources.search_empty
-import escalaralcoiaicomtat.composeapp.generated.resources.status_network_unavailable
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
@@ -88,12 +83,15 @@ fun AppScreen(
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
-    val areas by appScreenModel.areas.collectAsState(emptyList())
+    val areas by appScreenModel.areas.collectAsState()
+    val zones by appScreenModel.zones.collectAsState()
+    val sectors by appScreenModel.sectors.collectAsState()
+    val paths by appScreenModel.paths.collectAsState()
 
     val syncStatus by appScreenModel.syncStatus.collectAsState(SyncProcess.Status.WAITING)
 
     LaunchedEffect(areas) {
-        Napier.i { "There are ${areas?.size} areas loaded" }
+        Napier.i { "There are ${areas.size} areas loaded" }
     }
 
     LaunchedKeyEvent { event ->
@@ -132,6 +130,9 @@ fun AppScreen(
                 if (searching) {
                     SearchBarLogic(
                         areas,
+                        zones,
+                        sectors,
+                        paths,
                         searchQuery,
                         isSearching,
                         searchModel.filterAreas,
@@ -175,7 +176,7 @@ fun AppScreen(
                             }
                             IconButton(
                                 onClick = searchModel::search,
-                                enabled = !areas.isNullOrEmpty()
+                                enabled = areas.isNotEmpty()
                             ) {
                                 Icon(Icons.Rounded.Search, null)
                             }
@@ -200,6 +201,9 @@ fun AppScreen(
 @Suppress("LongParameterList")
 fun SearchBarLogic(
     areas: List<Area>?,
+    zones: List<Zone>?,
+    sectors: List<Sector>?,
+    paths: List<Path>?,
     searchQuery: String,
     isSearching: Boolean,
     filterAreas: SnapshotStateList<Filter<Any>>,
@@ -240,10 +244,6 @@ fun SearchBarLogic(
             }
         }
     }
-
-    val zones = areas?.flatMap { it.zones }
-    val sectors = zones?.flatMap { it.sectors }
-    val paths = sectors?.flatMap { it.paths }
 
     LaunchedEffect(areas, filterAreas, searchQuery) {
         filter(areas, filteredAreas, Area::displayName, filterAreas)
@@ -351,7 +351,7 @@ fun SearchBarLogic(
                 ) { path ->
                     if (path == null) return@items
                     val sector = sectors?.find { it.id == path.parentSectorId } ?: return@items
-                    val zone = zones.find { it.id == sector.parentZoneId } ?: return@items
+                    val zone = zones?.find { it.id == sector.parentZoneId } ?: return@items
                     ListItem(
                         headlineContent = { Text(path.displayName) },
                         supportingContent = { Text("Path") },
