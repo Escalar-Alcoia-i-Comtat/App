@@ -3,6 +3,7 @@ package push
 import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.PayloadData
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
+import data.DataTypes
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,10 +37,10 @@ object PushNotifications {
                 val idStr = data[DATA_ID] as? String ?: return
                 val id = idStr.toIntOrNull() ?: return
                 val dataType = when (type) {
-                    TYPE_AREA -> DataSync.DataType.Area
-                    TYPE_ZONE -> DataSync.DataType.Zone
-                    TYPE_SECTOR -> DataSync.DataType.Sector
-                    TYPE_PATH -> DataSync.DataType.Path
+                    TYPE_AREA -> DataTypes.Area
+                    TYPE_ZONE -> DataTypes.Zone
+                    TYPE_SECTOR -> DataTypes.Sector
+                    TYPE_PATH -> DataTypes.Path
                     else -> return Napier.e { "Received a push notification with an unknown type: $type" }
                 }
                 CoroutineScope(Dispatchers.IO).launch {

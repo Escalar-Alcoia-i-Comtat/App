@@ -1,6 +1,7 @@
 package sync
 
 import com.russhwolf.settings.set
+import data.DataTypes
 import database.DatabaseInterface
 import database.SettingsKeys
 import database.settings
@@ -17,13 +18,9 @@ object DataSync : SyncProcess() {
         Push, Scheduled, Manual
     }
 
-    enum class DataType {
-        Area, Zone, Sector, Path
-    }
-
     suspend fun start(
         cause: Cause,
-        syncId: Pair<DataType, Int>? = null
+        syncId: Pair<DataTypes, Int>? = null
     ) = start(
         mapOf(ARG_CAUSE to cause.name, ARG_ID to syncId?.second, ARG_TYPE to syncId?.first)
     )
@@ -36,7 +33,7 @@ object DataSync : SyncProcess() {
     override suspend fun SyncContext.synchronize() {
         val cause = getString(ARG_CAUSE)?.let(Cause::valueOf)
         val id = getString(ARG_ID)?.toIntOrNull()
-        val type = getString(ARG_TYPE)?.let { t -> DataType.entries.find { it.name == t } }
+        val type = getString(ARG_TYPE)?.let { t -> DataTypes.entries.find { it.name == t } }
 
         try {
             Napier.i { "Running data synchronization..." }
@@ -49,7 +46,7 @@ object DataSync : SyncProcess() {
             if (id != null && type != null) {
                 Napier.d { "Fetching $type#$id from server..." }
                 when (type) {
-                    DataType.Area -> {
+                    DataTypes.Area -> {
                         val item = Backend.area(id, progress)
                         if (item != null) {
                             Napier.d { "Storing Area#$id..." }
@@ -59,7 +56,7 @@ object DataSync : SyncProcess() {
                         }
                     }
 
-                    DataType.Zone -> {
+                    DataTypes.Zone -> {
                         val item = Backend.zone(id, progress)
                         if (item != null) {
                             Napier.d { "Storing Zone#$id..." }
@@ -69,7 +66,7 @@ object DataSync : SyncProcess() {
                         }
                     }
 
-                    DataType.Sector -> {
+                    DataTypes.Sector -> {
                         val item = Backend.sector(id, progress)
                         if (item != null) {
                             Napier.d { "Storing Sector#$id..." }
@@ -79,7 +76,7 @@ object DataSync : SyncProcess() {
                         }
                     }
 
-                    DataType.Path -> {
+                    DataTypes.Path -> {
                         val item = Backend.path(id, progress)
                         if (item != null) {
                             Napier.d { "Storing Path#$id..." }
