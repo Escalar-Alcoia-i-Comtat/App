@@ -1,6 +1,7 @@
 package platform
 
 import data.generic.LatLng
+import io.ktor.http.Url
 import kotlinx.browser.window
 import org.w3c.dom.Window
 
@@ -29,6 +30,6 @@ actual fun launchPoint(point: LatLng, label: String?): Boolean {
  * @return `true` if the point was launched successfully. `false` if there was an error, or the url
  * could not be launched for any reason.
  */
-actual fun launchUrl(url: String): Boolean {
-    return window.open(url, "_blank")?.also(Window::focus) != null
+actual fun launchUrl(url: Url): Boolean {
+    return window.open(url.toString(), "_blank")?.also(Window::focus) != null
 }
