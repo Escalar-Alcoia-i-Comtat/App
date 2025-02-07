@@ -3,8 +3,10 @@ package data
 import data.generic.ExternalTrack
 import data.generic.LatLng
 import data.generic.SunTime
+import io.ktor.http.Url
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import network.Backend
 
 @Serializable
 data class Sector(
@@ -42,9 +44,7 @@ data class Sector(
 
     override fun getParentId(): Long = parentZoneId
 
-    fun getGPXDownloadURL(): String? = gpx?.let {
-        "https://backend.escalaralcoiaicomtat.org/download/$it"
-    }
+    fun getGPXDownloadUrl(): Url? = gpx?.let(Backend::downloadFileUrl)
 
     /**
      * Checks whether the zone has any metadata to display.

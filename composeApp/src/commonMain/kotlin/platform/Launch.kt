@@ -1,6 +1,7 @@
 package platform
 
 import data.generic.LatLng
+import io.ktor.http.Url
 
 /**
  * Shows the given [point] in an external application.
@@ -21,4 +22,4 @@ expect fun launchPoint(point: LatLng, label: String?): Boolean
  * @return `true` if the point was launched successfully. `false` if there was an error, or the url
  * could not be launched for any reason.
  */
-expect fun launchUrl(url: String): Boolean
+expect fun launchUrl(url: Url): Boolean

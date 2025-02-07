@@ -14,6 +14,7 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.URLBuilder
+import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.ByteReadChannel
@@ -199,10 +200,7 @@ object Backend {
         var length: Long = 0
         progress?.invoke(0, length)
         val response = client.get(
-            URLBuilder(baseUrl)
-                .appendPathSegments("download", uuid)
-                .build()
-                .also { Napier.v("GET :: $it") }
+            downloadFileUrl(uuid).also { Napier.v("GET :: $it") }
         ) {
             onDownload { bytesSentTotal, contentLength ->
                 contentLength ?: return@onDownload
@@ -213,4 +211,13 @@ object Backend {
         progress?.invoke(length, length)
         return response.bodyAsChannel()
     }
+
+    /**
+     * Constructs the URL to access for downloading files from the backend.
+     * @param uuid The file's identifier.
+     */
+    fun downloadFileUrl(uuid: String): Url =
+        URLBuilder(baseUrl)
+            .appendPathSegments("download", uuid)
+            .build()
 }

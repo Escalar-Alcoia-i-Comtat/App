@@ -84,6 +84,8 @@ import data.generic.SportsGrade
 import data.generic.color
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
+import io.ktor.http.URLParserException
+import io.ktor.http.Url
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.pluralStringResource
@@ -214,7 +216,7 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
                 ) { launchPoint(point, sector.displayName) }
             }
 
-            val gpxDownloadUrl = sector.getGPXDownloadURL()
+            val gpxDownloadUrl = sector.getGPXDownloadUrl()
             if (sector.walkingTime != null) {
                 MetaCard(
                     icon = Icons.AutoMirrored.Filled.DirectionsWalk,
@@ -243,12 +245,20 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
             }
 
             for (track in sector.tracks.orEmpty()) {
+                val url = try {
+                    Url(track.url)
+                } catch (_: URLParserException) {
+                    continue
+                }
                 MetaCard(
                     icon = track.type.icon,
-                    text = stringResource(Res.string.sector_track_external_title, track.type.displayName),
+                    text = stringResource(
+                        Res.string.sector_track_external_title,
+                        track.type.displayName
+                    ),
                     message = stringResource(Res.string.sector_track_external_description),
                     modifier = Modifier.padding(vertical = 4.dp),
-                    onClick = { launchUrl(track.url) }
+                    onClick = { launchUrl(url) }
                 )
             }
         }
