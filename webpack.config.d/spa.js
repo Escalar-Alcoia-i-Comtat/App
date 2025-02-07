@@ -1,4 +1,7 @@
 config.devServer = {
     ...config.devServer,
-    historyApiFallback: true,
+    historyApiFallback: {
+        index: '/',
+        disableDotRule: true,
+    },
 };
