@@ -1,9 +1,10 @@
 [versions]
 agp = "8.8.0"
 androidx-activityCompose = "1.10.0"
+androidx-sqlite-bundled = "2.5.0-alpha13"
 buildkonfig = "0.15.2"
 coil = "3.0.4"
-compose-maps = "6.4.2"
+compose-maps = "6.4.3"
 compose-navigation = "2.8.0-alpha12"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.7.3"
@@ -16,15 +17,18 @@ kotlinx = "1.10.1"
 kotlinx-datetime = "0.6.1"
 kotlinx-json = "1.8.0"
 kotlinx-io = "0.6.0"
-ksoup = "0.2.1"
+ksp = "2.1.10-1.0.29"
+ksoup = "0.2.2"
 ktor = "3.0.3"
 mapbox = "5.8.0"
 multiplatform-settings = "1.3.0"
 napier = "2.7.1"
 play-appupdate = "2.1.0"
 play-instantapps = "18.1.0"
+room = "2.7.0-alpha13"
 semver = "2.0.0"
 zoomable = "1.7.0-SNAPSHOT"
+roomKtx = "2.6.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -60,8 +64,12 @@ multiplatformSettings-makeObservable = { module = "com.russhwolf:multiplatform-s
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 play-appupdate = { module = "com.google.android.play:app-update-ktx", version.ref = "play-appupdate" }
 play-instantapps = { module = "com.google.android.gms:play-services-instantapps", version.ref = "play-instantapps" }
+room-bundledSqlite = { module = "androidx.sqlite:sqlite-bundled", version.ref = "androidx-sqlite-bundled" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -71,3 +79,5 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }

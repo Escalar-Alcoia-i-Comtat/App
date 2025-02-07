@@ -1,6 +1,6 @@
 import cache.StorageProvider
 import cache.storageProvider
-import database.createDatabase
+import database.setRoomDatabaseBuilder
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
@@ -10,5 +10,5 @@ fun debugBuild() {
     storageProvider = StorageProvider()
 
     // Initialize the database
-    createDatabase(DriverFactory())
+    setRoomDatabaseBuilder()
 }

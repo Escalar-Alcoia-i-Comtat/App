@@ -1,6 +1,8 @@
 package data
 
+import data.generic.ExternalTrack
 import data.generic.LatLng
+import data.generic.SunTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,12 +13,21 @@ data class Sector(
     @SerialName("display_name") override val displayName: String,
     override val image: String,
     val gpx: String? = null,
+    val tracks: List<ExternalTrack>? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
     @SerialName("walking_time") val walkingTime: Long? = null,
     override val point: LatLng? = null,
-    @SerialName("sun_time") val sunTime: String?,
+    @SerialName("sun_time") val sunTime: SunTime,
     @SerialName("zone_id") val parentZoneId: Long,
+
+    @Deprecated(
+        "Should not be accessed, may be empty at any moment. Used just for fetching from server.",
+        replaceWith = ReplaceWith(
+            "DatabaseInterface.paths().all().filter { it.parentSectorId == this.id }",
+            "database.DatabaseInterface"
+        )
+    )
     val paths: List<Path>
 ): DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
@@ -30,4 +41,16 @@ data class Sector(
     }
 
     override fun getParentId(): Long = parentZoneId
+
+    fun getGPXDownloadURL(): String? = gpx?.let {
+        "https://backend.escalaralcoiaicomtat.org/download/$it"
+    }
+
+    /**
+     * Checks whether the zone has any metadata to display.
+     * @return `true` if either [point] is not null, or [tracks] is not null or empty.
+     */
+    override fun hasAnyMetadata(): Boolean {
+        return super.hasAnyMetadata() || !tracks.isNullOrEmpty()
+    }
 }

@@ -24,12 +24,4 @@ object SettingsKeys {
      * Stores the preferred distance units to use.
      */
     const val DISTANCE_UNITS = "distance_units"
-
-    const val AREAS = "areas"
-
-    const val ZONES = "zones"
-
-    const val SECTORS = "sectors"
-
-    const val PATHS = "paths"
 }

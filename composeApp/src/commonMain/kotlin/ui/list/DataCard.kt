@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Place
@@ -34,7 +33,6 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import data.DataTypeWithImage
 import data.DataTypeWithPoint
-import data.DataTypeWithPoints
 import platform.launchPoint
 
 @Composable
@@ -91,17 +89,6 @@ fun <T: DataTypeWithImage> DataCard(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom
             ) {
-                if (item is DataTypeWithPoints) {
-                    for (point in item.points) {
-                        SmallFloatingActionButton(
-                            onClick = { launchPoint(point.location, item.displayName) },
-                            modifier = Modifier.padding(bottom = 4.dp).size(32.dp)
-                        ) {
-                            Icon(point.iconVector, null)
-                        }
-                    }
-                }
-
                 if (item is DataTypeWithPoint) item.point?.let { point ->
                     SmallFloatingActionButton(
                         onClick = { launchPoint(point, item.displayName) }

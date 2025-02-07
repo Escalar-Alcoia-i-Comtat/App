@@ -16,6 +16,14 @@ data class Zone(
     override val point: LatLng? = null,
     override val points: List<Point>,
     @SerialName("area_id") val parentAreaId: Long,
+
+    @Deprecated(
+        "Should not be accessed, may be empty at any moment. Used just for fetching from server.",
+        replaceWith = ReplaceWith(
+            "DatabaseInterface.sectors().all().filter { it.parentZoneId == this.id }",
+            "database.DatabaseInterface"
+        )
+    )
     val sectors: List<Sector>
 ) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithPoints, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
@@ -23,4 +31,12 @@ data class Zone(
     }
 
     override fun getParentId(): Long = parentAreaId
+
+    /**
+     * Checks whether the zone has any metadata to display.
+     * @return `true` if either [point] is not null, or [points] is not empty.
+     */
+    override fun hasAnyMetadata(): Boolean {
+        return super.hasAnyMetadata() || points.isNotEmpty()
+    }
 }

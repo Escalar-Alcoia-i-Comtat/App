@@ -2,14 +2,10 @@ package sync
 
 import com.russhwolf.settings.set
 import data.Area
-import data.Path
-import data.Sector
-import data.Zone
+import database.DatabaseInterface
 import database.SettingsKeys
 import database.settings
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import network.Backend
 
@@ -25,8 +21,20 @@ object DataSync : SyncProcess<List<Area>>() {
 
         Napier.d { "Fetching tree from server..." }
         val areas = Backend.tree()
-
         Napier.d { "Got ${areas.size} areas" }
+
+        @Suppress("DEPRECATION") val zones = areas.flatMap { it.zones }
+        @Suppress("DEPRECATION") val sectors = zones.flatMap { it.sectors }
+        @Suppress("DEPRECATION") val paths = sectors.flatMap { it.paths }
+
+        Napier.d { "Saving areas..." }
+        DatabaseInterface.areas().updateOrInsert(areas)
+        Napier.d { "Saving zones..." }
+        DatabaseInterface.zones().updateOrInsert(zones)
+        Napier.d { "Saving sectors..." }
+        DatabaseInterface.sectors().updateOrInsert(sectors)
+        Napier.d { "Saving paths..." }
+        DatabaseInterface.paths().updateOrInsert(paths)
 
         settings[SettingsKeys.LAST_SYNC] = Clock.System.now().toEpochMilliseconds()
 
@@ -38,8 +46,8 @@ object DataSync : SyncProcess<List<Area>>() {
         mutableStatus.emit(Status.FINISHED)
     }
 
-    val areas: Flow<List<Area>?> get() = result
-    val zones: Flow<List<Zone>?> get() = result.map { areas -> areas?.flatMap { it.zones } }
-    val sectors: Flow<List<Sector>?> get() = zones.map { zones -> zones?.flatMap { it.sectors } }
-    val paths: Flow<List<Path>?> get() = sectors.map { sectors -> sectors?.flatMap { it.paths } }
+    val areas = DatabaseInterface.areas().allLive()
+    val zones = DatabaseInterface.zones().allLive()
+    val sectors = DatabaseInterface.sectors().allLive()
+    val paths = DatabaseInterface.paths().allLive()
 }
