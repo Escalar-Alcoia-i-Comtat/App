@@ -25,6 +25,14 @@ interface BaseDao<Type: DataType, Entity: DatabaseEntity<Type>> {
 
     fun allLive(): Flow<List<Entity>>
 
+    suspend fun get(id: Long): Entity?
+
+    /**
+     * Tries to get an item by its parent id.
+     * May throw [UnsupportedOperationException] if the item does not have a parent.
+     */
+    suspend fun getByParentId(parentId: Long): List<Entity>
+
     fun asInterface(): DataTypeInterface<Type> = object : DataTypeInterface<Type> {
         override suspend fun insert(items: List<Type>) {
             val entities = items.map(::constructor)
@@ -45,6 +53,12 @@ interface BaseDao<Type: DataType, Entity: DatabaseEntity<Type>> {
 
         override fun allLive(): Flow<List<Type>> = this@BaseDao.allLive().map { list ->
             list.map { it.convert() }
+        }
+
+        override suspend fun get(id: Long): Type? = this@BaseDao.get(id)?.convert()
+
+        override suspend fun getByParentId(parentId: Long): List<Type> {
+            return this@BaseDao.getByParentId(parentId).map { it.convert() }
         }
     }
 }

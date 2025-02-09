@@ -11,7 +11,7 @@ import data.generic.PitchInfo
 import kotlinx.datetime.Instant
 
 @Entity(
-    indices = [Index("parentSectorId", unique = true)],
+    indices = [Index("parentSectorId", unique = false)],
     foreignKeys = [
         ForeignKey(
             entity = SectorEntity::class,

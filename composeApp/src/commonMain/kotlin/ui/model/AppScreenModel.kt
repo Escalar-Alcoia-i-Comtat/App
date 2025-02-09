@@ -1,14 +1,26 @@
 package ui.model
 
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import database.DatabaseInterface
+import io.github.aakira.napier.Napier
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import sync.DataSync
-import sync.SyncProcess.Status
+import utils.IO
 
-class AppScreenModel : ViewModel() {
-    val areas = DataSync.areas.stateIn(this, emptyList())
-    val zones = DataSync.zones.stateIn(this, emptyList())
-    val sectors = DataSync.sectors.stateIn(this, emptyList())
-    val paths = DataSync.paths.stateIn(this, emptyList())
+class AppScreenModel : ViewModelBase() {
+    val areas = DatabaseInterface.areas().allLive().stateIn(null)
+    val zones = DatabaseInterface.zones().allLive().stateIn(null)
+    val sectors = DatabaseInterface.sectors().allLive().stateIn(null)
+    val paths = DatabaseInterface.paths().allLive().stateIn(null)
 
-    val syncStatus = DataSync.status.stateIn(this, Status.WAITING)
+    val syncStatus = DataSync.status
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            syncStatus.collect {
+                Napier.i { "Sync progress from model: $it" }
+            }
+        }
+    }
 }

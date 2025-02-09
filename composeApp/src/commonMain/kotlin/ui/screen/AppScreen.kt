@@ -56,7 +56,6 @@ import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
 import search.Filter
-import sync.SyncProcess
 import ui.composition.LocalLifecycleManager
 import ui.dialog.SearchFiltersDialog
 import ui.model.AppScreenModel
@@ -77,6 +76,7 @@ fun AppScreen(
     onAreaRequested: (areaId: Long) -> Unit,
     onZoneRequested: (parentAreaId: Long, zoneId: Long) -> Unit,
     onSectorRequested: (parentAreaId: Long, parentZoneId: Long, sectorId: Long, pathId: Long?) -> Unit,
+    onEditRequested: ((area: Area) -> Unit)?,
     appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     scrollToId: Long? = null
@@ -88,10 +88,13 @@ fun AppScreen(
     val sectors by appScreenModel.sectors.collectAsState()
     val paths by appScreenModel.paths.collectAsState()
 
-    val syncStatus by appScreenModel.syncStatus.collectAsState(SyncProcess.Status.WAITING)
+    val syncStatus by appScreenModel.syncStatus.collectAsState()
 
     LaunchedEffect(areas) {
-        Napier.i { "There are ${areas.size} areas loaded" }
+        Napier.i { "There are ${areas?.size} areas loaded" }
+    }
+    LaunchedEffect(syncStatus) {
+        Napier.i { "Sync status: $syncStatus" }
     }
 
     LaunchedKeyEvent { event ->
@@ -176,7 +179,7 @@ fun AppScreen(
                             }
                             IconButton(
                                 onClick = searchModel::search,
-                                enabled = areas.isNotEmpty()
+                                enabled = !areas.isNullOrEmpty()
                             ) {
                                 Icon(Icons.Rounded.Search, null)
                             }
@@ -187,7 +190,7 @@ fun AppScreen(
         }
     ) { page ->
         when (page) {
-            0 -> MainScreen(areas, syncStatus, onAreaRequested, scrollToId)
+            0 -> MainScreen(areas, syncStatus, onAreaRequested, onEditRequested, scrollToId)
 
             1 -> SettingsPage()
 

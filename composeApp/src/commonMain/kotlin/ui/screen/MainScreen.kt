@@ -1,8 +1,6 @@
 package ui.screen
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -28,9 +25,10 @@ import ui.list.DataCard
 
 @Composable
 fun MainScreen(
-    areas: List<Area>,
+    areas: List<Area>?,
     syncStatus: SyncProcess.Status?,
     onAreaRequested: (areaId: Long) -> Unit,
+    onEditRequested: ((area: Area) -> Unit)?,
     scrollToId: Long? = null
 ) {
     val lifecycleManager = LocalLifecycleManager.current
@@ -39,27 +37,37 @@ fun MainScreen(
         lifecycleManager.finish()
     }
 
-    AnimatedVisibility(
-        visible = areas.isEmpty() && (syncStatus is SyncProcess.Status.RUNNING || syncStatus == SyncProcess.Status.WAITING),
+    AnimatedContent(
+        targetState = areas to syncStatus,
         modifier = Modifier.fillMaxSize()
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
+    ) { (list, status) ->
+        if (list == null || (status is SyncProcess.Status.RUNNING || status == SyncProcess.Status.WAITING)) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                when (status) {
+                    is SyncProcess.Status.WAITING -> CircularProgressIndicator()
+                    is SyncProcess.Status.RUNNING -> if (status.isIndeterminate) {
+                        CircularProgressIndicator()
+                    } else {
+                        CircularProgressIndicator({ status.progress })
+                    }
+
+                    else -> CircularProgressIndicator()
+                }
+            }
+        } else {
+            AreasList(list, onAreaRequested, onEditRequested, scrollToId)
         }
     }
-
-    AreasList(areas, syncStatus, onAreaRequested, scrollToId)
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AreasList(
-    areas: List<Area>?,
-    status: SyncProcess.Status?,
+    areas: List<Area>,
     onAreaRequested: (areaId: Long) -> Unit,
+    onEditRequested: ((area: Area) -> Unit)?,
     scrollToId: Long? = null
 ) {
     val state = rememberLazyListState()
@@ -67,7 +75,8 @@ private fun AreasList(
     LaunchedEffect(scrollToId) {
         scrollToId ?: return@LaunchedEffect
 
-        val index = areas?.indexOfFirst { it.id == scrollToId } ?: return@LaunchedEffect
+        val index =
+            areas.indexOfFirst { it.id == scrollToId }.takeIf { it >= 0 } ?: return@LaunchedEffect
         state.animateScrollToItem(index)
     }
 
@@ -76,25 +85,10 @@ private fun AreasList(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        stickyHeader {
-            AnimatedContent(status) { currentStatus ->
-                if (!areas.isNullOrEmpty() && currentStatus is SyncProcess.Status.RUNNING) {
-                    LinearProgressIndicator(
-                        progress = { currentStatus.progress },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } else if (!areas.isNullOrEmpty() && currentStatus == SyncProcess.Status.WAITING) {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
-
         items(
             contentType = { "area" },
             key = { it.id },
-            items = areas?.sortedBy { it.displayName } ?: emptyList()
+            items = areas.sortedBy { it.displayName }
         ) { area ->
             DataCard(
                 item = area,
@@ -103,7 +97,8 @@ private fun AreasList(
                     .padding(horizontal = 8.dp)
                     .padding(bottom = 12.dp)
                     .widthIn(max = 600.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                onEdit = onEditRequested?.let { { it(area) } }
             ) { onAreaRequested(area.id) }
         }
 

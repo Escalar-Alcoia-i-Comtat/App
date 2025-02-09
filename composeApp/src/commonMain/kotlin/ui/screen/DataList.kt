@@ -46,6 +46,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     children: List<ChildrenType>?,
     scrollToId: Long? = null,
     onNavigationRequested: (ChildrenType) -> Unit,
+    onEditRequested: ((ChildrenType) -> Unit)?,
     onNavigateUp: () -> Unit
 ) {
     val state = rememberLazyListState()
@@ -98,7 +99,8 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                     .padding(horizontal = 8.dp)
                                     .padding(bottom = 12.dp)
                                     .widthIn(max = 600.dp)
-                                    .fillMaxWidth()
+                                    .fillMaxWidth(),
+                                onEdit = onEditRequested?.let { { it(child) } }
                             ) { onNavigationRequested(child) }
                         }
                     }

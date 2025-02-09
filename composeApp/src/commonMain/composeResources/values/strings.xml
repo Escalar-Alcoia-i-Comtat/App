@@ -146,4 +146,12 @@
     <string name="ending_rappel">Walking</string>
 
     <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">More Info</string>
+
+    <string name="editor_close">Close</string>
+    <string name="editor_loading">Loading...</string>
+    <string name="editor_clear">Clear</string>
+    <string name="editor_id_automatic">Automatic</string>
+    <string name="editor_id_label">ID</string>
+    <string name="editor_display_name_label">Display Name</string>
+    <string name="editor_image_label">Image</string>
 </resources>

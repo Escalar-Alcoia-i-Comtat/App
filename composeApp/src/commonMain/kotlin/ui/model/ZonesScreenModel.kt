@@ -2,12 +2,9 @@ package ui.model
 
 import data.Area
 import data.Zone
-import kotlinx.coroutines.flow.first
-import sync.DataSync
+import database.DatabaseInterface
 
 class ZonesScreenModel : DataScreenModel<Area, Zone>(
-    childrenListAccessor = { parentId ->
-        DataSync.zones.first()?.filter { it.getParentId() == parentId } ?: emptyList()
-    },
-    parentListAccessor = { id -> DataSync.areas.first()?.find { it.id == id } }
+    childrenListAccessor = { parentId -> DatabaseInterface.zones().getByParentId(parentId) },
+    parentListAccessor = { id -> DatabaseInterface.areas().get(id) }
 )

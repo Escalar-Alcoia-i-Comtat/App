@@ -15,4 +15,6 @@ sealed interface DataTypeWithImage : DataType {
             .appendPathSegments("download", image)
             .buildString()
     }
+
+    fun copy(image: String): DataTypeWithImage
 }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import data.Zone
 import platform.BackHandler
 import ui.model.ZonesScreenModel
 
@@ -13,6 +14,7 @@ fun ZonesScreen(
     areaId: Long,
     onBackRequested: () -> Unit,
     onZoneRequested: (zoneId: Long) -> Unit,
+    onEditRequested: ((zone: Zone) -> Unit)?,
     viewModel: ZonesScreenModel = viewModel { ZonesScreenModel() },
     scrollToId: Long? = null
 ) {
@@ -30,6 +32,7 @@ fun ZonesScreen(
         children = zones,
         scrollToId = scrollToId,
         onNavigationRequested = { onZoneRequested(it.id) },
+        onEditRequested = onEditRequested,
         onNavigateUp = onBackRequested,
     )
 }

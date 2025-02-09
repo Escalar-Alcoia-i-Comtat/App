@@ -66,4 +66,12 @@ data class Path(
     }
 
     override fun getParentId(): Long = parentSectorId
+
+    override fun copy(id: Long, timestamp: Long, displayName: String): Path {
+        return copy(id = id, timestamp = timestamp, displayName = displayName, sketchId = sketchId)
+    }
+
+    override fun copy(parentId: Long): Path {
+        return copy(id = id, parentSectorId = parentId)
+    }
 }

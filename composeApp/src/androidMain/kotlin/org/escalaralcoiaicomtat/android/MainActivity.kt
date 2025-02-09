@@ -20,6 +20,7 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.mmk.kmpnotifier.extensions.onCreateOrOnNewIntent
 import com.mmk.kmpnotifier.notification.NotifierManager
 import io.github.aakira.napier.Napier
+import io.github.vinceglb.filekit.core.FileKit
 import platform.Updates
 import ui.navigation.Destination
 import ui.navigation.Destinations
@@ -66,6 +67,9 @@ class MainActivity : ComponentActivity() {
 
         // Send intent to handle notifications
         NotifierManager.onCreateOrOnNewIntent(intent)
+
+        // Initialize the file picker
+        FileKit.init(this)
 
         val startDestination = computeStartDestination()
         setContent {

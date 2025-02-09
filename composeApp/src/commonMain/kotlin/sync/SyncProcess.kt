@@ -2,8 +2,7 @@ package sync
 
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.until
@@ -33,13 +32,23 @@ abstract class SyncProcess {
             override fun hashCode(): Int {
                 return progress.hashCode()
             }
+
+            override fun toString(): String {
+                val progress = if (isIndeterminate) "INDETERMINATE" else "${(progress*100).toInt()}%"
+                return "RUNNING[$progress]"
+            }
         }
 
         data object FINISHED : Status()
     }
 
-    protected val mutableStatus: MutableStateFlow<Status> = MutableStateFlow(Status.WAITING)
-    val status: SharedFlow<Status> get() = mutableStatus.asSharedFlow()
+    private val mutableStatus: MutableStateFlow<Status> = MutableStateFlow(Status.WAITING)
+    val status get() = mutableStatus.asStateFlow()
+
+    protected suspend fun setStatus(status: Status) {
+        Napier.d(tag = this::class.simpleName ?: "SyncProcess") { "Setting status to $status" }
+        mutableStatus.emit(status)
+    }
 
     interface SyncContext {
         val arguments: Map<String, Any>
@@ -64,11 +73,15 @@ abstract class SyncProcess {
             .mapNotNull { (key, value) -> value?.let { key to value } }
             .toMap()
 
+        setStatus(Status.RUNNING.Indeterminate)
+
         with(
             object : SyncContext {
                 override val arguments: Map<String, Any> = args
             }
         ) { synchronize() }
+
+        setStatus(Status.FINISHED)
 
         val end = Clock.System.now()
 

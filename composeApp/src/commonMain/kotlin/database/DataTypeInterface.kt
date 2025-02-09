@@ -14,6 +14,14 @@ interface DataTypeInterface<Type : DataType> {
 
     fun allLive(): Flow<List<Type>>
 
+    suspend fun get(id: Long): Type?
+
+    /**
+     * Tries to get an item by its parent id.
+     * May throw [UnsupportedOperationException] if the item does not have a parent.
+     */
+    suspend fun getByParentId(parentId: Long): List<Type>
+
     suspend fun updateOrInsert(list: List<Type>) {
         val insert = mutableListOf<Type>()
         val update = mutableListOf<Type>()

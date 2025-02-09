@@ -31,7 +31,7 @@ data class Sector(
         )
     )
     val paths: List<Path>
-): DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
+) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return (other as? Sector)
             // If other is a Sector, try to compare by weight, but don't consider empty weights
@@ -52,5 +52,21 @@ data class Sector(
      */
     override fun hasAnyMetadata(): Boolean {
         return super.hasAnyMetadata() || !tracks.isNullOrEmpty()
+    }
+
+    override fun copy(id: Long, timestamp: Long, displayName: String): Sector {
+        return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
+    }
+
+    override fun copy(image: String): Sector {
+        return copy(id = id, image = image)
+    }
+
+    override fun copy(parentId: Long): Sector {
+        return copy(id = id, parentZoneId = parentId)
+    }
+
+    override fun copy(point: LatLng?): Sector {
+        return copy(id = id, point = point)
     }
 }

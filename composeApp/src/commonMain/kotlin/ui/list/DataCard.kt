@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -40,6 +41,7 @@ fun <T: DataTypeWithImage> DataCard(
     item: T,
     imageHeight: Dp,
     modifier: Modifier = Modifier,
+    onEdit: (() -> Unit)?,
     onClick: () -> Unit
 ) {
     Column(
@@ -89,6 +91,14 @@ fun <T: DataTypeWithImage> DataCard(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom
             ) {
+                onEdit?.let {
+                    SmallFloatingActionButton(
+                        onClick = it,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Icon(Icons.Outlined.Edit, null)
+                    }
+                }
                 if (item is DataTypeWithPoint) item.point?.let { point ->
                     SmallFloatingActionButton(
                         onClick = { launchPoint(point, item.displayName) }

@@ -1,6 +1,5 @@
 package ui.model
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.DataType
 import data.DataTypeWithImage
@@ -17,7 +16,7 @@ import utils.IO
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWithParent>(
     private val childrenListAccessor: suspend (parentId: Long) -> List<Children>,
     private val parentListAccessor: suspend (id: Long) -> Parent?
-) : ViewModel() {
+) : ViewModelBase() {
     /**
      * Whether the children should be ordered automatically upon fetch.
      * [DataType.compareTo] is used for sorting.

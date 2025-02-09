@@ -21,7 +21,8 @@ class LocalStorageDataTypeInterface<Type : DataType>(
     private val serializer: KSerializer<Type>,
     private val pollingRate: Long = 100,
 ) : DataTypeInterface<Type> {
-    private fun buildKey(item: Type) = "$key#${item.id}"
+    private fun buildKey(id: Long) = "$key#${id}"
+    private fun buildKey(item: Type) = buildKey(item.id)
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun insert(items: List<Type>) {
@@ -92,5 +93,22 @@ class LocalStorageDataTypeInterface<Type : DataType>(
             delay(pollingRate)
         }
         close()
+    }
+
+    override suspend fun get(id: Int): Type? {
+        val value = localStorage.getItem(buildKey(id.toLong())) ?: return null
+        return try {
+            Json.decodeFromString(serializer, value)
+        } catch (e: SerializationException) {
+            Napier.e(e) { "Could not decode $key. The stored JSON is not valid." }
+            null
+        } catch (e: IllegalArgumentException) {
+            Napier.e(e) { "Could not decode $key. The stored JSON could not be decoded into ${serializer.descriptor.serialName}." }
+            null
+        }
+    }
+
+    override suspend fun getByParentId(parentId: Int): List<Type> {
+        TODO("Not yet implemented")
     }
 }

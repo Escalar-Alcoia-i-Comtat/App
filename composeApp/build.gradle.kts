@@ -166,6 +166,7 @@ kotlin {
 
             // Compose - Utilities
             implementation(libs.compose.windowSizeClass)
+            implementation(libs.compose.filekit)
 
             // Compose - Navigation
             implementation(libs.compose.navigation)

@@ -11,7 +11,7 @@ import database.appDatabase
 import kotlinx.datetime.Instant
 
 @Entity(
-    indices = [Index("parentAreaId", unique = true)],
+    indices = [Index("parentAreaId", unique = false)],
     foreignKeys = [
         ForeignKey(
             entity = AreaEntity::class,

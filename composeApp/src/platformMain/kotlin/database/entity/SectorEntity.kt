@@ -12,7 +12,7 @@ import database.appDatabase
 import kotlinx.datetime.Instant
 
 @Entity(
-    indices = [Index("parentZoneId", unique = true)],
+    indices = [Index("parentZoneId", unique = false)],
     foreignKeys = [
         ForeignKey(
             entity = ZoneEntity::class,
