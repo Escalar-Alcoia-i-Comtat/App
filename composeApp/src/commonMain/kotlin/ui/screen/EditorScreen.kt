@@ -20,6 +20,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataType
@@ -29,9 +33,11 @@ import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.stringResource
+import platform.BackHandler
 import ui.model.EditorModel
 import ui.reusable.form.FormField
 import ui.reusable.form.FormFilePicker
+import ui.state.LaunchedKeyEvent
 
 @Composable
 fun <DT : DataType> EditorScreen(
@@ -44,6 +50,17 @@ fun <DT : DataType> EditorScreen(
     val file by model.imageFile.collectAsState()
 
     LaunchedEffect(Unit) { model.load(onBackRequested) }
+
+    BackHandler { onBackRequested() }
+
+    LaunchedKeyEvent { event ->
+        if (event.key == Key.Escape && event.type == KeyEventType.KeyUp) {
+            onBackRequested()
+            true
+        } else {
+            false
+        }
+    }
 
     EditorScreen(
         item = item,
