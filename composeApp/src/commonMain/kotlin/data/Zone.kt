@@ -30,7 +30,7 @@ data class Zone(
         return displayName.compareTo(other.displayName)
     }
 
-    override fun getParentId(): Long = parentAreaId
+    override val parentId: Long get() = parentAreaId
 
     /**
      * Checks whether the zone has any metadata to display.

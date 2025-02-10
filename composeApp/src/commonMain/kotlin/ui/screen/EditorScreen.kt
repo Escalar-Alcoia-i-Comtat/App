@@ -2,6 +2,7 @@ package ui.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -31,7 +35,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataType
 import data.DataTypeWithImage
 import data.DataTypeWithParent
+import data.DataTypeWithPoint
 import data.DataTypes
+import data.generic.LatLng
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
@@ -69,7 +75,10 @@ fun <DT : DataType> EditorScreen(
 
     EditorScreen(
         item = item,
-        onUpdateItem = { model.updateItem { it } },
+        onUpdateItem = {
+            @Suppress("UNCHECKED_CAST")
+            model.updateItem(it as DT)
+        },
         parents = parents,
         imageFile = file,
         onImageFilePicked = model::setImageFile,
@@ -82,7 +91,7 @@ fun <DT : DataType> EditorScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 fun <DT : DataType> EditorScreen(
     item: DT?,
-    onUpdateItem: ((current: DT) -> DataType) -> Unit,
+    onUpdateItem: (DataType) -> Unit,
     parents: List<DataType>?,
     imageFile: PlatformFile?,
     onImageFilePicked: (PlatformFile?) -> Unit,
@@ -127,20 +136,20 @@ fun <DT : DataType> EditorScreen(
 
             if (item is DataTypeWithParent) {
                 FormDropdown(
-                    selection = item.getParentId(),
-                    onSelectionChanged = { id ->
-                        onUpdateItem { item.copy(parentId = id) }
-                    },
+                    selection = item.parentId,
+                    onSelectionChanged = { onUpdateItem(item.copy(parentId = it)) },
                     options = parents.orEmpty().map { it.id },
-                    label = "",
+                    label = stringResource(Res.string.editor_parent_label),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    toString = { id -> parents.orEmpty().find { it.id == id }?.displayName ?: id.toString() },
+                    toString = { id ->
+                        parents.orEmpty().find { it.id == id }?.displayName ?: id.toString()
+                    },
                 )
             }
 
             FormField(
                 value = item.displayName,
-                onValueChange = { v -> onUpdateItem { it.copy(displayName = v) } },
+                onValueChange = { onUpdateItem(item.copy(displayName = it)) },
                 label = stringResource(Res.string.editor_display_name_label),
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             )
@@ -153,6 +162,48 @@ fun <DT : DataType> EditorScreen(
                     type = PickerType.Image,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 )
+            }
+
+            if (item is DataTypeWithPoint) {
+                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                    var latitude by remember { mutableStateOf(item.point?.latitude?.toString() ?: "") }
+                    var longitude by remember { mutableStateOf(item.point?.longitude?.toString() ?: "") }
+
+                    fun update(lat: String?, lon: String?) {
+                        val (newLat, newLon) = if (lat != null) {
+                            latitude = lat
+                            lat.toDoubleOrNull() to item.point?.longitude
+                        } else if (lon != null) {
+                            longitude = lon
+                            item.point?.latitude to lon.toDoubleOrNull()
+                        } else {
+                            // Won't happen, but must be handled
+                            item.point?.latitude to item.point?.longitude
+                        }
+                        if (newLat != null && newLon != null) {
+                            onUpdateItem(item.copy(point = LatLng(newLat, newLon)))
+                        } else {
+                            onUpdateItem(item.copy(point = null))
+                        }
+                    }
+
+                    FormField(
+                        value = latitude,
+                        onValueChange = { update(it, null) },
+                        label = stringResource(Res.string.editor_latitude_label),
+                        modifier = Modifier.weight(1f).padding(end = 4.dp),
+                        error = stringResource(Res.string.editor_error_coordinate)
+                            .takeIf { latitude.isNotEmpty() && latitude.toDoubleOrNull() == null },
+                    )
+                    FormField(
+                        value = longitude,
+                        onValueChange = { update(null, it) },
+                        label = stringResource(Res.string.editor_longitude_label),
+                        modifier = Modifier.weight(1f).padding(start = 4.dp),
+                        error = stringResource(Res.string.editor_error_coordinate)
+                            .takeIf { longitude.isNotEmpty() && longitude.toDoubleOrNull() == null },
+                    )
+                }
             }
         }
     }

@@ -27,6 +27,7 @@ fun FormField(
     thisFocusRequester: FocusRequester? = null,
     nextFocusRequester: FocusRequester? = null,
     fallbackValue: String = "",
+    error: String? = null,
     onGo: (() -> Unit)? = null
 ) {
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
@@ -54,6 +55,10 @@ fun FormField(
             onNext = { nextFocusRequester?.requestFocus() },
             onDone = { softwareKeyboardController?.hide() },
             onGo = { onGo?.invoke() },
-        )
+        ),
+        isError = error != null,
+        supportingText = error?.let {
+            { Text(it) } // , color = MaterialTheme.colorScheme.error
+        }
     )
 }

@@ -152,6 +152,10 @@
     <string name="editor_clear">Clear</string>
     <string name="editor_id_automatic">Automatic</string>
     <string name="editor_id_label">ID</string>
+    <string name="editor_parent_label">Parent</string>
     <string name="editor_display_name_label">Display Name</string>
     <string name="editor_image_label">Image</string>
+    <string name="editor_latitude_label">Latitude</string>
+    <string name="editor_longitude_label">Longitude</string>
+    <string name="editor_error_coordinate" comment="Shown when introducing an invalid latitude or longitude on a field.">Must be a valid coordinate.</string>
 </resources>

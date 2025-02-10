@@ -42,7 +42,7 @@ data class Sector(
             ?: displayName.compareTo(other.displayName)
     }
 
-    override fun getParentId(): Long = parentZoneId
+    override val parentId: Long get() = parentZoneId
 
     fun getGPXDownloadUrl(): Url? = gpx?.let(Backend::downloadFileUrl)
 

@@ -65,7 +65,7 @@ data class Path(
             ?: displayName.compareTo(other.displayName)
     }
 
-    override fun getParentId(): Long = parentSectorId
+    override val parentId: Long get() = parentSectorId
 
     override fun copy(id: Long, timestamp: Long, displayName: String): Path {
         return copy(id = id, timestamp = timestamp, displayName = displayName, sketchId = sketchId)
