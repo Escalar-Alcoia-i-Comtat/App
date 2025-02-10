@@ -150,6 +150,7 @@
     <string name="editor_close">Close</string>
     <string name="editor_loading">Loading...</string>
     <string name="editor_clear">Clear</string>
+    <string name="editor_edit">Edit</string>
     <string name="editor_id_automatic">Automatic</string>
     <string name="editor_id_label">ID</string>
     <string name="editor_parent_label">Parent</string>
