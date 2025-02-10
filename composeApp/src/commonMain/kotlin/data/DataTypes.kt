@@ -107,6 +107,6 @@ sealed class DataTypes<out DT : DataType> {
         fun findByName(name: String): DataTypes<DataType>? = entries.find { it.name == name }
 
         fun valueOf(name: String): DataTypes<DataType> =
-            entries.find { dataType -> dataType.name == name } ?: throw IllegalArgumentException("Unknown data type: $name")
+            entries.find { it.name == name } ?: throw IllegalArgumentException("Unknown data type: $name")
     }
 }
