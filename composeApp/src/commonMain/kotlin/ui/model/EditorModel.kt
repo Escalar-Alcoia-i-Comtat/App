@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.DataType
 import data.DataTypes
+import data.Path
+import data.Sector
+import data.Zone
 import database.DatabaseInterface
 import database.byType
 import io.github.vinceglb.filekit.core.PlatformFile
@@ -19,6 +22,9 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
     private val _item = MutableStateFlow<DT?>(null)
     val item get() = _item.asStateFlow()
 
+    private val _parents = MutableStateFlow<List<DataType>?>(null)
+    val parents get() = _parents.asStateFlow()
+
     private val _imageFile = MutableStateFlow<PlatformFile?>(null)
     val imageFile get() = _imageFile.asStateFlow()
 
@@ -30,6 +36,14 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
         viewModelScope.launch(Dispatchers.IO) {
             val item = databaseInterface.get(id) ?: return@launch onNotFound()
             _item.emit(item)
+
+            val parents = when (item) {
+                is Zone -> DatabaseInterface.areas().all()
+                is Sector -> DatabaseInterface.zones().all()
+                is Path -> DatabaseInterface.sectors().all()
+                else -> null
+            }
+            _parents.emit(parents)
         }
     }
 

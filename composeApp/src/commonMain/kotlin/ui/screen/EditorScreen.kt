@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataType
 import data.DataTypeWithImage
+import data.DataTypeWithParent
 import data.DataTypes
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
@@ -35,6 +38,7 @@ import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
 import ui.model.EditorModel
+import ui.reusable.form.FormDropdown
 import ui.reusable.form.FormField
 import ui.reusable.form.FormFilePicker
 import ui.state.LaunchedKeyEvent
@@ -48,6 +52,7 @@ fun <DT : DataType> EditorScreen(
 ) {
     val item by model.item.collectAsState()
     val file by model.imageFile.collectAsState()
+    val parents by model.parents.collectAsState()
 
     LaunchedEffect(Unit) { model.load(onBackRequested) }
 
@@ -64,20 +69,21 @@ fun <DT : DataType> EditorScreen(
 
     EditorScreen(
         item = item,
-        onUpdateItem = model::updateItem,
+        onUpdateItem = { model.updateItem { it } },
+        parents = parents,
         imageFile = file,
         onImageFilePicked = model::setImageFile,
         isCreate = id == null,
-        onBackRequested
+        onBackRequested = onBackRequested
     )
 }
 
 @Composable
-@Suppress("UNCHECKED_CAST")
 @OptIn(ExperimentalMaterial3Api::class)
 fun <DT : DataType> EditorScreen(
     item: DT?,
-    onUpdateItem: ((current: DT) -> DT) -> Unit,
+    onUpdateItem: ((current: DT) -> DataType) -> Unit,
+    parents: List<DataType>?,
     imageFile: PlatformFile?,
     onImageFilePicked: (PlatformFile?) -> Unit,
     isCreate: Boolean,
@@ -104,7 +110,13 @@ fun <DT : DataType> EditorScreen(
             ) { CircularProgressIndicator() }
             return@Scaffold
         }
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(8.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(8.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
             FormField(
                 value = if (isCreate) stringResource(Res.string.editor_id_automatic) else item.id.toString(),
                 onValueChange = {},
@@ -112,12 +124,27 @@ fun <DT : DataType> EditorScreen(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 readOnly = true,
             )
+
+            if (item is DataTypeWithParent) {
+                FormDropdown(
+                    selection = item.getParentId(),
+                    onSelectionChanged = { id ->
+                        onUpdateItem { item.copy(parentId = id) }
+                    },
+                    options = parents.orEmpty().map { it.id },
+                    label = "",
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    toString = { id -> parents.orEmpty().find { it.id == id }?.displayName ?: id.toString() },
+                )
+            }
+
             FormField(
                 value = item.displayName,
-                onValueChange = { v -> onUpdateItem { it.copy(displayName = v) as DT } },
+                onValueChange = { v -> onUpdateItem { it.copy(displayName = v) } },
                 label = stringResource(Res.string.editor_display_name_label),
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             )
+
             if (item is DataTypeWithImage) {
                 FormFilePicker(
                     file = imageFile,
