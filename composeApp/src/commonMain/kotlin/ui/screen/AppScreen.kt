@@ -51,11 +51,11 @@ import data.Path
 import data.Sector
 import data.Zone
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
 import search.Filter
+import sync.DataSync
 import ui.composition.LocalLifecycleManager
 import ui.dialog.SearchFiltersDialog
 import ui.model.AppScreenModel
@@ -83,19 +83,12 @@ fun AppScreen(
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
-    val areas by appScreenModel.areas.collectAsState()
-    val zones by appScreenModel.zones.collectAsState()
-    val sectors by appScreenModel.sectors.collectAsState()
-    val paths by appScreenModel.paths.collectAsState()
+    val areas by appScreenModel.areas.collectAsState(null)
+    val zones by appScreenModel.zones.collectAsState(null)
+    val sectors by appScreenModel.sectors.collectAsState(null)
+    val paths by appScreenModel.paths.collectAsState(null)
 
-    val syncStatus by appScreenModel.syncStatus.collectAsState()
-
-    LaunchedEffect(areas) {
-        Napier.i { "There are ${areas?.size} areas loaded" }
-    }
-    LaunchedEffect(syncStatus) {
-        Napier.i { "Sync status: $syncStatus" }
-    }
+    val syncStatus by DataSync.status.collectAsState()
 
     LaunchedKeyEvent { event ->
         if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {

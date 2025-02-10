@@ -18,9 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.Area
-import platform.BackHandler
 import sync.SyncProcess
-import ui.composition.LocalLifecycleManager
 import ui.list.DataCard
 
 @Composable
@@ -31,12 +29,6 @@ fun MainScreen(
     onEditRequested: ((area: Area) -> Unit)?,
     scrollToId: Long? = null
 ) {
-    val lifecycleManager = LocalLifecycleManager.current
-
-    BackHandler {
-        lifecycleManager.finish()
-    }
-
     AnimatedContent(
         targetState = areas to syncStatus,
         modifier = Modifier.fillMaxSize()
@@ -46,15 +38,10 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                when (status) {
-                    is SyncProcess.Status.WAITING -> CircularProgressIndicator()
-                    is SyncProcess.Status.RUNNING -> if (status.isIndeterminate) {
-                        CircularProgressIndicator()
-                    } else {
-                        CircularProgressIndicator({ status.progress })
-                    }
-
-                    else -> CircularProgressIndicator()
+                if (status is SyncProcess.Status.RUNNING && !status.isIndeterminate) {
+                    CircularProgressIndicator({ status.progress })
+                } else {
+                    CircularProgressIndicator()
                 }
             }
         } else {

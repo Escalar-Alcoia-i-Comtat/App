@@ -20,10 +20,13 @@ import data.Sector
 import data.Zone
 import database.SettingsKeys
 import database.settings
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import network.ConnectivityStatusObserver
 import platform.Updates
 import platform.initialDestination
@@ -60,7 +63,17 @@ fun AppRoot(
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            DataSync.start(DataSync.Cause.Scheduled)
+            val lastSync = settings
+                .getLongOrNull(SettingsKeys.LAST_SYNC_TIME)
+                ?.let { Instant.fromEpochMilliseconds(it) }
+            val now = Clock.System.now()
+
+            // Synchronize if never synced, or every 12 hours
+            if (lastSync == null || (now - lastSync).inWholeHours > 12) {
+                DataSync.start(DataSync.Cause.Scheduled)
+            } else {
+                Napier.d { "Won't run synchronization. Last run: ${(now - lastSync).inWholeHours} hours ago" }
+            }
         }
     }
 

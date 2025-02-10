@@ -42,7 +42,7 @@ abstract class SyncProcess {
         data object FINISHED : Status()
     }
 
-    private val mutableStatus: MutableStateFlow<Status> = MutableStateFlow(Status.WAITING)
+    private val mutableStatus: MutableStateFlow<Status?> = MutableStateFlow(null)
     val status get() = mutableStatus.asStateFlow()
 
     protected suspend fun setStatus(status: Status) {

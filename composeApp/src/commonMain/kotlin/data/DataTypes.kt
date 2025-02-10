@@ -102,11 +102,11 @@ sealed class DataTypes<out DT : DataType> {
     }
 
     companion object {
-        private val entries: List<DataTypes<*>> = listOf(Area, Zone, Sector, Path)
+        private val entries get() = sequenceOf(Area, Zone, Sector, Path)
 
         fun findByName(name: String): DataTypes<DataType>? = entries.find { it.name == name }
 
         fun valueOf(name: String): DataTypes<DataType> =
-            entries.find { it.name == name } ?: throw IllegalArgumentException("Unknown data type: $name")
+            entries.find { dataType -> dataType.name == name } ?: throw IllegalArgumentException("Unknown data type: $name")
     }
 }
