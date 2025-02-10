@@ -217,7 +217,7 @@ kotlin {
             }
         }
 
-        val pushMain by creating {
+        val mobileMain by creating {
             dependsOn(platformMain)
 
             dependencies {
@@ -227,7 +227,7 @@ kotlin {
         }
 
         val androidMain by getting {
-            dependsOn(pushMain)
+            dependsOn(mobileMain)
 
             dependencies {
                 implementation(libs.androidx.activity.compose)
@@ -257,7 +257,7 @@ kotlin {
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
-            dependsOn(pushMain)
+            dependsOn(mobileMain)
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
