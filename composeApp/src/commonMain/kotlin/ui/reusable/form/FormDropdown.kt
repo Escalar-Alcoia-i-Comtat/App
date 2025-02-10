@@ -1,7 +1,5 @@
 package ui.reusable.form
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -10,10 +8,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,30 +43,8 @@ fun <T : Any> FormDropdown(
         OutlinedTextField(
             value = selection?.let { toString(it) } ?: "",
             onValueChange = { },
-            enabled = false, // TODO: Verify whether this should be true and read-only false
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledBorderColor = foregroundColor,
-                disabledContainerColor = MaterialTheme.colorScheme.background,
-                disabledLabelColor = foregroundColor,
-                disabledLeadingIconColor = foregroundColor,
-                disabledPlaceholderColor = foregroundColor.copy(alpha = .5f),
-                disabledPrefixColor = foregroundColor,
-                disabledSuffixColor = foregroundColor,
-                disabledSupportingTextColor = foregroundColor,
-                disabledTextColor = foregroundColor,
-                disabledTrailingIconColor = foregroundColor,
-            ),
+            readOnly = true,
             label = label?.let { { Text(it) } },
-            interactionSource = remember { MutableInteractionSource() }
-                .also { interactionSource ->
-                    LaunchedEffect(interactionSource) {
-                        interactionSource.interactions.collect {
-                            if (it is PressInteraction.Release) {
-                                expanded = !expanded
-                            }
-                        }
-                    }
-                },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             },
