@@ -25,15 +25,11 @@ fun <T : Any> FormDropdown(
     options: List<T>,
     label: String?,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     icon: (@Composable (T) -> ImageVector)? = null,
     toString: @Composable (T) -> String = { it.toString() }
 ) {
     var expanded by remember { mutableStateOf(false) }
-
-    val foregroundColor = if (expanded)
-        MaterialTheme.colorScheme.primary
-    else
-        MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -50,7 +46,8 @@ fun <T : Any> FormDropdown(
             },
             modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
             maxLines = 1,
-            singleLine = true
+            singleLine = true,
+            enabled = enabled
         )
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -68,6 +65,7 @@ fun <T : Any> FormDropdown(
                     leadingIcon = icon?.invoke(option)?.let {
                         { Icon(it, toString(option)) }
                     },
+                    enabled = enabled,
                     onClick = {
                         onSelectionChanged(option)
                         expanded = false
