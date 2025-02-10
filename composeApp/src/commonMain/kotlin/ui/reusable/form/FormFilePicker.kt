@@ -110,7 +110,14 @@ fun FormFilePicker(
                             .padding(horizontal = 8.dp)
                     )
                 }
-            } ?: fallbackContent?.invoke()
+            } ?: fallbackContent?.invoke() ?: Text(
+                text = stringResource(Res.string.file_picker_hint),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+                    .padding(horizontal = 8.dp)
+            )
         }
     }
 }

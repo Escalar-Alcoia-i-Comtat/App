@@ -3,8 +3,10 @@ package ui.screen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -38,14 +40,21 @@ import data.DataTypeWithImage
 import data.DataTypeWithParent
 import data.DataTypeWithPoint
 import data.DataTypes
+import data.Sector
+import data.Zone
 import data.generic.LatLng
 import escalaralcoiaicomtat.composeapp.generated.resources.*
+import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
 import ui.model.EditorModel
+import ui.model.EditorModel.Companion.FILE_KEY_GPX
+import ui.model.EditorModel.Companion.FILE_KEY_IMAGE
+import ui.model.EditorModel.Companion.FILE_KEY_KMZ
 import ui.reusable.form.FormDropdown
 import ui.reusable.form.FormField
+import ui.reusable.form.FormFilePicker
 import ui.reusable.form.FormImagePicker
 import ui.state.LaunchedKeyEvent
 
@@ -57,7 +66,7 @@ fun <DT : DataType> EditorScreen(
     onBackRequested: () -> Unit
 ) {
     val item by model.item.collectAsState()
-    val file by model.imageFile.collectAsState()
+    val files by model.files.collectAsState()
     val parents by model.parents.collectAsState()
 
     LaunchedEffect(Unit) { model.load(onBackRequested) }
@@ -80,8 +89,8 @@ fun <DT : DataType> EditorScreen(
             model.updateItem(it as DT)
         },
         parents = parents,
-        imageFile = file,
-        onImageFilePicked = model::setImageFile,
+        files = files,
+        onFilePicked = model::setFile,
         isCreate = id == null,
         onBackRequested = onBackRequested
     )
@@ -93,8 +102,8 @@ private fun <DT : DataType> EditorScreen(
     item: DT?,
     onUpdateItem: (DataType) -> Unit,
     parents: List<DataType>?,
-    imageFile: PlatformFile?,
-    onImageFilePicked: (PlatformFile?) -> Unit,
+    files: Map<String, PlatformFile>,
+    onFilePicked: (key: String, PlatformFile?) -> Unit,
     isCreate: Boolean,
     onBackRequested: () -> Unit
 ) {
@@ -132,7 +141,7 @@ private fun <DT : DataType> EditorScreen(
                     .widthIn(max = 600.dp)
                     .fillMaxWidth()
             ) {
-                EditorContent(item, onUpdateItem, parents, imageFile, onImageFilePicked, isCreate)
+                EditorContent(item, onUpdateItem, parents, files, onFilePicked, isCreate)
             }
         }
     }
@@ -143,8 +152,8 @@ private fun <DT : DataType> EditorContent(
     item: DT,
     onUpdateItem: (DataType) -> Unit,
     parents: List<DataType>?,
-    imageFile: PlatformFile?,
-    onImageFilePicked: (PlatformFile?) -> Unit,
+    files: Map<String, PlatformFile>,
+    onFilePicked: (key: String, PlatformFile?) -> Unit,
     isCreate: Boolean,
 ) {
     FormField(
@@ -177,8 +186,8 @@ private fun <DT : DataType> EditorContent(
 
     if (item is DataTypeWithImage) {
         FormImagePicker(
-            file = imageFile,
-            onFilePicked = onImageFilePicked,
+            file = files[FILE_KEY_IMAGE],
+            onFilePicked = { onFilePicked(FILE_KEY_IMAGE, it) },
             label = stringResource(Res.string.editor_image_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             fallbackImage = item.imageUrl(),
@@ -226,4 +235,28 @@ private fun <DT : DataType> EditorContent(
             )
         }
     }
+
+    // TODO: Points picker
+
+    if (item is Zone) {
+        FormFilePicker(
+            file = files[FILE_KEY_KMZ],
+            onFilePicked = { onFilePicked(FILE_KEY_KMZ, it) },
+            label = stringResource(Res.string.editor_kmz_label),
+            type = PickerType.File(listOf("kmz")),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
+    }
+
+    if (item is Sector) {
+        FormFilePicker(
+            file = files[FILE_KEY_GPX],
+            onFilePicked = { onFilePicked(FILE_KEY_GPX, it) },
+            label = stringResource(Res.string.editor_gpx_label),
+            type = PickerType.File(listOf("gpx")),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
+    }
+
+    Spacer(Modifier.height(32.dp))
 }

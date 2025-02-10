@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import utils.IO
 
 class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewModel() {
@@ -26,8 +28,9 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
     private val _parents = MutableStateFlow<List<DataType>?>(null)
     val parents get() = _parents.asStateFlow()
 
-    private val _imageFile = MutableStateFlow<PlatformFile?>(null)
-    val imageFile get() = _imageFile.asStateFlow()
+    private val _files = MutableStateFlow<Map<String, PlatformFile>>(emptyMap())
+    val files get() = _files.asStateFlow()
+    private val filesMutex = Semaphore(1)
 
     fun load(onNotFound: () -> Unit) {
         if (id == null) {
@@ -54,7 +57,23 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
         _item.tryEmit(value)
     }
 
-    fun setImageFile(file: PlatformFile?) {
-        _imageFile.tryEmit(file)
+    fun setFile(key: String, file: PlatformFile?) {
+        viewModelScope.launch {
+            filesMutex.withPermit {
+                val files = _files.value.toMutableMap()
+                if (file == null) {
+                    files -= key
+                } else {
+                    files[key] = file
+                }
+                _files.tryEmit(files)
+            }
+        }
+    }
+
+    companion object {
+        const val FILE_KEY_IMAGE = "image"
+        const val FILE_KEY_KMZ = "kmz"
+        const val FILE_KEY_GPX = "gpx"
     }
 }
