@@ -49,6 +49,7 @@ fun FormFilePicker(
     label: String,
     modifier: Modifier = Modifier,
     canBeCleared: Boolean = false,
+    fallbackContent: (@Composable () -> Unit)? = null
 ) {
     TooltipBox(
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(0.dp),
@@ -109,7 +110,29 @@ fun FormFilePicker(
                             .padding(horizontal = 8.dp)
                     )
                 }
-            }
+            } ?: fallbackContent?.invoke()
         }
     }
+}
+
+@Composable
+fun FormImagePicker(
+    file: PlatformFile?,
+    onFilePicked: (PlatformFile?) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    canBeCleared: Boolean = false,
+    fallbackImage: Any
+) {
+    FormFilePicker(
+        file = file,
+        onFilePicked = onFilePicked,
+        label = label,
+        modifier = modifier,
+        canBeCleared = canBeCleared,
+        type = PickerType.Image,
+        fallbackContent = {
+            AsyncImage(fallbackImage, null, Modifier.fillMaxWidth())
+        }
+    )
 }
