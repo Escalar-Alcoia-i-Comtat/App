@@ -22,6 +22,9 @@
     <string name="intro_1_message">Hay alguna información importante que necesitas conocer antes de usar la aplicación. Deslice a la derecha o presione el botón inferior derecho para continuar.</string>
     <string name="intro_2_title">¡Atención!</string>
     <string name="intro_2_message">La escalada es un deporte considerado de riesgo, por lo que todos los que la practican tienen que estar bien informados y asegurarse de realizar las maniobras correctamente. Desde esta guía no nos hacemos responsables de ningún tipo de accidente, ni somos responsables del material instalado en las zonas de escalada, mencionadas aquí.</string>
+    <string name="intro_legal_title">Legal Warning</string>
+    <string name="intro_legal_message">All the information, pictures, tracks and other type of content offered here is completely owned by Alexandre Mora i Monllor, and under the CC BY-NC-ND 4.0 license. Infractions will be legally prosecuted.</string>
+    <string name="intro_legal_web">Terms of Use and Service</string>
     <string name="intro_3_title">Conoce tu material</string>
     <string name="intro_3_message">Asegúrate de saber cómo utilizar correctamente el material que estás usando. La mayoría de los accidentes ocurren por mal uso del material de seguridad. Aquí hay un video donde se explica cómo utilizar el Grigri de Petzl: uno de los aseguradores más utilizados en el mundo.</string>
     <string name="intro_4_title">Cuida de los niños</string>
