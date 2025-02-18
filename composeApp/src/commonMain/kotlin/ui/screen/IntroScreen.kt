@@ -22,26 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import database.SettingsKeys
 import database.settings
-import escalaralcoiaicomtat.composeapp.generated.resources.Res
-import escalaralcoiaicomtat.composeapp.generated.resources.action_done
-import escalaralcoiaicomtat.composeapp.generated.resources.action_next
-import escalaralcoiaicomtat.composeapp.generated.resources.action_skip
-import escalaralcoiaicomtat.composeapp.generated.resources.action_view_video
-import escalaralcoiaicomtat.composeapp.generated.resources.belayer_color
-import escalaralcoiaicomtat.composeapp.generated.resources.climbing_color
-import escalaralcoiaicomtat.composeapp.generated.resources.climbing_helmet_color
-import escalaralcoiaicomtat.composeapp.generated.resources.drawstring_bag_color
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_1_message
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_1_title
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_2_message
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_2_title
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_3_message
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_3_title
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_4_message
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_4_title
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_5_message
-import escalaralcoiaicomtat.composeapp.generated.resources.intro_5_title
-import escalaralcoiaicomtat.composeapp.generated.resources.kid_color
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -58,6 +39,23 @@ private val pages: List<@Composable () -> Unit> = listOfNotNull(
             icon = painterResource(Res.drawable.climbing_color).icon,
             title = stringResource(Res.string.intro_1_title),
             message = stringResource(Res.string.intro_1_message)
+        )
+    },
+    {
+        val uriHandler = LocalUriHandler.current
+        IntroPage<Any>(
+            icon = painterResource(Res.drawable.document).icon,
+            title = stringResource(Res.string.intro_legal_title),
+            message = stringResource(Res.string.intro_legal_message),
+            action = object : IntroPage.Action() {
+                override val text: @Composable () -> String = {
+                    stringResource(Res.string.intro_legal_web)
+                }
+
+                override fun onClick() {
+                    uriHandler.openUri("https://legal.escalaralcoiaicomtat.org/")
+                }
+            },
         )
     },
     {
@@ -136,6 +134,7 @@ fun IntroScreen(onIntroFinished: () -> Unit) {
                 .padding(paddingValues)
         ) {
             TextButton(
+                enabled = pagerState.currentPage >= 2,
                 onClick = {
                     settings.putBoolean(SettingsKeys.SHOWN_INTRO, true)
                     onIntroFinished()
