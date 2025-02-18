@@ -22,6 +22,9 @@
     <string name="intro_1_message">Hi ha informació important que has de saber abans de fer servir l\'app. Llisca cap a la dreta o toca el botó de baix a la dreta per a continuar.</string>
     <string name="intro_2_title">Atenció!</string>
     <string name="intro_2_message">L\'escalada és un esport considerat de risc, tot el que el practiqui ha de preocupar-se del seu coneixement i correcta execució. Des d\'aquesta guia, no ens fem responsables de cap mena d\'accident. Tampoc ens fem responsables dels equipaments de les zones d\'escalada, ací anomenades.</string>
+    <string name="intro_legal_title">Legal Warning</string>
+    <string name="intro_legal_message">All the information, pictures, tracks and other type of content offered here is completely owned by Alexandre Mora i Monllor, and under the CC BY-NC-ND 4.0 license. Infractions will be legally prosecuted.</string>
+    <string name="intro_legal_web">Terms of Use and Service</string>
     <string name="intro_3_title">Coneix el teu material</string>
     <string name="intro_3_message">Assegura\'t de conèixer el material que fas servir. La gran part d\'accidents ocorren a causa d\'un mal ús del material de seguretat. Proporcionem un vídeo on s\'explica el correcte funcionament i ús del Grigri de Petzl: un dels asseguradors més utilitzats avui en dia.</string>
     <string name="intro_4_title">Cuida dels nens</string>
