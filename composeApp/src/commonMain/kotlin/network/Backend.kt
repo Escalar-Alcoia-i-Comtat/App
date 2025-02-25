@@ -41,15 +41,10 @@ import kotlin.uuid.Uuid
  * Allows running requests to the application backend.
  */
 object Backend {
-    private val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
-
     private val client = createHttpClient {
         install(ContentNegotiation) {
             json(
-                json = json
+                json = Json
             )
         }
         install(HttpCache) {
@@ -102,7 +97,7 @@ object Backend {
                 Napier.e(tag = "Backend") {
                     "Server responded with an exception.\nUrl: $url\nCode: $status. Body: $body"
                 }
-                json.decodeFromString<ErrorResponse>(body).throwException(url)
+                Json.decodeFromString<ErrorResponse>(body).throwException(url)
             }
         } catch (exception: NoTransformationFoundException) {
             Napier.e(tag = "Backend", throwable = exception) {

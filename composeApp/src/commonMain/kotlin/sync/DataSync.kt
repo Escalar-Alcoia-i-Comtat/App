@@ -49,7 +49,7 @@ object DataSync : SyncProcess() {
                     val item = Backend.area(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Area#$id..." }
-                        DatabaseInterface.areas().updateOrInsert(listOf(item))
+                        DatabaseInterface.areas().updateOrInsert(item)
                     } else {
                         Napier.e { "Could not find Area#$id in server." }
                     }
@@ -59,7 +59,7 @@ object DataSync : SyncProcess() {
                     val item = Backend.zone(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Zone#$id..." }
-                        DatabaseInterface.zones().updateOrInsert(listOf(item))
+                        DatabaseInterface.zones().updateOrInsert(item)
                     } else {
                         Napier.e { "Could not find Zone#$id in server." }
                     }
@@ -69,7 +69,7 @@ object DataSync : SyncProcess() {
                     val item = Backend.sector(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Sector#$id..." }
-                        DatabaseInterface.sectors().updateOrInsert(listOf(item))
+                        DatabaseInterface.sectors().updateOrInsert(item)
                     } else {
                         Napier.e { "Could not find Sector#$id in server." }
                     }
@@ -79,7 +79,7 @@ object DataSync : SyncProcess() {
                     val item = Backend.path(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Path#$id..." }
-                        DatabaseInterface.paths().updateOrInsert(listOf(item))
+                        DatabaseInterface.paths().updateOrInsert(item)
                     } else {
                         Napier.e { "Could not find Path#$id in server." }
                     }
