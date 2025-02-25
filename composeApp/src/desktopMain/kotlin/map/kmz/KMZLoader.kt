@@ -6,10 +6,11 @@ import map.MapData
 import map.placemark.Placemark
 import map.style.Style
 import maps.KMZHandler
+import kotlin.uuid.Uuid
 
 object KMZLoader {
     suspend inline fun loadKMZ(
-        kmzUUID: String
+        kmzUUID: Uuid
     ): MapData {
         val kmlFile = KMZHandler.load(kmzUUID, replaceImagePaths = false)
         Napier.d { "KMZ file is ready. Reading KML..." }

@@ -1,20 +1,28 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package data
 
 import data.generic.ExternalTrack
 import data.generic.LatLng
 import data.generic.SunTime
+import data.serialization.UuidSerializer
 import io.ktor.http.Url
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import network.Backend
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Serializable
+@ExperimentalUuidApi
 data class Sector(
     override val id: Long,
     override val timestamp: Long,
     @SerialName("display_name") override val displayName: String,
-    override val image: String,
-    val gpx: String? = null,
+    // Nullable to allow editing without uploading, must never be null
+    override val image: Uuid?,
+    val gpx: Uuid? = null,
     val tracks: List<ExternalTrack>? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
@@ -31,7 +39,7 @@ data class Sector(
         )
     )
     val paths: List<Path>
-): DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
+) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return (other as? Sector)
             // If other is a Sector, try to compare by weight, but don't consider empty weights
@@ -42,7 +50,7 @@ data class Sector(
             ?: displayName.compareTo(other.displayName)
     }
 
-    override fun getParentId(): Long = parentZoneId
+    override val parentId: Long get() = parentZoneId
 
     fun getGPXDownloadUrl(): Url? = gpx?.let(Backend::downloadFileUrl)
 
@@ -52,5 +60,21 @@ data class Sector(
      */
     override fun hasAnyMetadata(): Boolean {
         return super.hasAnyMetadata() || !tracks.isNullOrEmpty()
+    }
+
+    override fun copy(id: Long, timestamp: Long, displayName: String): Sector {
+        return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
+    }
+
+    override fun copy(image: Uuid): Sector {
+        return copy(id = id, image = image)
+    }
+
+    override fun copy(parentId: Long): Sector {
+        return copy(id = id, parentZoneId = parentId)
+    }
+
+    override fun copy(point: LatLng?): Sector {
+        return copy(id = id, point = point)
     }
 }

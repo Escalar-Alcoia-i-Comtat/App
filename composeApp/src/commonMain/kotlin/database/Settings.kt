@@ -29,4 +29,9 @@ object SettingsKeys {
      * Stores the preferred distance units to use.
      */
     const val DISTANCE_UNITS = "distance_units"
+
+    /**
+     * The API key that allows the user to edit the data.
+     */
+    const val API_KEY = "api_key"
 }

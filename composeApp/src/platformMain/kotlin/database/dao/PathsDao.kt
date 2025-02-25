@@ -18,6 +18,11 @@ interface PathsDao : BaseDao<Path, PathEntity> {
     @Query("SELECT * FROM PathEntity WHERE parentSectorId=:parentSectorId")
     suspend fun findBySectorId(parentSectorId: Long): List<PathEntity>
 
+    @Query("SELECT * FROM PathEntity WHERE id = :id")
+    override suspend fun get(id: Long): PathEntity?
+
+    override suspend fun getByParentId(parentId: Long): List<PathEntity> = findBySectorId(parentId.toLong())
+
     override fun constructor(type: Path): PathEntity {
         return with(type) {
             PathEntity(

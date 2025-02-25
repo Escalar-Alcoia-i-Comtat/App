@@ -1,5 +1,7 @@
 package data
 
 interface DataTypeWithParent : DataType {
-    fun getParentId(): Long
+    val parentId: Long
+
+    fun copy(parentId: Long): DataTypeWithParent
 }

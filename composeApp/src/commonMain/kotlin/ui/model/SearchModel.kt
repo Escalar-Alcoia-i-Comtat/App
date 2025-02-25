@@ -1,7 +1,6 @@
 package ui.model
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
 import data.Area
 import data.Path
 import data.Sector
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import search.Filter
 
-class SearchModel : ViewModel() {
+class SearchModel : ViewModelBase() {
     val query: StateFlow<String> get() = _query.asStateFlow()
     private val _query = MutableStateFlow("")
 

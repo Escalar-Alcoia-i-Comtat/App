@@ -357,7 +357,7 @@ fun PathsList(
                     Zoomable(
                         modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds()
                     ) {
-                        val image by ImageStorage.collectStateOf(parent.image)
+                        val image by ImageStorage.collectStateOf(parent.image!!)
 
                         image?.let { bitmap ->
                             Image(

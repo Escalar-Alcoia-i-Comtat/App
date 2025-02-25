@@ -14,12 +14,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.coroutines.getStringOrNullFlow
+import data.Area
+import data.DataTypes
+import data.Sector
+import data.Zone
 import database.SettingsKeys
 import database.settings
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import network.ConnectivityStatusObserver
 import platform.Updates
 import platform.initialDestination
@@ -32,6 +41,7 @@ import ui.navigation.Destination
 import ui.navigation.Destinations
 import ui.navigation.navigateTo
 import ui.screen.AppScreen
+import ui.screen.EditorScreen
 import ui.screen.IntroScreen
 import ui.screen.PathsScreen
 import ui.screen.SectorsScreen
@@ -55,7 +65,17 @@ fun AppRoot(
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            DataSync.start(DataSync.Cause.Scheduled)
+            val lastSync = settings
+                .getLongOrNull(SettingsKeys.LAST_SYNC_TIME)
+                ?.let { Instant.fromEpochMilliseconds(it) }
+            val now = Clock.System.now()
+
+            // Synchronize if never synced, or every 12 hours
+            if (lastSync == null || (now - lastSync).inWholeHours > 12) {
+                DataSync.start(DataSync.Cause.Scheduled)
+            } else {
+                Napier.d { "Won't run synchronization. Last run: ${(now - lastSync).inWholeHours} hours ago" }
+            }
         }
     }
 
@@ -82,7 +102,7 @@ fun AppRoot(
 }
 
 @Composable
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSettingsApi::class)
 fun SharedTransitionScope.NavigationController(
     navController: NavHostController,
     shownIntro: Boolean,
@@ -94,11 +114,14 @@ fun SharedTransitionScope.NavigationController(
     }
     LaunchedEffect(initial) { initialDestination(initial) }
 
+    val apiKey by settings.getStringOrNullFlow(SettingsKeys.API_KEY).collectAsState(null)
+    val editAllowed = apiKey != null
+
     CompositionLocalProvider(LocalSharedTransitionScope provides this) {
         NavHost(
             navController = navController,
             startDestination = initial,
-            modifier = modifier
+            modifier = modifier,
         ) {
             composable<Destinations.Root> {
                 LaunchedEffect(Unit) { onNavigate(Destinations.Root) }
@@ -114,6 +137,9 @@ fun SharedTransitionScope.NavigationController(
                         onSectorRequested = { parentAreaId, parentZoneId, sectorId, pathId ->
                             navController.navigateTo(Destinations.Sector(parentAreaId, parentZoneId, sectorId, pathId))
                         },
+                        onEditRequested = { area: Area ->
+                            navController.navigateTo(Destinations.Editor(DataTypes.Area, area.id))
+                        }.takeIf { editAllowed },
                         scrollToId = initial.id
                     )
                 }
@@ -135,7 +161,10 @@ fun SharedTransitionScope.NavigationController(
                     ZonesScreen(
                         areaId = route.areaId,
                         onBackRequested = { navController.navigateTo(route.up()) },
-                        onZoneRequested = { navController.navigateTo(route.down(it)) }
+                        onZoneRequested = { navController.navigateTo(route.down(it)) },
+                        onEditRequested = { zone: Zone ->
+                            navController.navigateTo(Destinations.Editor(DataTypes.Zone, zone.id))
+                        }.takeIf { editAllowed }
                     )
                 }
             }
@@ -147,7 +176,10 @@ fun SharedTransitionScope.NavigationController(
                     SectorsScreen(
                         zoneId = route.zoneId,
                         onBackRequested = { navController.navigateTo(route.up()) },
-                        onSectorRequested = { navController.navigateTo(route.down(it)) }
+                        onSectorRequested = { navController.navigateTo(route.down(it)) },
+                        onEditRequested = { sector: Sector ->
+                            navController.navigateTo(Destinations.Editor(DataTypes.Sector, sector.id))
+                        }.takeIf { editAllowed }
                     )
                 }
             }
@@ -162,6 +194,13 @@ fun SharedTransitionScope.NavigationController(
                         onBackRequested = { navController.navigateTo(route.up()) },
                     )
                 }
+            }
+            composable<Destinations.Editor> { navBackStackEntry ->
+                val route = navBackStackEntry.toRoute<Destinations.Editor>()
+                LaunchedEffect(Unit) { onNavigate(route) }
+                val dataTypes = remember(route) { DataTypes.valueOf(route.dataTypes) }
+
+                EditorScreen(dataTypes, route.id) { navController.navigateUp() }
             }
         }
     }

@@ -15,6 +15,7 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlin.uuid.Uuid
 
 @Composable
 @OptIn(MapsComposeExperimentalApi::class)
@@ -22,7 +23,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 actual fun MapComposable(
     viewModel: MapViewModel,
     modifier: Modifier,
-    kmzUUID: String?
+    kmz: Uuid?,
 ) {
     val context = LocalContext.current
 
@@ -55,13 +56,13 @@ actual fun MapComposable(
                 it.setOnMarkerClickListener { true }
             }
 
-            MapEffect(kmzUUID) { googleMap ->
-                if (kmzUUID != null) {
+            MapEffect(kmz) { googleMap ->
+                if (kmz != null) {
                     // Remove previous KML
                     viewModel.disposeLayer()
 
                     // Load new KML
-                    viewModel.load(context, googleMap, kmzUUID, cameraPositionState::move)
+                    viewModel.load(context, googleMap, kmz, cameraPositionState::move)
                 }
             }
         }

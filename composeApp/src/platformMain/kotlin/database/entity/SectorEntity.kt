@@ -10,9 +10,10 @@ import data.generic.LatLng
 import data.generic.SunTime
 import database.appDatabase
 import kotlinx.datetime.Instant
+import kotlin.uuid.Uuid
 
 @Entity(
-    indices = [Index("parentZoneId", unique = true)],
+    indices = [Index("parentZoneId", unique = false)],
     foreignKeys = [
         ForeignKey(
             entity = ZoneEntity::class,
@@ -26,8 +27,8 @@ data class SectorEntity(
     @PrimaryKey override val id: Long,
     override val timestamp: Instant,
     val displayName: String,
-    val image: String,
-    val gpx: String?,
+    val image: Uuid,
+    val gpx: Uuid?,
     val tracks: List<ExternalTrack>?,
     val kidsApt: Boolean,
     val weight: String,

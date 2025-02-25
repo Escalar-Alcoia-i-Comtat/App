@@ -1,5 +1,6 @@
 package ui.navigation
 
+import data.DataTypes
 import kotlinx.serialization.Serializable
 
 object Destinations {
@@ -54,5 +55,16 @@ object Destinations {
         override val id: Long = sectorId
 
         fun up(): Zone = Zone(parentAreaId, parentZoneId)
+    }
+
+    @Serializable
+    data class Editor(
+        val dataTypes: String,
+        override val id: Long?,
+    ) : Destination {
+        constructor(dataTypes: DataTypes<*>, id: Long?): this(dataTypes.name, id)
+
+        override val path: String = "/editor/${dataTypes}/${id ?: "new"}"
+        override val name: String = "Editor"
     }
 }

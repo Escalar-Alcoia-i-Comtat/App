@@ -7,12 +7,13 @@ import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import network.response.data.DataResponseType
+import json as defaultJson
 
 object DataResponse {
     fun <DataType : DataResponseType> decode(
         value: String,
         deserializer: DeserializationStrategy<DataType>,
-        json: Json = Json
+        json: Json = defaultJson
     ): DataType {
         val element = json.decodeFromString<JsonElement>(value).jsonObject
         val success = element.getValue("success").jsonPrimitive.boolean

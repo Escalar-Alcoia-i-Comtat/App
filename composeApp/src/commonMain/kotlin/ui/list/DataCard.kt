@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -33,67 +35,91 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import data.DataTypeWithImage
 import data.DataTypeWithPoint
+import escalaralcoiaicomtat.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import platform.launchPoint
+import ui.reusable.ContextMenu
 
 @Composable
-fun <T: DataTypeWithImage> DataCard(
+fun <T : DataTypeWithImage> DataCard(
     item: T,
     imageHeight: Dp,
     modifier: Modifier = Modifier,
+    onEdit: (() -> Unit)?,
     onClick: () -> Unit
 ) {
-    Column(
-        modifier = modifier
+    ContextMenu(
+        enabled = onEdit != null,
+        dropdownContent = {
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.editor_edit)) },
+                onClick = onEdit ?: {}
+            )
+        }
     ) {
-        Text(
-            text = item.displayName,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            fontSize = 20.sp
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(imageHeight)
-                .clickable(onClick = onClick),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = modifier
         ) {
-            val painter = rememberAsyncImagePainter(item.imageUrl())
-            val state by painter.state.collectAsState()
-            when (state) {
-                is AsyncImagePainter.State.Empty,
-                is AsyncImagePainter.State.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is AsyncImagePainter.State.Success -> {
-                    Image(
-                        painter = painter,
-                        contentDescription = item.displayName,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                is AsyncImagePainter.State.Error -> {
-                    // Show some error UI.
-                }
-            }
+            Text(
+                text = item.displayName,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                fontSize = 20.sp
+            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Bottom
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(imageHeight)
+                    .clickable(onClick = onClick),
+                contentAlignment = Alignment.Center
             ) {
-                if (item is DataTypeWithPoint) item.point?.let { point ->
-                    SmallFloatingActionButton(
-                        onClick = { launchPoint(point, item.displayName) }
-                    ) {
-                        Icon(Icons.Outlined.Place, null)
+                val painter = rememberAsyncImagePainter(item.imageUrl())
+                val state by painter.state.collectAsState()
+                when (state) {
+                    is AsyncImagePainter.State.Empty,
+                    is AsyncImagePainter.State.Loading -> {
+                        CircularProgressIndicator()
+                    }
+
+                    is AsyncImagePainter.State.Success -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = item.displayName,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(10.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    is AsyncImagePainter.State.Error -> {
+                        // Show some error UI.
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    onEdit?.let {
+                        SmallFloatingActionButton(
+                            onClick = it,
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Icon(Icons.Outlined.Edit, null)
+                        }
+                    }
+                    if (item is DataTypeWithPoint) item.point?.let { point ->
+                        SmallFloatingActionButton(
+                            onClick = { launchPoint(point, item.displayName) }
+                        ) {
+                            Icon(Icons.Outlined.Place, null)
+                        }
                     }
                 }
             }

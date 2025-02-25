@@ -35,20 +35,16 @@ import network.response.data.PathData
 import network.response.data.SectorData
 import network.response.data.ZoneData
 import platform.httpCacheStorage
+import kotlin.uuid.Uuid
 
 /**
  * Allows running requests to the application backend.
  */
 object Backend {
-    private val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
-
     private val client = createHttpClient {
         install(ContentNegotiation) {
             json(
-                json = json
+                json = Json
             )
         }
         install(HttpCache) {
@@ -101,7 +97,7 @@ object Backend {
                 Napier.e(tag = "Backend") {
                     "Server responded with an exception.\nUrl: $url\nCode: $status. Body: $body"
                 }
-                json.decodeFromString<ErrorResponse>(body).throwException(url)
+                Json.decodeFromString<ErrorResponse>(body).throwException(url)
             }
         } catch (exception: NoTransformationFoundException) {
             Napier.e(tag = "Backend", throwable = exception) {
@@ -262,7 +258,7 @@ object Backend {
      * @return A channel with the data of the file requested.
      */
     suspend fun downloadFile(
-        uuid: String,
+        uuid: Uuid,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): ByteReadChannel {
         Napier.d { "Downloading file $uuid from server...." }
@@ -285,8 +281,8 @@ object Backend {
      * Constructs the URL to access for downloading files from the backend.
      * @param uuid The file's identifier.
      */
-    fun downloadFileUrl(uuid: String): Url =
+    fun downloadFileUrl(uuid: Uuid): Url =
         URLBuilder(baseUrl)
-            .appendPathSegments("download", uuid)
+            .appendPathSegments("download", uuid.toString())
             .build()
 }

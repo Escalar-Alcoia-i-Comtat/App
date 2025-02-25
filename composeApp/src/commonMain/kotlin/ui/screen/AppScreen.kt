@@ -51,12 +51,11 @@ import data.Path
 import data.Sector
 import data.Zone
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import io.github.aakira.napier.Napier
 import network.connectivityStatus
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
 import search.Filter
-import sync.SyncProcess
+import sync.DataSync
 import ui.composition.LocalLifecycleManager
 import ui.dialog.SearchFiltersDialog
 import ui.model.AppScreenModel
@@ -77,22 +76,19 @@ fun AppScreen(
     onAreaRequested: (areaId: Long) -> Unit,
     onZoneRequested: (parentAreaId: Long, zoneId: Long) -> Unit,
     onSectorRequested: (parentAreaId: Long, parentZoneId: Long, sectorId: Long, pathId: Long?) -> Unit,
+    onEditRequested: ((area: Area) -> Unit)?,
     appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     scrollToId: Long? = null
 ) {
     val isNetworkConnected by connectivityStatus.isNetworkConnected.collectAsState()
 
-    val areas by appScreenModel.areas.collectAsState()
-    val zones by appScreenModel.zones.collectAsState()
-    val sectors by appScreenModel.sectors.collectAsState()
-    val paths by appScreenModel.paths.collectAsState()
+    val areas by appScreenModel.areas.collectAsState(null)
+    val zones by appScreenModel.zones.collectAsState(null)
+    val sectors by appScreenModel.sectors.collectAsState(null)
+    val paths by appScreenModel.paths.collectAsState(null)
 
-    val syncStatus by appScreenModel.syncStatus.collectAsState(SyncProcess.Status.WAITING)
-
-    LaunchedEffect(areas) {
-        Napier.i { "There are ${areas.size} areas loaded" }
-    }
+    val syncStatus by DataSync.status.collectAsState()
 
     LaunchedKeyEvent { event ->
         if (event.isCtrlPressed && event.key == Key.F && event.type == KeyEventType.KeyUp) {
@@ -176,7 +172,7 @@ fun AppScreen(
                             }
                             IconButton(
                                 onClick = searchModel::search,
-                                enabled = areas.isNotEmpty()
+                                enabled = !areas.isNullOrEmpty()
                             ) {
                                 Icon(Icons.Rounded.Search, null)
                             }
@@ -187,7 +183,7 @@ fun AppScreen(
         }
     ) { page ->
         when (page) {
-            0 -> MainScreen(areas, syncStatus, onAreaRequested, scrollToId)
+            0 -> MainScreen(areas, syncStatus, onAreaRequested, onEditRequested, scrollToId)
 
             1 -> SettingsPage()
 

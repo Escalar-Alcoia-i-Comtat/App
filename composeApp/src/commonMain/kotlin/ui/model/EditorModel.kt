@@ -1,0 +1,79 @@
+package ui.model
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import data.DataType
+import data.DataTypes
+import data.Path
+import data.Sector
+import data.Zone
+import database.DatabaseInterface
+import database.byType
+import io.github.aakira.napier.Napier
+import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import utils.IO
+
+class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewModel() {
+    private val databaseInterface = DatabaseInterface.byType(type)
+
+    private val _item = MutableStateFlow<DT?>(null)
+    val item get() = _item.asStateFlow()
+
+    private val _parents = MutableStateFlow<List<DataType>?>(null)
+    val parents get() = _parents.asStateFlow()
+
+    private val _files = MutableStateFlow<Map<String, PlatformFile>>(emptyMap())
+    val files get() = _files.asStateFlow()
+    private val filesMutex = Semaphore(1)
+
+    fun load(onNotFound: () -> Unit) {
+        if (id == null) {
+            Napier.d { "Creating a new ${type.name}..." }
+            _item.tryEmit(type.default())
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            Napier.d { "Editing ${type.name}#$id..." }
+            val item = databaseInterface.get(id) ?: return@launch onNotFound()
+            _item.emit(item)
+
+            val parents = when (item) {
+                is Zone -> DatabaseInterface.areas().all()
+                is Sector -> DatabaseInterface.zones().all()
+                is Path -> DatabaseInterface.sectors().all()
+                else -> null
+            }
+            _parents.emit(parents)
+        }
+    }
+
+    fun updateItem(value: DT) {
+        _item.tryEmit(value)
+    }
+
+    fun setFile(key: String, file: PlatformFile?) {
+        viewModelScope.launch {
+            filesMutex.withPermit {
+                val files = _files.value.toMutableMap()
+                if (file == null) {
+                    files -= key
+                } else {
+                    files[key] = file
+                }
+                _files.tryEmit(files)
+            }
+        }
+    }
+
+    companion object {
+        const val FILE_KEY_IMAGE = "image"
+        const val FILE_KEY_KMZ = "kmz"
+        const val FILE_KEY_GPX = "gpx"
+    }
+}

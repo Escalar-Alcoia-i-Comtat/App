@@ -14,4 +14,6 @@ sealed interface DataTypeWithPoint : DataType {
     fun hasAnyMetadata(): Boolean {
         return point != null
     }
+
+    fun copy(point: LatLng?): DataTypeWithPoint
 }

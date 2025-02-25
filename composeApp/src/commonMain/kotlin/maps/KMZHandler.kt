@@ -7,6 +7,7 @@ import io.github.aakira.napier.Napier
 import io.ktor.utils.io.readBuffer
 import network.Backend
 import platform.ZipFileHandler
+import kotlin.uuid.Uuid
 
 object KMZHandler {
 
@@ -41,7 +42,7 @@ object KMZHandler {
      * @return The KML file downloaded.
      */
     suspend fun load(
-        uuid: String,
+        uuid: Uuid,
         replaceImagePaths: Boolean = true,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): ZipFile {

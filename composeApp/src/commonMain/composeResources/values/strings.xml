@@ -149,4 +149,21 @@
     <string name="ending_rappel">Walking</string>
 
     <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">More Info</string>
+
+    <string name="file_picker_hint">Click to pick</string>
+
+    <string name="editor_close">Close</string>
+    <string name="editor_loading">Loading...</string>
+    <string name="editor_clear">Clear</string>
+    <string name="editor_edit">Edit</string>
+    <string name="editor_id_automatic">Automatic</string>
+    <string name="editor_id_label">ID</string>
+    <string name="editor_parent_label">Parent</string>
+    <string name="editor_display_name_label">Display Name</string>
+    <string name="editor_image_label">Image</string>
+    <string name="editor_latitude_label">Latitude</string>
+    <string name="editor_longitude_label">Longitude</string>
+    <string name="editor_kmz_label">KMZ</string>
+    <string name="editor_gpx_label">GPX</string>
+    <string name="editor_error_coordinate" comment="Shown when introducing an invalid latitude or longitude on a field.">Must be a valid coordinate.</string>
 </resources>

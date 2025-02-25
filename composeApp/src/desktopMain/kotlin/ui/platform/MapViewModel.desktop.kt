@@ -27,6 +27,7 @@ import map.kmz.KMZLoader
 import map.placemark.Polygon
 import network.createHttpClient
 import utils.asJavaFile
+import kotlin.uuid.Uuid
 
 actual class MapViewModel actual constructor() : ViewModel() {
     private val httpClient = createHttpClient {
@@ -44,10 +45,10 @@ actual class MapViewModel actual constructor() : ViewModel() {
     val mapImage: StateFlow<ByteArray?>
         get() = _mapImage.asStateFlow()
 
-    fun loadMap(kmzUUID: String, layoutSize: IntSize) {
+    fun loadMap(kmz: Uuid, layoutSize: IntSize) {
         viewModelScope.launch(Dispatchers.IO) {
-            Napier.i { "Loading KMZ $kmzUUID..." }
-            val mapData = KMZLoader.loadKMZ(kmzUUID)
+            Napier.i { "Loading KMZ $kmz..." }
+            val mapData = KMZLoader.loadKMZ(kmz)
 
             val (mapUUID, staticMap) = createMap(mapData, layoutSize)
             loadMap(mapUUID, staticMap)

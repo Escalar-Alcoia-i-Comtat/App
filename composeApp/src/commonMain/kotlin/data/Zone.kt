@@ -1,18 +1,24 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package data
 
 import data.generic.LatLng
 import data.generic.Point
+import data.serialization.UuidSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlin.uuid.Uuid
 
 @Serializable
 data class Zone(
     override val id: Long,
     override val timestamp: Long,
     @SerialName("display_name") override val displayName: String,
-    override val image: String,
-    @SerialName("web_url") val webUrl: String,
-    @SerialName("kmz") val kmzUUID: String,
+    // Nullable to allow editing without uploading, must never be null
+    override val image: Uuid?,
+    // Nullable to allow editing without uploading, must never be null
+    @SerialName("kmz") val kmz: Uuid?,
     override val point: LatLng? = null,
     override val points: List<Point>,
     @SerialName("area_id") val parentAreaId: Long,
@@ -30,7 +36,7 @@ data class Zone(
         return displayName.compareTo(other.displayName)
     }
 
-    override fun getParentId(): Long = parentAreaId
+    override val parentId: Long get() = parentAreaId
 
     /**
      * Checks whether the zone has any metadata to display.
@@ -38,5 +44,25 @@ data class Zone(
      */
     override fun hasAnyMetadata(): Boolean {
         return super.hasAnyMetadata() || points.isNotEmpty()
+    }
+
+    override fun copy(id: Long, timestamp: Long, displayName: String): Zone {
+        return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
+    }
+
+    override fun copy(image: Uuid): Zone {
+        return copy(id = id, image = image)
+    }
+
+    override fun copy(parentId: Long): Zone {
+        return copy(id = id, parentAreaId = parentId)
+    }
+
+    override fun copy(point: LatLng?): Zone {
+        return copy(id = id, point = point)
+    }
+
+    override fun copy(points: List<Point>): Zone {
+        return copy(id = id, points = points)
     }
 }

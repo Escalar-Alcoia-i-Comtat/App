@@ -19,9 +19,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import build.BuildKonfig
 import org.jetbrains.compose.resources.decodeToImageBitmap
+import kotlin.uuid.Uuid
 
 @Composable
-actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmzUUID: String?) {
+actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmz: Uuid?) {
     // Require that the Mapbox access token is set
     BuildKonfig.MAPBOX_ACCESS_TOKEN ?: return
 
@@ -30,11 +31,11 @@ actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmzUUID: S
     val loadingProgress by viewModel.progress.collectAsState()
 
     // Instantiate the map when layout is positioned
-    LaunchedEffect(layoutSize, kmzUUID) {
+    LaunchedEffect(layoutSize, kmz) {
         if (layoutSize == null) return@LaunchedEffect
-        if (kmzUUID == null) return@LaunchedEffect
+        if (kmz == null) return@LaunchedEffect
 
-        viewModel.loadMap(kmzUUID, layoutSize!!)
+        viewModel.loadMap(kmz, layoutSize!!)
     }
 
     AnimatedContent(

@@ -2,12 +2,9 @@ package ui.model
 
 import data.Path
 import data.Sector
-import kotlinx.coroutines.flow.first
-import sync.DataSync
+import database.DatabaseInterface
 
 class PathsScreenModel : DataScreenModel<Sector, Path>(
-    childrenListAccessor = { parentId ->
-        DataSync.paths.first()?.filter { it.getParentId() == parentId } ?: emptyList()
-    },
-    parentListAccessor = { id -> DataSync.sectors.first()?.find { it.id == id } }
+    childrenListAccessor = { parentId -> DatabaseInterface.paths().getByParentId(parentId) },
+    parentListAccessor = { id -> DatabaseInterface.sectors().get(id) }
 )

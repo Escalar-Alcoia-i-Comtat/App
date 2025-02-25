@@ -15,7 +15,8 @@ import database.entity.ZoneEntity
 
 @Database(
     entities = [AreaEntity::class, ZoneEntity::class, SectorEntity::class, PathEntity::class],
-    version = 1,
+    version = 2,
+    autoMigrations = []
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
