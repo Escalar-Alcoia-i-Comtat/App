@@ -14,6 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import data.Area
 import data.DataTypes
 import data.Sector
@@ -100,7 +102,7 @@ fun AppRoot(
 }
 
 @Composable
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSettingsApi::class)
 fun SharedTransitionScope.NavigationController(
     navController: NavHostController,
     shownIntro: Boolean,
@@ -112,8 +114,8 @@ fun SharedTransitionScope.NavigationController(
     }
     LaunchedEffect(initial) { initialDestination(initial) }
 
-    // TODO: Configure editing support accordingly
-    val editAllowed = false
+    val apiKey by settings.getStringOrNullFlow(SettingsKeys.API_KEY).collectAsState(null)
+    val editAllowed = apiKey != null
 
     CompositionLocalProvider(LocalSharedTransitionScope provides this) {
         NavHost(
