@@ -112,7 +112,8 @@ fun SharedTransitionScope.NavigationController(
     }
     LaunchedEffect(initial) { initialDestination(initial) }
 
-    val editAllowed = true
+    // TODO: Configure editing support accordingly
+    val editAllowed = false
 
     CompositionLocalProvider(LocalSharedTransitionScope provides this) {
         NavHost(
