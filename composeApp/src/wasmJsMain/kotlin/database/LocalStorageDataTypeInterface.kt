@@ -2,6 +2,7 @@ package database
 
 import data.Area
 import data.DataType
+import data.DataTypeWithParent
 import data.Sector
 import data.Zone
 import io.github.aakira.napier.Napier
@@ -95,8 +96,8 @@ class LocalStorageDataTypeInterface<Type : DataType>(
         close()
     }
 
-    override suspend fun get(id: Int): Type? {
-        val value = localStorage.getItem(buildKey(id.toLong())) ?: return null
+    override suspend fun get(id: Long): Type? {
+        val value = localStorage.getItem(buildKey(id)) ?: return null
         return try {
             Json.decodeFromString(serializer, value)
         } catch (e: SerializationException) {
@@ -108,7 +109,7 @@ class LocalStorageDataTypeInterface<Type : DataType>(
         }
     }
 
-    override suspend fun getByParentId(parentId: Int): List<Type> {
-        TODO("Not yet implemented")
+    override suspend fun getByParentId(parentId: Long): List<Type> {
+        return all().filter { (it as? DataTypeWithParent)?.parentId == parentId }
     }
 }
