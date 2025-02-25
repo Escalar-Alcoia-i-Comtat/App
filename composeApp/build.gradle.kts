@@ -121,6 +121,9 @@ kotlin {
                 configDirectory = File(project.rootDir, "webpack.config.d")
             }
         }
+        compilerOptions {
+            freeCompilerArgs.add("-Xwasm-attach-js-exception")
+        }
         binaries.executable()
     }
 
@@ -293,6 +296,12 @@ kotlin {
 
                 // Semantic Versioning
                 implementation(libs.semver)
+            }
+        }
+
+        wasmJsMain {
+            dependencies {
+                implementation(libs.kotlinx.browser)
             }
         }
     }
