@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "adca541c59d3ec04c634139d9c2f7d8a",
+    "identityHash": "02748c30afef1fae4cd6980d2bcff2f0",
     "entities": [
       {
         "tableName": "AreaEntity",
@@ -113,12 +113,12 @@
         "indices": [
           {
             "name": "index_ZoneEntity_parentAreaId",
-            "unique": false,
+            "unique": true,
             "columnNames": [
               "parentAreaId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_ZoneEntity_parentAreaId` ON `${TABLE_NAME}` (`parentAreaId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ZoneEntity_parentAreaId` ON `${TABLE_NAME}` (`parentAreaId`)"
           }
         ],
         "foreignKeys": [
@@ -217,12 +217,12 @@
         "indices": [
           {
             "name": "index_SectorEntity_parentZoneId",
-            "unique": false,
+            "unique": true,
             "columnNames": [
               "parentZoneId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_SectorEntity_parentZoneId` ON `${TABLE_NAME}` (`parentZoneId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_SectorEntity_parentZoneId` ON `${TABLE_NAME}` (`parentZoneId`)"
           }
         ],
         "foreignKeys": [
@@ -395,12 +395,12 @@
         "indices": [
           {
             "name": "index_PathEntity_parentSectorId",
-            "unique": false,
+            "unique": true,
             "columnNames": [
               "parentSectorId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_PathEntity_parentSectorId` ON `${TABLE_NAME}` (`parentSectorId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_PathEntity_parentSectorId` ON `${TABLE_NAME}` (`parentSectorId`)"
           }
         ],
         "foreignKeys": [
@@ -420,7 +420,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'adca541c59d3ec04c634139d9c2f7d8a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '02748c30afef1fae4cd6980d2bcff2f0')"
     ]
   }
 }
