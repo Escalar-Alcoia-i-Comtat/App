@@ -21,7 +21,7 @@ interface ZonesDao : BaseDao<Zone, ZoneEntity> {
     @Query("SELECT * FROM ZoneEntity WHERE id = :id")
     override suspend fun get(id: Long): ZoneEntity?
 
-    override suspend fun getByParentId(parentId: Long): List<ZoneEntity> = findByAreaId(parentId.toLong())
+    override suspend fun getByParentId(parentId: Long): List<ZoneEntity> = findByAreaId(parentId)
 
     override fun constructor(type: Zone): ZoneEntity {
         return with(type) {
@@ -29,9 +29,9 @@ interface ZonesDao : BaseDao<Zone, ZoneEntity> {
                 id,
                 Instant.fromEpochMilliseconds(timestamp),
                 displayName,
-                image,
+                image!!,
                 webUrl,
-                kmzUUID,
+                kmz!!,
                 point,
                 points,
                 parentAreaId

@@ -8,8 +8,8 @@ import data.generic.PitchInfo
 import data.generic.Point
 import kotlinx.datetime.Instant
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import kotlin.uuid.Uuid
 
 object Converters {
     @TypeConverter
@@ -30,6 +30,16 @@ object Converters {
 
     @TypeConverter
     fun toLatLng(value: LatLng?): String? {
+        return value?.toString()
+    }
+
+    @TypeConverter
+    fun fromUuid(value: String?): Uuid? {
+        return value?.let(Uuid::parse)
+    }
+
+    @TypeConverter
+    fun toUuid(value: Uuid?): String? {
         return value?.toString()
     }
 
@@ -90,12 +100,12 @@ object Converters {
 
 
     @TypeConverter
-    fun fromStringList(value: String?): List<String>? {
-        return value?.let { Json.decodeFromString(ListSerializer(String.serializer()), it) }
+    fun fromUuidList(value: String?): List<Uuid>? {
+        return value?.split(',')?.map(Uuid::parse)
     }
 
     @TypeConverter
-    fun toStringList(value: List<String>?): String? {
-        return value?.let { Json.encodeToString(ListSerializer(String.serializer()), it) }
+    fun toUuidList(value: List<Uuid>?): String? {
+        return value?.joinToString(",")
     }
 }

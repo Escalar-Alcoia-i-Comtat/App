@@ -1,14 +1,20 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package data
 
+import data.serialization.UuidSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlin.uuid.Uuid
 
 @Serializable
 data class Area(
     override val id: Long,
     override val timestamp: Long,
     @SerialName("display_name") override val displayName: String,
-    override val image: String,
+    // Nullable to allow editing without uploading, must never be null
+    override val image: Uuid?,
     @SerialName("web_url") val webUrl: String,
 
     @Deprecated(
@@ -29,7 +35,7 @@ data class Area(
         return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
     }
 
-    override fun copy(image: String): Area {
+    override fun copy(image: Uuid): Area {
         return copy(id = id, image = image)
     }
 }

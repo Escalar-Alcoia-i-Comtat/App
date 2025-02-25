@@ -5,13 +5,14 @@ import androidx.room.PrimaryKey
 import data.Area
 import database.appDatabase
 import kotlinx.datetime.Instant
+import kotlin.uuid.Uuid
 
 @Entity
 data class AreaEntity(
     @PrimaryKey override val id: Long,
     override val timestamp: Instant,
     val displayName: String,
-    val image: String,
+    val image: Uuid,
     val webUrl: String
 ) : DatabaseEntity<Area> {
     suspend fun zones(): List<ZoneEntity> = appDatabase.zones().findByAreaId(id)

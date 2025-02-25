@@ -1,20 +1,28 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package data
 
 import data.generic.ExternalTrack
 import data.generic.LatLng
 import data.generic.SunTime
+import data.serialization.UuidSerializer
 import io.ktor.http.Url
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import network.Backend
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Serializable
+@ExperimentalUuidApi
 data class Sector(
     override val id: Long,
     override val timestamp: Long,
     @SerialName("display_name") override val displayName: String,
-    override val image: String,
-    val gpx: String? = null,
+    // Nullable to allow editing without uploading, must never be null
+    override val image: Uuid?,
+    val gpx: Uuid? = null,
     val tracks: List<ExternalTrack>? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
@@ -58,7 +66,7 @@ data class Sector(
         return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
     }
 
-    override fun copy(image: String): Sector {
+    override fun copy(image: Uuid): Sector {
         return copy(id = id, image = image)
     }
 

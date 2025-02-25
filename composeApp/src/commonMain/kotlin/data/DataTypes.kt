@@ -2,6 +2,7 @@ package data
 
 import data.generic.SunTime
 import kotlinx.datetime.Clock
+import kotlin.uuid.Uuid
 
 sealed class DataTypes<out DT : DataType> {
     val name: String get() = this::class.simpleName ?: error("Class doesn't have a valid name")
@@ -31,7 +32,7 @@ sealed class DataTypes<out DT : DataType> {
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
             displayName = "",
-            image = "",
+            image = Uuid.random(),
             webUrl = "",
             zones = emptyList()
         )
@@ -42,9 +43,9 @@ sealed class DataTypes<out DT : DataType> {
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
             displayName = "",
-            image = "",
+            image = null,
             webUrl = "",
-            kmzUUID = "",
+            kmz = null,
             point = null,
             points = emptyList(),
             parentAreaId = 0,
@@ -57,7 +58,7 @@ sealed class DataTypes<out DT : DataType> {
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
             displayName = "",
-            image = "",
+            image = null,
             gpx = null,
             tracks = null,
             kidsApt = false,

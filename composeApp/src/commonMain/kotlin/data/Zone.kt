@@ -1,18 +1,25 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package data
 
 import data.generic.LatLng
 import data.generic.Point
+import data.serialization.UuidSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlin.uuid.Uuid
 
 @Serializable
 data class Zone(
     override val id: Long,
     override val timestamp: Long,
     @SerialName("display_name") override val displayName: String,
-    override val image: String,
+    // Nullable to allow editing without uploading, must never be null
+    override val image: Uuid?,
     @SerialName("web_url") val webUrl: String,
-    @SerialName("kmz") val kmzUUID: String,
+    // Nullable to allow editing without uploading, must never be null
+    @SerialName("kmz") val kmz: Uuid?,
     override val point: LatLng? = null,
     override val points: List<Point>,
     @SerialName("area_id") val parentAreaId: Long,
@@ -44,7 +51,7 @@ data class Zone(
         return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
     }
 
-    override fun copy(image: String): Zone {
+    override fun copy(image: Uuid): Zone {
         return copy(id = id, image = image)
     }
 

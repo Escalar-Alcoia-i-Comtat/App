@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import maps.KMZHandler
+import kotlin.uuid.Uuid
 
 actual class MapViewModel actual constructor() : ViewModel() {
 
@@ -108,7 +109,7 @@ actual class MapViewModel actual constructor() : ViewModel() {
     private suspend fun loadKMZ(
         context: Context,
         googleMap: GoogleMap,
-        kmzUUID: String,
+        kmzUUID: Uuid,
         onMoveCameraRequested: (CameraUpdate) -> Unit
     ) {
         val kml = KMZHandler.load(kmzUUID)
@@ -152,14 +153,14 @@ actual class MapViewModel actual constructor() : ViewModel() {
     fun load(
         context: Context,
         googleMap: GoogleMap,
-        kmzUUID: String,
+        kmz: Uuid,
         onMoveCameraRequested: (CameraUpdate) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _isLoading.emit(true)
 
-                loadKMZ(context, googleMap, kmzUUID, onMoveCameraRequested)
+                loadKMZ(context, googleMap, kmz, onMoveCameraRequested)
             } finally {
                 _isLoading.emit(false)
             }

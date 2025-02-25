@@ -9,6 +9,7 @@ import data.generic.LatLng
 import data.generic.Point
 import database.appDatabase
 import kotlinx.datetime.Instant
+import kotlin.uuid.Uuid
 
 @Entity(
     indices = [Index("parentAreaId", unique = false)],
@@ -25,9 +26,9 @@ data class ZoneEntity(
     @PrimaryKey override val id: Long,
     override val timestamp: Instant,
     val displayName: String,
-    val image: String,
+    val image: Uuid,
     val webUrl: String,
-    val kmzUUID: String,
+    val kmzUUID: Uuid,
     val point: LatLng?,
     val points: List<Point>,
     val parentAreaId: Long

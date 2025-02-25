@@ -1,6 +1,7 @@
 package ui.reusable.form
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,7 +50,7 @@ fun FormFilePicker(
     label: String,
     modifier: Modifier = Modifier,
     canBeCleared: Boolean = false,
-    fallbackContent: (@Composable () -> Unit)? = null
+    fallbackContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     TooltipBox(
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(0.dp),
@@ -110,7 +111,7 @@ fun FormFilePicker(
                             .padding(horizontal = 8.dp)
                     )
                 }
-            } ?: fallbackContent?.invoke() ?: Text(
+            } ?: fallbackContent?.invoke(this) ?: Text(
                 text = stringResource(Res.string.file_picker_hint),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier

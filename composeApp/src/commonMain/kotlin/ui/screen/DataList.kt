@@ -121,7 +121,7 @@ private fun LazyListScope.display(zone: Zone) {
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .shadow(3.dp),
-            kmzUUID = zone.kmzUUID
+            kmz = zone.kmz
         )
     }
     if (zone.hasAnyMetadata()) {

@@ -29,7 +29,7 @@ interface SectorsDao : BaseDao<Sector, SectorEntity> {
                 id,
                 Instant.fromEpochMilliseconds(timestamp),
                 displayName,
-                image,
+                image!!,
                 gpx,
                 tracks,
                 kidsApt,

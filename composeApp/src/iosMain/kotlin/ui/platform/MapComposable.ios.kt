@@ -27,6 +27,7 @@ import platform.MapKit.MKAnnotationProtocol
 import platform.MapKit.MKMapTypeSatellite
 import platform.MapKit.MKMapView
 import ui.reusable.CircularProgressIndicatorBox
+import kotlin.uuid.Uuid
 
 data class MapData(
     val placemarks: List<Placemark>,
@@ -34,10 +35,10 @@ data class MapData(
 )
 
 private suspend inline fun loadKMZ(
-    kmzUUID: String,
+    kmz: Uuid,
     onDocumentLoaded: (data: MapData) -> Unit
 ) {
-    val kmlFile = KMZHandler.load(kmzUUID, replaceImagePaths = false)
+    val kmlFile = KMZHandler.load(kmz, replaceImagePaths = false)
     val kmlString = kmlFile.readAllBytes().decodeToString()
     val dataDir = kmlFile.parent
     val xml = Ksoup.parse(kmlString)
@@ -58,12 +59,12 @@ private suspend inline fun loadKMZ(
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmzUUID: String?) {
+actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmz: Uuid?) {
     var mapData by remember { mutableStateOf<MapData?>(null) }
 
-    LaunchedEffect(kmzUUID) {
-        if (kmzUUID != null && mapData == null) CoroutineScope(Dispatchers.IO).launch {
-            loadKMZ(kmzUUID) { mapData = it }
+    LaunchedEffect(kmz) {
+        if (kmz != null && mapData == null) CoroutineScope(Dispatchers.IO).launch {
+            loadKMZ(kmz) { mapData = it }
         }
     }
 

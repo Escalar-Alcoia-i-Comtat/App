@@ -1,12 +1,17 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package data
 
 import data.generic.Builder
 import data.generic.Ending
 import data.generic.GradeValue
 import data.generic.PitchInfo
+import data.serialization.UuidSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import utils.isNotNullOrZero
+import kotlin.uuid.Uuid
 
 @Serializable
 data class Path(
@@ -42,7 +47,7 @@ data class Path(
     val builder: Builder? = null,
     @SerialName("re_builder") val reBuilders: List<Builder>? = null,
 
-    val images: List<String>? = null,
+    val images: List<Uuid>? = null,
 
     @SerialName("sector_id") val parentSectorId: Long
 ) : DataType, DataTypeWithParent {

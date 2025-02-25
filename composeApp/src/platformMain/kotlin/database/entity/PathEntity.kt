@@ -9,6 +9,7 @@ import data.generic.Builder
 import data.generic.Ending
 import data.generic.PitchInfo
 import kotlinx.datetime.Instant
+import kotlin.uuid.Uuid
 
 @Entity(
     indices = [Index("parentSectorId", unique = false)],
@@ -54,7 +55,7 @@ data class PathEntity(
     val builder: Builder? = null,
     val reBuilders: List<Builder>? = null,
 
-    val images: List<String>? = null,
+    val images: List<Uuid>? = null,
 
     val parentSectorId: Long
 ) : DatabaseEntity<Path> {

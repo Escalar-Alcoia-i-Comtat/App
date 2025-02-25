@@ -1,15 +1,20 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package network.response.data
 
 import data.Area
+import data.serialization.UuidSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlin.uuid.Uuid
 
 @Serializable
 data class AreaData(
     val id: Long,
     val timestamp: Long,
     @SerialName("display_name") val displayName: String,
-    val image: String,
+    val image: Uuid,
     @SerialName("web_url") val webUrl: String,
 ): DataResponseType {
     /**

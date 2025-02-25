@@ -14,13 +14,14 @@ import kotlinx.coroutines.withContext
 import network.Backend
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import utils.IO
+import kotlin.uuid.Uuid
 
 @Deprecated("Use Coil instead")
 object ImageStorage {
 
     @Composable
     fun collectStateOf(
-        uuid: String,
+        uuid: Uuid,
         onProgressUpdate: (suspend (current: Long, max: Long?) -> Unit)? = null
     ): State<ImageBitmap?> {
         val state: MutableState<ImageBitmap?> = remember { mutableStateOf(null) }
@@ -32,7 +33,7 @@ object ImageStorage {
 
     @Composable
     private fun FetchUUID(
-        uuid: String,
+        uuid: Uuid,
         state: MutableState<ImageBitmap?>,
         onProgressUpdate: (suspend (current: Long, max: Long?) -> Unit)?
     ) {

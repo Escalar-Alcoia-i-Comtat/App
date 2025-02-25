@@ -153,6 +153,7 @@ kotlin {
         all {
             languageSettings {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
 

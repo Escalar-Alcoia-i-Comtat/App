@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -245,6 +246,18 @@ private fun <DT : DataType> EditorContent(
             label = stringResource(Res.string.editor_kmz_label),
             type = PickerType.File(listOf("kmz")),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            fallbackContent = if (item.kmz != null) {
+                {
+                    Text(
+                        text = item.kmz.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                            .padding(horizontal = 8.dp)
+                    )
+                }
+            } else null,
         )
     }
 
@@ -255,6 +268,18 @@ private fun <DT : DataType> EditorContent(
             label = stringResource(Res.string.editor_gpx_label),
             type = PickerType.File(listOf("gpx")),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            fallbackContent = if (item.gpx != null) {
+                {
+                    Text(
+                        text = item.gpx.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                            .padding(horizontal = 8.dp)
+                    )
+                }
+            } else null,
         )
     }
 

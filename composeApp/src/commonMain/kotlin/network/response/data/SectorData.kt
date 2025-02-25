@@ -1,19 +1,24 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package network.response.data
 
 import data.Sector
 import data.generic.ExternalTrack
 import data.generic.LatLng
 import data.generic.SunTime
+import data.serialization.UuidSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlin.uuid.Uuid
 
 @Serializable
 data class SectorData(
     val id: Long,
     val timestamp: Long,
     @SerialName("display_name") val displayName: String,
-    val image: String,
-    val gpx: String? = null,
+    val image: Uuid,
+    val gpx: Uuid? = null,
     val tracks: List<ExternalTrack>? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
