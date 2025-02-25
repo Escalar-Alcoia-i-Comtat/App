@@ -39,7 +39,7 @@ jobs:
       - name: Build WASM Distribution
         id: build
         env:
-          BASE_URL: https://escalaralcoiaicomtat.com
+          BASE_URL: https://backend.escalaralcoiaicomtat.com
         run: ./gradlew :composeApp:wasmJsBrowserDistribution --no-daemon
 
       - name: Build and push production

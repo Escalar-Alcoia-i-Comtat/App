@@ -26,6 +26,9 @@
     <string name="intro_1_message">There's some important information you need to know before using the app. Slide to the right or press the bottom right button to continue.</string>
     <string name="intro_2_title">Attention!</string>
     <string name="intro_2_message">Climbing is a sport considered risky, everyone who practices it has to worry about its knowledge and correct execution. From this web-guide, we are not responsible for any type of accident. Nor are we responsible for the equipment in the climbing areas, named here.</string>
+    <string name="intro_legal_title">Legal Warning</string>
+    <string name="intro_legal_message">All the information, pictures, tracks and other type of content offered here is completely owned by Alexandre Mora i Monllor, and under the CC BY-NC-ND 4.0 license. Infractions will be legally prosecuted.</string>
+    <string name="intro_legal_web">Terms of Use and Service</string>
     <string name="intro_3_title">Know your material</string>
     <string name="intro_3_message">Make sure you properly know how to use the material you are using. Most accidents occur because of bad usages of the safety material. Here's a video where it's explained how to use the Grigri from Pezl: one of the most commonly used belaying equipment.</string>
     <string name="intro_4_title">Take care of children</string>
