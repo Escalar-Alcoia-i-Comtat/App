@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "adca541c59d3ec04c634139d9c2f7d8a",
+    "identityHash": "7d3b23b51fd33799b0fc0b436e2d23f7",
     "entities": [
       {
         "tableName": "AreaEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `displayName` TEXT NOT NULL, `image` TEXT NOT NULL, `webUrl` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `displayName` TEXT NOT NULL, `image` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -29,12 +29,6 @@
           {
             "fieldPath": "image",
             "columnName": "image",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "webUrl",
-            "columnName": "webUrl",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -48,7 +42,7 @@
       },
       {
         "tableName": "ZoneEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `displayName` TEXT NOT NULL, `image` TEXT NOT NULL, `webUrl` TEXT NOT NULL, `kmzUUID` TEXT NOT NULL, `point` TEXT, `points` TEXT NOT NULL, `parentAreaId` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`parentAreaId`) REFERENCES `AreaEntity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `displayName` TEXT NOT NULL, `image` TEXT NOT NULL, `kmzUUID` TEXT NOT NULL, `point` TEXT, `points` TEXT NOT NULL, `parentAreaId` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`parentAreaId`) REFERENCES `AreaEntity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -71,12 +65,6 @@
           {
             "fieldPath": "image",
             "columnName": "image",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "webUrl",
-            "columnName": "webUrl",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -420,7 +408,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'adca541c59d3ec04c634139d9c2f7d8a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7d3b23b51fd33799b0fc0b436e2d23f7')"
     ]
   }
 }

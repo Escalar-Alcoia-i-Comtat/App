@@ -13,7 +13,6 @@ data class AreaEntity(
     override val timestamp: Instant,
     val displayName: String,
     val image: Uuid,
-    val webUrl: String
 ) : DatabaseEntity<Area> {
     suspend fun zones(): List<ZoneEntity> = appDatabase.zones().findByAreaId(id)
 
@@ -22,7 +21,6 @@ data class AreaEntity(
         timestamp.toEpochMilliseconds(),
         displayName,
         image,
-        webUrl,
         zones().map { it.convert() }
     )
 }

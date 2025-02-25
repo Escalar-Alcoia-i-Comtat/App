@@ -15,12 +15,11 @@ data class AreaData(
     val timestamp: Long,
     @SerialName("display_name") val displayName: String,
     val image: Uuid,
-    @SerialName("web_url") val webUrl: String,
 ): DataResponseType {
     /**
      * Converts the response into an [Area].
      *
      * **[Area.zones] will be empty.**
      */
-    fun asArea(): Area = Area(id, timestamp, displayName, image, webUrl, emptyList())
+    fun asArea(): Area = Area(id, timestamp, displayName, image, emptyList())
 }

@@ -30,7 +30,6 @@ interface ZonesDao : BaseDao<Zone, ZoneEntity> {
                 Instant.fromEpochMilliseconds(timestamp),
                 displayName,
                 image!!,
-                webUrl,
                 kmz!!,
                 point,
                 points,

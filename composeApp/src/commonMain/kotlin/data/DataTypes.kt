@@ -33,7 +33,6 @@ sealed class DataTypes<out DT : DataType> {
             timestamp = Clock.System.now().toEpochMilliseconds(),
             displayName = "",
             image = Uuid.random(),
-            webUrl = "",
             zones = emptyList()
         )
     }
@@ -44,7 +43,6 @@ sealed class DataTypes<out DT : DataType> {
             timestamp = Clock.System.now().toEpochMilliseconds(),
             displayName = "",
             image = null,
-            webUrl = "",
             kmz = null,
             point = null,
             points = emptyList(),

@@ -15,7 +15,6 @@ data class Area(
     @SerialName("display_name") override val displayName: String,
     // Nullable to allow editing without uploading, must never be null
     override val image: Uuid?,
-    @SerialName("web_url") val webUrl: String,
 
     @Deprecated(
         "Should not be accessed, may be empty at any moment. Used just for fetching from server.",

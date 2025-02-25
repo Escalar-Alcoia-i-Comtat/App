@@ -1,6 +1,5 @@
 package database
 
-import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -17,9 +16,7 @@ import database.entity.ZoneEntity
 @Database(
     entities = [AreaEntity::class, ZoneEntity::class, SectorEntity::class, PathEntity::class],
     version = 2,
-    autoMigrations = [
-        AutoMigration(from = 1, to = 2)
-    ]
+    autoMigrations = []
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)

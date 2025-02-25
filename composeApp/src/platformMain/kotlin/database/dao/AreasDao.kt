@@ -24,7 +24,7 @@ interface AreasDao : BaseDao<Area, AreaEntity> {
 
     override fun constructor(type: Area): AreaEntity {
         return with(type) {
-            AreaEntity(id, Instant.fromEpochMilliseconds(timestamp), displayName, image!!, webUrl)
+            AreaEntity(id, Instant.fromEpochMilliseconds(timestamp), displayName, image!!)
         }
     }
 }
