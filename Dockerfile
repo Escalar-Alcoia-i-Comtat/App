@@ -3,8 +3,7 @@ FROM eclipse-temurin:23-alpine AS build
 
 COPY . /usr/src/app/
 WORKDIR /usr/src/app
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
+
 # Build the distribution
 RUN ./gradlew :composeApp:wasmJsBrowserDistribution --stacktrace --no-daemon
 
@@ -12,4 +11,4 @@ RUN ./gradlew :composeApp:wasmJsBrowserDistribution --stacktrace --no-daemon
 FROM httpd:2.4-alpine
 
 COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
-COPY --from=build /home/gradle/src/composeApp/build/dist/wasmJs/productionExecutable/ /usr/local/apache2/htdocs/
+COPY --from=build /usr/src/app/composeApp/build/dist/wasmJs/productionExecutable/ /usr/local/apache2/htdocs/
