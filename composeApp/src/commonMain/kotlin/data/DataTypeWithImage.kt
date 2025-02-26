@@ -1,10 +1,9 @@
 package data
 
-import build.BuildKonfig
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import kotlinx.serialization.Serializable
-import network.Backend.BASE_URL_FALLBACK
+import network.Backend
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -15,7 +14,7 @@ sealed interface DataTypeWithImage : DataType {
     val image: Uuid?
 
     fun imageUrl(): String {
-        return URLBuilder(BuildKonfig.BASE_URL ?: BASE_URL_FALLBACK)
+        return URLBuilder(Backend.baseUrl)
             .appendPathSegments("download", image.toString())
             .buildString()
     }
