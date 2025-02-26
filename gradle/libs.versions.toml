@@ -1,6 +1,7 @@
 [versions]
 agp = "8.8.1"
 androidx-activityCompose = "1.10.0"
+androidx-appcompat = "1.7.0"
 androidx-sqlite-bundled = "2.5.0-beta01"
 buildkonfig = "0.17.0"
 coil = "3.1.0"
@@ -36,6 +37,7 @@ roomKtx = "2.6.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 compose-filekit = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
