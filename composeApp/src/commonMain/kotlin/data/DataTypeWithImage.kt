@@ -1,7 +1,5 @@
 package data
 
-import io.ktor.http.URLBuilder
-import io.ktor.http.appendPathSegments
 import kotlinx.serialization.Serializable
 import network.Backend
 import kotlin.uuid.ExperimentalUuidApi
@@ -13,11 +11,7 @@ sealed interface DataTypeWithImage : DataType {
     // Nullable to allow editing without uploading, must never be null
     val image: Uuid?
 
-    fun imageUrl(): String {
-        return URLBuilder(Backend.baseUrl)
-            .appendPathSegments("download", image.toString())
-            .buildString()
-    }
+    fun imageUrl(): String = Backend.downloadFileUrl(image!!).toString()
 
     fun copy(image: Uuid): DataTypeWithImage
 }
