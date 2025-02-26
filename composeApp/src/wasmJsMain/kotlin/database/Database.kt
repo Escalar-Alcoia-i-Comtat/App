@@ -217,8 +217,9 @@ object Database {
         return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)
     }
 
-    suspend fun <T : DataType> TransactionContext<T>.allByIndex(): List<T> {
-        val jsonArray = store.request { index(ddti.parentKeyIndexName()).getAll() }?.toString() ?: "[]"
+    suspend fun <T : DataType> TransactionContext<T>.allByIndex(parentId: Long): List<T> {
+        val key = IDBKey(parentId.toInt())
+        val jsonArray = store.request { index(ddti.parentKeyIndexName()).getAll(key) }?.toString() ?: "[]"
         return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)
     }
 

@@ -72,5 +72,5 @@ class DatabaseDataTypeInterface<T : DataType>(
 
     override suspend fun get(id: Long): T? = transaction { get(id) }
 
-    override suspend fun getByParentId(parentId: Long): List<T> = transaction { allByIndex() }
+    override suspend fun getByParentId(parentId: Long): List<T> = transaction { allByIndex(parentId) }
 }
