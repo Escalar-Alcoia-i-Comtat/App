@@ -13,11 +13,11 @@ actual object DatabaseInterface {
         CoroutineScope(Dispatchers.Default).launch { Database.open() }
     }
 
-    actual fun areas(): DataTypeInterface<Area> = DatabaseDataTypeInterface("area", Area.serializer())
+    actual fun areas(): DataTypeInterface<Area> = areasInterface
 
-    actual fun zones(): DataTypeInterface<Zone> = DatabaseDataTypeInterface("zone", Zone.serializer())
+    actual fun zones(): DataTypeInterface<Zone> = zonesInterface
 
-    actual fun sectors(): DataTypeInterface<Sector> = DatabaseDataTypeInterface("sector", Sector.serializer())
+    actual fun sectors(): DataTypeInterface<Sector> = sectorsInterface
 
-    actual fun paths(): DataTypeInterface<Path> = DatabaseDataTypeInterface("path", Path.serializer())
+    actual fun paths(): DataTypeInterface<Path> = pathsInterface
 }

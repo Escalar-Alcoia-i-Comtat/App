@@ -1,7 +1,6 @@
 package database
 
 import data.DataType
-import database.Database.ObserverCallback
 import database.indexeddb.IDBDatabase
 import database.indexeddb.IDBKey
 import database.indexeddb.IDBObjectStore
@@ -9,13 +8,12 @@ import database.indexeddb.IDBObjectStoreOptions
 import database.indexeddb.IDBRequest
 import database.indexeddb.getDatabase
 import database.indexeddb.indexedDB
+import exception.JavaScriptException.Companion.toJavaScriptException
+import interop.DOMException
 import io.github.aakira.napier.Napier
 import json
 import kotlinx.coroutines.await
-import kotlinx.coroutines.channels.onClosed
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.builtins.ListSerializer
@@ -63,7 +61,7 @@ object Database {
         }
     }
 
-    suspend fun await() {
+    private suspend fun await() {
         while (!this::db.isInitialized) {
             delay(5)
         }
@@ -71,10 +69,6 @@ object Database {
 
     private fun createObjectStores(database: IDBDatabase) {
         for (int in interfaces) createObjectStore(database, int)
-    }
-
-    private fun DatabaseDataTypeInterface<*>.indexName(): String {
-        return "${objectStoreName}.parentKey"
     }
 
     private fun <T : DataType> createObjectStore(
@@ -88,17 +82,50 @@ object Database {
                 IDBObjectStoreOptions(keyPath = "id".toJsString())
             )
             if (int.parentKey != null) {
-                objectStore.createIndex(int.indexName(), int.parentKey.toJsString())
+                objectStore.createIndex(int.parentKeyIndexName(), int.parentKey.toJsString())
             }
         } catch (e: JsException) {
             Napier.e(e) { "Could not create object store." }
         }
     }
 
+    suspend fun <R, T: DataType> transaction(
+        ddti: DatabaseDataTypeInterface<T>,
+        isWrite: Boolean = false,
+        block: suspend TransactionContext<T>.() -> R
+    ): R {
+        await()
+
+        val transaction = db.transaction(ddti.objectStoreName, if (isWrite) "readwrite" else "readonly")
+
+        var error: JsAny? = null
+        var isComplete = false
+
+        transaction.onerror = { error = it }
+
+        val objectStore = transaction.objectStore(ddti.objectStoreName)
+        val context = TransactionContext(objectStore, ddti)
+        val result = block(context)
+
+        transaction.oncomplete = { isComplete = true }
+
+        // Wait until an error occurs or the transaction completes
+        while (!isComplete || error != null) delay(5)
+
+        // If an error happened, throw it
+        if (error != null) throw Exception(error.toString())
+
+        // If the transaction was a write, notify all listeners
+        if (isWrite) notifyUpdate(ddti.objectStoreName)
+
+        // Finally, return the result of the block
+        return result
+    }
+
     private val flowsList: MutableMap<String, List<ObserverCallback>> = mutableMapOf()
     private val flowsListMutex = Semaphore(1)
 
-    private suspend fun newFlow(
+    suspend fun newFlow(
         storeName: String,
         producer: ObserverCallback
     ) = flowsListMutex.withPermit {
@@ -107,7 +134,7 @@ object Database {
         flowsList[storeName] = list
     }
 
-    private suspend fun removeFlow(
+    suspend fun removeFlow(
         storeName: String,
         producer: ObserverCallback
     ) = flowsListMutex.withPermit {
@@ -123,37 +150,8 @@ object Database {
 
     class TransactionContext<T : DataType>(
         val store: IDBObjectStore,
-        val dtti: DatabaseDataTypeInterface<T>
+        val ddti: DatabaseDataTypeInterface<T>
     )
-
-    suspend fun <R, T: DataType> DatabaseDataTypeInterface<T>.transaction(
-        storeName: String,
-        isWrite: Boolean = false,
-        block: suspend TransactionContext<T>.() -> R
-    ): R {
-        await()
-
-        val transaction = db.transaction(storeName, if (isWrite) "readwrite" else "readonly")
-
-        var error: JsAny? = null
-        var isComplete = false
-
-        transaction.onerror = { error = it }
-
-        val objectStore = transaction.objectStore(storeName)
-        val context = TransactionContext(objectStore, this)
-        val result = block(context)
-
-        transaction.oncomplete = { isComplete = true }
-
-        // Wait until an error occurs or the transaction completes
-        while (!isComplete || error != null) delay(5)
-
-        // If an error happened, throw it
-        if (error != null) throw Exception(error.toString())
-        // Otherwise, return the result of the block
-        return result
-    }
 
     private suspend fun <R : JsAny?> IDBObjectStore.request(
         operation: IDBObjectStore.() -> IDBRequest<R>
@@ -166,28 +164,21 @@ object Database {
         req.onerror = { reject(req.error!!) }
     }.await()
 
-    private suspend fun <R : JsAny?, I> IDBObjectStore.requestBatch(
+    private fun <R : JsAny?, I> IDBObjectStore.requestBatch(
         list: List<I>,
+        onSuccess: (R) -> Unit = {},
         operation: IDBObjectStore.(I) -> IDBRequest<R>
-    ): List<String> = Promise { resolve, reject ->
-        var counter = 0
-        val resultList = mutableListOf<JsString>()
-
-        fun tryResolve() {
-            if (++counter == list.size) resolve(resultList.toJsArray())
-        }
-
+    ) {
         for (item in list) {
             val req = operation(item)
             req.onsuccess = {
-                req.result?.let { jsonStringify(it) }?.let { result ->
-                    resultList += result
-                }
-                tryResolve()
+                onSuccess(req.result)
             }
-            req.onerror = { reject(req.error!!) }
+            req.onerror = {
+                throw req.error!!.unsafeCast<DOMException>().toJavaScriptException()
+            }
         }
-    }.await()
+    }
 
     suspend fun <T: DataType> TransactionContext<T>.get(id: Long): T? {
         val jsonObject = store.request {
@@ -195,78 +186,44 @@ object Database {
             store.get(key)
         } ?: return null
 
-        return json.decodeFromString(dtti.serializer, jsonObject.toString())
+        return json.decodeFromString(ddti.serializer, jsonObject.toString())
     }
 
-    suspend fun <T : DataType> TransactionContext<T>.insertAll(
-        data: List<T>
-    ) {
+    fun <T : DataType> TransactionContext<T>.insertAll(data: List<T>) {
         store.requestBatch(data) { item ->
-            val jsonString = json.encodeToString(dtti.serializer, item)
+            val jsonString = json.encodeToString(ddti.serializer, item)
             val obj: JsAny = jsonParse(jsonString)
             add(obj)
         }
-        notifyUpdate(dtti.objectStoreName)
     }
 
-    suspend fun <T : DataType> TransactionContext<T>.insert(data: T) {
-        store.request {
-            val jsonString = json.encodeToString(dtti.serializer, data)
-            val obj: JsAny = jsonParse(jsonString)
-            add(obj)
-        }
-        notifyUpdate(dtti.objectStoreName)
-    }
-
-    suspend fun <T : DataType> TransactionContext<T>.update(data: T) {
-        store.request {
-            val jsonString = json.encodeToString(dtti.serializer, data)
+    fun <T : DataType> TransactionContext<T>.updateAll(data: List<T>) {
+        store.requestBatch(data) { item ->
+            val jsonString = json.encodeToString(ddti.serializer, item)
             val obj: JsAny = jsonParse(jsonString)
             put(obj)
         }
-        notifyUpdate(dtti.objectStoreName)
     }
 
-    suspend fun TransactionContext<*>.delete(id: Long) {
-        store.request {
+    fun <T : DataType> TransactionContext<T>.deleteAll(ids: List<Long>) {
+        store.requestBatch(ids) { id ->
             val key = IDBKey(id.toInt())
             delete(key)
         }
-        notifyUpdate(dtti.objectStoreName)
     }
 
     suspend fun <T : DataType> TransactionContext<T>.all(): List<T> {
         val jsonArray = store.request { getAll() }?.toString() ?: "[]"
-        return json.decodeFromString(ListSerializer(dtti.serializer), jsonArray)
+        return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)
     }
 
-    suspend fun <T : DataType> TransactionContext<T>.allByIndex(): List<T> {
-        val jsonArray = store.request { index(dtti.indexName()).getAll() }?.toString() ?: "[]"
-        return json.decodeFromString(ListSerializer(dtti.serializer), jsonArray)
+    suspend fun <T : DataType> TransactionContext<T>.allByIndex(parentId: Long): List<T> {
+        val key = IDBKey(parentId.toInt())
+        val jsonArray = store.request { index(ddti.parentKeyIndexName()).getAll(key) }?.toString() ?: "[]"
+        return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)
     }
 
-    private fun interface ObserverCallback {
+    fun interface ObserverCallback {
         suspend operator fun invoke()
-    }
-
-    fun <T : DataType> DatabaseDataTypeInterface<T>.allFlow(): Flow<List<T>> = channelFlow {
-        var closed = false
-        val flowReceiver = ObserverCallback {
-            val all = transaction(objectStoreName) { all() }
-            trySend(all).onClosed {
-                // channel is closed
-                closed = true
-            }
-        }
-        newFlow(objectStoreName, flowReceiver)
-
-        val all = transaction(objectStoreName) { all() }
-        send(all)
-
-        while (!closed) {
-            delay(5)
-        }
-
-        removeFlow(objectStoreName, flowReceiver)
     }
 }
