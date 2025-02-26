@@ -31,8 +31,15 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
+      - name: Build distribution
+        run: |
+          ./gradlew :composeApp:wasmJsBrowserDistribution --stacktrace --no-daemon
+
       - name: Build and push development
         uses: docker/build-push-action@v6
         with:
           push: true
           tags: arnyminerz/escalaralcoiaicomtat-web:development
+          # There's an issue when building the regular Dockerfile, so build manually, and then push
+          # the standalone image
+          file: standalone.Dockerfile
