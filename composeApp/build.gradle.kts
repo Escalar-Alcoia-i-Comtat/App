@@ -320,6 +320,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_23
     }
 
+    @Suppress("UnstableApiUsage")
     androidResources {
         generateLocaleConfig = true
     }
