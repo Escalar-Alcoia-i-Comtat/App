@@ -126,6 +126,10 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
+      - name: Build distribution
+        run: |
+          ./gradlew :composeApp:wasmJsBrowserDistribution --stacktrace --no-daemon
+
       # Build and push the release image, tagging it as latest and the release tag
       - name: Build and push release
         uses: docker/build-push-action@v6
@@ -133,3 +137,6 @@ jobs:
         with:
           push: true
           tags: arnyminerz/escalaralcoiaicomtat-web:latest,arnyminerz/escalaralcoiaicomtat-web:${{ github.event.release.tag_name }}
+          # There's an issue when building the regular Dockerfile, so build manually, and then push
+          # the standalone image
+          file: standalone.Dockerfile
