@@ -583,17 +583,17 @@ fun updateXCodeProjectOption(key: String, value: String) {
     projectFile.writeText(project.joinToString("\n"))
 }
 
-val increaseVersionCode = task("increaseVersionCode") {
+val increaseVersionCode = tasks.register("increaseVersionCode") {
     doFirst {
         increaseNumberInProperties("VERSION_ANDROID_CODE")
     }
 }
-val increaseLinuxRelease = task("increaseLinuxRelease") {
+val increaseLinuxRelease = tasks.register("increaseLinuxRelease") {
     doFirst {
         increaseNumberInProperties("VERSION_LIN_RELEASE")
     }
 }
-val updateIOSVersion = task("updateIOSVersion") {
+val updateIOSVersion = tasks.register("updateIOSVersion") {
     doFirst {
         properties["version"]?.toString()?.let {
             updatePListFile("CFBundleShortVersionString", it)
@@ -605,7 +605,7 @@ val updateIOSVersion = task("updateIOSVersion") {
         }
     }
 }
-val updateVersionName = task("updateVersionName") {
+val updateVersionName = tasks.register("updateVersionName") {
     doFirst {
         val version = properties.getValue("version").toString()
         updateProperties("version.properties") {
