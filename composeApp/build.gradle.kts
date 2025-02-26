@@ -1,7 +1,3 @@
-import Build_gradle.IOSVersion
-import Build_gradle.LinuxVersion
-import Build_gradle.MacOSVersion
-import Build_gradle.WindowsVersion
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
@@ -10,7 +6,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Properties
 
@@ -39,64 +34,9 @@ fun readProperties(fileName: String): Properties? {
     }
 }
 
-inline fun updateProperties(fileName: String, block: Properties.() -> Unit) {
-    val propsFile = project.rootProject.file(fileName)
-    val props = readProperties(propsFile.name)!!
-    block(props)
-    propsFile.outputStream().use {
-        val date = LocalDateTime.now()
-        props.store(it, "Updated at $date")
-    }
-}
-
-open class PlatformVersion(
-    open val versionName: String
-)
-
-data class PlatformVersionWithCode(
-    override val versionName: String,
-    val versionCode: Int
-) : PlatformVersion(versionName)
-
-typealias AndroidVersion = PlatformVersionWithCode
-typealias IOSVersion = PlatformVersion
-typealias WindowsVersion = PlatformVersion
-typealias MacOSVersion = PlatformVersion
-typealias LinuxVersion = PlatformVersionWithCode
-
-sealed class Platform<VersionType : PlatformVersion> {
-    object Android : Platform<PlatformVersionWithCode>()
-    object IOS : Platform<IOSVersion>()
-    object Windows : Platform<WindowsVersion>()
-    object MacOS : Platform<MacOSVersion>()
-    object Linux : Platform<LinuxVersion>()
-}
-
-fun <VersionType : PlatformVersion> getVersionForPlatform(platform: Platform<VersionType>?): VersionType {
-    val versionProperties = readProperties("version.properties")!!
-
-    fun getAndReplaceVersion(key: String): String {
-        val versionName = versionProperties.getProperty("VERSION_NAME")
-        return versionProperties.getProperty(key).replace("\$VERSION_NAME", versionName)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    return when (platform) {
-        Platform.Android -> PlatformVersionWithCode(
-            getAndReplaceVersion("VERSION_ANDROID"),
-            versionProperties.getProperty("VERSION_ANDROID_CODE").toInt()
-        ) as VersionType
-
-        Platform.IOS -> IOSVersion(getAndReplaceVersion("VERSION_NAME")) as VersionType
-        Platform.Windows -> WindowsVersion(getAndReplaceVersion("VERSION_WIN")) as VersionType
-        Platform.MacOS -> MacOSVersion(getAndReplaceVersion("VERSION_MAC")) as VersionType
-        Platform.Linux -> LinuxVersion(
-            getAndReplaceVersion("VERSION_LIN"),
-            versionProperties.getProperty("VERSION_LIN_RELEASE").toInt()
-        ) as VersionType
-        else -> PlatformVersion(versionProperties.getProperty("VERSION_NAME")) as VersionType
-    }
-}
+val versionProperties = readProperties("version.properties")!!
+val appVersionName: String = versionProperties.getProperty("VERSION_NAME")
+val appVersionCode: String = versionProperties.getProperty("VERSION_CODE")
 
 kotlin {
     jvmToolchain(23)
@@ -337,11 +277,9 @@ android {
         minSdk = 24
         targetSdk = 35
 
-        val version = getVersionForPlatform(Platform.Android)
-
-        versionName = version.versionName
+        versionName = appVersionName
         versionNameSuffix = "_instant"
-        versionCode = version.versionCode
+        versionCode = appVersionCode.toInt()
 
         val localProperties = readProperties("local.properties")
         val mapsApiKey = localProperties?.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY")
@@ -397,7 +335,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
             packageName = "org.escalaralcoiaicomtat.app"
-            packageVersion = getVersionForPlatform<PlatformVersion>(null).versionName
+            packageVersion = appVersionName
 
             description = "Escalar Alcoià i Comtat"
             copyright = "© ${
@@ -416,9 +354,8 @@ compose.desktop {
                 menuGroup = "Escalar Alcoia i Comtat"
                 packageName = "Escalar Alcoia i Comtat"
                 upgradeUuid = "1193b0ce-a276-42cc-b38a-f066b5cfe81e"
-                val version = getVersionForPlatform(Platform.Windows)
-                msiPackageVersion = version.versionName
-                exePackageVersion = version.versionName
+                msiPackageVersion = appVersionName
+                exePackageVersion = appVersionName
             }
             linux {
                 iconFile.set(
@@ -427,10 +364,9 @@ compose.desktop {
                 debMaintainer = "app.linux@escalaralcoiaicomtat.org"
                 menuGroup = "Escalar Alcoià i Comtat"
                 appCategory = "Sports"
-                val version = getVersionForPlatform(Platform.Linux)
-                appRelease = version.versionCode.toString()
-                debPackageVersion = version.versionName
-                rpmPackageVersion = version.versionName
+                appRelease = appVersionCode
+                debPackageVersion = appVersionName
+                rpmPackageVersion = appVersionName
             }
             macOS {
                 iconFile.set(
@@ -440,12 +376,11 @@ compose.desktop {
                 dockName = "Escalar Alcoià i Comtat"
                 appStore = true
                 appCategory = "public.app-category.sports"
-                val version = getVersionForPlatform(Platform.MacOS)
-                dmgPackageVersion = version.versionName
-                pkgPackageVersion = version.versionName
-                packageBuildVersion = version.versionName
-                dmgPackageBuildVersion = version.versionName
-                pkgPackageBuildVersion = version.versionName
+                dmgPackageVersion = appVersionName
+                pkgPackageVersion = appVersionName
+                packageBuildVersion = appVersionName
+                dmgPackageBuildVersion = appVersionName
+                pkgPackageBuildVersion = appVersionName
             }
         }
     }
@@ -465,9 +400,8 @@ buildkonfig {
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
         buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "false")
 
-        val defaultVersion = getVersionForPlatform<PlatformVersion>(null)
-        buildConfigField(STRING, "VERSION_NAME", defaultVersion.versionName)
-        buildConfigField(INT, "VERSION_CODE", null, nullable = true)
+        buildConfigField(STRING, "VERSION_NAME", appVersionName)
+        buildConfigField(INT, "VERSION_CODE", appVersionCode)
 
         val date = object {
             val now = Calendar.getInstance()
@@ -486,16 +420,6 @@ buildkonfig {
     }
 
     targetConfigs {
-        create("android") {
-            val version = getVersionForPlatform(Platform.Android)
-            buildConfigField(STRING, "VERSION_NAME", version.versionName)
-            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString(), nullable = true)
-        }
-        create("ios") {
-            val version = getVersionForPlatform(Platform.IOS)
-            buildConfigField(STRING, "VERSION_NAME", version.versionName)
-        }
-
         create("desktop") {
             buildConfigField(
                 STRING,
@@ -504,19 +428,6 @@ buildkonfig {
                 nullable = true
             )
             buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "true")
-        }
-        create("macos") {
-            val version = getVersionForPlatform(Platform.MacOS)
-            buildConfigField(STRING, "VERSION_NAME", version.versionName)
-        }
-        create("linux") {
-            val version = getVersionForPlatform(Platform.Linux)
-            buildConfigField(STRING, "VERSION_NAME", version.versionName)
-            buildConfigField(INT, "VERSION_CODE", version.versionCode.toString(), nullable = true)
-        }
-        create("mingw") {
-            val version = getVersionForPlatform(Platform.Windows)
-            buildConfigField(STRING, "VERSION_NAME", version.versionName)
         }
     }
 }
@@ -527,101 +438,3 @@ tasks.withType(KotlinCompilationTask::class.java) {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
-
-fun increaseNumberInProperties(key: String) {
-    var code = 0
-    updateProperties("version.properties") {
-        code = getProperty(key).toInt() + 1
-        setProperty(key, code.toString())
-    }
-
-    println("Increased $key to $code")
-}
-
-fun updatePListFile(key: String, value: String) {
-    val iosAppRoot = project.rootProject.file("iosApp")
-    val iosApp = File(iosAppRoot, "iosApp")
-    val infoFile = File(iosApp, "Info.plist")
-    val info = infoFile.readLines()
-    val keyLineNumber = info.indexOfFirst { it.contains("<key>$key</key>") }
-    if (keyLineNumber == -1) {
-        System.err.println("Key $key not found in Info.plist file")
-        return
-    }
-    val valueLine = info[keyLineNumber + 1]
-    val regex = "([ \\t]*)<(.+)>(.*)<\\/.+>".toRegex()
-    regex.find(valueLine)?.let {
-        val (indent, type, _) = it.destructured
-        val newValueLine = "$indent<$type>$value</$type>"
-        val newInfo = info.toMutableList()
-        newInfo[keyLineNumber + 1] = newValueLine
-        infoFile.writeText(newInfo.joinToString("\n"))
-    }
-}
-
-fun updateXCodeProjectOption(key: String, value: String) {
-    val iosAppRoot = project.rootProject.file("iosApp")
-    val iosApp = File(iosAppRoot, "iosApp.xcodeproj")
-    val projectFile = File(iosApp, "project.pbxproj")
-    if (!projectFile.exists()) {
-        System.err.println("project.pbxproj file not found")
-        return
-    }
-    val project = projectFile.readLines().map { line ->
-        if (line.contains("$key =")) {
-            val regex = "([ \\t]*)$key = (.+);".toRegex()
-            regex.find(line)?.let {
-                val (indent, _) = it.destructured
-                "$indent$key = $value;"
-            }
-        } else {
-            line
-        }
-    }
-    projectFile.delete()
-    projectFile.createNewFile()
-    projectFile.writeText(project.joinToString("\n"))
-}
-
-val increaseVersionCode = tasks.register("increaseVersionCode") {
-    doFirst {
-        increaseNumberInProperties("VERSION_ANDROID_CODE")
-    }
-}
-val increaseLinuxRelease = tasks.register("increaseLinuxRelease") {
-    doFirst {
-        increaseNumberInProperties("VERSION_LIN_RELEASE")
-    }
-}
-val updateIOSVersion = tasks.register("updateIOSVersion") {
-    doFirst {
-        properties["version"]?.toString()?.let {
-            updatePListFile("CFBundleShortVersionString", it)
-            updateXCodeProjectOption("MARKETING_VERSION", it)
-        }
-        properties["code"]?.toString()?.let {
-            updatePListFile("CFBundleVersion", it)
-            updateXCodeProjectOption("CURRENT_PROJECT_VERSION", it)
-        }
-    }
-}
-val updateVersionName = tasks.register("updateVersionName") {
-    doFirst {
-        val version = properties.getValue("version").toString()
-        updateProperties("version.properties") {
-            // Store the full version name for general
-            setProperty("VERSION_NAME", version)
-            // Android, iOS and Linux support suffixes (such as -beta01)
-            setProperty("VERSION_ANDROID", version)
-            setProperty("VERSION_IOS", version)
-            setProperty("VERSION_LIN", version)
-            // Windows and MacOS do not support suffixes
-            val stripped = version.substringBefore('-')
-            setProperty("VERSION_WIN", stripped)
-            setProperty("VERSION_MAC", stripped)
-        }
-    }
-}
-
-tasks.findByName("bundleRelease")?.dependsOn?.add(increaseVersionCode)
-tasks.findByName("packageDeb")?.dependsOn?.add(increaseLinuxRelease)

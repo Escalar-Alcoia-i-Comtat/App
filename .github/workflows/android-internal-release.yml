@@ -16,9 +16,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  increase_version_code:
+    name: Increase version code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Increase version code
+        id: increase_version_code
+        run: python ./scripts/increaseVersionCode.py
+
+      - name: Commit modified version code file
+        id: commit_version_code
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Updated Version'
+          file_pattern: 'version.properties'
+          branch: master
+
   publish_internal_release:
     name: Publish Internal Release
     runs-on: ubuntu-latest
+
+    needs: increase_version_code
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,20 +78,13 @@ jobs:
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        run: ./gradlew :composeApp:increaseVersionCode :composeApp:bundleRelease
+        run: ./gradlew :composeApp:bundleRelease
       - name: AAB Artifact
         id: aab_artifact
         uses: actions/upload-artifact@v4
         with:
           name: AAB Artifact
           path: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
-
-      - name: Commit version.properties
-        id: commit_version
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Increased Version Code
-          file_pattern: 'version.properties'
 
       - name: Upload to Play Store
         id: upload_play_store
