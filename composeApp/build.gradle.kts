@@ -320,6 +320,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_23
     }
 
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
     }
