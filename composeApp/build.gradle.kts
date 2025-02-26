@@ -63,6 +63,7 @@ kotlin {
         }
         compilerOptions {
             freeCompilerArgs.add("-Xwasm-attach-js-exception")
+            freeCompilerArgs.add("-Xwasm-debugger-custom-formatters")
         }
         binaries.executable()
     }
