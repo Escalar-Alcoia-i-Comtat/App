@@ -50,6 +50,7 @@ fun FormFilePicker(
     label: String,
     modifier: Modifier = Modifier,
     canBeCleared: Boolean = false,
+    enabled: Boolean = true,
     fallbackContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     TooltipBox(
@@ -57,9 +58,11 @@ fun FormFilePicker(
         state = rememberTooltipState(),
         tooltip = {
             PlainTooltip { Text("Click or tap to pick") }
-        }
+        },
+        enableUserInput = enabled,
     ) {
         OutlinedCard(
+            enabled = enabled,
             onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
                     val pickedFile = FileKit.pickFile(type, PickerMode.Single) ?: return@launch
@@ -78,7 +81,7 @@ fun FormFilePicker(
                     modifier = Modifier.weight(1f).padding(end = 8.dp)
                 )
                 if (canBeCleared) {
-                    IconButton(onClick = { onFilePicked(null) }) {
+                    IconButton(onClick = { onFilePicked(null) }, enabled = enabled) {
                         Icon(Icons.Default.Close, stringResource(Res.string.editor_clear))
                     }
                 }
@@ -130,6 +133,7 @@ fun FormImagePicker(
     label: String,
     modifier: Modifier = Modifier,
     canBeCleared: Boolean = false,
+    enabled: Boolean = true,
     fallbackImage: Any
 ) {
     FormFilePicker(
@@ -139,6 +143,7 @@ fun FormImagePicker(
         modifier = modifier,
         canBeCleared = canBeCleared,
         type = PickerType.Image,
+        enabled = enabled,
         fallbackContent = {
             AsyncImage(fallbackImage, null, Modifier.fillMaxWidth())
         }

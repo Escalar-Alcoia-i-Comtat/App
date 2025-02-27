@@ -5,7 +5,7 @@ import cache.ZipFile
 import cache.storageProvider
 import io.github.aakira.napier.Napier
 import io.ktor.utils.io.readBuffer
-import network.Backend
+import network.BasicBackend
 import platform.ZipFileHandler
 import kotlin.uuid.Uuid
 
@@ -47,7 +47,7 @@ object KMZHandler {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): ZipFile {
         Napier.d { "Downloading KMZ for $uuid ..." }
-        val kmzFile = Backend.downloadFile(uuid, progress).readBuffer()
+        val kmzFile = BasicBackend.downloadFile(uuid, progress).readBuffer()
         Napier.d { "Unzipping KMZ into memory..." }
         val data = ZipFileHandler.unzip(kmzFile)
         if (replaceImagePaths) replaceImages(data)

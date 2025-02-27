@@ -1,7 +1,6 @@
 package ui.model
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import data.Area
 import data.DataType
 import data.DataTypes
 import data.Path
@@ -11,19 +10,22 @@ import database.DatabaseInterface
 import database.byType
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.PlatformFile
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import utils.IO
+import network.AdminBackend
 
-class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewModel() {
+class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewModelBase() {
     private val databaseInterface = DatabaseInterface.byType(type)
+
+    private var originalItem: DT? = null
 
     private val _item = MutableStateFlow<DT?>(null)
     val item get() = _item.asStateFlow()
+
+    val isDirty = _item.map { it != originalItem }
 
     private val _parents = MutableStateFlow<List<DataType>?>(null)
     val parents get() = _parents.asStateFlow()
@@ -32,15 +34,22 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
     val files get() = _files.asStateFlow()
     private val filesMutex = Semaphore(1)
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading get() = _isLoading.asStateFlow()
+
+    private val _progress = MutableStateFlow<Float?>(null)
+    val progress get() = _progress.asStateFlow()
+
     fun load(onNotFound: () -> Unit) {
         if (id == null) {
             Napier.d { "Creating a new ${type.name}..." }
             _item.tryEmit(type.default())
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        launch {
             Napier.d { "Editing ${type.name}#$id..." }
             val item = databaseInterface.get(id) ?: return@launch onNotFound()
+            originalItem = item
             _item.emit(item)
 
             val parents = when (item) {
@@ -58,7 +67,7 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
     }
 
     fun setFile(key: String, file: PlatformFile?) {
-        viewModelScope.launch {
+        launch {
             filesMutex.withPermit {
                 val files = _files.value.toMutableMap()
                 if (file == null) {
@@ -67,6 +76,39 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
                     files[key] = file
                 }
                 _files.tryEmit(files)
+            }
+        }
+    }
+
+    fun save() {
+        launch {
+            try {
+                _isLoading.emit(true)
+                _progress.emit(0f)
+
+                val image = filesMutex.withPermit { _files.value[FILE_KEY_IMAGE] }
+
+                val modifiedItem = when (val item = item.value) {
+                    is Area -> {
+                        @Suppress("UNCHECKED_CAST")
+                        AdminBackend.patchArea(item, image) { current, total ->
+                            val progress = current.toDouble() / total
+                            _progress.emit(progress.toFloat())
+                        } as DT?
+                    }
+                    else -> {
+                        Napier.w { "Tried to save an unknown data type." }
+                        return@launch
+                    }
+                }
+                if (modifiedItem != null) {
+                    originalItem = modifiedItem
+                    _item.emit(modifiedItem)
+                    _files.emit(emptyMap())
+                }
+            } finally {
+                _isLoading.emit(false)
+                _progress.emit(null)
             }
         }
     }

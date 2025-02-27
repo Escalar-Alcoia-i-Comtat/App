@@ -14,6 +14,7 @@
     <string name="action_update">Update</string>
     <string name="action_view_video">View Video</string>
     <string name="action_confirm">Confirm</string>
+    <string name="action_save">Save</string>
     <string name="action_tap_to_see_more">Tap to know more</string>
 
     <string name="search">Search...</string>
@@ -52,6 +53,8 @@
     <string name="settings_app_info_last_sync_never">Never synchronized</string>
     <string name="settings_app_info_last_sync_no_cause">Last synchronization: %1$s</string>
     <string name="settings_app_info_last_sync_message">Last synchronization: %1$s. Cause: %2$s</string>
+    <string name="settings_app_info_last_sync_running_progress">Running... %1$d %</string>
+    <string name="settings_app_info_last_sync_running">Running...</string>
     <string name="settings_app_info_version">App Version</string>
     <string name="settings_app_info_version_code">App Version and Code</string>
     <string name="settings_app_info_build_date">Build Date</string>

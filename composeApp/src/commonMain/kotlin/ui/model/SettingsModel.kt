@@ -12,13 +12,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import network.Backend
+import network.AdminBackend
+import sync.DataSync
 import utils.IO
 
 @OptIn(ExperimentalSettingsApi::class)
 class SettingsModel : ViewModelBase() {
     val lastSyncTime = settings.getLongOrNullFlow(SettingsKeys.LAST_SYNC_TIME)
     val lastSyncCause = settings.getStringOrNullFlow(SettingsKeys.LAST_SYNC_CAUSE)
+    val syncStatus = DataSync.status
+
     val apiKey = settings.getStringOrNullFlow(SettingsKeys.API_KEY)
 
     private val _isLoading = MutableStateFlow(false)
@@ -44,7 +47,7 @@ class SettingsModel : ViewModelBase() {
 
     fun unlock(apiKey: String, onUnlock: () -> Unit) {
         operate {
-            val isValid = Backend.validateApiKey(apiKey)
+            val isValid = AdminBackend.validateApiKey(apiKey)
             if (isValid) {
                 settings[SettingsKeys.API_KEY] = apiKey
                 onUnlock()

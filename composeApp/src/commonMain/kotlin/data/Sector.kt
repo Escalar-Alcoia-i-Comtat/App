@@ -10,7 +10,7 @@ import io.ktor.http.Url
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import network.Backend
+import network.BasicBackend
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -38,7 +38,7 @@ data class Sector(
             "database.DatabaseInterface"
         )
     )
-    val paths: List<Path>
+    val paths: List<Path>? = null
 ) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return (other as? Sector)
@@ -52,7 +52,7 @@ data class Sector(
 
     override val parentId: Long get() = parentZoneId
 
-    fun getGPXDownloadUrl(): Url? = gpx?.let(Backend::downloadFileUrl)
+    fun getGPXDownloadUrl(): Url? = gpx?.let(BasicBackend::downloadFileUrl)
 
     /**
      * Checks whether the zone has any metadata to display.

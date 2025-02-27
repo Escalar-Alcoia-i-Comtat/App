@@ -1,50 +1,39 @@
 package network
 
 import build.BuildKonfig
-import data.Area
-import data.Path
-import data.Sector
-import data.Zone
 import exception.ServerException
 import io.github.aakira.napier.Napier
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.onDownload
-import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.forms.FormBuilder
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
-import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.charsets.Charsets
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import network.response.DataResponse
 import network.response.ErrorResponse
-import network.response.data.AreaData
-import network.response.data.AreasData
 import network.response.data.DataResponseType
-import network.response.data.FileListRequestData
-import network.response.data.FileRequestData
-import network.response.data.PathData
-import network.response.data.SectorData
-import network.response.data.ZoneData
 import platform.httpCacheStorage
-import kotlin.uuid.Uuid
 
-/**
- * Allows running requests to the application backend.
- */
-object Backend {
-    private val client = createHttpClient {
+abstract class Backend {
+    companion object {
+        private const val BASE_URL_FALLBACK = "https://backend.escalaralcoiaicomtat.org"
+        val baseUrl = BuildKonfig.BASE_URL.takeUnless { it.isNullOrBlank() } ?: BASE_URL_FALLBACK
+    }
+
+    protected val client = createHttpClient {
         install(ContentNegotiation) {
             json(
                 json = Json
@@ -61,9 +50,6 @@ object Backend {
             }
         }
     }
-
-    private const val BASE_URL_FALLBACK = "https://backend.escalaralcoiaicomtat.org"
-    private val baseUrl = BuildKonfig.BASE_URL.takeUnless { it.isNullOrBlank() } ?: BASE_URL_FALLBACK
 
     init {
         Napier.i { "Base URL: $baseUrl" }
@@ -128,7 +114,7 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend fun <DT : DataResponseType> get(
+    protected suspend fun <DT : DataResponseType> get(
         deserializer: DeserializationStrategy<DT>,
         vararg pathComponents: Any,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
@@ -168,7 +154,7 @@ object Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    private suspend fun <DT : DataResponseType> getOrNull(
+    protected suspend fun <DT : DataResponseType> getOrNull(
         deserializer: DeserializationStrategy<DT>,
         vararg pathComponents: Any,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
@@ -184,92 +170,36 @@ object Backend {
     }
 
     /**
-     * Makes a call to the `/tree` endpoint.
+     * Makes a POST request to the endpoint defined by the path components given.
      *
+     * @param serializer The serializer to use for the response.
+     * @param pathComponents The components of the path to request. If not [String], will be
+     * converted into one automatically using the class's `toString` function.
      * @param progress If not null, will be called with the progress of the request.
      *
-     * @return A list of all the [Area]s provided by the server.
+     * @return The response given by the server, of the type desired.
      *
      * @throws ServerException If the server responded with an exception, or the body of the body of
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    suspend fun tree(
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): List<Area> {
-        return get(AreasData.serializer(), "tree", progress = progress).areas
-    }
-
-    suspend fun area(
-        id: Int,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): Area? {
-        return getOrNull(AreaData.serializer(), "area", id, progress = progress)?.asArea()
-    }
-
-    suspend fun zone(
-        id: Int,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): Zone? {
-        return getOrNull(ZoneData.serializer(), "zone", id, progress = progress)?.asZone()
-    }
-
-    suspend fun sector(
-        id: Int,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): Sector? {
-        return getOrNull(SectorData.serializer(), "sector", id, progress = progress)?.asSector()
-    }
-
-    suspend fun path(
-        id: Int,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): Path? {
-        return getOrNull(PathData.serializer(), "path", id, progress = progress)?.asPath()
-    }
-
-    /**
-     * Requests the data of a file with the given UUID.
-     * An exception may be thrown if the file was not found in the server.
-     *
-     * @param uuid The UUID of the file to fetch.
-     * @param progress If not null, will be called with the progress of the request.
-     *
-     * @return The data of the file requested.
-     *
-     * @throws ServerException If the server responded with an exception, or the body of the body of
-     * the response didn't match a [DataResponse].
-     * @throws IllegalStateException If the server gave a response that could not be handled.
-     * @throws NoSuchElementException If the server did not provide the file requested.
-     */
-    @Deprecated("Do not request file, use downloads with conditional headers")
-    suspend fun requestFile(
-        uuid: String,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): FileRequestData {
-        Napier.d { "Requesting file $uuid to server...." }
-        return get(FileListRequestData.serializer(), "file", uuid, progress = progress)
-            .files
-            .first()
-    }
-
-    /**
-     * Downloads a file with the given UUID.
-     * An exception may be thrown if the file was not found in the server.
-     * @param uuid The UUID of the file to fetch.
-     * @param progress If not null, will be called with the progress of the request.
-     * @return A channel with the data of the file requested.
-     */
-    suspend fun downloadFile(
-        uuid: Uuid,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null
-    ): ByteReadChannel {
-        Napier.d { "Downloading file $uuid from server...." }
+    protected suspend fun <DT: DataResponseType> patch(
+        serializer: KSerializer<DT>,
+        vararg pathComponents: Any,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+        requestBuilder: HttpRequestBuilder.() -> Unit = {},
+        formBuilder: FormBuilder.() -> Unit
+    ): DT {
         var length: Long = 0
         progress?.invoke(0, length)
-        val response = client.get(
-            downloadFileUrl(uuid).also { Napier.v("GET :: $it") }
+        val response = client.submitFormWithBinaryData(
+            url = URLBuilder(baseUrl)
+                .appendPathSegments(pathComponents.map { it.toString() })
+                .buildString()
+                .also { Napier.v("PATCH :: $it") },
+            formData = formData(formBuilder)
         ) {
+            requestBuilder()
             onDownload { bytesSentTotal, contentLength ->
                 contentLength ?: return@onDownload
                 length = contentLength
@@ -277,32 +207,6 @@ object Backend {
             }
         }
         progress?.invoke(length, length)
-        return response.bodyAsChannel()
-    }
-
-    /**
-     * Constructs the URL to access for downloading files from the backend.
-     * @param uuid The file's identifier.
-     */
-    fun downloadFileUrl(uuid: Uuid): Url =
-        URLBuilder(baseUrl)
-            .appendPathSegments("download", uuid.toString())
-            .build()
-
-    /**
-     * Checks whether the given key is the correct one.
-     */
-    suspend fun validateApiKey(apiKey: String): Boolean {
-        val request = client.submitFormWithBinaryData(
-            url = URLBuilder(baseUrl)
-                .appendPathSegments("area")
-                .buildString(),
-            formData = emptyList()
-        ) {
-            bearerAuth(apiKey)
-        }
-        // Since we are not properly making the request, it will return BadRequest, but if it does,
-        // it means that the key is correct.
-        return request.status == HttpStatusCode.BadRequest
+        return decodeBody(response, serializer)
     }
 }

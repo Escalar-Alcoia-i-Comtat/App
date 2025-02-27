@@ -11,7 +11,7 @@ import io.github.aakira.napier.Napier
 import io.ktor.utils.io.toByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import network.Backend
+import network.BasicBackend
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import utils.IO
 import kotlin.uuid.Uuid
@@ -41,7 +41,7 @@ object ImageStorage {
             withContext(Dispatchers.IO) {
                 try {
                     Napier.v(tag = "ImageCache-$uuid") { "Requesting file data ($uuid)..." }
-                    val downloadChannel = Backend.downloadFile(uuid, onProgressUpdate)
+                    val downloadChannel = BasicBackend.downloadFile(uuid, onProgressUpdate)
                     val fileBytes = downloadChannel.toByteArray()
                     state.value = fileBytes.decodeToImageBitmap()
                 } catch (e: Exception) {

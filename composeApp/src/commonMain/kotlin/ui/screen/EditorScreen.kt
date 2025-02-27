@@ -1,5 +1,6 @@
 package ui.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,9 +18,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,6 +72,9 @@ fun <DT : DataType> EditorScreen(
     val item by model.item.collectAsState()
     val files by model.files.collectAsState()
     val parents by model.parents.collectAsState()
+    val isDirty by model.isDirty.collectAsState(false)
+    val isLoading by model.isLoading.collectAsState()
+    val progress by model.progress.collectAsState()
 
     LaunchedEffect(Unit) { model.load(onBackRequested) }
 
@@ -93,7 +99,11 @@ fun <DT : DataType> EditorScreen(
         files = files,
         onFilePicked = model::setFile,
         isCreate = id == null,
-        onBackRequested = onBackRequested
+        isDirty = isDirty,
+        isLoading = isLoading,
+        progress = progress,
+        onSaveRequested = model::save,
+        onBackRequested = onBackRequested,
     )
 }
 
@@ -106,6 +116,10 @@ private fun <DT : DataType> EditorScreen(
     files: Map<String, PlatformFile>,
     onFilePicked: (key: String, PlatformFile?) -> Unit,
     isCreate: Boolean,
+    isDirty: Boolean,
+    isLoading: Boolean,
+    progress: Float?,
+    onSaveRequested: () -> Unit,
     onBackRequested: () -> Unit
 ) {
     Scaffold(
@@ -120,7 +134,31 @@ private fun <DT : DataType> EditorScreen(
                     }
                 }
             )
-        }
+        },
+        bottomBar = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isLoading) {
+                    if (progress != null) {
+                        LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+                    } else {
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    TextButton(
+                        onClick = onSaveRequested,
+                        enabled = isDirty && !isLoading,
+                    ) {
+                        Text(stringResource(Res.string.action_save))
+                    }
+                }
+            }
+        },
     ) { paddingValues ->
         if (item == null) {
             Box(
@@ -142,7 +180,7 @@ private fun <DT : DataType> EditorScreen(
                     .widthIn(max = 600.dp)
                     .fillMaxWidth()
             ) {
-                EditorContent(item, onUpdateItem, parents, files, onFilePicked, isCreate)
+                EditorContent(item, onUpdateItem, parents, files, onFilePicked, isCreate, isLoading)
             }
         }
     }
@@ -156,6 +194,7 @@ private fun <DT : DataType> EditorContent(
     files: Map<String, PlatformFile>,
     onFilePicked: (key: String, PlatformFile?) -> Unit,
     isCreate: Boolean,
+    isLoading: Boolean,
 ) {
     FormField(
         value = if (isCreate) stringResource(Res.string.editor_id_automatic) else item.id.toString(),
@@ -163,6 +202,7 @@ private fun <DT : DataType> EditorContent(
         label = stringResource(Res.string.editor_id_label),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         readOnly = true,
+        enabled = !isLoading,
     )
 
     if (item is DataTypeWithParent) {
@@ -175,6 +215,7 @@ private fun <DT : DataType> EditorContent(
             toString = { id ->
                 parents.orEmpty().find { it.id == id }?.displayName ?: id.toString()
             },
+            enabled = !isLoading,
         )
     }
 
@@ -183,6 +224,7 @@ private fun <DT : DataType> EditorContent(
         onValueChange = { onUpdateItem(item.copy(displayName = it)) },
         label = stringResource(Res.string.editor_display_name_label),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        enabled = !isLoading,
     )
 
     if (item is DataTypeWithImage) {
@@ -192,6 +234,7 @@ private fun <DT : DataType> EditorContent(
             label = stringResource(Res.string.editor_image_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             fallbackImage = item.imageUrl(),
+            enabled = !isLoading,
         )
     }
 
@@ -225,6 +268,7 @@ private fun <DT : DataType> EditorContent(
                 modifier = Modifier.weight(1f).padding(end = 4.dp),
                 error = stringResource(Res.string.editor_error_coordinate)
                     .takeIf { latitude.isNotEmpty() && latitude.toDoubleOrNull() == null },
+                enabled = !isLoading,
             )
             FormField(
                 value = longitude,
@@ -233,6 +277,7 @@ private fun <DT : DataType> EditorContent(
                 modifier = Modifier.weight(1f).padding(start = 4.dp),
                 error = stringResource(Res.string.editor_error_coordinate)
                     .takeIf { longitude.isNotEmpty() && longitude.toDoubleOrNull() == null },
+                enabled = !isLoading,
             )
         }
     }
@@ -258,6 +303,7 @@ private fun <DT : DataType> EditorContent(
                     )
                 }
             } else null,
+            enabled = !isLoading,
         )
     }
 
@@ -280,6 +326,7 @@ private fun <DT : DataType> EditorContent(
                     )
                 }
             } else null,
+            enabled = !isLoading,
         )
     }
 

@@ -30,7 +30,7 @@ data class Zone(
             "database.DatabaseInterface"
         )
     )
-    val sectors: List<Sector>
+    val sectors: List<Sector>? = null
 ) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithPoints, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return displayName.compareTo(other.displayName)
