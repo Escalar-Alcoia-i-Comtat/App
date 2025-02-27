@@ -15,22 +15,29 @@ import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.rounded.Straighten
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import build.BuildKonfig
 import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.coroutines.getLongOrNullFlow
-import com.russhwolf.settings.coroutines.getStringOrNullFlow
-import database.SettingsKeys
-import database.settings
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -38,6 +45,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import sync.DataSync
 import ui.composition.LocalUnitsConfiguration
+import ui.model.SettingsModel
 import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
@@ -45,15 +53,40 @@ import ui.reusable.settings.SettingsSelector
 import utils.unit.DistanceUnits
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSettingsApi::class)
-fun SettingsPage() {
+@OptIn(ExperimentalSettingsApi::class)
+fun SettingsPage(model: SettingsModel = viewModel { SettingsModel() }) {
+    val unitsConfiguration = LocalUnitsConfiguration.current
+    val units by unitsConfiguration.unitsLive.collectAsState(DistanceUnits.METER)
+
+    val isLoading by model.isLoading.collectAsState(false)
+    val lastSyncTime by model.lastSyncTime.collectAsState(null)
+    val lastSyncCause by model.lastSyncCause.collectAsState(null)
+    val apiKey by model.apiKey.collectAsState(null)
+
+    SettingsPage(
+        isLoading = isLoading,
+        lastSyncTime = lastSyncTime,
+        lastSyncCause = lastSyncCause,
+        apiKey = apiKey,
+        onLockRequest = model::lock,
+        onUnlockRequest = model::unlock,
+        distanceUnits = units,
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun SettingsPage(
+    isLoading: Boolean,
+    lastSyncTime: Long?,
+    lastSyncCause: String?,
+    apiKey: String?,
+    onLockRequest: (onLock: () -> Unit) -> Unit,
+    onUnlockRequest: (apiKey: String, onUnlock: () -> Unit) -> Unit,
+    distanceUnits: DistanceUnits,
+) {
     val uriHandler = LocalUriHandler.current
     val unitsConfiguration = LocalUnitsConfiguration.current
-
-    val lastSyncTime by settings.getLongOrNullFlow(SettingsKeys.LAST_SYNC_TIME)
-        .collectAsState(null)
-    val lastSyncCause by settings.getStringOrNullFlow(SettingsKeys.LAST_SYNC_CAUSE)
-        .collectAsState(null)
 
     Column(
         modifier = Modifier
@@ -71,22 +104,51 @@ fun SettingsPage() {
 
             PlatformSettings()
 
-            val units by unitsConfiguration.unitsLive.collectAsState(DistanceUnits.METER)
-
             SettingsCategory(
                 text = stringResource(Res.string.settings_category_general)
             )
             SettingsSelector(
                 headline = stringResource(Res.string.settings_units_distance),
-                summary = stringResource(units.label),
+                summary = stringResource(distanceUnits.label),
                 icon = Icons.Rounded.Straighten,
                 options = DistanceUnits.entries,
                 onOptionSelected = {
                     unitsConfiguration.setUnits(it)
                 },
-                selection = units,
+                selection = distanceUnits,
                 optionsDialogTitle = stringResource(Res.string.settings_units_distance),
                 stringConverter = { stringResource(it.label) }
+            )
+
+            var showingUnlockDialog by remember { mutableStateOf(false) }
+            if (showingUnlockDialog) {
+                APIKeyDialog(
+                    isLocked = apiKey == null,
+                    isLoading = isLoading,
+                    onUnlockRequest = {
+                        onUnlockRequest(it) { showingUnlockDialog = false }
+                    },
+                    onLockRequest = {
+                        onLockRequest { showingUnlockDialog = false }
+                                    },
+                    onDismissRequest = { showingUnlockDialog = false }
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+            SettingsCategory(
+                text = stringResource(Res.string.settings_category_admin)
+            )
+            SettingsRow(
+                headline = stringResource(Res.string.settings_admin_lock_title),
+                summary = stringResource(
+                    if (apiKey == null)
+                        Res.string.settings_admin_lock_locked
+                    else
+                        Res.string.settings_admin_lock_unlocked
+                ),
+                icon = if (apiKey == null) Icons.Outlined.Lock else Icons.Outlined.LockOpen,
+                onClick = { showingUnlockDialog = true },
             )
 
             Spacer(Modifier.height(16.dp))
@@ -168,4 +230,45 @@ fun SettingsPage() {
             ) { uriHandler.openUri("https://crowdin.com/project/escalar-alcoia-i-comtat") }
         }
     }
+}
+
+@Composable
+fun APIKeyDialog(
+    isLocked: Boolean,
+    isLoading: Boolean,
+    onUnlockRequest: (apiKey: String) -> Unit,
+    onLockRequest: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    var apiKey by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = { if (!isLoading) onDismissRequest() },
+        title = { Text(stringResource(Res.string.settings_admin_lock_title)) },
+        icon = {
+            Icon(
+                imageVector = if (isLocked) Icons.Outlined.Lock else Icons.Outlined.LockOpen,
+                contentDescription = stringResource(Res.string.settings_admin_lock_title),
+            )
+        },
+        text = {
+            if (isLocked) {
+                OutlinedTextField(
+                    value = apiKey,
+                    onValueChange = { apiKey = it },
+                    label = { Text(stringResource(Res.string.settings_admin_lock_api_key)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading,
+                )
+            } else {
+                Text(stringResource(Res.string.settings_admin_lock_lock_description))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !isLoading,
+                onClick = { if (isLocked) onUnlockRequest(apiKey) else onLockRequest() },
+            ) { Text(stringResource(Res.string.action_confirm)) }
+        },
+    )
 }
