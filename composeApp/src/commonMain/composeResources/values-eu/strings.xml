@@ -11,6 +11,7 @@
     <string name="action_skip">Skip</string>
     <string name="action_update">Update</string>
     <string name="action_view_video">View Video</string>
+    <string name="action_confirm">Confirm</string>
     <string name="action_tap_to_see_more">Tap to know more</string>
     <string name="search">Search...</string>
     <string name="search_empty">Start typing to get results</string>
@@ -33,6 +34,12 @@
     <string name="intro_5_message">You are ready to access the app! Don\'t hesitate in contacting us if you find any data wrong or inaccurate.</string>
     <string name="settings_category_general">General Configuration</string>
     <string name="settings_units_distance">Distance Units</string>
+    <string name="settings_category_admin">Administration</string>
+    <string name="settings_admin_lock_title">Admin Lock</string>
+    <string name="settings_admin_lock_locked">Access Locked</string>
+    <string name="settings_admin_lock_unlocked">Access Allowed</string>
+    <string name="settings_admin_lock_lock_description">Do you want to lock the admin access?</string>
+    <string name="settings_admin_lock_api_key">API Key</string>
     <string name="settings_category_app_info">Application Information</string>
     <string name="settings_app_info_last_sync_title">Synchronized Data</string>
     <string name="settings_app_info_last_sync_never">Never synchronized</string>
