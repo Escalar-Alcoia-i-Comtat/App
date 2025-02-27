@@ -127,19 +127,11 @@ fun SettingsPage() {
                 } ?: stringResource(Res.string.settings_app_info_last_sync_never),
                 icon = Icons.Outlined.Info
             )
-            BuildKonfig.VERSION_CODE?.let { versionCode ->
-                SettingsRow(
-                    headline = stringResource(Res.string.settings_app_info_version_code),
-                    summary = "${BuildKonfig.VERSION_NAME} ($versionCode)",
-                    icon = Icons.Outlined.Info
-                )
-            } ?: run {
-                SettingsRow(
-                    headline = stringResource(Res.string.settings_app_info_version),
-                    summary = BuildKonfig.VERSION_NAME,
-                    icon = Icons.Outlined.Info
-                )
-            }
+            SettingsRow(
+                headline = stringResource(Res.string.settings_app_info_version_code),
+                summary = "${BuildKonfig.VERSION_NAME} (${BuildKonfig.VERSION_CODE})",
+                icon = Icons.Outlined.Info
+            )
             HorizontalDivider()
             SettingsRow(
                 headline = stringResource(Res.string.settings_app_info_build_date),
