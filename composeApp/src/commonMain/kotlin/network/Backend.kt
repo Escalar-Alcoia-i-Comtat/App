@@ -11,11 +11,14 @@ import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.onDownload
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
@@ -285,4 +288,21 @@ object Backend {
         URLBuilder(baseUrl)
             .appendPathSegments("download", uuid.toString())
             .build()
+
+    /**
+     * Checks whether the given key is the correct one.
+     */
+    suspend fun validateApiKey(apiKey: String): Boolean {
+        val request = client.submitFormWithBinaryData(
+            url = URLBuilder(baseUrl)
+                .appendPathSegments("area")
+                .buildString(),
+            formData = emptyList()
+        ) {
+            bearerAuth(apiKey)
+        }
+        // Since we are not properly making the request, it will return BadRequest, but if it does,
+        // it means that the key is correct.
+        return request.status == HttpStatusCode.BadRequest
+    }
 }
