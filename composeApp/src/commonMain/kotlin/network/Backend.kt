@@ -8,6 +8,7 @@ import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.delete
 import io.ktor.client.request.forms.FormBuilder
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
@@ -198,6 +199,45 @@ abstract class Backend {
                 .buildString()
                 .also { Napier.v("PATCH :: $it") },
             formData = formData(formBuilder)
+        ) {
+            requestBuilder()
+            onDownload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onDownload
+                length = contentLength
+                progress?.invoke(bytesSentTotal, contentLength)
+            }
+        }
+        progress?.invoke(length, length)
+        return decodeBody(response, serializer)
+    }
+
+    /**
+     * Makes a DELETE request to the endpoint defined by the path components given.
+     *
+     * @param serializer The serializer to use for the response.
+     * @param pathComponents The components of the path to request. If not [String], will be
+     * converted into one automatically using the class's `toString` function.
+     * @param progress If not null, will be called with the progress of the request.
+     *
+     * @return The response given by the server, of the type desired.
+     *
+     * @throws ServerException If the server responded with an exception, or the body of the body of
+     * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
+     */
+    protected suspend fun <DT: DataResponseType> delete(
+        serializer: KSerializer<DT>,
+        vararg pathComponents: Any,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+        requestBuilder: HttpRequestBuilder.() -> Unit = {}
+    ): DT {
+        var length: Long = 0
+        progress?.invoke(0, length)
+        val response = client.delete(
+            url = URLBuilder(baseUrl)
+                .appendPathSegments(pathComponents.map { it.toString() })
+                .build()
+                .also { Napier.v("PATCH :: $it") },
         ) {
             requestBuilder()
             onDownload { bytesSentTotal, contentLength ->

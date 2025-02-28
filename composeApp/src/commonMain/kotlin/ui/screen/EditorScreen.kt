@@ -14,6 +14,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -103,6 +105,9 @@ fun <DT : DataType> EditorScreen(
         isLoading = isLoading,
         progress = progress,
         onSaveRequested = model::save,
+        onDeleteRequested = {
+            model.delete { onBackRequested() }
+        },
         onBackRequested = onBackRequested,
     )
 }
@@ -120,8 +125,18 @@ private fun <DT : DataType> EditorScreen(
     isLoading: Boolean,
     progress: Float?,
     onSaveRequested: () -> Unit,
+    onDeleteRequested: () -> Unit,
     onBackRequested: () -> Unit
 ) {
+    var isShowingDeleteDialog by remember { mutableStateOf(false) }
+    if (isShowingDeleteDialog) {
+        DeleteConfirmationDialog(
+            displayName = item?.displayName ?: stringResource(Res.string.editor_loading),
+            onDeleteRequested = onDeleteRequested,
+            onDismissRequest = { isShowingDeleteDialog = false }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -131,6 +146,13 @@ private fun <DT : DataType> EditorScreen(
                         onClick = onBackRequested
                     ) {
                         Icon(Icons.Default.Close, stringResource(Res.string.editor_close))
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { isShowingDeleteDialog = true }
+                    ) {
+                        Icon(Icons.Default.DeleteForever, stringResource(Res.string.editor_delete))
                     }
                 }
             )
@@ -331,4 +353,27 @@ private fun <DT : DataType> EditorContent(
     }
 
     Spacer(Modifier.height(32.dp))
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    displayName: String,
+    onDeleteRequested: () -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(stringResource(Res.string.editor_delete_dialog_title)) },
+        text = { Text(stringResource(Res.string.editor_delete_dialog_message, displayName)) },
+        confirmButton = {
+            TextButton(
+                onClick = onDeleteRequested
+            ) { Text(stringResource(Res.string.action_confirm)) }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismissRequest
+            ) { Text(stringResource(Res.string.action_cancel)) }
+        },
+    )
 }

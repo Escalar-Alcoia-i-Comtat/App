@@ -80,6 +80,31 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
         }
     }
 
+    fun delete(onComplete: () -> Unit) {
+        launch {
+            try {
+                _isLoading.emit(true)
+                _progress.emit(0f)
+
+                when (val item = item.value) {
+                    is Area -> AdminBackend.delete(item)
+                    is Zone -> AdminBackend.delete(item)
+                    is Sector -> AdminBackend.delete(item)
+                    is Path -> AdminBackend.delete(item)
+                    else -> {
+                        Napier.w { "Tried to delete an unknown data type." }
+                        return@launch
+                    }
+                }
+
+                onComplete()
+            } finally {
+                _isLoading.emit(false)
+                _progress.emit(null)
+            }
+        }
+    }
+
     fun save() {
         launch {
             try {

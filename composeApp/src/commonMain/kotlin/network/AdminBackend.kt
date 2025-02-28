@@ -27,6 +27,7 @@ import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
+import network.response.data.DataResponseType
 import network.response.data.UpdateResponseData
 import utils.append
 import utils.appendOrRemove
@@ -47,6 +48,28 @@ object AdminBackend : Backend() {
         // Since we are not properly making the request, it will return BadRequest, but if it does,
         // it means that the key is correct.
         return request.status == HttpStatusCode.BadRequest
+    }
+
+    private suspend fun <DT: DataType> delete(
+        item: DT,
+        type: DataTypes<DT>,
+    ) {
+        val token = settings.getStringOrNull(SettingsKeys.API_KEY)
+        checkNotNull(token) { "There isn't any stored token." }
+
+        val int = DatabaseInterface.byType(type)
+        val stored = int.get(item.id)
+        requireNotNull(stored) { "Could not find the $type in the database." }
+
+        delete(
+            DataResponseType.serializer(),
+            type.path, item.id,
+            requestBuilder = {
+                bearerAuth(token)
+            },
+        )
+
+        int.delete(listOf(stored))
     }
 
     private suspend fun <DT: DataType> patch(
@@ -187,4 +210,10 @@ object AdminBackend : Backend() {
         path: Path,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
     ): Path? = patch(path, DataTypes.Path, Path.serializer(), progress)
+
+    suspend fun delete(area: Area) = delete(area, DataTypes.Area)
+    suspend fun delete(zone: Zone) = delete(zone, DataTypes.Zone)
+    suspend fun delete(sector: Sector) = delete(sector, DataTypes.Sector)
+    suspend fun delete(path: Path) = delete(path, DataTypes.Path)
+
 }
