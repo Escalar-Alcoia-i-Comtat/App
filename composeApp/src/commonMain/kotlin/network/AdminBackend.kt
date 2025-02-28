@@ -2,28 +2,34 @@ package network
 
 import data.Area
 import data.DataType
+import data.DataTypeWithGPX
 import data.DataTypeWithImage
+import data.DataTypeWithKMZ
 import data.DataTypeWithParent
 import data.DataTypeWithPoint
 import data.DataTypes
+import data.Path
+import data.Sector
+import data.Zone
+import data.generic.Builder
+import data.generic.LatLng
+import data.generic.PitchInfo
 import database.DatabaseInterface
 import database.SettingsKeys
 import database.byType
 import database.settings
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.PlatformFile
-import io.github.vinceglb.filekit.core.extension
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.forms.submitFormWithBinaryData
-import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
-import io.ktor.http.defaultForFileExtension
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
 import network.response.data.UpdateResponseData
+import utils.append
+import utils.appendOrRemove
 
 object AdminBackend : Backend() {
     /**
@@ -48,6 +54,8 @@ object AdminBackend : Backend() {
         type: DataTypes<DT>,
         serializer: KSerializer<DT>,
         image: PlatformFile?,
+        kmz: PlatformFile?,
+        gpx: PlatformFile?,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
     ): DT? {
         val token = settings.getStringOrNull(SettingsKeys.API_KEY)
@@ -61,9 +69,15 @@ object AdminBackend : Backend() {
         }
         requireNotNull(stored) { "Could not find the $type in the database." }
         require(item.id > 0) { "The $type must already exist in order to patch it." }
-        require(item is DataTypeWithImage || image == null) { "Cannot pass an image to a data type that doesn't support it." }
 
+        require(item is DataTypeWithImage || image == null) { "Cannot pass an image to a data type that doesn't support it." }
         val imageBytes = image?.readBytes()
+
+        require(item is DataTypeWithKMZ || kmz == null) { "Cannot pass a kmz to a data type that doesn't support it." }
+        val kmzBytes = kmz?.readBytes()
+
+        require(item is DataTypeWithGPX || gpx == null) { "Cannot pass a gpx to a data type that doesn't support it." }
+        val gpxBytes = gpx?.readBytes()
 
         return patch(
             UpdateResponseData.serializer(serializer),
@@ -75,25 +89,76 @@ object AdminBackend : Backend() {
         ) {
             if (stored.displayName != item.displayName) append("displayName", item.displayName)
 
-            if (item is DataTypeWithParent) {
+            if (item is DataTypeWithParent && type.parentDataType != null) {
                 stored as DataTypeWithParent
-                if (stored.parentId != item.parentId) append("parentId", item.parentId)
+                val parentDataType = type.parentDataType
+                if (stored.parentId != item.parentId) {
+                    append(parentDataType.path, item.parentId)
+                }
             }
 
             if (item is DataTypeWithPoint) {
                 stored as DataTypeWithPoint
-                if (stored.point != item.point) append("parentId", item.parentId)
+                if (stored.point != item.point) {
+                    appendOrRemove("point", item.point, LatLng.serializer())
+                }
             }
 
             if (imageBytes != null) {
-                append(
-                    "image",
-                    imageBytes,
-                    Headers.build {
-                        append(HttpHeaders.ContentType, ContentType.defaultForFileExtension(image.extension).toString())
-                        append(HttpHeaders.ContentDisposition, "filename=\"${image.name}\"")
-                    },
-                )
+                append("image", image, imageBytes)
+            }
+            if (kmzBytes != null) {
+                append("kmz", kmz, kmzBytes)
+            }
+            if (gpxBytes != null) {
+                append("gpx", gpx, gpxBytes)
+            }
+
+            if (item is Sector) {
+                stored as Sector
+                if (stored.kidsApt != item.kidsApt) append("kidsApt", item.kidsApt)
+                if (stored.sunTime != item.sunTime) append("sunTime", item.sunTime.name)
+                if (stored.weight != item.weight) append("weight", item.weight)
+                if (stored.walkingTime != item.walkingTime) appendOrRemove("walkingTime", item.walkingTime)
+                if (stored.tracks != item.tracks) {
+                    if (item.tracks == null) {
+                        append("tracks", "")
+                    } else {
+                        append("tracks", item.tracks.joinToString("\n") { "${it.type};${it.url}" })
+                    }
+                }
+            }
+            if (item is Path) {
+                stored as Path
+                if (stored.sketchId != item.sketchId) append("sketchId", item.sketchId.toInt())
+
+                if (stored.height != item.height) appendOrRemove("height", item.height?.toInt())
+                if (stored.grade != item.grade) appendOrRemove("grade", item.gradeValue)
+                if (stored.ending != item.ending) appendOrRemove("ending", item.ending?.name)
+
+                if (stored.pitches != item.pitches) appendOrRemove("pitches", item.pitches, ListSerializer(PitchInfo.serializer()))
+
+                if (stored.stringCount != item.stringCount) appendOrRemove("stringCount", item.stringCount?.toInt())
+                if (stored.paraboltCount != item.paraboltCount) appendOrRemove("paraboltCount", item.paraboltCount?.toInt())
+                if (stored.burilCount != item.burilCount) appendOrRemove("burilCount", item.burilCount?.toInt())
+                if (stored.pitonCount != item.pitonCount) appendOrRemove("pitonCount", item.pitonCount?.toInt())
+                if (stored.spitCount != item.spitCount) appendOrRemove("spitCount", item.spitCount?.toInt())
+                if (stored.tensorCount != item.tensorCount) appendOrRemove("tensorCount", item.tensorCount?.toInt())
+
+                if (stored.nutRequired != item.nutRequired) appendOrRemove("crackerRequired", item.nutRequired)
+                if (stored.friendRequired != item.friendRequired) appendOrRemove("friendRequired", item.friendRequired)
+                if (stored.lanyardRequired != item.lanyardRequired) appendOrRemove("lanyardRequired", item.lanyardRequired)
+                if (stored.nailRequired != item.nailRequired) appendOrRemove("nailRequired", item.nailRequired)
+                if (stored.pitonRequired != item.pitonRequired) appendOrRemove("pitonRequired", item.pitonRequired)
+                if (stored.stapesRequired != item.stapesRequired) appendOrRemove("stapesRequired", item.stapesRequired)
+
+                if (stored.showDescription != item.showDescription) appendOrRemove("showDescription", item.showDescription)
+                if (stored.description != item.description) appendOrRemove("description", item.description)
+
+                if (stored.builder != item.builder) appendOrRemove("builder", item.builder, Builder.serializer())
+                if (stored.reBuilders != item.reBuilders) appendOrRemove("reBuilder", item.reBuilders, ListSerializer(Builder.serializer()))
+
+                // TODO: Upload and remove images
             }
         }.element.also { int.update(listOf(it)) }
     }
@@ -102,5 +167,24 @@ object AdminBackend : Backend() {
         area: Area,
         image: PlatformFile?,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
-    ): Area? = patch(area, DataTypes.Area, Area.serializer(), image, progress)
+    ): Area? = patch(area, DataTypes.Area, Area.serializer(), image, null, null, progress)
+
+    suspend fun patchZone(
+        zone: Zone,
+        image: PlatformFile?,
+        kmz: PlatformFile?,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): Zone? = patch(zone, DataTypes.Zone, Zone.serializer(), image, kmz, null, progress)
+
+    suspend fun patchSector(
+        sector: Sector,
+        image: PlatformFile?,
+        gpx: PlatformFile?,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): Sector? = patch(sector, DataTypes.Sector, Sector.serializer(), image, null, gpx, progress)
+
+    suspend fun patchPath(
+        path: Path,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): Path? = patch(path, DataTypes.Path, Path.serializer(), null, null, null, progress)
 }

@@ -4,7 +4,10 @@ import data.generic.SunTime
 import kotlinx.datetime.Clock
 import kotlin.uuid.Uuid
 
-sealed class DataTypes<out DT : DataType>(val path: String) {
+sealed class DataTypes<out DT : DataType>(
+    val path: String,
+    val parentDataType: DataTypes<*>?,
+) {
     val name: String get() = this::class.simpleName ?: error("Class doesn't have a valid name")
 
     abstract fun default(): DT
@@ -27,7 +30,7 @@ sealed class DataTypes<out DT : DataType>(val path: String) {
         return name
     }
 
-    data object Area : DataTypes<data.Area>("area") {
+    data object Area : DataTypes<data.Area>("area", null) {
         override fun default(): data.Area = Area(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
@@ -37,7 +40,7 @@ sealed class DataTypes<out DT : DataType>(val path: String) {
         )
     }
 
-    data object Zone : DataTypes<data.Zone>("zone") {
+    data object Zone : DataTypes<data.Zone>("zone", Area) {
         override fun default(): data.Zone = Zone(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
@@ -51,7 +54,7 @@ sealed class DataTypes<out DT : DataType>(val path: String) {
         )
     }
 
-    data object Sector : DataTypes<data.Sector>("sector") {
+    data object Sector : DataTypes<data.Sector>("sector", Zone) {
         override fun default(): data.Sector = Sector(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
@@ -69,7 +72,7 @@ sealed class DataTypes<out DT : DataType>(val path: String) {
         )
     }
 
-    data object Path : DataTypes<data.Path>("path") {
+    data object Path : DataTypes<data.Path>("path", Sector) {
         override fun default(): data.Path = Path(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),

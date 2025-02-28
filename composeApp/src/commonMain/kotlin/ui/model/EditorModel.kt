@@ -87,6 +87,8 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
                 _progress.emit(0f)
 
                 val image = filesMutex.withPermit { _files.value[FILE_KEY_IMAGE] }
+                val kmz = filesMutex.withPermit { _files.value[FILE_KEY_KMZ] }
+                val gpx = filesMutex.withPermit { _files.value[FILE_KEY_GPX] }
 
                 val modifiedItem = when (val item = item.value) {
                     is Area -> {
@@ -96,6 +98,31 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
                             _progress.emit(progress.toFloat())
                         } as DT?
                     }
+
+                    is Zone -> {
+                        @Suppress("UNCHECKED_CAST")
+                        AdminBackend.patchZone(item, image, kmz) { current, total ->
+                            val progress = current.toDouble() / total
+                            _progress.emit(progress.toFloat())
+                        } as DT?
+                    }
+
+                    is Sector -> {
+                        @Suppress("UNCHECKED_CAST")
+                        AdminBackend.patchSector(item, image, gpx) { current, total ->
+                            val progress = current.toDouble() / total
+                            _progress.emit(progress.toFloat())
+                        } as DT?
+                    }
+
+                    is Path -> {
+                        @Suppress("UNCHECKED_CAST")
+                        AdminBackend.patchPath(item) { current, total ->
+                            val progress = current.toDouble() / total
+                            _progress.emit(progress.toFloat())
+                        } as DT?
+                    }
+
                     else -> {
                         Napier.w { "Tried to save an unknown data type." }
                         return@launch

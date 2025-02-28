@@ -22,7 +22,7 @@ data class Sector(
     @SerialName("display_name") override val displayName: String,
     // Nullable to allow editing without uploading, must never be null
     override val image: Uuid?,
-    val gpx: Uuid? = null,
+    override val gpx: Uuid? = null,
     val tracks: List<ExternalTrack>? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
@@ -39,7 +39,7 @@ data class Sector(
         )
     )
     val paths: List<Path>? = null
-) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
+) : DataTypeWithImage, DataTypeWithGPX, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return (other as? Sector)
             // If other is a Sector, try to compare by weight, but don't consider empty weights
@@ -68,6 +68,10 @@ data class Sector(
 
     override fun copy(image: Uuid): Sector {
         return copy(id = id, image = image)
+    }
+
+    override fun copyGpx(gpx: Uuid): DataTypeWithGPX {
+        return copy(id = id, gpx = gpx)
     }
 
     override fun copy(parentId: Long): Sector {
