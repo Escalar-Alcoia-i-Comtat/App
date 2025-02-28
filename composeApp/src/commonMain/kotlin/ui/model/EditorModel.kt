@@ -90,44 +90,23 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
                 val kmz = filesMutex.withPermit { _files.value[FILE_KEY_KMZ] }
                 val gpx = filesMutex.withPermit { _files.value[FILE_KEY_GPX] }
 
+                val progress: suspend (current: Long, total: Long) -> Unit = { current, total ->
+                    val progress = current.toDouble() / total
+                    _progress.emit(progress.toFloat())
+                }
+
                 val modifiedItem = when (val item = item.value) {
-                    is Area -> {
-                        @Suppress("UNCHECKED_CAST")
-                        AdminBackend.patchArea(item, image) { current, total ->
-                            val progress = current.toDouble() / total
-                            _progress.emit(progress.toFloat())
-                        } as DT?
-                    }
-
-                    is Zone -> {
-                        @Suppress("UNCHECKED_CAST")
-                        AdminBackend.patchZone(item, image, kmz) { current, total ->
-                            val progress = current.toDouble() / total
-                            _progress.emit(progress.toFloat())
-                        } as DT?
-                    }
-
-                    is Sector -> {
-                        @Suppress("UNCHECKED_CAST")
-                        AdminBackend.patchSector(item, image, gpx) { current, total ->
-                            val progress = current.toDouble() / total
-                            _progress.emit(progress.toFloat())
-                        } as DT?
-                    }
-
-                    is Path -> {
-                        @Suppress("UNCHECKED_CAST")
-                        AdminBackend.patchPath(item) { current, total ->
-                            val progress = current.toDouble() / total
-                            _progress.emit(progress.toFloat())
-                        } as DT?
-                    }
-
+                    is Area -> AdminBackend.patch(item, image, progress)
+                    is Zone -> AdminBackend.patch(item, image, kmz, progress)
+                    is Sector -> AdminBackend.patch(item, image, gpx, progress)
+                    is Path -> AdminBackend.patch(item, progress)
                     else -> {
                         Napier.w { "Tried to save an unknown data type." }
                         return@launch
                     }
                 }
+                @Suppress("UNCHECKED_CAST")
+                modifiedItem as DT?
                 if (modifiedItem != null) {
                     originalItem = modifiedItem
                     _item.emit(modifiedItem)

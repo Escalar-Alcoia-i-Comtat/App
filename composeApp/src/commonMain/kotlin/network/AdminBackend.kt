@@ -49,14 +49,14 @@ object AdminBackend : Backend() {
         return request.status == HttpStatusCode.BadRequest
     }
 
-    suspend fun <DT: DataType> patch(
+    private suspend fun <DT: DataType> patch(
         item: DT,
         type: DataTypes<DT>,
         serializer: KSerializer<DT>,
-        image: PlatformFile?,
-        kmz: PlatformFile?,
-        gpx: PlatformFile?,
-        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+        progress: (suspend (current: Long, total: Long) -> Unit)?,
+        image: PlatformFile? = null,
+        kmz: PlatformFile? = null,
+        gpx: PlatformFile? = null,
     ): DT? {
         val token = settings.getStringOrNull(SettingsKeys.API_KEY)
         checkNotNull(token) { "There isn't any stored token." }
@@ -163,28 +163,28 @@ object AdminBackend : Backend() {
         }.element.also { int.update(listOf(it)) }
     }
 
-    suspend fun patchArea(
+    suspend fun patch(
         area: Area,
         image: PlatformFile?,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
-    ): Area? = patch(area, DataTypes.Area, Area.serializer(), image, null, null, progress)
+    ): Area? = patch(area, DataTypes.Area, Area.serializer(), progress, image)
 
-    suspend fun patchZone(
+    suspend fun patch(
         zone: Zone,
         image: PlatformFile?,
         kmz: PlatformFile?,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
-    ): Zone? = patch(zone, DataTypes.Zone, Zone.serializer(), image, kmz, null, progress)
+    ): Zone? = patch(zone, DataTypes.Zone, Zone.serializer(), progress, image, kmz = kmz)
 
-    suspend fun patchSector(
+    suspend fun patch(
         sector: Sector,
         image: PlatformFile?,
         gpx: PlatformFile?,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
-    ): Sector? = patch(sector, DataTypes.Sector, Sector.serializer(), image, null, gpx, progress)
+    ): Sector? = patch(sector, DataTypes.Sector, Sector.serializer(), progress, image, gpx = gpx)
 
-    suspend fun patchPath(
+    suspend fun patch(
         path: Path,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
-    ): Path? = patch(path, DataTypes.Path, Path.serializer(), null, null, null, progress)
+    ): Path? = patch(path, DataTypes.Path, Path.serializer(), progress)
 }
