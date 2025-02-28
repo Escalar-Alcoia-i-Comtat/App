@@ -53,7 +53,9 @@ import data.DataTypes
 import data.Path
 import data.Sector
 import data.Zone
+import data.generic.Ending
 import data.generic.LatLng
+import data.generic.SportsGrade
 import data.generic.SunTime
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
@@ -72,6 +74,7 @@ import ui.reusable.form.FormField
 import ui.reusable.form.FormFilePicker
 import ui.reusable.form.FormImagePicker
 import ui.reusable.form.FormOptionPicker
+import ui.reusable.form.FormToggleSwitch
 import ui.state.LaunchedKeyEvent
 
 @Composable
@@ -434,27 +437,181 @@ private fun <DT : DataType> EditorContent(
         )
     }
     if (item is Path) {
-        // TODO: Sketch Id picker
+        var sketchId by remember { mutableStateOf(item.sketchId.toString()) }
+        FormField(
+            value = sketchId,
+            onValueChange = { value ->
+                sketchId = value
+                if (value.isBlank()) {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(sketchId = number))
+                }
+            },
+            label = stringResource(Res.string.editor_sketch_id_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
 
-        // TODO: Height picker
-        // TODO: Grade picker
-        // TODO: Ending picker
+        FormField(
+            value = item.height?.toString(),
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(height = null))
+                } else {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(height = number))
+                }
+            },
+            label = stringResource(Res.string.editor_height_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+
+        FormDropdown(
+            selection = item.grade,
+            onSelectionChanged = { onUpdateItem(item.copy(gradeValue = it.name)) },
+            label = stringResource(Res.string.editor_grade_label),
+            options = SportsGrade.entries,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
+        FormDropdown(
+            selection = item.ending,
+            onSelectionChanged = { onUpdateItem(item.copy(ending = it)) },
+            label = stringResource(Res.string.editor_ending_label),
+            options = Ending.entries,
+            toString = { stringResource(it.displayName) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
 
         // TODO: Pitches picker
 
-        // TODO: String count picker
-        // TODO: Parabolt count picker
-        // TODO: buril count picker
-        // TODO: piton count picker
-        // TODO: spit count picker
-        // TODO: tensor count picker
+        FormField(
+            value = item.stringCount?.toString(),
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(stringCount = null))
+                } else {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(stringCount = number))
+                }
+            },
+            label = stringResource(Res.string.editor_string_count_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormField(
+            value = item.paraboltCount?.toString(),
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(paraboltCount = null))
+                } else {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(paraboltCount = number))
+                }
+            },
+            label = stringResource(Res.string.editor_parabolt_count_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormField(
+            value = item.burilCount?.toString(),
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(burilCount = null))
+                } else {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(burilCount = number))
+                }
+            },
+            label = stringResource(Res.string.editor_buril_count_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormField(
+            value = item.pitonCount?.toString(),
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(pitonCount = null))
+                } else {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(pitonCount = number))
+                }
+            },
+            label = stringResource(Res.string.editor_piton_count_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormField(
+            value = item.spitCount?.toString(),
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(spitCount = null))
+                } else {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(spitCount = number))
+                }
+            },
+            label = stringResource(Res.string.editor_spit_count_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormField(
+            value = item.tensorCount?.toString(),
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(tensorCount = null))
+                } else {
+                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(tensorCount = number))
+                }
+            },
+            label = stringResource(Res.string.editor_tensor_count_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
 
-        // TODO: nut required picker
-        // TODO: friend required picker
-        // TODO: lanyard required picker
-        // TODO: nail required picker
-        // TODO: piton required picker
-        // TODO: stapes required picker
+        FormToggleSwitch(
+            checked = item.nutRequired,
+            onCheckedChange = { onUpdateItem(item.copy(nutRequired = it)) },
+            label = stringResource(Res.string.editor_nut_required_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormToggleSwitch(
+            checked = item.friendRequired,
+            onCheckedChange = { onUpdateItem(item.copy(friendRequired = it)) },
+            label = stringResource(Res.string.editor_friend_required_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormToggleSwitch(
+            checked = item.lanyardRequired,
+            onCheckedChange = { onUpdateItem(item.copy(lanyardRequired = it)) },
+            label = stringResource(Res.string.editor_lanyard_required_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormToggleSwitch(
+            checked = item.nailRequired,
+            onCheckedChange = { onUpdateItem(item.copy(nailRequired = it)) },
+            label = stringResource(Res.string.editor_nail_required_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormToggleSwitch(
+            checked = item.pitonRequired,
+            onCheckedChange = { onUpdateItem(item.copy(pitonRequired = it)) },
+            label = stringResource(Res.string.editor_piton_required_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+        FormToggleSwitch(
+            checked = item.stapesRequired,
+            onCheckedChange = { onUpdateItem(item.copy(stapesRequired = it)) },
+            label = stringResource(Res.string.editor_stapes_required_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
 
         // TODO: Description and show picker
 
