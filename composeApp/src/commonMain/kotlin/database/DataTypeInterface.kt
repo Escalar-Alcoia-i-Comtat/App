@@ -1,6 +1,7 @@
 package database
 
 import data.DataType
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 
 interface DataTypeInterface<Type : DataType> {
@@ -44,11 +45,13 @@ interface DataTypeInterface<Type : DataType> {
                 update += entity
             }
         }
-        val entitiesIds = entities.map { it.id }
+        val entitiesIds = (insert + update).map { it.id }
         for (entity in entities) {
             if (entitiesIds.contains(entity.id)) continue
             delete += entity
         }
+
+        Napier.d { "Inserting ${insert.size}, updating ${update.size}, deleting ${delete.size}" }
 
         insert(insert)
         update(update)

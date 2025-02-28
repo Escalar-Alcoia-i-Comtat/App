@@ -17,8 +17,14 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import network.AdminBackend
 
-class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewModelBase() {
+class EditorModel<DT : DataType>(
+    val type: DataTypes<DT>,
+    id: Long?
+) : ViewModelBase() {
     private val databaseInterface = DatabaseInterface.byType(type)
+
+    var id: Long? = id
+        private set
 
     private var originalItem: DT? = null
 
@@ -40,26 +46,31 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
     private val _progress = MutableStateFlow<Float?>(null)
     val progress get() = _progress.asStateFlow()
 
+    private val _error = MutableStateFlow<Exception?>(null)
+    val error get() = _error.asStateFlow()
+
     fun load(onNotFound: () -> Unit) {
-        if (id == null) {
-            Napier.d { "Creating a new ${type.name}..." }
-            _item.tryEmit(type.default())
-            return
-        }
+        val id = id
         launch {
-            Napier.d { "Editing ${type.name}#$id..." }
-            val item = databaseInterface.get(id) ?: return@launch onNotFound()
-            originalItem = item
+            val item = if (id == null) {
+                Napier.d { "Creating a new ${type.name}..." }
+                type.default()
+            } else {
+                Napier.d { "Editing ${type.name}#$id..." }
+                databaseInterface.get(id)?.also { originalItem = it } ?: return@launch onNotFound()
+            }
             _item.emit(item)
 
-            val parents = when (item) {
-                is Zone -> DatabaseInterface.areas().all()
-                is Sector -> DatabaseInterface.zones().all()
-                is Path -> DatabaseInterface.sectors().all()
-                else -> null
+            if (type.parentDataType != null) {
+                val parents = DatabaseInterface.byType(type.parentDataType).all()
+                Napier.d { "Got ${parents.size} parents." }
+                _parents.tryEmit(parents)
             }
-            _parents.emit(parents)
         }
+    }
+
+    fun clearError() {
+        _error.tryEmit(null)
     }
 
     fun updateItem(value: DT) {
@@ -98,6 +109,9 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
                 }
 
                 onComplete()
+            } catch (e: Exception) {
+                Napier.e(e) { "Could not save." }
+                _error.emit(e)
             } finally {
                 _isLoading.emit(false)
                 _progress.emit(null)
@@ -105,7 +119,7 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
         }
     }
 
-    fun save() {
+    fun save(onComplete: () -> Unit) {
         launch {
             try {
                 _isLoading.emit(true)
@@ -120,23 +134,52 @@ class EditorModel<DT : DataType>(val type: DataTypes<DT>, val id: Long?) : ViewM
                     _progress.emit(progress.toFloat())
                 }
 
-                val modifiedItem = when (val item = item.value) {
-                    is Area -> AdminBackend.patch(item, image, progress)
-                    is Zone -> AdminBackend.patch(item, image, kmz, progress)
-                    is Sector -> AdminBackend.patch(item, image, gpx, progress)
-                    is Path -> AdminBackend.patch(item, progress)
-                    else -> {
-                        Napier.w { "Tried to save an unknown data type." }
-                        return@launch
+                if (id == null) {
+                    // Create operation
+                    val newItem = when (val item = item.value) {
+                        is Area -> AdminBackend.create(item, image, progress)
+                        is Zone -> AdminBackend.create(item, image, kmz, progress)
+                        is Sector -> AdminBackend.create(item, image, gpx, progress)
+                        is Path -> AdminBackend.create(item, progress)
+                        else -> {
+                            Napier.w { "Tried to create an unknown data type." }
+                            return@launch
+                        }
                     }
-                }
-                @Suppress("UNCHECKED_CAST")
-                modifiedItem as DT?
-                if (modifiedItem != null) {
-                    originalItem = modifiedItem
-                    _item.emit(modifiedItem)
+                    @Suppress("UNCHECKED_CAST")
+                    newItem as DT
+
+                    id = newItem.id
+                    originalItem = newItem
+                    _item.emit(newItem)
                     _files.emit(emptyMap())
+
+                    onComplete()
+                } else {
+                    // Update operation
+                    val modifiedItem = when (val item = item.value) {
+                        is Area -> AdminBackend.patch(item, image, progress)
+                        is Zone -> AdminBackend.patch(item, image, kmz, progress)
+                        is Sector -> AdminBackend.patch(item, image, gpx, progress)
+                        is Path -> AdminBackend.patch(item, progress)
+                        else -> {
+                            Napier.w { "Tried to patch an unknown data type." }
+                            return@launch
+                        }
+                    }
+                    @Suppress("UNCHECKED_CAST")
+                    modifiedItem as DT?
+                    if (modifiedItem != null) {
+                        originalItem = modifiedItem
+                        _item.emit(modifiedItem)
+                        _files.emit(emptyMap())
+                    }
+
+                    onComplete()
                 }
+            } catch (e: Exception) {
+                Napier.e(e) { "Could not save." }
+                _error.emit(e)
             } finally {
                 _isLoading.emit(false)
                 _progress.emit(null)

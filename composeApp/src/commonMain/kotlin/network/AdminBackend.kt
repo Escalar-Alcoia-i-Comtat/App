@@ -17,6 +17,7 @@ import data.generic.PitchInfo
 import database.DatabaseInterface
 import database.SettingsKeys
 import database.byType
+import database.parentInterface
 import database.settings
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.PlatformFile
@@ -31,6 +32,7 @@ import network.response.data.DataResponseType
 import network.response.data.UpdateResponseData
 import utils.append
 import utils.appendOrRemove
+import utils.appendSerializable
 
 object AdminBackend : Backend() {
     /**
@@ -102,7 +104,7 @@ object AdminBackend : Backend() {
         require(item is DataTypeWithGPX || gpx == null) { "Cannot pass a gpx to a data type that doesn't support it." }
         val gpxBytes = gpx?.readBytes()
 
-        return patch(
+        return submitForm(
             UpdateResponseData.serializer(serializer),
             type.path, item.id,
             progress = progress,
@@ -186,6 +188,120 @@ object AdminBackend : Backend() {
         }.element.also { int.update(listOf(it)) }
     }
 
+    private suspend fun <DT: DataType> create(
+        item: DT,
+        type: DataTypes<DT>,
+        serializer: KSerializer<DT>,
+        progress: (suspend (current: Long, total: Long) -> Unit)?,
+        image: PlatformFile? = null,
+        kmz: PlatformFile? = null,
+        gpx: PlatformFile? = null,
+    ): DT {
+        val token = settings.getStringOrNull(SettingsKeys.API_KEY)
+        checkNotNull(token) { "There isn't any stored token." }
+
+        val int = DatabaseInterface.byType(type)
+        require(item.id == 0L) { "The $type must not already exist." }
+
+        require(item !is DataTypeWithImage || image != null) { "An image is required." }
+        val imageBytes = image?.readBytes()
+
+        require(item !is DataTypeWithKMZ || kmz != null) { "A KMZ is required." }
+        val kmzBytes = kmz?.readBytes()
+
+        require(item is DataTypeWithGPX || gpx == null) { "Cannot pass a gpx to a data type that doesn't support it." }
+        val gpxBytes = gpx?.readBytes()
+
+        // Verify that a parent is set if required
+        if (item is DataTypeWithParent) {
+            require(type.parentDataType == null || item.parentId != 0L) {
+                "A parent must be passed to types that support it."
+            }
+            requireNotNull(int.parentInterface(type).get(item.parentId)) {
+                "Could not find the set item's parent."
+            }
+        }
+
+        // Validate the display name field
+        require(item.displayName.isNotBlank())
+
+        return submitForm(
+            UpdateResponseData.serializer(serializer),
+            type.path,
+            progress = progress,
+            requestBuilder = {
+                bearerAuth(token)
+            },
+        ) {
+            append("displayName", item.displayName)
+            append("webUrl", "https://escalaralcoiaicomtat.org")
+
+            if (item is DataTypeWithParent) {
+                val parentDataType = type.parentDataType!!
+                append(parentDataType.path, item.parentId)
+            }
+
+            if (item is DataTypeWithPoint) {
+                item.point?.let {
+                    appendSerializable("point", it, LatLng.serializer())
+                }
+            }
+
+            if (imageBytes != null) {
+                append("image", image, imageBytes)
+            }
+            if (kmzBytes != null) {
+                append("kmz", kmz, kmzBytes)
+            }
+            if (gpxBytes != null) {
+                append("gpx", gpx, gpxBytes)
+            }
+
+            if (item is Sector) {
+                append("kidsApt", item.kidsApt)
+                append("sunTime", item.sunTime.name)
+                append("weight", item.weight)
+                if (item.walkingTime != null) {
+                    append("walkingTime", item.walkingTime)
+                }
+                if (item.tracks != null) {
+                    append("tracks", item.tracks.joinToString("\n") { "${it.type};${it.url}" })
+                }
+            }
+            if (item is Path) {
+                append("sketchId", item.sketchId.toInt())
+
+                if (item.height != null) append("height", item.height.toInt())
+                if (item.gradeValue != null) append("grade", item.gradeValue)
+                if (item.ending != null) append("ending", item.ending.name)
+
+                if (item.pitches != null) appendSerializable("pitches", item.pitches, ListSerializer(PitchInfo.serializer()))
+
+                if (item.stringCount != null) append("stringCount", item.stringCount.toInt())
+                if (item.paraboltCount != null) append("paraboltCount", item.paraboltCount.toInt())
+                if (item.burilCount != null) append("burilCount", item.burilCount.toInt())
+                if (item.pitonCount != null) append("pitonCount", item.pitonCount.toInt())
+                if (item.spitCount != null) append("spitCount", item.spitCount.toInt())
+                if (item.tensorCount != null) append("tensorCount", item.tensorCount.toInt())
+
+                append("crackerRequired", item.nutRequired)
+                append("friendRequired", item.friendRequired)
+                append("lanyardRequired", item.lanyardRequired)
+                append("nailRequired", item.nailRequired)
+                append("pitonRequired", item.pitonRequired)
+                append("stapesRequired", item.stapesRequired)
+
+                append("showDescription", item.showDescription)
+                if (item.description != null) append("description", item.description)
+
+                if (item.builder != null) appendSerializable("builder", item.builder, Builder.serializer())
+                if (item.reBuilders != null) appendSerializable("reBuilder", item.reBuilders, ListSerializer(Builder.serializer()))
+
+                // TODO: Upload and remove images
+            }
+        }.element.also { int.insert(listOf(it)) }
+    }
+
     suspend fun patch(
         area: Area,
         image: PlatformFile?,
@@ -215,5 +331,30 @@ object AdminBackend : Backend() {
     suspend fun delete(zone: Zone) = delete(zone, DataTypes.Zone)
     suspend fun delete(sector: Sector) = delete(sector, DataTypes.Sector)
     suspend fun delete(path: Path) = delete(path, DataTypes.Path)
+
+    suspend fun create(
+        area: Area,
+        image: PlatformFile?,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): Area = create(area, DataTypes.Area, Area.serializer(), progress, image)
+
+    suspend fun create(
+        zone: Zone,
+        image: PlatformFile?,
+        kmz: PlatformFile?,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): Zone = create(zone, DataTypes.Zone, Zone.serializer(), progress, image, kmz = kmz)
+
+    suspend fun create(
+        sector: Sector,
+        image: PlatformFile?,
+        gpx: PlatformFile?,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): Sector = create(sector, DataTypes.Sector, Sector.serializer(), progress, image, gpx = gpx)
+
+    suspend fun create(
+        path: Path,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): Path = create(path, DataTypes.Path, Path.serializer(), progress)
 
 }

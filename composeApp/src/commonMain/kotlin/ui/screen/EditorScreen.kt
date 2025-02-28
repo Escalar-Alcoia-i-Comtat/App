@@ -23,6 +23,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -32,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +42,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataType
@@ -46,14 +50,18 @@ import data.DataTypeWithImage
 import data.DataTypeWithParent
 import data.DataTypeWithPoint
 import data.DataTypes
+import data.Path
 import data.Sector
 import data.Zone
 import data.generic.LatLng
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
+import ui.dialog.DeleteConfirmationDialog
 import ui.model.EditorModel
 import ui.model.EditorModel.Companion.FILE_KEY_GPX
 import ui.model.EditorModel.Companion.FILE_KEY_IMAGE
@@ -77,6 +85,7 @@ fun <DT : DataType> EditorScreen(
     val isDirty by model.isDirty.collectAsState(false)
     val isLoading by model.isLoading.collectAsState()
     val progress by model.progress.collectAsState()
+    val error by model.error.collectAsState()
 
     LaunchedEffect(Unit) { model.load(onBackRequested) }
 
@@ -104,9 +113,11 @@ fun <DT : DataType> EditorScreen(
         isDirty = isDirty,
         isLoading = isLoading,
         progress = progress,
+        error = error,
+        onClearErrorRequested = model::clearError,
         onSaveRequested = model::save,
         onDeleteRequested = {
-            model.delete { onBackRequested() }
+            model.delete(onBackRequested)
         },
         onBackRequested = onBackRequested,
     )
@@ -124,17 +135,29 @@ private fun <DT : DataType> EditorScreen(
     isDirty: Boolean,
     isLoading: Boolean,
     progress: Float?,
-    onSaveRequested: () -> Unit,
+    error: Exception?,
+    onClearErrorRequested: () -> Unit,
+    onSaveRequested: (onComplete: () -> Unit) -> Unit,
     onDeleteRequested: () -> Unit,
     onBackRequested: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     var isShowingDeleteDialog by remember { mutableStateOf(false) }
     if (isShowingDeleteDialog) {
         DeleteConfirmationDialog(
             displayName = item?.displayName ?: stringResource(Res.string.editor_loading),
-            onDeleteRequested = onDeleteRequested,
+            onDeleteRequested = {
+                onDeleteRequested()
+                isShowingDeleteDialog = false
+            },
             onDismissRequest = { isShowingDeleteDialog = false }
         )
+    }
+
+    if (error != null) {
+        ErrorDialog(error, onClearErrorRequested)
     }
 
     Scaffold(
@@ -149,10 +172,15 @@ private fun <DT : DataType> EditorScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = { isShowingDeleteDialog = true }
-                    ) {
-                        Icon(Icons.Default.DeleteForever, stringResource(Res.string.editor_delete))
+                    if (!isCreate) {
+                        IconButton(
+                            onClick = { isShowingDeleteDialog = true }
+                        ) {
+                            Icon(
+                                Icons.Default.DeleteForever,
+                                stringResource(Res.string.editor_delete)
+                            )
+                        }
                     }
                 }
             )
@@ -163,7 +191,10 @@ private fun <DT : DataType> EditorScreen(
             ) {
                 if (isLoading) {
                     if (progress != null) {
-                        LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     } else {
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     }
@@ -173,13 +204,27 @@ private fun <DT : DataType> EditorScreen(
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(
-                        onClick = onSaveRequested,
+                        onClick = {
+                            onSaveRequested {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        getString(
+                                            if (isCreate) Res.string.editor_created
+                                            else Res.string.editor_updated
+                                        )
+                                    )
+                                }
+                            }
+                        },
                         enabled = isDirty && !isLoading,
                     ) {
                         Text(stringResource(Res.string.action_save))
                     }
                 }
             }
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
         },
     ) { paddingValues ->
         if (item == null) {
@@ -350,30 +395,93 @@ private fun <DT : DataType> EditorContent(
             } else null,
             enabled = !isLoading,
         )
+
+        // TODO: External tracks picker
+        // TODO: Kids apt picker
+        // TODO: Walking time picker
+        // TODO: Sun time picker
+    }
+    if (item is Path) {
+        // TODO: Sketch Id picker
+
+        // TODO: Height picker
+        // TODO: Grade picker
+        // TODO: Ending picker
+
+        // TODO: Pitches picker
+
+        // TODO: String count picker
+        // TODO: Parabolt count picker
+        // TODO: buril count picker
+        // TODO: piton count picker
+        // TODO: spit count picker
+        // TODO: tensor count picker
+
+        // TODO: nut required picker
+        // TODO: friend required picker
+        // TODO: lanyard required picker
+        // TODO: nail required picker
+        // TODO: piton required picker
+        // TODO: stapes required picker
+
+        // TODO: Description and show picker
+
+        // TODO: Builder picker
+        // TODO: Re-builder picker
+
+        // TODO: Path images picker
     }
 
     Spacer(Modifier.height(32.dp))
 }
 
 @Composable
-fun DeleteConfirmationDialog(
-    displayName: String,
-    onDeleteRequested: () -> Unit,
+fun ErrorDialog(
+    error: Exception,
     onDismissRequest: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(Res.string.editor_delete_dialog_title)) },
-        text = { Text(stringResource(Res.string.editor_delete_dialog_message, displayName)) },
+        title = { Text(stringResource(Res.string.editor_error_title)) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    stringResource(Res.string.editor_error_message_exception)
+                )
+                Text(
+                    text = error::class.simpleName ?: "N/A",
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    fontFamily = FontFamily.Monospace,
+                )
+
+                Text(
+                    stringResource(
+                        Res.string.editor_error_message_message,
+                        error.message ?: "N/A"
+                    )
+                )
+                Text(
+                    text = error.message ?: "N/A",
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    fontFamily = FontFamily.Monospace,
+                )
+
+                Text(
+                    stringResource(Res.string.editor_error_message_trace)
+                )
+                Text(
+                    text = error.stackTraceToString(),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    fontFamily = FontFamily.Monospace,
+                )
+            }
+        },
         confirmButton = {
             TextButton(
-                onClick = onDeleteRequested
-            ) { Text(stringResource(Res.string.action_confirm)) }
-        },
-        dismissButton = {
-            TextButton(
                 onClick = onDismissRequest
-            ) { Text(stringResource(Res.string.action_cancel)) }
+            ) { Text(stringResource(Res.string.action_close)) }
         },
     )
 }

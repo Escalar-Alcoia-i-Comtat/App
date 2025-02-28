@@ -134,7 +134,7 @@ fun FormImagePicker(
     modifier: Modifier = Modifier,
     canBeCleared: Boolean = false,
     enabled: Boolean = true,
-    fallbackImage: Any
+    fallbackImage: Any?
 ) {
     FormFilePicker(
         file = file,
@@ -144,8 +144,10 @@ fun FormImagePicker(
         canBeCleared = canBeCleared,
         type = PickerType.Image,
         enabled = enabled,
-        fallbackContent = {
-            AsyncImage(fallbackImage, null, Modifier.fillMaxWidth())
-        }
+        fallbackContent = if (fallbackImage != null) {
+            {
+                AsyncImage(fallbackImage, null, Modifier.fillMaxWidth())
+            }
+        } else null
     )
 }

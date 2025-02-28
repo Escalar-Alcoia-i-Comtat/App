@@ -15,6 +15,7 @@ fun ZonesScreen(
     onBackRequested: () -> Unit,
     onZoneRequested: (zoneId: Long) -> Unit,
     onEditRequested: ((zone: Zone) -> Unit)?,
+    onCreateZoneRequested: (() -> Unit)?,
     viewModel: ZonesScreenModel = viewModel { ZonesScreenModel() },
     scrollToId: Long? = null
 ) {
@@ -33,6 +34,7 @@ fun ZonesScreen(
         scrollToId = scrollToId,
         onNavigationRequested = { onZoneRequested(it.id) },
         onEditRequested = onEditRequested,
+        onCreateRequested = onCreateZoneRequested,
         onNavigateUp = onBackRequested,
     )
 }

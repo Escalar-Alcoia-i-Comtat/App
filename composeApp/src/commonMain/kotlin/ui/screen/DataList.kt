@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.OutlinedFlag
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +48,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     scrollToId: Long? = null,
     onNavigationRequested: (ChildrenType) -> Unit,
     onEditRequested: ((ChildrenType) -> Unit)?,
+    onCreateRequested: (() -> Unit)?,
     onNavigateUp: () -> Unit
 ) {
     val state = rememberLazyListState()
@@ -58,6 +60,8 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
         state.animateScrollToItem(index)
     }
 
+    // TODO: Allow sorting elements to admins
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -65,6 +69,13 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                    }
+                },
+                actions = {
+                    if (onCreateRequested != null) {
+                        IconButton(onClick = onCreateRequested) {
+                            Icon(Icons.Default.Add, null)
+                        }
                     }
                 }
             )

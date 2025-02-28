@@ -23,4 +23,15 @@ object DataResponse {
         val data = element.getValue("data").jsonObject
         return json.decodeFromJsonElement(deserializer, data)
     }
+
+    fun decode(
+        value: String,
+        json: Json = defaultJson
+    ) {
+        val element = json.decodeFromString<JsonElement>(value).jsonObject
+        val success = element.getValue("success").jsonPrimitive.boolean
+        if (!success) {
+            json.decodeFromString<ErrorResponse>(value).throwException<Unit>(null)
+        }
+    }
 }

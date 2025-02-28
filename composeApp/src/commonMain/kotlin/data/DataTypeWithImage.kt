@@ -9,7 +9,7 @@ sealed interface DataTypeWithImage : DataType {
     // Nullable to allow editing without uploading, must never be null
     val image: Uuid?
 
-    fun imageUrl(): String = BasicBackend.downloadFileUrl(image!!).toString()
+    fun imageUrl(): String? = image?.let(BasicBackend::downloadFileUrl)?.toString()
 
     fun copy(image: Uuid): DataTypeWithImage
 }

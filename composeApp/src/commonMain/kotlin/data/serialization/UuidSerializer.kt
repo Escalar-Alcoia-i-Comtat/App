@@ -19,7 +19,11 @@ object UuidSerializer : KSerializer<Uuid> {
     }
 
     override fun deserialize(decoder: Decoder): Uuid {
-        val value = decoder.decodeString()
-        return Uuid.parse(value)
+        val value = decoder.decodeString().substringBefore('.')
+        return try {
+            Uuid.parse(value)
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException("Could not decode UUID: $value", e)
+        }
     }
 }

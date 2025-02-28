@@ -18,6 +18,7 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import data.Area
 import data.DataTypes
+import data.Path
 import data.Sector
 import data.Zone
 import database.SettingsKeys
@@ -140,6 +141,9 @@ fun SharedTransitionScope.NavigationController(
                         onEditRequested = { area: Area ->
                             navController.navigateTo(Destinations.Editor(DataTypes.Area, area.id))
                         }.takeIf { editAllowed },
+                        onCreateAreaRequested = {
+                            navController.navigateTo(Destinations.Editor(DataTypes.Area, null))
+                        }.takeIf { editAllowed },
                         scrollToId = initial.id
                     )
                 }
@@ -164,7 +168,10 @@ fun SharedTransitionScope.NavigationController(
                         onZoneRequested = { navController.navigateTo(route.down(it)) },
                         onEditRequested = { zone: Zone ->
                             navController.navigateTo(Destinations.Editor(DataTypes.Zone, zone.id))
-                        }.takeIf { editAllowed }
+                        }.takeIf { editAllowed },
+                        onCreateZoneRequested = {
+                            navController.navigateTo(Destinations.Editor(DataTypes.Zone, null))
+                        }.takeIf { editAllowed },
                     )
                 }
             }
@@ -179,7 +186,10 @@ fun SharedTransitionScope.NavigationController(
                         onSectorRequested = { navController.navigateTo(route.down(it)) },
                         onEditRequested = { sector: Sector ->
                             navController.navigateTo(Destinations.Editor(DataTypes.Sector, sector.id))
-                        }.takeIf { editAllowed }
+                        }.takeIf { editAllowed },
+                        onCreateSectorRequested = {
+                            navController.navigateTo(Destinations.Editor(DataTypes.Sector, null))
+                        }.takeIf { editAllowed },
                     )
                 }
             }
@@ -192,6 +202,12 @@ fun SharedTransitionScope.NavigationController(
                         sectorId = route.sectorId,
                         highlightPathId = route.pathId,
                         onBackRequested = { navController.navigateTo(route.up()) },
+                        onEditRequested = { path: Path ->
+                            navController.navigateTo(Destinations.Editor(DataTypes.Path, path.id))
+                        }.takeIf { editAllowed },
+                        onCreatePathRequested = {
+                            navController.navigateTo(Destinations.Editor(DataTypes.Path, null))
+                        }.takeIf { editAllowed },
                     )
                 }
             }

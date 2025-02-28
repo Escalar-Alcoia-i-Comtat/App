@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.SwipeDownAlt
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
@@ -43,6 +44,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
@@ -101,6 +103,7 @@ import ui.icons.Rope
 import ui.list.PathListItem
 import ui.model.PathsScreenModel
 import ui.reusable.CircularProgressIndicatorBox
+import ui.reusable.ContextMenu
 import utils.format
 import utils.unit.meters
 
@@ -112,6 +115,8 @@ fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
+    onEditRequested: ((Path) -> Unit)?,
+    onCreatePathRequested: (() -> Unit)?,
     viewModel: PathsScreenModel = viewModel { PathsScreenModel() }
 ) {
     val sector by viewModel.parent.collectAsState()
@@ -133,6 +138,8 @@ fun PathsScreen(
         selectedPath,
         highlightPathId,
         onBackRequested,
+        onEditRequested,
+        onCreatePathRequested,
         viewModel::selectChild
     )
 }
@@ -145,6 +152,8 @@ private fun PathsScreen(
     selectedPath: Path?,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
+    onEditRequested: ((Path) -> Unit)?,
+    onCreatePathRequested: (() -> Unit)?,
     onPathClicked: (path: Path?) -> Unit
 ) {
     var showingBottomSheet by remember { mutableStateOf(false) }
@@ -170,6 +179,13 @@ private fun PathsScreen(
                             stringResource(Res.string.sector_information_title)
                         )
                     }
+                    if (onCreatePathRequested != null) {
+                        IconButton(
+                            onClick = onCreatePathRequested
+                        ) {
+                            Icon(Icons.Outlined.Add, null)
+                        }
+                    }
                 }
             )
         }
@@ -180,6 +196,7 @@ private fun PathsScreen(
             selectedPath,
             highlightPathId,
             modifier = Modifier.padding(paddingValues),
+            onEditRequested = onEditRequested,
             onPathClicked = onPathClicked
         )
     }
@@ -273,6 +290,7 @@ fun PathsList(
     selectedPath: Path?,
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
+    onEditRequested: ((Path) -> Unit)?,
     onPathClicked: (path: Path?) -> Unit
 ) {
     val windowSizeClass = calculateWindowSizeClass()
@@ -312,6 +330,7 @@ fun PathsList(
                             paths = paths,
                             highlightPathId = highlightPathId,
                             modifier = Modifier.fillMaxHeight().weight(1f),
+                            onEditRequested = onEditRequested,
                             onPathClicked = onPathClicked
                         )
 
@@ -379,6 +398,7 @@ fun PathsList(
                             modifier = Modifier.fillMaxWidth()
                                 .fillMaxHeight(0.3f)
                                 .weight(1f),
+                            onEditRequested = onEditRequested,
                             onPathClicked = onPathClicked
                         )
                     }
@@ -394,6 +414,7 @@ private fun PathsListView(
     paths: List<Path>?,
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
+    onEditRequested: ((Path) -> Unit)?,
     onPathClicked: (path: Path) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -413,14 +434,28 @@ private fun PathsListView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(paths ?: emptyList()) { path ->
-            PathListItem(
-                path = path,
-                modifier = Modifier
-                    .widthIn(max = 600.dp)
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                highlight = highlightPathId == path.id
-            ) { onPathClicked(path) }
+            ContextMenu(
+                enabled = onEditRequested != null,
+                dropdownContent = {
+                    ListItem(
+                        headlineContent = {
+                            Text(stringResource(Res.string.editor_edit))
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onEditRequested?.invoke(path) }
+                    )
+                },
+            ) {
+                PathListItem(
+                    path = path,
+                    modifier = Modifier
+                        .widthIn(max = 600.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    highlight = highlightPathId == path.id
+                ) { onPathClicked(path) }
+            }
         }
     }
 }

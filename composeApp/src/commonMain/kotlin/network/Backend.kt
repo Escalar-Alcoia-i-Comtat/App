@@ -18,11 +18,12 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
+import io.ktor.http.content.PartData
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.charsets.Charsets
+import json
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
 import network.response.DataResponse
 import network.response.ErrorResponse
 import network.response.data.DataResponseType
@@ -37,7 +38,7 @@ abstract class Backend {
     protected val client = createHttpClient {
         install(ContentNegotiation) {
             json(
-                json = Json
+                json = json
             )
         }
         install(HttpCache) {
@@ -67,7 +68,8 @@ abstract class Backend {
     private suspend fun <DT : DataResponseType> decodeBody(
         response: HttpResponse,
         deserializer: DeserializationStrategy<DT>,
-    ): DT {
+        hasData: Boolean = true,
+    ): DT? {
         return try {
             val url = response.request.url
             val status = response.status.value
@@ -78,7 +80,12 @@ abstract class Backend {
             }*/
 
             if (status in 200..299) {
-                DataResponse.decode(body, deserializer).also {
+                if (hasData) {
+                    DataResponse.decode(body, deserializer)
+                } else {
+                    DataResponse.decode(body)
+                    null
+                }.also {
                     Napier.d(tag = "Backend") {
                         "Server responded successfully to ${response.request.url}. Status: $status"
                     }
@@ -87,7 +94,7 @@ abstract class Backend {
                 Napier.e(tag = "Backend") {
                     "Server responded with an exception.\nUrl: $url\nCode: $status. Body: $body"
                 }
-                Json.decodeFromString<ErrorResponse>(body).throwException(url)
+                json.decodeFromString<ErrorResponse>(body).throwException(url)
             }
         } catch (exception: NoTransformationFoundException) {
             Napier.e(tag = "Backend", throwable = exception) {
@@ -135,7 +142,7 @@ abstract class Backend {
             }
         }
         progress?.invoke(length, length)
-        return decodeBody(response, deserializer)
+        return decodeBody(response, deserializer)!!
     }
 
     /**
@@ -184,7 +191,7 @@ abstract class Backend {
      * the response didn't match a [DataResponse].
      * @throws IllegalStateException If the server gave a response that could not be handled.
      */
-    protected suspend fun <DT: DataResponseType> patch(
+    protected suspend fun <DT: DataResponseType> submitForm(
         serializer: KSerializer<DT>,
         vararg pathComponents: Any,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
@@ -193,12 +200,25 @@ abstract class Backend {
     ): DT {
         var length: Long = 0
         progress?.invoke(0, length)
+
+        val url = URLBuilder(baseUrl)
+            .appendPathSegments(pathComponents.map { it.toString() })
+            .buildString()
+        Napier.v("POST :: $url")
+
         val response = client.submitFormWithBinaryData(
-            url = URLBuilder(baseUrl)
-                .appendPathSegments(pathComponents.map { it.toString() })
-                .buildString()
-                .also { Napier.v("PATCH :: $it") },
-            formData = formData(formBuilder)
+            url = url,
+            formData = formData(formBuilder).also { parts ->
+                val data = StringBuilder()
+                for (part in parts) {
+                    if (part is PartData.FormItem) {
+                        data.appendLine("- ${part.name}\n  ${part.value}")
+                    } else {
+                        data.appendLine("- ${part.name} - Type: ${part.contentType}")
+                    }
+                }
+                Napier.i { "Making request to $url\nData:\n$data" }
+            }
         ) {
             requestBuilder()
             onDownload { bytesSentTotal, contentLength ->
@@ -208,7 +228,7 @@ abstract class Backend {
             }
         }
         progress?.invoke(length, length)
-        return decodeBody(response, serializer)
+        return decodeBody(response, serializer)!!
     }
 
     /**
@@ -230,7 +250,7 @@ abstract class Backend {
         vararg pathComponents: Any,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
         requestBuilder: HttpRequestBuilder.() -> Unit = {}
-    ): DT {
+    ) {
         var length: Long = 0
         progress?.invoke(0, length)
         val response = client.delete(
@@ -247,6 +267,6 @@ abstract class Backend {
             }
         }
         progress?.invoke(length, length)
-        return decodeBody(response, serializer)
+        decodeBody(response, serializer, false)
     }
 }
