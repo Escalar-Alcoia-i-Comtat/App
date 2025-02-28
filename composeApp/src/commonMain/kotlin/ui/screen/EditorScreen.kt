@@ -54,6 +54,7 @@ import data.Path
 import data.Sector
 import data.Zone
 import data.generic.LatLng
+import data.generic.SunTime
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
@@ -70,6 +71,7 @@ import ui.reusable.form.FormDropdown
 import ui.reusable.form.FormField
 import ui.reusable.form.FormFilePicker
 import ui.reusable.form.FormImagePicker
+import ui.reusable.form.FormOptionPicker
 import ui.state.LaunchedKeyEvent
 
 @Composable
@@ -397,9 +399,39 @@ private fun <DT : DataType> EditorContent(
         )
 
         // TODO: External tracks picker
-        // TODO: Kids apt picker
-        // TODO: Walking time picker
-        // TODO: Sun time picker
+
+        FormOptionPicker(
+            selection = item.kidsApt,
+            onSelectionChanged = { onUpdateItem(item.copy(kidsApt = it)) },
+            label = stringResource(Res.string.editor_kids_apt_label),
+            options = listOf(true, false),
+            toString = { stringResource(if (it) Res.string.editor_yes else Res.string.editor_no) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
+
+        FormField(
+            value = item.walkingTime?.toString() ?: "",
+            onValueChange = { value ->
+                if (value.isBlank()) {
+                    onUpdateItem(item.copy(walkingTime = null))
+                } else {
+                    val walkingTime = value.toLongOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(walkingTime = walkingTime))
+                }
+            },
+            label = stringResource(Res.string.editor_walking_time_label),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+
+        FormDropdown(
+            selection = item.sunTime,
+            onSelectionChanged = { onUpdateItem(item.copy(sunTime = it)) },
+            label = stringResource(Res.string.editor_sun_time_label),
+            options = SunTime.entries,
+            toString = { it.label() },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
     }
     if (item is Path) {
         // TODO: Sketch Id picker

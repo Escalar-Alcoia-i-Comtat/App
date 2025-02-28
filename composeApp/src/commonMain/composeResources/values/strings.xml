@@ -163,6 +163,8 @@
 
     <string name="file_picker_hint">Click to pick</string>
 
+    <string name="editor_yes">Yes</string>
+    <string name="editor_no">No</string>
     <string name="editor_close">Close</string>
     <string name="editor_loading">Loading...</string>
     <string name="editor_clear">Clear</string>
@@ -177,6 +179,9 @@
     <string name="editor_longitude_label">Longitude</string>
     <string name="editor_kmz_label">KMZ</string>
     <string name="editor_gpx_label">GPX</string>
+    <string name="editor_kids_apt_label">Kids Apt</string>
+    <string name="editor_walking_time_label">Walking time</string>
+    <string name="editor_sun_time_label">Sun Time</string>
     <string name="editor_error_coordinate" comment="Shown when introducing an invalid latitude or longitude on a field.">Must be a valid coordinate.</string>
     <string name="editor_updated">Updated successfully</string>
     <string name="editor_created">Created successfully</string>

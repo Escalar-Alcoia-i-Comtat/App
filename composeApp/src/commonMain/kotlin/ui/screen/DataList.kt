@@ -101,7 +101,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                         items(
                             items = children,
                             key = { it.id },
-                            contentType = { it::class.simpleName + "-" + it.id }
+                            contentType = { it::class.simpleName }
                         ) { child ->
                             DataCard(
                                 item = child,
@@ -122,7 +122,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
 }
 
 private fun LazyListScope.display(zone: Zone) {
-    item(key = zone.id, contentType = "zone-map") {
+    item(key = "zone-map-${zone.id}", contentType = "zone-map") {
         MapComposable(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
