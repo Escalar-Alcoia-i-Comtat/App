@@ -53,7 +53,9 @@ import data.DataTypes
 import data.Path
 import data.Sector
 import data.Zone
+import data.editable.EditableExternalTrack
 import data.generic.Ending
+import data.generic.ExternalTrack
 import data.generic.LatLng
 import data.generic.SportsGrade
 import data.generic.SunTime
@@ -73,6 +75,7 @@ import ui.reusable.form.FormDropdown
 import ui.reusable.form.FormField
 import ui.reusable.form.FormFilePicker
 import ui.reusable.form.FormImagePicker
+import ui.reusable.form.FormListCreator
 import ui.reusable.form.FormOptionPicker
 import ui.reusable.form.FormToggleSwitch
 import ui.state.LaunchedKeyEvent
@@ -401,7 +404,42 @@ private fun <DT : DataType> EditorContent(
             enabled = !isLoading,
         )
 
-        // TODO: External tracks picker
+        FormListCreator(
+            elements = item.tracks.orEmpty().map { it.editable() },
+            onElementsChange = { list ->
+                onUpdateItem(item.copy(tracks = list.map(EditableExternalTrack::build)))
+            },
+            constructor = { EditableExternalTrack() },
+            validate = EditableExternalTrack::validate,
+            creator = { value, onChange ->
+                // FIXME: Cannot modify values
+                FormDropdown(
+                    selection = value.type,
+                    onSelectionChanged = { onChange(value.copy(type = it)) },
+                    options = ExternalTrack.Type.entries,
+                    label = stringResource(Res.string.editor_external_track_type_label),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                FormField(
+                    value = value.url,
+                    onValueChange = { onChange(value.copy(url = it)) },
+                    label = stringResource(Res.string.editor_external_track_url_label),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            title = stringResource(Res.string.editor_external_tracks_label),
+            elementRender = { (type, url) ->
+                if (type == null) return@FormListCreator
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(type.icon, null)
+                    Text(text = url, modifier = Modifier.padding(start = 4.dp).weight(1f))
+                }
+            },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
 
         FormOptionPicker(
             selection = item.kidsApt,
