@@ -68,7 +68,7 @@ jobs:
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        run: ./gradlew :composeApp:increaseVersionCode :composeApp:bundleRelease :composeApp:assembleRelease
+        run: ./gradlew :composeApp:bundleRelease :composeApp:assembleRelease
 
       - name: Release AAB & APK
         uses: softprops/action-gh-release@v2
