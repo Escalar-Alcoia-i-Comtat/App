@@ -65,11 +65,16 @@ import data.Path
 import data.Sector
 import data.Zone
 import data.editable.EditableExternalTrack
+import data.editable.EditablePitchInfo
 import data.editable.EditablePoint
+import data.generic.ArtificialGrade
 import data.generic.Builder
 import data.generic.Ending
+import data.generic.EndingInclination
+import data.generic.EndingInfo
 import data.generic.ExternalTrack
 import data.generic.LatLng
+import data.generic.PitchInfo
 import data.generic.Point
 import data.generic.SportsGrade
 import data.generic.SunTime
@@ -505,7 +510,12 @@ private fun <DT : DataType> EditorContent(
 
         HorizontalDivider()
 
-        // TODO: Pitches picker
+        PitchesEditor(
+            list = item.pitches.orEmpty(),
+            onUpdateItem = { onUpdateItem(item.copy(pitches = it.takeUnless { it.isEmpty() })) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
 
         FormField(
             value = item.stringCount?.toString(),
@@ -986,7 +996,7 @@ private fun ExternalTracksEditor(
 }
 
 @Composable
-fun ReBuildersEditor(
+private fun ReBuildersEditor(
     list: List<Builder>,
     onUpdateItem: (List<Builder>) -> Unit,
     enabled: Boolean,
@@ -1024,6 +1034,130 @@ fun ReBuildersEditor(
                         text = date ?: "N/A",
                         modifier = Modifier.fillMaxWidth(),
                         fontStyle = if (date == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                }
+
+                IconButton(
+                    onClick = edit,
+                    enabled = enabled,
+                ) { Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit)) }
+                IconButton(
+                    onClick = delete,
+                    enabled = enabled,
+                ) {
+                    Icon(
+                        Icons.Default.DeleteForever,
+                        stringResource(Res.string.editor_delete)
+                    )
+                }
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun PitchesEditor(
+    list: List<PitchInfo>,
+    onUpdateItem: (List<PitchInfo>) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    FormListCreator<EditablePitchInfo>(
+        elements = list.map { it.editable() },
+        onElementsChange = { onUpdateItem(it.map(EditablePitchInfo::build)) },
+        constructor = { EditablePitchInfo() },
+        validate = { true },
+        creator = { value, onChange ->
+            FormField(
+                value = value.pitch,
+                onValueChange = { onChange(value.copy(pitch = it)) },
+                label = stringResource(Res.string.editor_pitch_info_pitch_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+                error = stringResource(Res.string.editor_error_uint)
+                    .takeIf { value.pitch.isNotBlank() && value.pitch.toUIntOrNull() == null },
+            )
+            FormDropdown(
+                selection = value.grade,
+                onSelectionChanged = { onChange(value.copy(grade = it)) },
+                options = (SportsGrade.entries + ArtificialGrade.entries),
+                label = stringResource(Res.string.editor_pitch_info_grade_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+            FormField(
+                value = value.height,
+                onValueChange = { onChange(value.copy(height = it)) },
+                label = stringResource(Res.string.editor_pitch_info_height_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+                error = stringResource(Res.string.editor_error_uint)
+                    .takeIf { value.height.isNotBlank() && value.height.toUIntOrNull() == null },
+            )
+            FormDropdown(
+                selection = value.ending,
+                onSelectionChanged = { onChange(value.copy(ending = it)) },
+                options = Ending.entries,
+                label = stringResource(Res.string.editor_pitch_info_ending_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+            FormDropdown(
+                selection = value.info,
+                onSelectionChanged = { onChange(value.copy(info = it)) },
+                options = EndingInfo.entries,
+                label = stringResource(Res.string.editor_pitch_info_ending_info_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+            FormDropdown(
+                selection = value.inclination,
+                onSelectionChanged = { onChange(value.copy(inclination = it)) },
+                options = EndingInclination.entries,
+                label = stringResource(Res.string.editor_pitch_info_ending_inclination_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+        },
+        title = stringResource(Res.string.editor_pitch_info_label),
+        elementRender = { pitch, edit, delete ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
+                    .padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.padding(start = 4.dp).weight(1f),
+                ) {
+                    Text(
+                        text = pitch.pitch,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(
+                        text = pitch.grade?.toString() ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontStyle = if (pitch.grade == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                    Text(
+                        text = pitch.height.takeUnless { it.isBlank() } ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontStyle = if (pitch.height.isBlank()) FontStyle.Italic else FontStyle.Normal,
+                    )
+                    Text(
+                        text = pitch.ending?.displayName?.let { stringResource(it) } ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontStyle = if (pitch.ending == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                    Text(
+                        text = pitch.info?.toString() ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontStyle = if (pitch.info == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                    Text(
+                        text = pitch.inclination?.toString() ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontStyle = if (pitch.inclination == null) FontStyle.Italic else FontStyle.Normal,
                     )
                 }
 

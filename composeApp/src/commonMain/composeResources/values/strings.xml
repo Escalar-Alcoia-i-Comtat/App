@@ -224,7 +224,15 @@
     <string name="editor_re_builder_label">Re-Builder(s)</string>
     <string name="editor_description_label">Description</string>
     <string name="editor_show_description_label">Show Description</string>
+    <string name="editor_pitch_info_label">Pitches</string>
+    <string name="editor_pitch_info_pitch_label">Pitch</string>
+    <string name="editor_pitch_info_grade_label">Grade</string>
+    <string name="editor_pitch_info_height_label">Height</string>
+    <string name="editor_pitch_info_ending_label">Ending</string>
+    <string name="editor_pitch_info_ending_info_label">Ending Info</string>
+    <string name="editor_pitch_info_ending_inclination_label">Ending Inclination</string>
     <string name="editor_error_coordinate" comment="Shown when introducing an invalid latitude or longitude on a field.">Must be a valid coordinate.</string>
+    <string name="editor_error_uint">Must be a positive number.</string>
     <string name="editor_updated">Updated successfully</string>
     <string name="editor_created">Created successfully</string>
 
