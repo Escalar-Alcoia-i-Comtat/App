@@ -26,6 +26,7 @@ fun FormField(
     capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
     thisFocusRequester: FocusRequester? = null,
     nextFocusRequester: FocusRequester? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
     fallbackValue: String = "",
     error: String? = null,
     onGo: (() -> Unit)? = null
@@ -59,6 +60,7 @@ fun FormField(
         isError = error != null,
         supportingText = error?.let {
             { Text(it) } // , color = MaterialTheme.colorScheme.error
-        }
+        },
+        trailingIcon = trailingContent,
     )
 }

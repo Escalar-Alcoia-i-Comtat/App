@@ -35,8 +35,9 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 
 @Composable
 fun RichTextStyleRow(
-    modifier: Modifier = Modifier,
     state: RichTextState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     LazyRow(
         verticalAlignment = Alignment.CenterVertically,
@@ -52,7 +53,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentParagraphStyle.textAlign == TextAlign.Left,
-                icon = Icons.AutoMirrored.Outlined.FormatAlignLeft
+                icon = Icons.AutoMirrored.Outlined.FormatAlignLeft,
+                enabled = enabled,
             )
         }
 
@@ -66,7 +68,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentParagraphStyle.textAlign == TextAlign.Center,
-                icon = Icons.Outlined.FormatAlignCenter
+                icon = Icons.Outlined.FormatAlignCenter,
+                enabled = enabled,
             )
         }
 
@@ -80,7 +83,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentParagraphStyle.textAlign == TextAlign.Right,
-                icon = Icons.AutoMirrored.Outlined.FormatAlignRight
+                icon = Icons.AutoMirrored.Outlined.FormatAlignRight,
+                enabled = enabled,
             )
         }
 
@@ -94,7 +98,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentSpanStyle.fontWeight == FontWeight.Bold,
-                icon = Icons.Outlined.FormatBold
+                icon = Icons.Outlined.FormatBold,
+                enabled = enabled,
             )
         }
 
@@ -108,7 +113,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentSpanStyle.fontStyle == FontStyle.Italic,
-                icon = Icons.Outlined.FormatItalic
+                icon = Icons.Outlined.FormatItalic,
+                enabled = enabled,
             )
         }
 
@@ -122,7 +128,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentSpanStyle.textDecoration?.contains(TextDecoration.Underline) == true,
-                icon = Icons.Outlined.FormatUnderlined
+                icon = Icons.Outlined.FormatUnderlined,
+                enabled = enabled,
             )
         }
 
@@ -136,7 +143,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentSpanStyle.textDecoration?.contains(TextDecoration.LineThrough) == true,
-                icon = Icons.Outlined.FormatStrikethrough
+                icon = Icons.Outlined.FormatStrikethrough,
+                enabled = enabled,
             )
         }
 
@@ -150,7 +158,8 @@ fun RichTextStyleRow(
                     )
                 },
                 isSelected = state.currentSpanStyle.fontSize == 28.sp,
-                icon = Icons.Outlined.FormatSize
+                icon = Icons.Outlined.FormatSize,
+                enabled = enabled,
             )
         }
 
@@ -165,7 +174,8 @@ fun RichTextStyleRow(
                 },
                 isSelected = state.currentSpanStyle.color == Color.Red,
                 icon = Icons.Filled.Circle,
-                tint = Color.Red
+                tint = Color.Red,
+                enabled = enabled,
             )
         }
 
@@ -180,7 +190,8 @@ fun RichTextStyleRow(
                 },
                 isSelected = state.currentSpanStyle.background == Color.Yellow,
                 icon = Icons.Outlined.Circle,
-                tint = Color.Yellow
+                tint = Color.Yellow,
+                enabled = enabled,
             )
         }
 
@@ -200,6 +211,7 @@ fun RichTextStyleRow(
                 },
                 isSelected = state.isUnorderedList,
                 icon = Icons.AutoMirrored.Outlined.FormatListBulleted,
+                enabled = enabled,
             )
         }
 
@@ -210,6 +222,7 @@ fun RichTextStyleRow(
                 },
                 isSelected = state.isOrderedList,
                 icon = Icons.Outlined.FormatListNumbered,
+                enabled = enabled,
             )
         }
 
@@ -229,6 +242,7 @@ fun RichTextStyleRow(
                 },
                 isSelected = state.isCodeSpan,
                 icon = Icons.Outlined.Code,
+                enabled = enabled,
             )
         }
     }

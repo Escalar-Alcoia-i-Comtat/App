@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -452,6 +453,8 @@ private fun <DT : DataType> EditorContent(
         )
     }
     if (item is Path) {
+        HorizontalDivider()
+
         var sketchId by remember { mutableStateOf(item.sketchId.toString()) }
         FormField(
             value = sketchId,
@@ -480,14 +483,15 @@ private fun <DT : DataType> EditorContent(
             label = stringResource(Res.string.editor_height_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
+            trailingContent = { Text("m") },
         )
-
         FormDropdown(
             selection = item.grade,
             onSelectionChanged = { onUpdateItem(item.copy(gradeValue = it.name)) },
             label = stringResource(Res.string.editor_grade_label),
             options = SportsGrade.entries,
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
         )
         FormDropdown(
             selection = item.ending,
@@ -496,7 +500,10 @@ private fun <DT : DataType> EditorContent(
             options = Ending.entries,
             toString = { stringResource(it.displayName) },
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
         )
+
+        HorizontalDivider()
 
         // TODO: Pitches picker
 
@@ -585,6 +592,8 @@ private fun <DT : DataType> EditorContent(
             enabled = !isLoading,
         )
 
+        HorizontalDivider()
+
         FormToggleSwitch(
             checked = item.nutRequired,
             onCheckedChange = { onUpdateItem(item.copy(nutRequired = it)) },
@@ -628,7 +637,8 @@ private fun <DT : DataType> EditorContent(
             enabled = !isLoading,
         )
 
-        // TODO: Description show picker
+        HorizontalDivider()
+
         val state = rememberRichTextState()
         LaunchedEffect(Unit) {
             item.description?.let(state::setMarkdown)
@@ -639,20 +649,30 @@ private fun <DT : DataType> EditorContent(
                     )
                 }
         }
+        FormToggleSwitch(
+            checked = item.showDescription,
+            onCheckedChange = { onUpdateItem(item.copy(showDescription = it)) },
+            label = stringResource(Res.string.editor_show_description_label),
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            enabled = !isLoading,
+        )
         Text(
             text = stringResource(Res.string.editor_description_label),
             style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            modifier = Modifier.fillMaxWidth(),
         )
         RichTextStyleRow(
             state = state,
             modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading,
         )
         OutlinedRichTextEditor(
             state = state,
             enabled = !isLoading,
             modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
         )
+
+        HorizontalDivider()
 
         Text(
             text = stringResource(Res.string.editor_builder_label),
@@ -663,9 +683,15 @@ private fun <DT : DataType> EditorContent(
             builder = item.builder,
             onBuilderChange = { onUpdateItem(item.copy(builder = it.orNull())) },
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
         )
 
-        // TODO: Re-builder picker
+        ReBuildersEditor(
+            list = item.reBuilders.orEmpty(),
+            onUpdateItem = { onUpdateItem(item.copy(reBuilders = it.takeUnless { it.isEmpty() })) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
 
         // TODO: Path images picker
     }
@@ -778,7 +804,8 @@ private fun LatLngEditor(
 fun BuilderEditor(
     builder: Builder?,
     onBuilderChange: (Builder) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Row(modifier = modifier) {
         FormField(
@@ -786,12 +813,14 @@ fun BuilderEditor(
             onValueChange = { onBuilderChange(builder?.copy(name = it) ?: Builder(it)) },
             label = stringResource(Res.string.editor_builder_name_label),
             modifier = Modifier.weight(1f).padding(end = 4.dp),
+            enabled = enabled,
         )
         FormField(
             value = builder?.date,
             onValueChange = { onBuilderChange(builder?.copy(date = it) ?: Builder(date = it)) },
             label = stringResource(Res.string.editor_builder_date_label),
             modifier = Modifier.weight(1f).padding(start = 4.dp),
+            enabled = enabled,
         )
     }
 }
@@ -937,6 +966,67 @@ private fun ExternalTracksEditor(
                 IconButton(
                     onClick = { onCopyRequested(url) },
                 ) { Icon(Icons.Default.ContentCopy, stringResource(Res.string.action_copy)) }
+                IconButton(
+                    onClick = edit,
+                    enabled = enabled,
+                ) { Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit)) }
+                IconButton(
+                    onClick = delete,
+                    enabled = enabled,
+                ) {
+                    Icon(
+                        Icons.Default.DeleteForever,
+                        stringResource(Res.string.editor_delete)
+                    )
+                }
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun ReBuildersEditor(
+    list: List<Builder>,
+    onUpdateItem: (List<Builder>) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    FormListCreator(
+        elements = list,
+        onElementsChange = onUpdateItem,
+        constructor = { Builder() },
+        validate = { true },
+        creator = { value, onChange ->
+            BuilderEditor(
+                builder = value,
+                onBuilderChange = onChange,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+        },
+        title = stringResource(Res.string.editor_re_builder_label),
+        elementRender = { (name, date), edit, delete ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
+                    .padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.padding(start = 4.dp).weight(1f),
+                ) {
+                    Text(
+                        text = name ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontStyle = if (name == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                    Text(
+                        text = date ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontStyle = if (date == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                }
+
                 IconButton(
                     onClick = edit,
                     enabled = enabled,

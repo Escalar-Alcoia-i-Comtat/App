@@ -19,6 +19,7 @@ fun RichTextStyleButton(
     icon: ImageVector,
     tint: Color? = null,
     isSelected: Boolean = false,
+    enabled: Boolean = true,
 ) {
     IconButton(
         modifier = Modifier
@@ -34,6 +35,7 @@ fun RichTextStyleButton(
                 MaterialTheme.colorScheme.onBackground
             },
         ),
+        enabled = enabled,
     ) {
         Icon(
             icon,
