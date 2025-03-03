@@ -27,6 +27,8 @@
     <string name="search_filter_zones">Zones</string>
     <string name="search_filter_sectors">Sectors</string>
     <string name="search_filter_paths">Paths</string>
+    <string name="search_filter_kids_apt">Kids Apt</string>
+    <string name="search_filter_visibility">Visible</string>
 
     <string name="intro_1_title">Welcome to Escalar Alcoià i Comtat</string>
     <string name="intro_1_message">There's some important information you need to know before using the app. Slide to the right or press the bottom right button to continue.</string>
