@@ -45,9 +45,16 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Job set up
         uses: ./.github/actions/job-set-up
+
+      # Refresh the version name again just in case
+      - name: Update version name
+        run: python ./scripts/updateVersionName.py --name=${{ github.event.release.name }}
 
       - name: Decode Keystore
         run: |
@@ -89,9 +96,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Job set up
         uses: ./.github/actions/job-set-up
+
+      # Refresh the version name again just in case
+      - name: Update version name
+        run: python ./scripts/updateVersionName.py --name=${{ github.event.release.name }}
+
 
       - name: Write local.properties
         run: echo '${{ secrets.LOCAL_PROPERTIES }}' > local.properties
@@ -116,6 +131,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      # Refresh the version name again just in case
+      - name: Update version name
+        run: python ./scripts/updateVersionName.py --name=${{ github.event.release.name }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
