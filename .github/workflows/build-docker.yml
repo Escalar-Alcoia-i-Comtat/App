@@ -33,7 +33,7 @@ jobs:
 
       - name: Build distribution
         run: |
-          ./gradlew :composeApp:wasmJsBrowserDistribution --stacktrace --no-daemon
+          ./gradlew :composeApp:wasmJsBrowserDevelopmentExecutableDistribution --stacktrace --no-daemon
 
       - name: Build and push development
         uses: docker/build-push-action@v6

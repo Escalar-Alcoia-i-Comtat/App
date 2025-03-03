@@ -342,7 +342,7 @@ compose.desktop {
         }
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
 
             packageName = "org.escalaralcoiaicomtat.app"
             packageVersion = appVersionName

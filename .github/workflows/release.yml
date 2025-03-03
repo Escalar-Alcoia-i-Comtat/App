@@ -105,7 +105,7 @@ jobs:
         with:
           files: |
             composeApp/build/compose/binaries/main-release/**/*.dmg
-            composeApp/build/compose/binaries/main-release/**/*.msi
+            composeApp/build/compose/binaries/main-release/**/*.exe
             composeApp/build/compose/binaries/main-release/**/*.deb
 
   build-wasm:
@@ -128,7 +128,7 @@ jobs:
 
       - name: Build distribution
         run: |
-          ./gradlew :composeApp:wasmJsBrowserDistribution --stacktrace --no-daemon
+          ./gradlew :composeApp:wasmJsBrowserDevelopmentExecutableDistribution --stacktrace --no-daemon
 
       # Build and push the release image, tagging it as latest and the release tag
       - name: Build and push release
