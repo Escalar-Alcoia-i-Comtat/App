@@ -116,6 +116,9 @@ kotlin {
             // Compose - Navigation
             implementation(libs.compose.navigation)
 
+            // Compose - Rich Text Editor
+            implementation(libs.compose.richeditor)
+
             // Compose - View Model
             implementation(libs.compose.viewModel)
 

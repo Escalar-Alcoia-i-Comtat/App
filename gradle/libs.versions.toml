@@ -9,6 +9,7 @@ compose-maps = "6.4.4"
 compose-navigation = "2.8.0-alpha12"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.7.3"
+compose-richeditor = "1.0.0-rc11"
 compose-ui = "1.7.8"
 compose-viewModel = "2.8.4"
 compose-windowSizeClass = "0.5.0"
@@ -46,6 +47,7 @@ compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", ve
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
 compose-viewModel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewModel" }
 compose-windowSizeClass = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "compose-windowSizeClass" }
+compose-richeditor = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "compose-richeditor" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }

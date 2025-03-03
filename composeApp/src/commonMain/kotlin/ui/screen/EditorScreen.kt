@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -51,6 +52,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.material3.OutlinedRichTextEditor
 import data.DataType
 import data.DataTypeWithImage
 import data.DataTypeWithParent
@@ -80,6 +83,7 @@ import ui.model.EditorModel
 import ui.model.EditorModel.Companion.FILE_KEY_GPX
 import ui.model.EditorModel.Companion.FILE_KEY_IMAGE
 import ui.model.EditorModel.Companion.FILE_KEY_KMZ
+import ui.reusable.editor.RichTextStyleRow
 import ui.reusable.form.FormDropdown
 import ui.reusable.form.FormField
 import ui.reusable.form.FormFilePicker
@@ -279,6 +283,7 @@ private fun <DT : DataType> EditorScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun <DT : DataType> EditorContent(
     item: DT,
@@ -621,7 +626,26 @@ private fun <DT : DataType> EditorContent(
             enabled = !isLoading,
         )
 
-        // TODO: Description and show picker
+        // TODO: Description show picker
+        val state = rememberRichTextState()
+        LaunchedEffect(Unit) {
+            item.description?.let(state::setMarkdown)
+            snapshotFlow { state.annotatedString }
+                .collect {
+                    onUpdateItem(
+                        item.copy(description = state.toMarkdown().takeUnless { it.isBlank() })
+                    )
+                }
+        }
+        RichTextStyleRow(
+            state = state,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        )
+        OutlinedRichTextEditor(
+            state = state,
+            enabled = !isLoading,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+        )
 
         // TODO: Builder picker
         // TODO: Re-builder picker
