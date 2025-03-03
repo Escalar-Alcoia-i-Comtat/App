@@ -1,5 +1,6 @@
 package data.generic
 
+import data.editable.EditableLatLng
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,4 +19,6 @@ data class LatLng(
     override fun toString(): String {
         return "$latitude,$longitude"
     }
+
+    fun editable(): EditableLatLng = EditableLatLng(latitude.toString(), longitude.toString())
 }

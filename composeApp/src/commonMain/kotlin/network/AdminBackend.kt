@@ -7,6 +7,7 @@ import data.DataTypeWithImage
 import data.DataTypeWithKMZ
 import data.DataTypeWithParent
 import data.DataTypeWithPoint
+import data.DataTypeWithPoints
 import data.DataTypes
 import data.Path
 import data.Sector
@@ -14,6 +15,7 @@ import data.Zone
 import data.generic.Builder
 import data.generic.LatLng
 import data.generic.PitchInfo
+import data.generic.Point
 import database.DatabaseInterface
 import database.SettingsKeys
 import database.byType
@@ -104,88 +106,100 @@ object AdminBackend : Backend() {
         require(item is DataTypeWithGPX || gpx == null) { "Cannot pass a gpx to a data type that doesn't support it." }
         val gpxBytes = gpx?.readBytes()
 
-        return submitForm(
-            UpdateResponseData.serializer(serializer),
-            type.path, item.id,
-            progress = progress,
-            requestBuilder = {
-                bearerAuth(token)
-            },
-        ) {
-            if (stored.displayName != item.displayName) append("displayName", item.displayName)
+        return try {
+            submitForm(
+                UpdateResponseData.serializer(serializer),
+                type.path, item.id,
+                progress = progress,
+                requestBuilder = {
+                    bearerAuth(token)
+                },
+            ) {
+                if (stored.displayName != item.displayName) append("displayName", item.displayName)
 
-            if (item is DataTypeWithParent && type.parentDataType != null) {
-                stored as DataTypeWithParent
-                val parentDataType = type.parentDataType
-                if (stored.parentId != item.parentId) {
-                    append(parentDataType.path, item.parentId)
-                }
-            }
-
-            if (item is DataTypeWithPoint) {
-                stored as DataTypeWithPoint
-                if (stored.point != item.point) {
-                    appendOrRemove("point", item.point, LatLng.serializer())
-                }
-            }
-
-            if (imageBytes != null) {
-                append("image", image, imageBytes)
-            }
-            if (kmzBytes != null) {
-                append("kmz", kmz, kmzBytes)
-            }
-            if (gpxBytes != null) {
-                append("gpx", gpx, gpxBytes)
-            }
-
-            if (item is Sector) {
-                stored as Sector
-                if (stored.kidsApt != item.kidsApt) append("kidsApt", item.kidsApt)
-                if (stored.sunTime != item.sunTime) append("sunTime", item.sunTime.name)
-                if (stored.weight != item.weight) append("weight", item.weight)
-                if (stored.walkingTime != item.walkingTime) appendOrRemove("walkingTime", item.walkingTime)
-                if (stored.tracks != item.tracks) {
-                    if (item.tracks == null) {
-                        append("tracks", "")
-                    } else {
-                        append("tracks", item.tracks.joinToString("\n") { "${it.type};${it.url}" })
+                if (item is DataTypeWithParent && type.parentDataType != null) {
+                    stored as DataTypeWithParent
+                    val parentDataType = type.parentDataType
+                    if (stored.parentId != item.parentId) {
+                        append(parentDataType.path, item.parentId)
                     }
                 }
-            }
-            if (item is Path) {
-                stored as Path
-                if (stored.sketchId != item.sketchId) append("sketchId", item.sketchId.toInt())
 
-                if (stored.height != item.height) appendOrRemove("height", item.height?.toInt())
-                if (stored.grade != item.grade) appendOrRemove("grade", item.gradeValue)
-                if (stored.ending != item.ending) appendOrRemove("ending", item.ending?.name)
+                if (item is DataTypeWithPoint) {
+                    stored as DataTypeWithPoint
+                    if (stored.point != item.point) {
+                        appendOrRemove("point", item.point, LatLng.serializer())
+                    }
+                }
 
-                if (stored.pitches != item.pitches) appendOrRemove("pitches", item.pitches, ListSerializer(PitchInfo.serializer()))
+                if (item is DataTypeWithPoints) {
+                    stored as DataTypeWithPoints
+                    if (stored.points != item.points) {
+                        appendOrRemove("points", item.points, ListSerializer(Point.serializer()))
+                    }
+                }
 
-                if (stored.stringCount != item.stringCount) appendOrRemove("stringCount", item.stringCount?.toInt())
-                if (stored.paraboltCount != item.paraboltCount) appendOrRemove("paraboltCount", item.paraboltCount?.toInt())
-                if (stored.burilCount != item.burilCount) appendOrRemove("burilCount", item.burilCount?.toInt())
-                if (stored.pitonCount != item.pitonCount) appendOrRemove("pitonCount", item.pitonCount?.toInt())
-                if (stored.spitCount != item.spitCount) appendOrRemove("spitCount", item.spitCount?.toInt())
-                if (stored.tensorCount != item.tensorCount) appendOrRemove("tensorCount", item.tensorCount?.toInt())
+                if (imageBytes != null) {
+                    append("image", image, imageBytes)
+                }
+                if (kmzBytes != null) {
+                    append("kmz", kmz, kmzBytes)
+                }
+                if (gpxBytes != null) {
+                    append("gpx", gpx, gpxBytes)
+                }
 
-                if (stored.nutRequired != item.nutRequired) appendOrRemove("crackerRequired", item.nutRequired)
-                if (stored.friendRequired != item.friendRequired) appendOrRemove("friendRequired", item.friendRequired)
-                if (stored.lanyardRequired != item.lanyardRequired) appendOrRemove("lanyardRequired", item.lanyardRequired)
-                if (stored.nailRequired != item.nailRequired) appendOrRemove("nailRequired", item.nailRequired)
-                if (stored.pitonRequired != item.pitonRequired) appendOrRemove("pitonRequired", item.pitonRequired)
-                if (stored.stapesRequired != item.stapesRequired) appendOrRemove("stapesRequired", item.stapesRequired)
+                if (item is Sector) {
+                    stored as Sector
+                    if (stored.kidsApt != item.kidsApt) append("kidsApt", item.kidsApt)
+                    if (stored.sunTime != item.sunTime) append("sunTime", item.sunTime.name)
+                    if (stored.weight != item.weight) append("weight", item.weight)
+                    if (stored.walkingTime != item.walkingTime) appendOrRemove("walkingTime", item.walkingTime)
+                    if (stored.tracks != item.tracks) {
+                        if (item.tracks == null) {
+                            append("tracks", "")
+                        } else {
+                            append("tracks", item.tracks.joinToString("\n") { "${it.type};${it.url}" })
+                        }
+                    }
+                }
+                if (item is Path) {
+                    stored as Path
+                    if (stored.sketchId != item.sketchId) append("sketchId", item.sketchId.toInt())
 
-                if (stored.showDescription != item.showDescription) appendOrRemove("showDescription", item.showDescription)
-                if (stored.description != item.description) appendOrRemove("description", item.description)
+                    if (stored.height != item.height) appendOrRemove("height", item.height?.toInt())
+                    if (stored.grade != item.grade) appendOrRemove("grade", item.gradeValue)
+                    if (stored.ending != item.ending) appendOrRemove("ending", item.ending?.name)
 
-                if (stored.builder != item.builder) appendOrRemove("builder", item.builder, Builder.serializer())
-                if (stored.reBuilders != item.reBuilders) appendOrRemove("reBuilder", item.reBuilders, ListSerializer(Builder.serializer()))
+                    if (stored.pitches != item.pitches) appendOrRemove("pitches", item.pitches, ListSerializer(PitchInfo.serializer()))
 
-                // TODO: Upload and remove images
-            }
-        }.element.also { int.update(listOf(it)) }
+                    if (stored.stringCount != item.stringCount) appendOrRemove("stringCount", item.stringCount?.toInt())
+                    if (stored.paraboltCount != item.paraboltCount) appendOrRemove("paraboltCount", item.paraboltCount?.toInt())
+                    if (stored.burilCount != item.burilCount) appendOrRemove("burilCount", item.burilCount?.toInt())
+                    if (stored.pitonCount != item.pitonCount) appendOrRemove("pitonCount", item.pitonCount?.toInt())
+                    if (stored.spitCount != item.spitCount) appendOrRemove("spitCount", item.spitCount?.toInt())
+                    if (stored.tensorCount != item.tensorCount) appendOrRemove("tensorCount", item.tensorCount?.toInt())
+
+                    if (stored.nutRequired != item.nutRequired) appendOrRemove("crackerRequired", item.nutRequired)
+                    if (stored.friendRequired != item.friendRequired) appendOrRemove("friendRequired", item.friendRequired)
+                    if (stored.lanyardRequired != item.lanyardRequired) appendOrRemove("lanyardRequired", item.lanyardRequired)
+                    if (stored.nailRequired != item.nailRequired) appendOrRemove("nailRequired", item.nailRequired)
+                    if (stored.pitonRequired != item.pitonRequired) appendOrRemove("pitonRequired", item.pitonRequired)
+                    if (stored.stapesRequired != item.stapesRequired) appendOrRemove("stapesRequired", item.stapesRequired)
+
+                    if (stored.showDescription != item.showDescription) appendOrRemove("showDescription", item.showDescription)
+                    if (stored.description != item.description) appendOrRemove("description", item.description)
+
+                    if (stored.builder != item.builder) appendOrRemove("builder", item.builder, Builder.serializer())
+                    if (stored.reBuilders != item.reBuilders) appendOrRemove("reBuilder", item.reBuilders, ListSerializer(Builder.serializer()))
+
+                    // TODO: Upload and remove images
+                }
+            }.element.also { int.update(listOf(it)) }
+        } catch (_: IllegalArgumentException) {
+            Napier.w { "Nothing to update" }
+            item
+        }
     }
 
     private suspend fun <DT: DataType> create(

@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,21 +45,27 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.DataType
 import data.DataTypeWithImage
 import data.DataTypeWithParent
 import data.DataTypeWithPoint
+import data.DataTypeWithPoints
 import data.DataTypes
 import data.Path
 import data.Sector
 import data.Zone
 import data.editable.EditableExternalTrack
+import data.editable.EditablePoint
 import data.generic.Ending
 import data.generic.ExternalTrack
 import data.generic.LatLng
+import data.generic.Point
 import data.generic.SportsGrade
 import data.generic.SunTime
 import escalaralcoiaicomtat.composeapp.generated.resources.*
@@ -147,7 +156,7 @@ private fun <DT : DataType> EditorScreen(
     onClearErrorRequested: () -> Unit,
     onSaveRequested: (onComplete: () -> Unit) -> Unit,
     onDeleteRequested: () -> Unit,
-    onBackRequested: () -> Unit
+    onBackRequested: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -255,7 +264,16 @@ private fun <DT : DataType> EditorScreen(
                     .widthIn(max = 600.dp)
                     .fillMaxWidth()
             ) {
-                EditorContent(item, onUpdateItem, parents, files, onFilePicked, isCreate, isLoading)
+                EditorContent(
+                    item,
+                    onUpdateItem,
+                    parents,
+                    files,
+                    onFilePicked,
+                    isCreate,
+                    isLoading,
+                    snackbarHostState::showSnackbar
+                )
             }
         }
     }
@@ -270,7 +288,11 @@ private fun <DT : DataType> EditorContent(
     onFilePicked: (key: String, PlatformFile?) -> Unit,
     isCreate: Boolean,
     isLoading: Boolean,
+    onSnackbarMessageRequested: suspend (String) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
+
     FormField(
         value = if (isCreate) stringResource(Res.string.editor_id_automatic) else item.id.toString(),
         onValueChange = {},
@@ -314,50 +336,22 @@ private fun <DT : DataType> EditorContent(
     }
 
     if (item is DataTypeWithPoint) {
-        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-            var latitude by remember { mutableStateOf(item.point?.latitude?.toString() ?: "") }
-            var longitude by remember { mutableStateOf(item.point?.longitude?.toString() ?: "") }
-
-            fun update(lat: String?, lon: String?) {
-                val (newLat, newLon) = if (lat != null) {
-                    latitude = lat
-                    lat.toDoubleOrNull() to item.point?.longitude
-                } else if (lon != null) {
-                    longitude = lon
-                    item.point?.latitude to lon.toDoubleOrNull()
-                } else {
-                    // Won't happen, but must be handled
-                    item.point?.latitude to item.point?.longitude
-                }
-                if (newLat != null && newLon != null) {
-                    onUpdateItem(item.copy(point = LatLng(newLat, newLon)))
-                } else {
-                    onUpdateItem(item.copy(point = null))
-                }
-            }
-
-            FormField(
-                value = latitude,
-                onValueChange = { update(it, null) },
-                label = stringResource(Res.string.editor_latitude_label),
-                modifier = Modifier.weight(1f).padding(end = 4.dp),
-                error = stringResource(Res.string.editor_error_coordinate)
-                    .takeIf { latitude.isNotEmpty() && latitude.toDoubleOrNull() == null },
-                enabled = !isLoading,
-            )
-            FormField(
-                value = longitude,
-                onValueChange = { update(null, it) },
-                label = stringResource(Res.string.editor_longitude_label),
-                modifier = Modifier.weight(1f).padding(start = 4.dp),
-                error = stringResource(Res.string.editor_error_coordinate)
-                    .takeIf { longitude.isNotEmpty() && longitude.toDoubleOrNull() == null },
-                enabled = !isLoading,
-            )
-        }
+        LatLngEditor(
+            point = item.point,
+            onUpdateItem = { onUpdateItem(item.copy(point = it)) },
+            enabled = !isLoading,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
     }
 
-    // TODO: Points picker
+    if (item is DataTypeWithPoints) {
+        PointListEditor(
+            points = item.points,
+            onUpdateItem = { onUpdateItem(item.copy(points = it)) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+        )
+    }
 
     if (item is Zone) {
         FormFilePicker(
@@ -404,41 +398,17 @@ private fun <DT : DataType> EditorContent(
             enabled = !isLoading,
         )
 
-        FormListCreator(
-            elements = item.tracks.orEmpty().map { it.editable() },
-            onElementsChange = { list ->
-                onUpdateItem(item.copy(tracks = list.map(EditableExternalTrack::build)))
-            },
-            constructor = { EditableExternalTrack() },
-            validate = EditableExternalTrack::validate,
-            creator = { value, onChange ->
-                // FIXME: Cannot modify values
-                FormDropdown(
-                    selection = value.type,
-                    onSelectionChanged = { onChange(value.copy(type = it)) },
-                    options = ExternalTrack.Type.entries,
-                    label = stringResource(Res.string.editor_external_track_type_label),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                FormField(
-                    value = value.url,
-                    onValueChange = { onChange(value.copy(url = it)) },
-                    label = stringResource(Res.string.editor_external_track_url_label),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-            title = stringResource(Res.string.editor_external_tracks_label),
-            elementRender = { (type, url) ->
-                if (type == null) return@FormListCreator
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(type.icon, null)
-                    Text(text = url, modifier = Modifier.padding(start = 4.dp).weight(1f))
+        ExternalTracksEditor(
+            tracks = item.tracks.orEmpty(),
+            onUpdateItem = { onUpdateItem(item.copy(tracks = it)) },
+            onCopyRequested = {
+                clipboardManager.setText(buildAnnotatedString { append(it) })
+                scope.launch {
+                    onSnackbarMessageRequested(getString(Res.string.message_copied))
                 }
             },
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
         )
 
         FormOptionPicker(
@@ -710,5 +680,215 @@ fun ErrorDialog(
                 onClick = onDismissRequest
             ) { Text(stringResource(Res.string.action_close)) }
         },
+    )
+}
+
+@Composable
+private fun LatLngEditor(
+    point: LatLng?,
+    onUpdateItem: (LatLng?) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        var latitude by remember { mutableStateOf(point?.latitude?.toString() ?: "") }
+        var longitude by remember { mutableStateOf(point?.longitude?.toString() ?: "") }
+
+        fun update(lat: String?, lon: String?) {
+            val (newLat, newLon) = if (lat != null) {
+                latitude = lat
+                lat.toDoubleOrNull() to point?.longitude
+            } else if (lon != null) {
+                longitude = lon
+                point?.latitude to lon.toDoubleOrNull()
+            } else {
+                // Won't happen, but must be handled
+                point?.latitude to point?.longitude
+            }
+            if (newLat != null && newLon != null) {
+                onUpdateItem(LatLng(newLat, newLon))
+            } else {
+                onUpdateItem(null)
+            }
+        }
+
+        FormField(
+            value = latitude,
+            onValueChange = { update(it, null) },
+            label = stringResource(Res.string.editor_latitude_label),
+            modifier = Modifier.weight(1f).padding(end = 4.dp),
+            error = stringResource(Res.string.editor_error_coordinate)
+                .takeIf { latitude.isNotEmpty() && latitude.toDoubleOrNull() == null },
+            enabled = enabled,
+        )
+        FormField(
+            value = longitude,
+            onValueChange = { update(null, it) },
+            label = stringResource(Res.string.editor_longitude_label),
+            modifier = Modifier.weight(1f).padding(start = 4.dp),
+            error = stringResource(Res.string.editor_error_coordinate)
+                .takeIf { longitude.isNotEmpty() && longitude.toDoubleOrNull() == null },
+            enabled = enabled,
+        )
+    }
+}
+
+@Composable
+private fun PointListEditor(
+    points: List<Point>,
+    onUpdateItem: (List<Point>) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    FormListCreator(
+        elements = points.map(Point::editable),
+        onElementsChange = { list -> onUpdateItem(list.map(EditablePoint::build)) },
+        constructor = { EditablePoint() },
+        validate = EditablePoint::validate,
+        creator = { value, onChange ->
+            val (icon, latLng, label) = value
+            FormDropdown(
+                selection = icon,
+                onSelectionChanged = { onChange(value.copy(icon = it)) },
+                options = Point.Name.entries,
+                label = stringResource(Res.string.editor_external_track_type_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                FormField(
+                    value = latLng.latitude,
+                    onValueChange = { onChange(value.copy(location = latLng.copy(latitude = it))) },
+                    label = stringResource(Res.string.editor_latitude_label),
+                    modifier = Modifier.weight(1f).padding(end = 4.dp),
+                    enabled = enabled,
+                )
+                FormField(
+                    value = latLng.longitude,
+                    onValueChange = { onChange(value.copy(location = latLng.copy(longitude = it))) },
+                    label = stringResource(Res.string.editor_longitude_label),
+                    modifier = Modifier.weight(1f).padding(start = 4.dp),
+                    enabled = enabled,
+                )
+            }
+            FormField(
+                value = label,
+                onValueChange = { onChange(value.copy(label = it)) },
+                label = stringResource(Res.string.editor_point_label_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+        },
+        title = stringResource(Res.string.editor_points_label),
+        elementRender = { (icon, latLng, label), edit, delete ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
+                    .padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = icon.iconVector,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                )
+
+                Column(
+                    modifier = Modifier.padding(start = 4.dp).weight(1f),
+                ) {
+                    Text(
+                        text = "${latLng.latitude}, ${latLng.longitude}",
+                    )
+                    Text(
+                        text = label.takeUnless { it.isBlank() } ?: "N/A",
+                        fontStyle = if (label.isBlank()) FontStyle.Italic else FontStyle.Normal,
+                    )
+                }
+
+                IconButton(
+                    onClick = edit,
+                    enabled = enabled,
+                ) { Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit)) }
+                IconButton(
+                    onClick = delete,
+                    enabled = enabled,
+                ) {
+                    Icon(
+                        Icons.Default.DeleteForever,
+                        stringResource(Res.string.editor_delete)
+                    )
+                }
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ExternalTracksEditor(
+    tracks: List<ExternalTrack>,
+    onUpdateItem: (List<ExternalTrack>) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    onCopyRequested: (String) -> Unit
+) {
+    FormListCreator(
+        elements = tracks.map { it.editable() },
+        onElementsChange = { list -> onUpdateItem(list.map(EditableExternalTrack::build)) },
+        constructor = { EditableExternalTrack() },
+        validate = EditableExternalTrack::validate,
+        creator = { value, onChange ->
+            FormDropdown(
+                selection = value.type,
+                onSelectionChanged = { onChange(value.copy(type = it)) },
+                options = ExternalTrack.Type.entries,
+                label = stringResource(Res.string.editor_external_track_type_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+            FormField(
+                value = value.url,
+                onValueChange = { onChange(value.copy(url = it)) },
+                label = stringResource(Res.string.editor_external_track_url_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+        },
+        title = stringResource(Res.string.editor_external_tracks_label),
+        elementRender = { (type, url), edit, delete ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
+                    .padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = type.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                )
+
+                Text(
+                    text = url,
+                    modifier = Modifier.padding(start = 4.dp).weight(1f),
+                )
+
+                IconButton(
+                    onClick = { onCopyRequested(url) },
+                ) { Icon(Icons.Default.ContentCopy, stringResource(Res.string.action_copy)) }
+                IconButton(
+                    onClick = edit,
+                    enabled = enabled,
+                ) { Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit)) }
+                IconButton(
+                    onClick = delete,
+                    enabled = enabled,
+                ) {
+                    Icon(
+                        Icons.Default.DeleteForever,
+                        stringResource(Res.string.editor_delete)
+                    )
+                }
+            }
+        },
+        modifier = modifier,
     )
 }

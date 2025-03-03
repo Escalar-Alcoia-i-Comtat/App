@@ -165,7 +165,7 @@ private fun LazyListScope.display(zone: Zone) {
             contentType = { "zone-metadata" }
         ) { point ->
             LocationCard(
-                icon = point.iconVector,
+                icon = point.icon.iconVector,
                 title = point.label,
                 point = point.location,
                 modifier = Modifier

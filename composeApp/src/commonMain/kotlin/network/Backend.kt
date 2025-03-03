@@ -206,19 +206,22 @@ abstract class Backend {
             .buildString()
         Napier.v("POST :: $url")
 
+        val formData = formData(formBuilder).also { parts ->
+            val data = StringBuilder()
+            for (part in parts) {
+                if (part is PartData.FormItem) {
+                    data.appendLine("- ${part.name}\n  ${part.value}")
+                } else {
+                    data.appendLine("- ${part.name} - Type: ${part.contentType}")
+                }
+            }
+            Napier.i { "Making request to $url\nData:\n$data" }
+        }
+        require(formData.isNotEmpty()) { "Form data is empty, nothing to send." }
+
         val response = client.submitFormWithBinaryData(
             url = url,
-            formData = formData(formBuilder).also { parts ->
-                val data = StringBuilder()
-                for (part in parts) {
-                    if (part is PartData.FormItem) {
-                        data.appendLine("- ${part.name}\n  ${part.value}")
-                    } else {
-                        data.appendLine("- ${part.name} - Type: ${part.contentType}")
-                    }
-                }
-                Napier.i { "Making request to $url\nData:\n$data" }
-            }
+            formData = formData,
         ) {
             requestBuilder()
             onDownload { bytesSentTotal, contentLength ->

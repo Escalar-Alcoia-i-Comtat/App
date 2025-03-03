@@ -9,34 +9,30 @@ import androidx.compose.material.icons.outlined.Pool
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.Water
 import androidx.compose.ui.graphics.vector.ImageVector
+import data.editable.EditablePoint
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 data class Point(
-    val icon: String,
+    val icon: Name,
     val location: LatLng,
     val label: String
 ) {
-    companion object {
-        const val POINT_NAME_DEFAULT = "default"
-        const val POINT_NAME_PARKING = "parking"
-        const val POINT_NAME_PARK = "park"
-        const val POINT_NAME_WATER = "water"
-        const val POINT_NAME_POOL = "pool"
-        const val POINT_NAME_RESTAURANT = "restaurant"
-        const val POINT_NAME_HOTEL = "hotel"
+    enum class Name {
+        DEFAULT, PARKING, PARK, WATER, POOL, RESTAURANT, HOTEL;
+
+        val key: String = name.lowercase()
+
+        val iconVector: ImageVector get() = when (this) {
+            DEFAULT -> Icons.Outlined.Place
+            PARKING -> Icons.Outlined.LocalParking
+            PARK -> Icons.Outlined.Park
+            WATER -> Icons.Outlined.Water
+            POOL -> Icons.Outlined.Pool
+            RESTAURANT -> Icons.Outlined.Restaurant
+            HOTEL -> Icons.Outlined.Hotel
+        }
     }
 
-    @Transient
-    val iconVector: ImageVector = when (icon) {
-        POINT_NAME_DEFAULT -> Icons.Outlined.Place
-        POINT_NAME_PARKING -> Icons.Outlined.LocalParking
-        POINT_NAME_PARK -> Icons.Outlined.Park
-        POINT_NAME_WATER -> Icons.Outlined.Water
-        POINT_NAME_POOL -> Icons.Outlined.Pool
-        POINT_NAME_RESTAURANT -> Icons.Outlined.Restaurant
-        POINT_NAME_HOTEL -> Icons.Outlined.Hotel
-        else -> Icons.Outlined.Place
-    }
+    fun editable(): EditablePoint = EditablePoint(icon, location.editable(), label)
 }
