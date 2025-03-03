@@ -9,7 +9,7 @@ compose-maps = "6.4.4"
 compose-navigation = "2.8.0-alpha12"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.7.3"
-compose-richeditor = "1.0.0-rc11"
+compose-richeditor = "1.0.0-dev01"
 compose-ui = "1.7.8"
 compose-viewModel = "2.8.4"
 compose-windowSizeClass = "0.5.0"
