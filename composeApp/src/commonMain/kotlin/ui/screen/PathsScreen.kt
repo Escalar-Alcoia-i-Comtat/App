@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.SwipeDownAlt
@@ -115,7 +116,8 @@ fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
-    onEditRequested: ((Path) -> Unit)?,
+    onEditSectorRequested: (() -> Unit)?,
+    onEditPathRequested: ((Path) -> Unit)?,
     onCreatePathRequested: (() -> Unit)?,
     viewModel: PathsScreenModel = viewModel { PathsScreenModel() }
 ) {
@@ -133,14 +135,15 @@ fun PathsScreen(
     BackHandler(onBack = onBackRequested)
 
     PathsScreen(
-        sector,
-        paths,
-        selectedPath,
-        highlightPathId,
-        onBackRequested,
-        onEditRequested,
-        onCreatePathRequested,
-        viewModel::selectChild
+        sector = sector,
+        paths = paths,
+        selectedPath = selectedPath,
+        highlightPathId = highlightPathId,
+        onBackRequested = onBackRequested,
+        onEditSectorRequested = onEditSectorRequested,
+        onEditPathRequested = onEditPathRequested,
+        onCreatePathRequested = onCreatePathRequested,
+        onPathClicked = viewModel::selectChild
     )
 }
 
@@ -152,7 +155,8 @@ private fun PathsScreen(
     selectedPath: Path?,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
-    onEditRequested: ((Path) -> Unit)?,
+    onEditSectorRequested: (() -> Unit)?,
+    onEditPathRequested: ((Path) -> Unit)?,
     onCreatePathRequested: (() -> Unit)?,
     onPathClicked: (path: Path?) -> Unit
 ) {
@@ -179,11 +183,18 @@ private fun PathsScreen(
                             stringResource(Res.string.sector_information_title)
                         )
                     }
+                    if (onEditSectorRequested != null) {
+                        IconButton(
+                            onClick = onEditSectorRequested,
+                        ) {
+                            Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit))
+                        }
+                    }
                     if (onCreatePathRequested != null) {
                         IconButton(
-                            onClick = onCreatePathRequested
+                            onClick = onCreatePathRequested,
                         ) {
-                            Icon(Icons.Outlined.Add, null)
+                            Icon(Icons.Outlined.Add, stringResource(Res.string.editor_create))
                         }
                     }
                 }
@@ -196,7 +207,7 @@ private fun PathsScreen(
             selectedPath,
             highlightPathId,
             modifier = Modifier.padding(paddingValues),
-            onEditRequested = onEditRequested,
+            onEditRequested = onEditPathRequested,
             onPathClicked = onPathClicked
         )
     }
@@ -339,8 +350,8 @@ fun PathsList(
                             transitionSpec = {
                                 slideInVertically { it } togetherWith slideOutVertically { it }
                             }
-                        ) {
-                            if (it != null) {
+                        ) { path ->
+                            if (path != null) {
                                 Column(
                                     modifier = Modifier
                                         .widthIn(max = sidePathInformationPanelMaxWidth)
@@ -353,8 +364,9 @@ fun PathsList(
                                         .verticalScroll(rememberScrollState())
                                 ) {
                                     BottomSheetContents(
-                                        it,
+                                        path,
                                         false,
+                                        onEditRequested = { onEditRequested?.invoke(path) },
                                         onDismissRequested = { onPathClicked(null) }
                                     )
                                 }
@@ -362,11 +374,15 @@ fun PathsList(
                         }
                     }
                 } else {
-                    selectedPath?.let {
+                    selectedPath?.let { path ->
                         ModalBottomSheet(
                             onDismissRequest = { onPathClicked(null) }
                         ) {
-                            BottomSheetContents(it, true) { onPathClicked(null) }
+                            BottomSheetContents(
+                                path,
+                                isModal = true,
+                                onEditRequested = { onEditRequested?.invoke(path) },
+                            ) { onPathClicked(null) }
                         }
                     }
                 }
@@ -465,6 +481,7 @@ private fun PathsListView(
 private fun BottomSheetContents(
     child: Path,
     isModal: Boolean,
+    onEditRequested: (() -> Unit)?,
     onDismissRequested: () -> Unit
 ) {
     val localUnitsConfiguration = LocalUnitsConfiguration.current
@@ -475,13 +492,21 @@ private fun BottomSheetContents(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = child.displayName,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f)
             )
+            if (onEditRequested != null) {
+                IconButton(
+                    onClick = onEditRequested,
+                ) {
+                    Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit))
+                }
+            }
             if (!isModal) {
                 IconButton(
                     onClick = onDismissRequested

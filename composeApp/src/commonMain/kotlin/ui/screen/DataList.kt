@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.OutlinedFlag
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,7 +48,8 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     children: List<ChildrenType>?,
     scrollToId: Long? = null,
     onNavigationRequested: (ChildrenType) -> Unit,
-    onEditRequested: ((ChildrenType) -> Unit)?,
+    onEditRequested: (() -> Unit)?,
+    onEditChildRequested: ((ChildrenType) -> Unit)?,
     onCreateRequested: (() -> Unit)?,
     onNavigateUp: () -> Unit
 ) {
@@ -72,9 +74,14 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                     }
                 },
                 actions = {
+                    if (onEditRequested != null) {
+                        IconButton(onClick = onEditRequested) {
+                            Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit))
+                        }
+                    }
                     if (onCreateRequested != null) {
                         IconButton(onClick = onCreateRequested) {
-                            Icon(Icons.Default.Add, null)
+                            Icon(Icons.Default.Add, stringResource(Res.string.editor_create))
                         }
                     }
                 }
@@ -111,7 +118,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                     .padding(bottom = 12.dp)
                                     .widthIn(max = 600.dp)
                                     .fillMaxWidth(),
-                                onEdit = onEditRequested?.let { { it(child) } }
+                                onEdit = onEditChildRequested?.let { { it(child) } }
                             ) { onNavigationRequested(child) }
                         }
                     }

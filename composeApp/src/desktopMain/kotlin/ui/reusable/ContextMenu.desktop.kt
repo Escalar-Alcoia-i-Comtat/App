@@ -30,7 +30,7 @@ actual fun ContextMenu(
     val density = LocalDensity.current
 
     DropdownMenu(
-        expanded = expanded,
+        expanded = enabled && expanded,
         onDismissRequest = { expanded = false },
         offset = offset ?: DpOffset.Unspecified,
         content = dropdownContent,

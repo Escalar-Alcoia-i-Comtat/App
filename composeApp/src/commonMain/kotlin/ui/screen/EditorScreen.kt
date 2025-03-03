@@ -65,6 +65,7 @@ import data.Sector
 import data.Zone
 import data.editable.EditableExternalTrack
 import data.editable.EditablePoint
+import data.generic.Builder
 import data.generic.Ending
 import data.generic.ExternalTrack
 import data.generic.LatLng
@@ -97,7 +98,8 @@ import ui.state.LaunchedKeyEvent
 fun <DT : DataType> EditorScreen(
     dataType: DataTypes<DT>,
     id: Long?, // If null, a new item will be created
-    model: EditorModel<DT> = viewModel { EditorModel(dataType, id) },
+    parentId: Long?,
+    model: EditorModel<DT> = viewModel { EditorModel(dataType, id, parentId) },
     onBackRequested: () -> Unit
 ) {
     val item by model.item.collectAsState()
@@ -637,9 +639,14 @@ private fun <DT : DataType> EditorContent(
                     )
                 }
         }
+        Text(
+            text = stringResource(Res.string.editor_description_label),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        )
         RichTextStyleRow(
             state = state,
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            modifier = Modifier.fillMaxWidth(),
         )
         OutlinedRichTextEditor(
             state = state,
@@ -647,7 +654,17 @@ private fun <DT : DataType> EditorContent(
             modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
         )
 
-        // TODO: Builder picker
+        Text(
+            text = stringResource(Res.string.editor_builder_label),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        )
+        BuilderEditor(
+            builder = item.builder,
+            onBuilderChange = { onUpdateItem(item.copy(builder = it.orNull())) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        )
+
         // TODO: Re-builder picker
 
         // TODO: Path images picker
@@ -753,6 +770,28 @@ private fun LatLngEditor(
             error = stringResource(Res.string.editor_error_coordinate)
                 .takeIf { longitude.isNotEmpty() && longitude.toDoubleOrNull() == null },
             enabled = enabled,
+        )
+    }
+}
+
+@Composable
+fun BuilderEditor(
+    builder: Builder?,
+    onBuilderChange: (Builder) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        FormField(
+            value = builder?.name,
+            onValueChange = { onBuilderChange(builder?.copy(name = it) ?: Builder(it)) },
+            label = stringResource(Res.string.editor_builder_name_label),
+            modifier = Modifier.weight(1f).padding(end = 4.dp),
+        )
+        FormField(
+            value = builder?.date,
+            onValueChange = { onBuilderChange(builder?.copy(date = it) ?: Builder(date = it)) },
+            label = stringResource(Res.string.editor_builder_date_label),
+            modifier = Modifier.weight(1f).padding(start = 4.dp),
         )
     }
 }

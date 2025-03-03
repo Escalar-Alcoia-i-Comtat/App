@@ -2,6 +2,7 @@ package ui.model
 
 import data.Area
 import data.DataType
+import data.DataTypeWithParent
 import data.DataTypes
 import data.Path
 import data.Sector
@@ -19,7 +20,8 @@ import network.AdminBackend
 
 class EditorModel<DT : DataType>(
     val type: DataTypes<DT>,
-    id: Long?
+    id: Long?,
+    private val parentId: Long?,
 ) : ViewModelBase() {
     private val databaseInterface = DatabaseInterface.byType(type)
 
@@ -57,14 +59,28 @@ class EditorModel<DT : DataType>(
                 type.default()
             } else {
                 Napier.d { "Editing ${type.name}#$id..." }
-                databaseInterface.get(id)?.also { originalItem = it } ?: return@launch onNotFound()
+                databaseInterface.get(id)?.also { originalItem = it } ?: return@launch run {
+                    Napier.e { "Could not find ${type.name} with id $id" }
+                    onNotFound()
+                }
             }
             _item.emit(item)
 
             if (type.parentDataType != null) {
-                val parents = DatabaseInterface.byType(type.parentDataType).all()
+                val pdbi = DatabaseInterface.byType(type.parentDataType)
+                val parents = pdbi.all()
                 Napier.d { "Got ${parents.size} parents." }
                 _parents.tryEmit(parents)
+
+                if (item is DataTypeWithParent && parentId != null) {
+                    // Make sure the parent exists
+                    pdbi.get(parentId)?.let {
+                        @Suppress("UNCHECKED_CAST")
+                        _item.emit(
+                            item.copy(parentId = parentId) as DT
+                        )
+                    }
+                }
             }
         }
     }

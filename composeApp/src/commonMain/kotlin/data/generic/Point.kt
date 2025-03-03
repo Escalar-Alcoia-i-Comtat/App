@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Water
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import data.editable.EditablePoint
+import data.serialization.PointNameSerializer
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
@@ -18,7 +19,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Serializable
 data class Point(
-    val icon: Name,
+    @Serializable(with = PointNameSerializer::class) val icon: Name,
     val location: LatLng,
     val label: String
 ) {
