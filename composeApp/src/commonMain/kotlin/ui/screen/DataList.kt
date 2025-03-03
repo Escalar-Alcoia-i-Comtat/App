@@ -166,7 +166,7 @@ private fun LazyListScope.display(zone: Zone) {
         ) { point ->
             LocationCard(
                 icon = point.icon.iconVector,
-                title = point.label,
+                title = point.displayName(),
                 point = point.location,
                 modifier = Modifier
                     .padding(horizontal = 8.dp, vertical = 4.dp)

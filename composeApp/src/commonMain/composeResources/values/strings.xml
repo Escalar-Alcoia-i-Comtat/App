@@ -135,6 +135,14 @@
     <string name="path_builder_name_date">by %s on %s</string>
     <string name="path_ending">Path Ending</string>
 
+    <string name="point_default">Place</string>
+    <string name="point_parking">Parking</string>
+    <string name="point_park">Park</string>
+    <string name="point_water">Water Point</string>
+    <string name="point_pool">Pool</string>
+    <string name="point_restaurant">Restaurant</string>
+    <string name="point_hotel">Hotel</string>
+
     <string name="unit_label_meter">Meter</string>
     <string name="unit_value_meter">%.0f m</string>
     <string name="unit_label_feet">Feet</string>

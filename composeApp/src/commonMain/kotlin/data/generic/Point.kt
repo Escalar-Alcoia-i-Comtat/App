@@ -8,9 +8,13 @@ import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Pool
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.Water
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import data.editable.EditablePoint
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 @Serializable
 data class Point(
@@ -32,7 +36,20 @@ data class Point(
             RESTAURANT -> Icons.Outlined.Restaurant
             HOTEL -> Icons.Outlined.Hotel
         }
+
+        val label: StringResource get() = when(this) {
+            DEFAULT -> Res.string.point_default
+            PARKING -> Res.string.point_parking
+            PARK -> Res.string.point_park
+            WATER -> Res.string.point_water
+            POOL -> Res.string.point_pool
+            RESTAURANT -> Res.string.point_restaurant
+            HOTEL -> Res.string.point_hotel
+        }
     }
 
     fun editable(): EditablePoint = EditablePoint(icon, location.editable(), label)
+
+    @Composable
+    fun displayName(): String = label.takeIf { it.isNotBlank() } ?: stringResource(icon.label)
 }
