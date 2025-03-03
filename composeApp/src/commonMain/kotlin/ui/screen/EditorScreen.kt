@@ -1063,7 +1063,7 @@ private fun PitchesEditor(
     enabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    FormListCreator<EditablePitchInfo>(
+    FormListCreator(
         elements = list.map { it.editable() },
         onElementsChange = { onUpdateItem(it.map(EditablePitchInfo::build)) },
         constructor = { EditablePitchInfo() },
