@@ -10,7 +10,7 @@ import io.ktor.http.Url
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import network.Backend
+import network.BasicBackend
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -22,7 +22,7 @@ data class Sector(
     @SerialName("display_name") override val displayName: String,
     // Nullable to allow editing without uploading, must never be null
     override val image: Uuid?,
-    val gpx: Uuid? = null,
+    override val gpx: Uuid? = null,
     val tracks: List<ExternalTrack>? = null,
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
@@ -38,8 +38,8 @@ data class Sector(
             "database.DatabaseInterface"
         )
     )
-    val paths: List<Path>
-) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithParent {
+    val paths: List<Path>? = null
+) : DataTypeWithImage, DataTypeWithGPX, DataTypeWithPoint, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return (other as? Sector)
             // If other is a Sector, try to compare by weight, but don't consider empty weights
@@ -52,7 +52,7 @@ data class Sector(
 
     override val parentId: Long get() = parentZoneId
 
-    fun getGPXDownloadUrl(): Url? = gpx?.let(Backend::downloadFileUrl)
+    fun getGPXDownloadUrl(): Url? = gpx?.let(BasicBackend::downloadFileUrl)
 
     /**
      * Checks whether the zone has any metadata to display.
@@ -68,6 +68,10 @@ data class Sector(
 
     override fun copy(image: Uuid): Sector {
         return copy(id = id, image = image)
+    }
+
+    override fun copyGpx(gpx: Uuid): DataTypeWithGPX {
+        return copy(id = id, gpx = gpx)
     }
 
     override fun copy(parentId: Long): Sector {

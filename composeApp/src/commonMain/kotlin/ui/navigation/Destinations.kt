@@ -61,8 +61,9 @@ object Destinations {
     data class Editor(
         val dataTypes: String,
         override val id: Long?,
+        val parentId: Long?,
     ) : Destination {
-        constructor(dataTypes: DataTypes<*>, id: Long?): this(dataTypes.name, id)
+        constructor(dataTypes: DataTypes<*>, id: Long?, parentId: Long? = null): this(dataTypes.name, id, parentId)
 
         override val path: String = "/editor/${dataTypes}/${id ?: "new"}"
         override val name: String = "Editor"

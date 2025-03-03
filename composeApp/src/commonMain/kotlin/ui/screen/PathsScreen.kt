@@ -32,9 +32,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.SwipeDownAlt
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
@@ -43,6 +45,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
@@ -101,6 +104,7 @@ import ui.icons.Rope
 import ui.list.PathListItem
 import ui.model.PathsScreenModel
 import ui.reusable.CircularProgressIndicatorBox
+import ui.reusable.ContextMenu
 import utils.format
 import utils.unit.meters
 
@@ -112,6 +116,9 @@ fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
+    onEditSectorRequested: (() -> Unit)?,
+    onEditPathRequested: ((Path) -> Unit)?,
+    onCreatePathRequested: (() -> Unit)?,
     viewModel: PathsScreenModel = viewModel { PathsScreenModel() }
 ) {
     val sector by viewModel.parent.collectAsState()
@@ -128,12 +135,15 @@ fun PathsScreen(
     BackHandler(onBack = onBackRequested)
 
     PathsScreen(
-        sector,
-        paths,
-        selectedPath,
-        highlightPathId,
-        onBackRequested,
-        viewModel::selectChild
+        sector = sector,
+        paths = paths,
+        selectedPath = selectedPath,
+        highlightPathId = highlightPathId,
+        onBackRequested = onBackRequested,
+        onEditSectorRequested = onEditSectorRequested,
+        onEditPathRequested = onEditPathRequested,
+        onCreatePathRequested = onCreatePathRequested,
+        onPathClicked = viewModel::selectChild
     )
 }
 
@@ -145,6 +155,9 @@ private fun PathsScreen(
     selectedPath: Path?,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
+    onEditSectorRequested: (() -> Unit)?,
+    onEditPathRequested: ((Path) -> Unit)?,
+    onCreatePathRequested: (() -> Unit)?,
     onPathClicked: (path: Path?) -> Unit
 ) {
     var showingBottomSheet by remember { mutableStateOf(false) }
@@ -170,6 +183,20 @@ private fun PathsScreen(
                             stringResource(Res.string.sector_information_title)
                         )
                     }
+                    if (onEditSectorRequested != null) {
+                        IconButton(
+                            onClick = onEditSectorRequested,
+                        ) {
+                            Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit))
+                        }
+                    }
+                    if (onCreatePathRequested != null) {
+                        IconButton(
+                            onClick = onCreatePathRequested,
+                        ) {
+                            Icon(Icons.Outlined.Add, stringResource(Res.string.editor_create))
+                        }
+                    }
                 }
             )
         }
@@ -180,6 +207,7 @@ private fun PathsScreen(
             selectedPath,
             highlightPathId,
             modifier = Modifier.padding(paddingValues),
+            onEditRequested = onEditPathRequested,
             onPathClicked = onPathClicked
         )
     }
@@ -273,6 +301,7 @@ fun PathsList(
     selectedPath: Path?,
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
+    onEditRequested: ((Path) -> Unit)?,
     onPathClicked: (path: Path?) -> Unit
 ) {
     val windowSizeClass = calculateWindowSizeClass()
@@ -312,6 +341,7 @@ fun PathsList(
                             paths = paths,
                             highlightPathId = highlightPathId,
                             modifier = Modifier.fillMaxHeight().weight(1f),
+                            onEditRequested = onEditRequested,
                             onPathClicked = onPathClicked
                         )
 
@@ -320,8 +350,8 @@ fun PathsList(
                             transitionSpec = {
                                 slideInVertically { it } togetherWith slideOutVertically { it }
                             }
-                        ) {
-                            if (it != null) {
+                        ) { path ->
+                            if (path != null) {
                                 Column(
                                     modifier = Modifier
                                         .widthIn(max = sidePathInformationPanelMaxWidth)
@@ -334,8 +364,9 @@ fun PathsList(
                                         .verticalScroll(rememberScrollState())
                                 ) {
                                     BottomSheetContents(
-                                        it,
+                                        path,
                                         false,
+                                        onEditRequested = { onEditRequested?.invoke(path) },
                                         onDismissRequested = { onPathClicked(null) }
                                     )
                                 }
@@ -343,11 +374,15 @@ fun PathsList(
                         }
                     }
                 } else {
-                    selectedPath?.let {
+                    selectedPath?.let { path ->
                         ModalBottomSheet(
                             onDismissRequest = { onPathClicked(null) }
                         ) {
-                            BottomSheetContents(it, true) { onPathClicked(null) }
+                            BottomSheetContents(
+                                path,
+                                isModal = true,
+                                onEditRequested = { onEditRequested?.invoke(path) },
+                            ) { onPathClicked(null) }
                         }
                     }
                 }
@@ -379,6 +414,7 @@ fun PathsList(
                             modifier = Modifier.fillMaxWidth()
                                 .fillMaxHeight(0.3f)
                                 .weight(1f),
+                            onEditRequested = onEditRequested,
                             onPathClicked = onPathClicked
                         )
                     }
@@ -394,6 +430,7 @@ private fun PathsListView(
     paths: List<Path>?,
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
+    onEditRequested: ((Path) -> Unit)?,
     onPathClicked: (path: Path) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -413,14 +450,28 @@ private fun PathsListView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(paths ?: emptyList()) { path ->
-            PathListItem(
-                path = path,
-                modifier = Modifier
-                    .widthIn(max = 600.dp)
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                highlight = highlightPathId == path.id
-            ) { onPathClicked(path) }
+            ContextMenu(
+                enabled = onEditRequested != null,
+                dropdownContent = {
+                    ListItem(
+                        headlineContent = {
+                            Text(stringResource(Res.string.editor_edit))
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onEditRequested?.invoke(path) }
+                    )
+                },
+            ) {
+                PathListItem(
+                    path = path,
+                    modifier = Modifier
+                        .widthIn(max = 600.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    highlight = highlightPathId == path.id
+                ) { onPathClicked(path) }
+            }
         }
     }
 }
@@ -430,6 +481,7 @@ private fun PathsListView(
 private fun BottomSheetContents(
     child: Path,
     isModal: Boolean,
+    onEditRequested: (() -> Unit)?,
     onDismissRequested: () -> Unit
 ) {
     val localUnitsConfiguration = LocalUnitsConfiguration.current
@@ -440,13 +492,21 @@ private fun BottomSheetContents(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = child.displayName,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f)
             )
+            if (onEditRequested != null) {
+                IconButton(
+                    onClick = onEditRequested,
+                ) {
+                    Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit))
+                }
+            }
             if (!isModal) {
                 IconButton(
                     onClick = onDismissRequested

@@ -23,7 +23,7 @@ data class Area(
             "database.DatabaseInterface"
         )
     )
-    val zones: List<Zone>
+    val zones: List<Zone>? = null
 ) : DataTypeWithImage {
     override fun compareTo(other: DataType): Int {
         // Sort by displayName

@@ -5,11 +5,11 @@ import network.BasicBackend
 import kotlin.uuid.Uuid
 
 @Serializable
-sealed interface DataTypeWithImage : DataType {
+sealed interface DataTypeWithKMZ : DataType {
     // Nullable to allow editing without uploading, must never be null
-    val image: Uuid?
+    val kmz: Uuid?
 
-    fun imageUrl(): String? = image?.let(BasicBackend::downloadFileUrl)?.toString()
+    fun kmzUrl(): String = BasicBackend.downloadFileUrl(kmz!!).toString()
 
-    fun copy(image: Uuid): DataTypeWithImage
+    fun copyKmz(kmz: Uuid): DataTypeWithKMZ
 }

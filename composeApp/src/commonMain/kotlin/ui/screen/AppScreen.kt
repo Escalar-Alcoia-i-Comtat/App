@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.FilterAlt
@@ -77,6 +78,7 @@ fun AppScreen(
     onZoneRequested: (parentAreaId: Long, zoneId: Long) -> Unit,
     onSectorRequested: (parentAreaId: Long, parentZoneId: Long, sectorId: Long, pathId: Long?) -> Unit,
     onEditRequested: ((area: Area) -> Unit)?,
+    onCreateAreaRequested: (() -> Unit)?,
     appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     scrollToId: Long? = null
@@ -175,6 +177,14 @@ fun AppScreen(
                                 enabled = !areas.isNullOrEmpty()
                             ) {
                                 Icon(Icons.Rounded.Search, null)
+                            }
+
+                            if (onCreateAreaRequested != null) {
+                                IconButton(
+                                    onClick = onCreateAreaRequested,
+                                ) {
+                                    Icon(Icons.Rounded.Add, null)
+                                }
                             }
                         }
                     )

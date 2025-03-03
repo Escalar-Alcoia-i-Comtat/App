@@ -39,17 +39,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import build.BuildKonfig
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import sync.DataSync
+import sync.SyncProcess
 import ui.composition.LocalUnitsConfiguration
 import ui.model.SettingsModel
 import ui.platform.PlatformSettings
 import ui.reusable.settings.SettingsCategory
 import ui.reusable.settings.SettingsRow
 import ui.reusable.settings.SettingsSelector
+import utils.IO
 import utils.unit.DistanceUnits
 
 @Composable
@@ -61,12 +66,14 @@ fun SettingsPage(model: SettingsModel = viewModel { SettingsModel() }) {
     val isLoading by model.isLoading.collectAsState(false)
     val lastSyncTime by model.lastSyncTime.collectAsState(null)
     val lastSyncCause by model.lastSyncCause.collectAsState(null)
+    val syncStatus by model.syncStatus.collectAsState()
     val apiKey by model.apiKey.collectAsState(null)
 
     SettingsPage(
         isLoading = isLoading,
         lastSyncTime = lastSyncTime,
         lastSyncCause = lastSyncCause,
+        syncStatus = syncStatus,
         apiKey = apiKey,
         onLockRequest = model::lock,
         onUnlockRequest = model::unlock,
@@ -80,6 +87,7 @@ fun SettingsPage(
     isLoading: Boolean,
     lastSyncTime: Long?,
     lastSyncCause: String?,
+    syncStatus: SyncProcess.Status?,
     apiKey: String?,
     onLockRequest: (onLock: () -> Unit) -> Unit,
     onUnlockRequest: (apiKey: String, onUnlock: () -> Unit) -> Unit,
@@ -157,7 +165,12 @@ fun SettingsPage(
             )
             SettingsRow(
                 headline = stringResource(Res.string.settings_app_info_last_sync_title),
-                summary = lastSyncTime?.let { time ->
+                summary = if (syncStatus is SyncProcess.Status.RUNNING) {
+                    if (syncStatus.isIndeterminate)
+                        stringResource(Res.string.settings_app_info_last_sync_running)
+                    else
+                        stringResource(Res.string.settings_app_info_last_sync_running_progress, syncStatus.progress)
+                } else lastSyncTime?.let { time ->
                     val localDateTime = Instant.fromEpochMilliseconds(time)
                         .toLocalDateTime(TimeZone.currentSystemDefault())
                         .let {
@@ -187,7 +200,12 @@ fun SettingsPage(
                             localDateTime
                         )
                 } ?: stringResource(Res.string.settings_app_info_last_sync_never),
-                icon = Icons.Outlined.Info
+                icon = Icons.Outlined.Info,
+                onClick = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        DataSync.start(DataSync.Cause.Manual)
+                    }
+                }
             )
             SettingsRow(
                 headline = stringResource(Res.string.settings_app_info_version_code),

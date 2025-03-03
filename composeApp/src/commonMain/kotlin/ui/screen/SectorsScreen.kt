@@ -14,7 +14,9 @@ fun SectorsScreen(
     zoneId: Long,
     onBackRequested: () -> Unit,
     onSectorRequested: (sectorId: Long) -> Unit,
-    onEditRequested: ((sector: Sector) -> Unit)?,
+    onEditZoneRequested: (() -> Unit)?,
+    onEditSectorRequested: ((sector: Sector) -> Unit)?,
+    onCreateSectorRequested: (() -> Unit)?,
     viewModel: SectorsScreenModel = viewModel { SectorsScreenModel() },
     scrollToId: Long? = null
 ) {
@@ -32,7 +34,9 @@ fun SectorsScreen(
         children = sectors,
         scrollToId = scrollToId,
         onNavigationRequested = { onSectorRequested(it.id) },
-        onEditRequested = onEditRequested,
+        onEditRequested = onEditZoneRequested,
+        onEditChildRequested = onEditSectorRequested,
+        onCreateRequested = onCreateSectorRequested,
         onNavigateUp = onBackRequested
     )
 }

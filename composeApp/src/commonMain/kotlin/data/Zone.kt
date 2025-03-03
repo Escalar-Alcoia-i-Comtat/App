@@ -18,7 +18,7 @@ data class Zone(
     // Nullable to allow editing without uploading, must never be null
     override val image: Uuid?,
     // Nullable to allow editing without uploading, must never be null
-    @SerialName("kmz") val kmz: Uuid?,
+    override val kmz: Uuid?,
     override val point: LatLng? = null,
     override val points: List<Point>,
     @SerialName("area_id") val parentAreaId: Long,
@@ -30,8 +30,8 @@ data class Zone(
             "database.DatabaseInterface"
         )
     )
-    val sectors: List<Sector>
-) : DataTypeWithImage, DataTypeWithPoint, DataTypeWithPoints, DataTypeWithParent {
+    val sectors: List<Sector>? = null
+) : DataTypeWithImage, DataTypeWithKMZ, DataTypeWithPoint, DataTypeWithPoints, DataTypeWithParent {
     override fun compareTo(other: DataType): Int {
         return displayName.compareTo(other.displayName)
     }
@@ -52,6 +52,10 @@ data class Zone(
 
     override fun copy(image: Uuid): Zone {
         return copy(id = id, image = image)
+    }
+
+    override fun copyKmz(kmz: Uuid): DataTypeWithKMZ {
+        return copy(id = id, kmz = kmz)
     }
 
     override fun copy(parentId: Long): Zone {

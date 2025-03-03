@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.OutlinedFlag
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +48,9 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     children: List<ChildrenType>?,
     scrollToId: Long? = null,
     onNavigationRequested: (ChildrenType) -> Unit,
-    onEditRequested: ((ChildrenType) -> Unit)?,
+    onEditRequested: (() -> Unit)?,
+    onEditChildRequested: ((ChildrenType) -> Unit)?,
+    onCreateRequested: (() -> Unit)?,
     onNavigateUp: () -> Unit
 ) {
     val state = rememberLazyListState()
@@ -58,6 +62,8 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
         state.animateScrollToItem(index)
     }
 
+    // TODO: Allow sorting elements to admins
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -65,6 +71,18 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                    }
+                },
+                actions = {
+                    if (onEditRequested != null) {
+                        IconButton(onClick = onEditRequested) {
+                            Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit))
+                        }
+                    }
+                    if (onCreateRequested != null) {
+                        IconButton(onClick = onCreateRequested) {
+                            Icon(Icons.Default.Add, stringResource(Res.string.editor_create))
+                        }
                     }
                 }
             )
@@ -90,7 +108,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                         items(
                             items = children,
                             key = { it.id },
-                            contentType = { it::class.simpleName + "-" + it.id }
+                            contentType = { it::class.simpleName }
                         ) { child ->
                             DataCard(
                                 item = child,
@@ -100,7 +118,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                     .padding(bottom = 12.dp)
                                     .widthIn(max = 600.dp)
                                     .fillMaxWidth(),
-                                onEdit = onEditRequested?.let { { it(child) } }
+                                onEdit = onEditChildRequested?.let { { it(child) } }
                             ) { onNavigationRequested(child) }
                         }
                     }
@@ -111,7 +129,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
 }
 
 private fun LazyListScope.display(zone: Zone) {
-    item(key = zone.id, contentType = "zone-map") {
+    item(key = "zone-map-${zone.id}", contentType = "zone-map") {
         MapComposable(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
@@ -154,8 +172,8 @@ private fun LazyListScope.display(zone: Zone) {
             contentType = { "zone-metadata" }
         ) { point ->
             LocationCard(
-                icon = point.iconVector,
-                title = point.label,
+                icon = point.icon.iconVector,
+                title = point.displayName(),
                 point = point.location,
                 modifier = Modifier
                     .padding(horizontal = 8.dp, vertical = 4.dp)

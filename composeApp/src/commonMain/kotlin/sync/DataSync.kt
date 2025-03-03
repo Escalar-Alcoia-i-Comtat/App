@@ -7,7 +7,7 @@ import database.SettingsKeys
 import database.settings
 import io.github.aakira.napier.Napier
 import kotlinx.datetime.Clock
-import network.Backend
+import network.BasicBackend
 
 object DataSync : SyncProcess() {
     private const val ARG_CAUSE = "cause"
@@ -46,7 +46,7 @@ object DataSync : SyncProcess() {
             Napier.d { "Fetching $type#$id from server..." }
             when (type) {
                 DataTypes.Area -> {
-                    val item = Backend.area(id, progress)
+                    val item = BasicBackend.area(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Area#$id..." }
                         DatabaseInterface.areas().updateOrInsert(item)
@@ -56,7 +56,7 @@ object DataSync : SyncProcess() {
                 }
 
                 DataTypes.Zone -> {
-                    val item = Backend.zone(id, progress)
+                    val item = BasicBackend.zone(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Zone#$id..." }
                         DatabaseInterface.zones().updateOrInsert(item)
@@ -66,7 +66,7 @@ object DataSync : SyncProcess() {
                 }
 
                 DataTypes.Sector -> {
-                    val item = Backend.sector(id, progress)
+                    val item = BasicBackend.sector(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Sector#$id..." }
                         DatabaseInterface.sectors().updateOrInsert(item)
@@ -76,7 +76,7 @@ object DataSync : SyncProcess() {
                 }
 
                 DataTypes.Path -> {
-                    val item = Backend.path(id, progress)
+                    val item = BasicBackend.path(id, progress)
                     if (item != null) {
                         Napier.d { "Storing Path#$id..." }
                         DatabaseInterface.paths().updateOrInsert(item)
@@ -87,14 +87,14 @@ object DataSync : SyncProcess() {
             }
         } else @Suppress("DEPRECATION") {
             Napier.d { "Fetching tree from server..." }
-            val areas = Backend.tree(progress)
+            val areas = BasicBackend.tree(progress)
             Napier.d { "Got ${areas.size} areas" }
 
             setStatus(Status.RUNNING.Indeterminate)
 
-            val zones = areas.flatMap { it.zones }
-            val sectors = zones.flatMap { it.sectors }
-            val paths = sectors.flatMap { it.paths }
+            val zones = areas.flatMap { it.zones.orEmpty() }
+            val sectors = zones.flatMap { it.sectors.orEmpty() }
+            val paths = sectors.flatMap { it.paths.orEmpty() }
 
             Napier.d { "Saving ${areas.size} areas..." }
             DatabaseInterface.areas().updateOrInsert(areas)

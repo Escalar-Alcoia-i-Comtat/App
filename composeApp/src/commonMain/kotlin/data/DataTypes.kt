@@ -4,7 +4,10 @@ import data.generic.SunTime
 import kotlinx.datetime.Clock
 import kotlin.uuid.Uuid
 
-sealed class DataTypes<out DT : DataType> {
+sealed class DataTypes<out DT : DataType>(
+    val path: String,
+    val parentDataType: DataTypes<*>?,
+) {
     val name: String get() = this::class.simpleName ?: error("Class doesn't have a valid name")
 
     abstract fun default(): DT
@@ -27,7 +30,7 @@ sealed class DataTypes<out DT : DataType> {
         return name
     }
 
-    data object Area : DataTypes<data.Area>() {
+    data object Area : DataTypes<data.Area>("area", null) {
         override fun default(): data.Area = Area(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
@@ -37,7 +40,7 @@ sealed class DataTypes<out DT : DataType> {
         )
     }
 
-    data object Zone : DataTypes<data.Zone>() {
+    data object Zone : DataTypes<data.Zone>("zone", Area) {
         override fun default(): data.Zone = Zone(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
@@ -51,7 +54,7 @@ sealed class DataTypes<out DT : DataType> {
         )
     }
 
-    data object Sector : DataTypes<data.Sector>() {
+    data object Sector : DataTypes<data.Sector>("sector", Zone) {
         override fun default(): data.Sector = Sector(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
@@ -69,7 +72,7 @@ sealed class DataTypes<out DT : DataType> {
         )
     }
 
-    data object Path : DataTypes<data.Path>() {
+    data object Path : DataTypes<data.Path>("path", Sector) {
         override fun default(): data.Path = Path(
             id = 0,
             timestamp = Clock.System.now().toEpochMilliseconds(),
@@ -106,6 +109,7 @@ sealed class DataTypes<out DT : DataType> {
         fun findByName(name: String): DataTypes<DataType>? = entries.find { it.name == name }
 
         fun valueOf(name: String): DataTypes<DataType> =
-            entries.find { it.name == name } ?: throw IllegalArgumentException("Unknown data type: $name")
+            entries.find { it.name == name }
+                ?: throw IllegalArgumentException("Unknown data type: $name")
     }
 }
