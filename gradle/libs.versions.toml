@@ -33,7 +33,7 @@ play-appupdate = "2.1.0"
 play-instantapps = "18.1.0"
 room = "2.7.0-rc02"
 semver = "2.0.0"
-zoomable = "1.7.0-SNAPSHOT"
+zoomable = "1.7.0"
 roomKtx = "2.6.1"
 
 [libraries]
