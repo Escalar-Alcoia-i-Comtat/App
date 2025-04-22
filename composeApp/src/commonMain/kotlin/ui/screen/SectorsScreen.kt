@@ -17,6 +17,7 @@ fun SectorsScreen(
     onEditZoneRequested: (() -> Unit)?,
     onEditSectorRequested: ((sector: Sector) -> Unit)?,
     onCreateSectorRequested: (() -> Unit)?,
+    onItemDragged: ((fromIndex: Int, toIndex: Int) -> Unit)?,
     viewModel: SectorsScreenModel = viewModel { SectorsScreenModel() },
     scrollToId: Long? = null
 ) {
@@ -37,6 +38,7 @@ fun SectorsScreen(
         onEditRequested = onEditZoneRequested,
         onEditChildRequested = onEditSectorRequested,
         onCreateRequested = onCreateSectorRequested,
+        onItemDragged = onItemDragged,
         onNavigateUp = onBackRequested
     )
 }

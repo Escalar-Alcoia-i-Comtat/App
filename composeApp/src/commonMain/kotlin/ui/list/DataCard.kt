@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,6 +46,7 @@ fun <T : DataTypeWithImage> DataCard(
     item: T,
     imageHeight: Dp,
     modifier: Modifier = Modifier,
+    prefixContent: (@Composable RowScope.() -> Unit)? = null,
     onEdit: (() -> Unit)?,
     onClick: () -> Unit
 ) {
@@ -60,15 +62,21 @@ fun <T : DataTypeWithImage> DataCard(
         Column(
             modifier = modifier
         ) {
-            Text(
-                text = item.displayName,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
-                fontSize = 20.sp
-            )
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                prefixContent?.invoke(this)
+                Text(
+                    text = item.displayName,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f).padding(start = 4.dp),
+                    fontSize = 20.sp
+                )
+            }
 
             Box(
                 modifier = Modifier
