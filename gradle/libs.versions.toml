@@ -10,7 +10,7 @@ compose-navigation = "2.8.0-alpha12"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.7.3"
 compose-richeditor = "1.0.0-rc11"
-compose-ui = "1.7.8"
+compose-ui = "1.8.0"
 compose-viewModel = "2.8.4"
 compose-windowSizeClass = "0.5.0"
 filekit = "0.8.8"
