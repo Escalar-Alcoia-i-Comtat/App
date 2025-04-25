@@ -184,7 +184,8 @@
     <string name="editor_clear">Clear</string>
     <string name="editor_edit">Edit</string>
     <string name="editor_reorder">Reorder</string>
-    <string name="editor_drag_indicator">Drag Indicator</string>
+    <string name="editor_reorder_up">Move Up</string>
+    <string name="editor_reorder_down">Move Down</string>
     <string name="editor_create">Create New</string>
     <string name="editor_delete">Delete</string>
     <string name="editor_id_automatic">Automatic</string>

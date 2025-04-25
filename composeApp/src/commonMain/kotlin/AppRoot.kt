@@ -200,9 +200,6 @@ fun SharedTransitionScope.NavigationController(
                                 Destinations.Editor(DataTypes.Sector, null, route.id)
                             )
                         }.takeIf { editAllowed },
-                        onItemDragged = { fromIndex, toIndex ->
-                            // TODO
-                        },
                     )
                 }
             }

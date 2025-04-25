@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import utils.IO
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWithParent>(
-    private val childrenListAccessor: suspend (parentId: Long) -> List<Children>,
+    protected val childrenListAccessor: suspend (parentId: Long) -> List<Children>,
     private val parentListAccessor: suspend (id: Long) -> Parent?
 ) : ViewModelBase() {
     /**
@@ -26,7 +26,9 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
     private val _parent = MutableStateFlow<Parent?>(null)
     val parent: StateFlow<Parent?> get() = _parent.asStateFlow()
 
-    private val _children = MutableStateFlow<List<Children>?>(null)
+    protected var originalChildren: List<Children>? = null
+        private set
+    protected val _children = MutableStateFlow<List<Children>?>(null)
     val children: StateFlow<List<Children>?> get() = _children.asStateFlow()
 
     /**
@@ -36,10 +38,10 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
     private val _displayingChild = MutableStateFlow<Children?>(null)
 
     fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        val dbChildren = childrenListAccessor(id)
+        originalChildren = childrenListAccessor(id)
         _children.emit(
-            if (sortChildren) dbChildren.sorted()
-            else dbChildren
+            if (sortChildren) originalChildren!!.sorted()
+            else originalChildren
         )
 
         val dbParent = parentListAccessor(id)

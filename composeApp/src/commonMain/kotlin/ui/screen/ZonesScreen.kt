@@ -37,7 +37,6 @@ fun ZonesScreen(
         onEditRequested = onEditAreaRequested,
         onEditChildRequested = onEditZoneRequested,
         onCreateRequested = onCreateZoneRequested,
-        onItemDragged = null,
         onNavigateUp = onBackRequested,
     )
 }

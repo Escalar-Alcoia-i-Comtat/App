@@ -9,12 +9,14 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -23,11 +25,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DragIndicator
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.OutlinedFlag
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,8 +55,6 @@ import data.Zone
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import platform.launchPoint
-import ui.drag.DraggableItem
-import ui.drag.DraggableLazyColumn
 import ui.list.DataCard
 import ui.list.LocationCard
 import ui.platform.MapComposable
@@ -68,11 +70,13 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     onEditRequested: (() -> Unit)?,
     onEditChildRequested: ((ChildrenType) -> Unit)?,
     onCreateRequested: (() -> Unit)?,
-    onItemDragged: ((fromIndex: Int, toIndex: Int) -> Unit)?,
+    isLoading: Boolean = false,
+    onItemMoved: ((fromIndex: Int, toIndex: Int) -> Unit)? = null,
+    onFinishSorting: (() -> Unit)? = null,
     onNavigateUp: () -> Unit,
 ) {
     val state = rememberLazyListState()
-    var draggable by remember { mutableStateOf(false) }
+    var canSort by remember { mutableStateOf(false) }
 
     LaunchedEffect(scrollToId) {
         scrollToId ?: return@LaunchedEffect
@@ -80,8 +84,6 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
         val index = children?.indexOfFirst { it.id == scrollToId } ?: return@LaunchedEffect
         state.animateScrollToItem(index)
     }
-
-    // TODO: Allow sorting elements to admins
 
     Scaffold(
         topBar = {
@@ -93,7 +95,10 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                     }
                 },
                 actions = {
-                    if (onItemDragged != null) {
+                    if (isLoading) {
+                        CircularProgressIndicator()
+                    }
+                    if (onItemMoved != null) {
                         val infiniteTransition = rememberInfiniteTransition()
                         val rotation by infiniteTransition.animateFloat(
                             initialValue = -10f,
@@ -101,8 +106,11 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                             animationSpec = infiniteRepeatable(tween(100), RepeatMode.Reverse)
                         )
                         IconButton(
-                            modifier = Modifier.rotate(if (draggable) rotation else 0f),
-                            onClick = { draggable = !draggable },
+                            modifier = Modifier.rotate(if (canSort) rotation else 0f),
+                            onClick = {
+                                canSort = !canSort
+                                if (!canSort) onFinishSorting?.invoke()
+                            },
                         ) {
                             Icon(Icons.Default.Reorder, stringResource(Res.string.editor_reorder))
                         }
@@ -130,40 +138,55 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
             if (data == null) {
                 CircularProgressIndicatorBox()
             } else {
-                DraggableLazyColumn(
-                    itemsSize = children?.size ?: 0,
+                LazyColumn(
                     state = state,
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    onMove = { f, t -> onItemDragged?.invoke(f, t) },
-                ) { modifier ->
+                ) {
                     if (data is Zone) display(data)
 
                     if (children != null) {
                         itemsIndexed(
                             items = children,
-                            key = { _, i -> i::class.simpleName + i.id },
-                            contentType = { i, _ -> DraggableItem(i) },
-                        ) { index, child ->
+                            key = { _, item -> item::class.simpleName + item.id },
+                            contentType = { _, item -> item::class.simpleName },
+                        ) { i, child ->
                             DataCard(
                                 item = child,
                                 imageHeight = 200.dp,
-                                modifier = modifier(index)
+                                modifier = Modifier
                                     .padding(horizontal = 8.dp)
                                     .padding(bottom = 12.dp)
                                     .widthIn(max = 600.dp)
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .animateItem(),
                                 onEdit = onEditChildRequested?.let { { it(child) } },
                                 prefixContent = {
                                     AnimatedVisibility(
-                                        visible = draggable,
+                                        visible = canSort,
                                         enter = slideInHorizontally { -it },
                                         exit = slideOutHorizontally { -it },
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.DragIndicator,
-                                            contentDescription = stringResource(Res.string.editor_drag_indicator),
-                                        )
+                                        Row {
+                                            IconButton(
+                                                onClick = { onItemMoved?.invoke(i, i - 1) },
+                                                enabled = i > 0,
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.ArrowUpward,
+                                                    contentDescription = stringResource(Res.string.editor_reorder_up),
+                                                )
+                                            }
+                                            IconButton(
+                                                onClick = { onItemMoved?.invoke(i, i + 1) },
+                                                enabled = i + 1 < children.size,
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.ArrowDownward,
+                                                    contentDescription = stringResource(Res.string.editor_reorder_down),
+                                                )
+                                            }
+                                        }
                                     }
                                 },
                             ) { onNavigationRequested(child) }
