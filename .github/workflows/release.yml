@@ -33,6 +33,29 @@ jobs:
           file_pattern: 'version.properties iosApp/iosApp.xcodeproj/project.pbxproj iosApp/iosApp/Info.plist'
           branch: master
 
+  create-sentry-release:
+    name: Create Sentry release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create production Sentry release for Platform
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'escalar-alcoia-i-comtat'
+          SENTRY_PROJECT: 'platform'
+        with:
+          environment: production
+          release: ${{ github.event.release.tag_name }}
+      - name: Create production Sentry release for Web
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'escalar-alcoia-i-comtat'
+          SENTRY_PROJECT: 'web'
+        with:
+          environment: production
+          release: ${{ github.event.release.tag_name }}
+
   build-android:
     name: Build for Android
     runs-on: ubuntu-latest
