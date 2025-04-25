@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.sentry.android)
 }
 
 fun readProperties(fileName: String): Properties? {
@@ -35,6 +36,7 @@ fun readProperties(fileName: String): Properties? {
 }
 
 val versionProperties = readProperties("version.properties")!!
+
 val appVersionName: String = versionProperties.getProperty("VERSION_NAME")
 val appVersionCode: String = versionProperties.getProperty("VERSION_CODE")
 
@@ -62,6 +64,7 @@ kotlin {
         }
         compilerOptions {
             freeCompilerArgs.add("-Xwasm-attach-js-exception")
+            freeCompilerArgs.add("-Xwasm-generate-dwarf")
         }
         binaries.executable()
     }
@@ -153,6 +156,7 @@ kotlin {
             implementation(libs.kotlin.test)
         }
 
+        // Desktop & mobile
         val platformMain by creating {
             dependsOn(commonMain.get())
 
@@ -160,6 +164,9 @@ kotlin {
                 // Room
                 implementation(libs.room.bundledSqlite)
                 implementation(libs.room.runtime)
+
+                // Sentry for Kotlin Multiplatform is not available for WASM
+                implementation(libs.sentry)
             }
         }
 
@@ -268,8 +275,7 @@ dependencies {
 
 android {
     namespace = "org.escalaralcoiaicomtat.android"
-
-    compileSdk = 35
+    compileSdk = 36
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -278,7 +284,7 @@ android {
     defaultConfig {
         applicationId = "org.escalaralcoiaicomtat.android"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
 
         versionName = appVersionName
         versionNameSuffix = "_instant"
@@ -406,6 +412,7 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(STRING, "BASE_URL", System.getenv("BASE_URL"), nullable = true)
         buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
+        buildConfigField(STRING, "SENTRY_DSN", null, nullable = true)
         buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "false")
 
         buildConfigField(STRING, "VERSION_NAME", appVersionName)
@@ -428,6 +435,9 @@ buildkonfig {
     }
 
     targetConfigs {
+        create("platform") {
+            buildConfigField(STRING, "SENTRY_DSN", localProperties!!.getProperty("SENTRY_DSN"), nullable = true)
+        }
         create("desktop") {
             buildConfigField(
                 STRING,
@@ -437,6 +447,13 @@ buildkonfig {
             )
             buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "true")
         }
+    }
+}
+
+// Prevent Sentry dependencies from being included in the Android app through the AGP.
+sentry {
+    autoInstallation {
+        enabled.set(false)
     }
 }
 

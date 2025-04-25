@@ -32,6 +32,8 @@ napier = "2.7.1"
 play-appupdate = "2.1.0"
 play-instantapps = "18.1.0"
 room = "2.7.1"
+sentry-android = "5.4.0"
+sentry-multiplatform = "0.12.0"
 semver = "3.0.0"
 zoomable = "1.7.0"
 roomKtx = "2.7.1"
@@ -78,6 +80,7 @@ play-instantapps = { module = "com.google.android.gms:play-services-instantapps"
 room-bundledSqlite = { module = "androidx.sqlite:sqlite-bundled", version.ref = "androidx-sqlite-bundled" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+sentry = { module = "io.sentry:sentry-kotlin-multiplatform", version.ref = "sentry-multiplatform" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
@@ -93,3 +96,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
+sentry-android = { id = "io.sentry.android.gradle", version.ref = "sentry-android" }

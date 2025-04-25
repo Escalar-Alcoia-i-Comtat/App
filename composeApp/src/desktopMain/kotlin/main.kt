@@ -27,6 +27,8 @@ fun main() = application {
     // Initialize the logging library
     Napier.base(DebugAntilog())
 
+    initializeSentry()
+
     storageProvider = StorageProvider()
     roomDatabaseBuilder = getDatabaseBuilder()
 
