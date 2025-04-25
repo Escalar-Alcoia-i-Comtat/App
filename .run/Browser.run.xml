@@ -3,7 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="BASE_URL" value="https://backend.escalaralcoiaicomtat.org" />
+          <entry key="BASE_URL" value="https://beta-backend.escalaralcoiaicomtat.org" />
         </map>
       </option>
       <option name="executionName" />
@@ -15,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="wasmJsBrowserRun" />
+          <option value="wasmJsBrowserDevelopmentRun" />
         </list>
       </option>
       <option name="vmOptions" />
