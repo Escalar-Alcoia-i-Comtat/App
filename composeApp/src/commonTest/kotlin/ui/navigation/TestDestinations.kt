@@ -1,6 +1,7 @@
 package ui.navigation
 
-import data.DataTypes
+import org.escalaralcoiaicomtat.app.data.DataTypes
+import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

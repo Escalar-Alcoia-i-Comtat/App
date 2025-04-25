@@ -1,16 +1,20 @@
 package data
 
-import data.generic.Builder
-import data.generic.Ending
-import data.generic.ExternalTrack
-import data.generic.LatLng
-import data.generic.PitchInfo
-import data.generic.Point
-import data.generic.SunTime
+import org.escalaralcoiaicomtat.app.data.Area
+import org.escalaralcoiaicomtat.app.data.Path
+import org.escalaralcoiaicomtat.app.data.Sector
+import org.escalaralcoiaicomtat.app.data.Zone
+import org.escalaralcoiaicomtat.app.data.generic.Builder
+import org.escalaralcoiaicomtat.app.data.generic.Ending
+import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
+import org.escalaralcoiaicomtat.app.data.generic.Point
+import org.escalaralcoiaicomtat.app.data.generic.SunTime
 import kotlin.uuid.Uuid
 
 /**
- * Allows generating [DataType]s without the need of specifying each argument.
+ * Allows generating [org.escalaralcoiaicomtat.app.data.DataType]s without the need of specifying each argument.
  * Provides default values for all of them.
  */
 object DataTypeGenerator {

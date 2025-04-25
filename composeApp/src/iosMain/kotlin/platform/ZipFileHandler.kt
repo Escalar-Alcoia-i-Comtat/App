@@ -1,8 +1,8 @@
 package platform
 
-import cache.File
 import com.oldguy.common.io.ZipFile
 import io.github.aakira.napier.Napier
+import org.escalaralcoiaicomtat.app.cache.File
 
 actual object ZipFileHandler {
     /**

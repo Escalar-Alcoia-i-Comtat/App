@@ -1,6 +1,6 @@
 package platform
 
-import ui.navigation.Destination
+import org.escalaralcoiaicomtat.app.ui.navigation.Destination
 
 actual fun <T : Destination> onNavigate(destination: T) {
     // nothing

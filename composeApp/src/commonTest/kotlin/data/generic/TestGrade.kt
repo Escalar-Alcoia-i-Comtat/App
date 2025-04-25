@@ -1,5 +1,6 @@
 package data.generic
 
+import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

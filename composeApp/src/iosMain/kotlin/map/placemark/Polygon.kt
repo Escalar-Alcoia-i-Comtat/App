@@ -1,13 +1,13 @@
 package map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
-import data.generic.LatLng
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.interpretCPointer
 import kotlinx.cinterop.objcPtr
 import map.parser.PlacemarkParser
 import map.style.Style
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKMapView
 import platform.MapKit.MKPolygon

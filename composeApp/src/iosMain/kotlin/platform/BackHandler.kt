@@ -2,7 +2,7 @@ package platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import store
+import org.escalaralcoiaicomtat.app.store
 
 @Composable
 actual fun BackHandler(enabled: Boolean, onBack: () -> Unit) {

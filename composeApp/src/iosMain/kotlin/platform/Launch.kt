@@ -1,14 +1,10 @@
 package platform
 
-import data.generic.LatLng
 import kotlinx.cinterop.ExperimentalForeignApi
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.CoreLocation.CLLocationDegrees
-import platform.Foundation.NSCoder
 import platform.Foundation.NSURL
-import platform.Foundation.NSValue
-import platform.MapKit.MKCoordinateRegion
-import platform.MapKit.MKLaunchOptionsMapCenterKey
 import platform.MapKit.MKMapItem
 import platform.MapKit.MKPlacemark
 import platform.UIKit.UIApplication

@@ -3,14 +3,14 @@ package push
 import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.PayloadData
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
-import data.DataTypes
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import sync.DataSync
+import org.escalaralcoiaicomtat.app.data.DataTypes
+import org.escalaralcoiaicomtat.app.sync.DataSync
 
 object PushNotifications {
     private const val TOPIC_CREATED = "created"

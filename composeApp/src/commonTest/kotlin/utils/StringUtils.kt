@@ -1,5 +1,6 @@
 package utils
 
+import org.escalaralcoiaicomtat.app.utils.format
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

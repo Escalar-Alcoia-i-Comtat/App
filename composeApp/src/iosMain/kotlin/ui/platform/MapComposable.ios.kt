@@ -12,7 +12,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import com.fleeksoft.ksoup.Ksoup
-import data.generic.LatLng
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
@@ -22,11 +21,13 @@ import kotlinx.coroutines.launch
 import map.placemark.Placemark
 import map.style.Style
 import map.utils.coordinateRegionOf
-import maps.KMZHandler
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.maps.KMZHandler
+import org.escalaralcoiaicomtat.app.ui.platform.MapViewModel
+import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import platform.MapKit.MKAnnotationProtocol
 import platform.MapKit.MKMapTypeSatellite
 import platform.MapKit.MKMapView
-import ui.reusable.CircularProgressIndicatorBox
 import kotlin.uuid.Uuid
 
 data class MapData(

@@ -1,7 +1,8 @@
 package cache
 
-import cache.File.Companion.asFile
 import okio.FileSystem
+import org.escalaralcoiaicomtat.app.cache.File
+import org.escalaralcoiaicomtat.app.cache.File.Companion.asFile
 
 actual class StorageProvider {
     private val temp = FileSystem.SYSTEM_TEMPORARY_DIRECTORY

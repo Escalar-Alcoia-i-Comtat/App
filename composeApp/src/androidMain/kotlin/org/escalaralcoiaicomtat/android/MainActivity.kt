@@ -1,6 +1,5 @@
 package org.escalaralcoiaicomtat.android
 
-import AppRoot
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -21,9 +20,10 @@ import com.mmk.kmpnotifier.extensions.onCreateOrOnNewIntent
 import com.mmk.kmpnotifier.notification.NotifierManager
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.FileKit
-import platform.Updates
-import ui.navigation.Destination
-import ui.navigation.Destinations
+import org.escalaralcoiaicomtat.app.AppRoot
+import org.escalaralcoiaicomtat.app.platform.Updates
+import org.escalaralcoiaicomtat.app.ui.navigation.Destination
+import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
 
 class MainActivity : AppCompatActivity() {
     companion object {

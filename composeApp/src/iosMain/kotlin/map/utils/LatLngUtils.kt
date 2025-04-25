@@ -1,8 +1,8 @@
 package map.utils
 
-import data.generic.LatLng
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKCoordinateRegion
 import platform.MapKit.MKCoordinateRegionMake

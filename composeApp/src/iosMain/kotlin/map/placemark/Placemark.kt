@@ -1,8 +1,8 @@
 package map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
-import data.generic.LatLng
 import map.style.Style
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import platform.MapKit.MKMapView
 
 interface Placemark {

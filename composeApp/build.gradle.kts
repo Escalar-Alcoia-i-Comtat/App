@@ -339,7 +339,7 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "org.escalaralcoiaicomtat.app.MainKt"
 
         buildTypes.release.proguard {
             isEnabled = false
