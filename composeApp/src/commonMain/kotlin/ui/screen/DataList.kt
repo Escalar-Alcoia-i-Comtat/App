@@ -1,6 +1,15 @@
 package ui.screen
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,14 +19,19 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.OutlinedFlag
+import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,9 +40,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import data.DataTypeWithImage
@@ -51,9 +70,13 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     onEditRequested: (() -> Unit)?,
     onEditChildRequested: ((ChildrenType) -> Unit)?,
     onCreateRequested: (() -> Unit)?,
-    onNavigateUp: () -> Unit
+    isLoading: Boolean = false,
+    onItemMoved: ((fromIndex: Int, toIndex: Int) -> Unit)? = null,
+    onFinishSorting: (() -> Unit)? = null,
+    onNavigateUp: () -> Unit,
 ) {
     val state = rememberLazyListState()
+    var canSort by remember { mutableStateOf(false) }
 
     LaunchedEffect(scrollToId) {
         scrollToId ?: return@LaunchedEffect
@@ -61,8 +84,6 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
         val index = children?.indexOfFirst { it.id == scrollToId } ?: return@LaunchedEffect
         state.animateScrollToItem(index)
     }
-
-    // TODO: Allow sorting elements to admins
 
     Scaffold(
         topBar = {
@@ -74,6 +95,26 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                     }
                 },
                 actions = {
+                    if (isLoading) {
+                        CircularProgressIndicator()
+                    }
+                    if (onItemMoved != null) {
+                        val infiniteTransition = rememberInfiniteTransition()
+                        val rotation by infiniteTransition.animateFloat(
+                            initialValue = -10f,
+                            targetValue = 10f,
+                            animationSpec = infiniteRepeatable(tween(100), RepeatMode.Reverse)
+                        )
+                        IconButton(
+                            modifier = Modifier.rotate(if (canSort) rotation else 0f),
+                            onClick = {
+                                canSort = !canSort
+                                if (!canSort) onFinishSorting?.invoke()
+                            },
+                        ) {
+                            Icon(Icons.Default.Reorder, stringResource(Res.string.editor_reorder))
+                        }
+                    }
                     if (onEditRequested != null) {
                         IconButton(onClick = onEditRequested) {
                             Icon(Icons.Default.Edit, stringResource(Res.string.editor_edit))
@@ -100,16 +141,16 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                 LazyColumn(
                     state = state,
                     modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     if (data is Zone) display(data)
 
                     if (children != null) {
-                        items(
+                        itemsIndexed(
                             items = children,
-                            key = { it.id },
-                            contentType = { it::class.simpleName }
-                        ) { child ->
+                            key = { _, item -> item::class.simpleName + item.id },
+                            contentType = { _, item -> item::class.simpleName },
+                        ) { i, child ->
                             DataCard(
                                 item = child,
                                 imageHeight = 200.dp,
@@ -117,8 +158,37 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                     .padding(horizontal = 8.dp)
                                     .padding(bottom = 12.dp)
                                     .widthIn(max = 600.dp)
-                                    .fillMaxWidth(),
-                                onEdit = onEditChildRequested?.let { { it(child) } }
+                                    .fillMaxWidth()
+                                    .animateItem(),
+                                onEdit = onEditChildRequested?.let { { it(child) } },
+                                prefixContent = {
+                                    AnimatedVisibility(
+                                        visible = canSort,
+                                        enter = slideInHorizontally { -it },
+                                        exit = slideOutHorizontally { -it },
+                                    ) {
+                                        Row {
+                                            IconButton(
+                                                onClick = { onItemMoved?.invoke(i, i - 1) },
+                                                enabled = i > 0,
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.ArrowUpward,
+                                                    contentDescription = stringResource(Res.string.editor_reorder_up),
+                                                )
+                                            }
+                                            IconButton(
+                                                onClick = { onItemMoved?.invoke(i, i + 1) },
+                                                enabled = i + 1 < children.size,
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.ArrowDownward,
+                                                    contentDescription = stringResource(Res.string.editor_reorder_down),
+                                                )
+                                            }
+                                        }
+                                    }
+                                },
                             ) { onNavigationRequested(child) }
                         }
                     }

@@ -22,6 +22,7 @@ fun SectorsScreen(
 ) {
     val zone by viewModel.parent.collectAsState()
     val sectors by viewModel.children.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     LaunchedEffect(zoneId) {
         viewModel.load(zoneId, onBackRequested)
@@ -37,6 +38,9 @@ fun SectorsScreen(
         onEditRequested = onEditZoneRequested,
         onEditChildRequested = onEditSectorRequested,
         onCreateRequested = onCreateSectorRequested,
+        isLoading = isLoading,
+        onItemMoved = viewModel::moveItem,
+        onFinishSorting = viewModel::saveMovedItems,
         onNavigateUp = onBackRequested
     )
 }
