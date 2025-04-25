@@ -144,7 +144,7 @@ actual class MapViewModel actual constructor() : ViewModel() {
             _mapImage.emit(bytes)
         } else {
             Napier.e { "Could not load map image. Status: ${result.status}" }
-            // TODO: Notify user
+            _mapImage.emit(ByteArray(0))
         }
     } finally {
         _progress.emit(null)

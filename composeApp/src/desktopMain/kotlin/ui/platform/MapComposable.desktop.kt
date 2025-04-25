@@ -4,7 +4,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,12 +52,20 @@ actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmz: Uuid?
             contentAlignment = Alignment.Center
         ) {
             if (mapImage != null) {
-                Image(
-                    bitmap = mapImage.decodeToImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                if (mapImage.isEmpty()) {
+                    Icon(
+                        imageVector = Icons.Default.ErrorOutline,
+                        contentDescription = null,
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                } else {
+                    Image(
+                        bitmap = mapImage.decodeToImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             } else if (loadingProgress != null) {
                 CircularProgressIndicator(progress = { loadingProgress })
             } else {
