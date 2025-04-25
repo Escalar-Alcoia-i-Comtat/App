@@ -45,7 +45,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        outputModuleName.set("escalaralcoiaicomtat")
+        outputModuleName = "escalaralcoiaicomtat"
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
