@@ -2,9 +2,12 @@ package data
 
 import data.generic.Builder
 import data.generic.Ending
+import data.generic.ExternalTrack
 import data.generic.LatLng
 import data.generic.PitchInfo
 import data.generic.Point
+import data.generic.SunTime
+import kotlin.uuid.Uuid
 
 /**
  * Allows generating [DataType]s without the need of specifying each argument.
@@ -15,18 +18,16 @@ object DataTypeGenerator {
         id: Long = 0L,
         timestamp: Long = 0L,
         displayName: String = "",
-        image: String = "",
-        webUrl: String = "",
+        image: Uuid = Uuid.parse("ac69f4b2-d059-42d2-847b-5f09358d55f3"),
         zones: List<Zone> = emptyList()
-    ): Area = Area(id, timestamp, displayName, image, webUrl, zones)
+    ): Area = Area(id, timestamp, displayName, image, zones)
 
     fun newZone(
         id: Long = 0L,
         timestamp: Long = 0L,
         displayName: String = "",
-        image: String = "",
-        webUrl: String = "",
-        kmzUUID: String = "",
+        image: Uuid = Uuid.parse("ac69f4b2-d059-42d2-847b-5f09358d55f3"),
+        kmz: Uuid = Uuid.parse("ac69f4b2-d059-42d2-847b-5f09358d55f4"),
         point: LatLng? = null,
         points: List<Point> = emptyList(),
         parentAreaId: Long = 0L,
@@ -36,8 +37,7 @@ object DataTypeGenerator {
         timestamp,
         displayName,
         image,
-        webUrl,
-        kmzUUID,
+        kmz,
         point,
         points,
         parentAreaId,
@@ -48,12 +48,14 @@ object DataTypeGenerator {
         id: Long = 0L,
         timestamp: Long = 0L,
         displayName: String = "",
-        image: String = "",
+        image: Uuid = Uuid.parse("ac69f4b2-d059-42d2-847b-5f09358d55f3"),
+        gpx: Uuid = Uuid.parse("ac69f4b2-d059-42d2-847b-5f09358d55f4"),
+        tracks: List<ExternalTrack> = emptyList(),
         kidsApt: Boolean = false,
         weight: String = "zzz",
         walkingTime: Long? = null,
         point: LatLng? = null,
-        sunTime: String? = null,
+        sunTime: SunTime = SunTime.Morning,
         parentZoneId: Long = 0L,
         paths: List<Path> = emptyList()
     ): Sector = Sector(
@@ -61,6 +63,8 @@ object DataTypeGenerator {
         timestamp,
         displayName,
         image,
+        gpx,
+        tracks,
         kidsApt,
         weight,
         walkingTime,
@@ -95,7 +99,7 @@ object DataTypeGenerator {
         description: String? = null,
         builder: Builder? = null,
         reBuilders: List<Builder>? = null,
-        images: List<String>? = null,
+        images: List<Uuid>? = null,
         parentSectorId: Long = 0L
     ): Path = Path(
         id,

@@ -45,7 +45,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        outputModuleName.set("escalaralcoiaicomtat")
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
@@ -58,12 +58,10 @@ kotlin {
                         add(projectDirPath)
                     }
                 }
-                configDirectory = File(project.rootDir, "webpack.config.d")
             }
         }
         compilerOptions {
             freeCompilerArgs.add("-Xwasm-attach-js-exception")
-            freeCompilerArgs.add("-Xwasm-debugger-custom-formatters")
         }
         binaries.executable()
     }

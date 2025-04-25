@@ -47,8 +47,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
@@ -85,6 +84,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import platform.BackHandler
+import platform.clipEntryOf
 import ui.dialog.DeleteConfirmationDialog
 import ui.model.EditorModel
 import ui.model.EditorModel.Companion.FILE_KEY_GPX
@@ -304,7 +304,7 @@ private fun <DT : DataType> EditorContent(
     onSnackbarMessageRequested: suspend (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
 
     FormField(
         value = if (isCreate) stringResource(Res.string.editor_id_automatic) else item.id.toString(),
@@ -415,8 +415,11 @@ private fun <DT : DataType> EditorContent(
             tracks = item.tracks.orEmpty(),
             onUpdateItem = { onUpdateItem(item.copy(tracks = it)) },
             onCopyRequested = {
-                clipboardManager.setText(buildAnnotatedString { append(it) })
                 scope.launch {
+                    clipboard.setClipEntry(
+                        clipEntryOf(it)
+                    )
+
                     onSnackbarMessageRequested(getString(Res.string.message_copied))
                 }
             },
