@@ -64,7 +64,7 @@ kotlin {
         }
         compilerOptions {
             freeCompilerArgs.add("-Xwasm-attach-js-exception")
-            freeCompilerArgs.add("-Xwasm-generate-dwarf")
+            // freeCompilerArgs.add("-Xwasm-generate-dwarf")
         }
         binaries.executable()
     }
