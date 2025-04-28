@@ -160,6 +160,9 @@
     <string name="editor_loading">Cargando...</string>
     <string name="editor_clear">Borrar</string>
     <string name="editor_edit">Editar</string>
+    <string name="editor_reorder">Reordenar</string>
+    <string name="editor_reorder_up">Subir</string>
+    <string name="editor_reorder_down">Bajar</string>
     <string name="editor_create">Crear nuevo</string>
     <string name="editor_delete">Eliminar</string>
     <string name="editor_id_automatic">Automático</string>
