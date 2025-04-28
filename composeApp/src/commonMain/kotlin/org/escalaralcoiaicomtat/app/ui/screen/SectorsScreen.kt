@@ -12,6 +12,7 @@ import org.escalaralcoiaicomtat.app.ui.model.SectorsScreenModel
 @Composable
 fun SectorsScreen(
     zoneId: Long,
+    editAllowed: Boolean,
     onBackRequested: () -> Unit,
     onSectorRequested: (sectorId: Long) -> Unit,
     onEditZoneRequested: (() -> Unit)?,
@@ -39,7 +40,7 @@ fun SectorsScreen(
         onEditChildRequested = onEditSectorRequested,
         onCreateRequested = onCreateSectorRequested,
         isLoading = isLoading,
-        onItemMoved = viewModel::moveItem,
+        onItemMoved = viewModel::moveItem.takeIf { editAllowed },
         onFinishSorting = viewModel::saveMovedItems,
         onNavigateUp = onBackRequested
     )

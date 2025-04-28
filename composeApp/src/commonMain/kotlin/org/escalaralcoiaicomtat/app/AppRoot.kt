@@ -196,6 +196,7 @@ fun SharedTransitionScope.NavigationController(
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     SectorsScreen(
                         zoneId = route.zoneId,
+                        editAllowed = editAllowed,
                         onBackRequested = { navController.navigateTo(route.up()) },
                         onSectorRequested = { navController.navigateTo(route.down(it)) },
                         onEditZoneRequested = {
