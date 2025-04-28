@@ -12,14 +12,10 @@ import androidx.compose.ui.window.application
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.cache.StorageProvider
 import org.escalaralcoiaicomtat.app.cache.storageProvider
 import org.escalaralcoiaicomtat.app.database.getDatabaseBuilder
 import org.escalaralcoiaicomtat.app.database.roomDatabaseBuilder
-import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.platform.backEventReceiver
 import org.escalaralcoiaicomtat.app.ui.state.KeyEventCollector
 import org.jetbrains.compose.resources.painterResource
@@ -34,9 +30,9 @@ fun main() {
     storageProvider = StorageProvider()
     roomDatabaseBuilder = getDatabaseBuilder()
 
-    CoroutineScope(Dispatchers.IO).launch {
+    /*CoroutineScope(Dispatchers.IO).launch {
         Updates.checkForUpdates()
-    }
+    }*/
 
     application {
         Window(
