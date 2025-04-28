@@ -127,21 +127,34 @@ class MainActivity : AppCompatActivity() {
      */
     private fun computeStartDestination(): Destination? {
         val action: String? = intent?.action
-        val data: Uri? = intent?.data
-        val pathSegments: List<Long>? = data?.pathSegments?.map(String::toLongOrNull)?.filterNotNull()
-        val pathId = data?.getQueryParameter("path")?.toLongOrNull()
+        val data: Uri = intent?.data ?: return null
 
         Napier.i { "Action: $action, data: $data" }
+        Napier.i { "Host: ${data.host}, fragment: ${data.fragment}" }
 
-        return if (action == Intent.ACTION_VIEW && !pathSegments.isNullOrEmpty()) {
-            when (pathSegments.size) {
-                1 -> Destinations.Area(pathSegments[0])
-                2 -> Destinations.Zone(pathSegments[0], pathSegments[1])
-                3 -> Destinations.Sector(pathSegments[0], pathSegments[1], pathSegments[2], pathId)
-                else -> null
-            }
+        return if (data.host?.equals("web.escalaralcoiaicomtat.org", true) == true) {
+            Destinations.parse(data.fragment ?: return null)
+                .takeUnless { it == Destinations.Intro || it is Destinations.Editor }
         } else {
-            null
+            val pathSegments: List<Long> = data.pathSegments.mapNotNull(String::toLongOrNull)
+            val pathId = data.getQueryParameter("path")?.toLongOrNull()
+
+            return if (action == Intent.ACTION_VIEW && pathSegments.isNotEmpty()) {
+                when (pathSegments.size) {
+                    1 -> Destinations.Area(pathSegments[0])
+                    2 -> Destinations.Zone(pathSegments[0], pathSegments[1])
+                    3 -> Destinations.Sector(
+                        pathSegments[0],
+                        pathSegments[1],
+                        pathSegments[2],
+                        pathId
+                    )
+
+                    else -> null
+                }
+            } else {
+                null
+            }
         }
     }
 
