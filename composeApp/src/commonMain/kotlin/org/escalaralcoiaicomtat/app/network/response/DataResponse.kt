@@ -19,7 +19,7 @@ object DataResponse {
         if (!success) {
             json.decodeFromString<ErrorResponse>(value).throwException<Unit>(null)
         }
-        val data = element.getValue("org/escalaralcoiaicomtat/app/dataescalaralcoiaicomtat/app/data").jsonObject
+        val data = element.getValue("data").jsonObject
         return json.decodeFromJsonElement(deserializer, data)
     }
 
