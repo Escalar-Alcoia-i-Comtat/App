@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.escalaralcoiaicomtat.android",
+      "sha256_cert_fingerprints": [
+        "40:80:98:D0:8D:25:C7:40:1D:ED:B8:ED:66:A4:5D:0C:4B:EC:00:83:A9:03:79:7A:84:3D:16:FE:F6:36:64:1D",
+        "0F:EC:74:B5:51:39:2C:95:CC:41:49:7D:EB:45:3F:99:66:41:07:B6:5A:E5:7F:78:D0:2C:A3:1B:BC:B6:E0:3B"
+      ]
+    }
+  }
+]
