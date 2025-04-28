@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -135,8 +136,10 @@ actual object Updates {
 
         val skipVersion = settings.getStringOrNull(SettingsKeys.SKIP_VERSION) == latestVersion.toString()
 
-        this.updateAvailable.emit(!skipVersion && latestVersion > installedVersion)
-        this.latestVersion.emit(latestVersion.toString())
+        withContext(Dispatchers.Main) {
+            this@Updates.updateAvailable.emit(!skipVersion && latestVersion > installedVersion)
+            this@Updates.latestVersion.emit(latestVersion.toString())
+        }
 
         if (latestVersion > installedVersion) {
             Napier.i { "There's a new version available: ${updates.first().tagName}" }
@@ -175,24 +178,32 @@ actual object Updates {
         }
     }
 
+    private suspend fun setProgress(progress: Float?) = withContext(Dispatchers.Main) {
+        downloadProgress.emit(progress)
+    }
+
+    private suspend fun setError(error: Error) = withContext(Dispatchers.Main) {
+        updateError.emit(error)
+    }
+
     /**
      * Requests the device to update to the latest version available.
      *
      * @return The job that is performing the update, or null if updates are not available.
      */
     actual fun requestUpdate(): Job? = CoroutineScope(Dispatchers.IO).launch {
-        downloadProgress.emit(null)
+        setProgress(null)
 
         val osType = OsCheck.getOSType()
         if (osType == OSType.Other) {
-            updateError.emit(Error.UNKNOWN_OS)
+            setError(Error.UNKNOWN_OS)
             return@launch
         }
 
         val versions = getVersions() ?: return@launch
         val version = versions.last()
         if (version.assets.isEmpty()) {
-            updateError.emit(Error.NO_ASSETS)
+            setError(Error.NO_ASSETS)
             return@launch
         }
 
@@ -202,25 +213,25 @@ actual object Updates {
             osType.installerFormats.find { asset.name.endsWith(it, ignoreCase = true) } != null
         }
         if (asset == null) {
-            updateError.emit(Error.INSTALLER_NOT_FOUND)
+            setError(Error.INSTALLER_NOT_FOUND)
             return@launch
         }
 
         val result = client.get(asset.browserDownloadUrl) {
             onDownload { bytesSentTotal, contentLength ->
                 contentLength ?: return@onDownload
-                downloadProgress.emit(
+                setProgress(
                     (bytesSentTotal.toDouble() / contentLength.toDouble()).toFloat()
                 )
             }
         }
-        downloadProgress.emit(DOWNLOAD_PROGRESS_STORING)
+        setProgress(DOWNLOAD_PROGRESS_STORING)
         val installerFile = File.createTempFile("eaic", "installer")
         val channel = result.bodyAsChannel()
         installerFile.outputStream().use { channel.copyTo(it.channel) }
 
         runInstaller(osType, installerFile)
 
-        downloadProgress.emit(null)
+        setProgress(null)
     }
 }
