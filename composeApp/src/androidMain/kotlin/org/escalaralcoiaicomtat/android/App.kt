@@ -2,11 +2,11 @@ package org.escalaralcoiaicomtat.android
 
 import android.app.Application
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
-import database.getDatabaseBuilder
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.escalaralcoiaicomtat.app.cache.StorageProvider
 import org.escalaralcoiaicomtat.app.cache.storageProvider
+import org.escalaralcoiaicomtat.app.database.getDatabaseBuilder
 import org.escalaralcoiaicomtat.app.database.roomDatabaseBuilder
 import push.PushNotifications
 

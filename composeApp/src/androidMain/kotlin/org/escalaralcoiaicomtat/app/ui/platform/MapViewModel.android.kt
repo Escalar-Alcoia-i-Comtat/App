@@ -1,4 +1,4 @@
-package org.escalaralcoiaicomtat.app.platform
+package org.escalaralcoiaicomtat.app.ui.platform
 
 import android.content.Context
 import androidx.annotation.WorkerThread

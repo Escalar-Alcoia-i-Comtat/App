@@ -1,4 +1,4 @@
-package org.escalaralcoiaicomtat.app.platform
+package org.escalaralcoiaicomtat.app.ui.platform
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,6 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
-import org.escalaralcoiaicomtat.app.ui.platform.MapViewModel
 import kotlin.uuid.Uuid
 
 @Composable

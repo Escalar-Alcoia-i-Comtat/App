@@ -1,4 +1,4 @@
-package ui.reusable
+package org.escalaralcoiaicomtat.app.ui.reusable
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable

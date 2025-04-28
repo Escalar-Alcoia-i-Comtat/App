@@ -3,7 +3,7 @@ package org.escalaralcoiaicomtat.app.platform
 import io.github.aakira.napier.Napier
 import kotlinx.io.Buffer
 import org.escalaralcoiaicomtat.app.cache.ZipFile
-import utils.MemoryUnzipUtils
+import org.escalaralcoiaicomtat.app.utils.MemoryUnzipUtils
 
 actual object ZipFileHandler {
     /**

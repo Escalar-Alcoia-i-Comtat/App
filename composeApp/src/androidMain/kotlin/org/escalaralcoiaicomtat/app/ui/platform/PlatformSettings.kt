@@ -1,4 +1,4 @@
-package org.escalaralcoiaicomtat.app.platform
+package org.escalaralcoiaicomtat.app.ui.platform
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
