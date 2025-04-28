@@ -25,7 +25,7 @@ import org.escalaralcoiaicomtat.app.ui.state.KeyEventCollector
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
+fun main() {
     // Initialize the logging library
     Napier.base(DebugAntilog())
 
@@ -38,20 +38,22 @@ fun main() = application {
         Updates.checkForUpdates()
     }
 
-    Window(
-        title = "Escalar Alcoià i Comtat",
-        icon = painterResource(Res.drawable.icon),
-        onCloseRequest = ::exitApplication,
-        onPreviewKeyEvent = { KeyEventCollector.emit(it) }
-    ) {
-        AppRoot(
-            modifier = Modifier
-                .onPointerEvent(PointerEventType.Press) {
-                    if (it.button == PointerButton.Back) {
-                        backEventReceiver.tryEmit(true)
+    application {
+        Window(
+            title = "Escalar Alcoià i Comtat",
+            icon = painterResource(Res.drawable.icon),
+            onCloseRequest = ::exitApplication,
+            onPreviewKeyEvent = { KeyEventCollector.emit(it) }
+        ) {
+            AppRoot(
+                modifier = Modifier
+                    .onPointerEvent(PointerEventType.Press) {
+                        if (it.button == PointerButton.Back) {
+                            backEventReceiver.tryEmit(true)
+                        }
                     }
-                }
-        )
+            )
+        }
     }
 }
 
