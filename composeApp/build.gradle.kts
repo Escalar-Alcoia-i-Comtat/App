@@ -41,7 +41,7 @@ val appVersionName: String = versionProperties.getProperty("VERSION_NAME")
 val appVersionCode: String = versionProperties.getProperty("VERSION_CODE")
 
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(21)
 
     jvm("desktop")
 
@@ -323,8 +323,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_23
-        targetCompatibility = JavaVersion.VERSION_23
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     @Suppress("UnstableApiUsage")
