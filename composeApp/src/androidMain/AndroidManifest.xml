@@ -51,6 +51,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" />
                 <data android:scheme="https" />
+                <data android:host="web.escalaralcoiaicomtat.org" />
+            </intent-filter>
+            <intent-filter android:label="@string/app_name" android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
                 <data android:host="app.escalaralcoiaicomtat.org" />
             </intent-filter>
             <intent-filter android:label="@string/link_view_area" android:autoVerify="true">
