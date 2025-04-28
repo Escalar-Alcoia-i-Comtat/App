@@ -160,9 +160,9 @@
     <string name="editor_loading">Carregant...</string>
     <string name="editor_clear">Esborra</string>
     <string name="editor_edit">Editar</string>
-    <string name="editor_reorder">Reorder</string>
-    <string name="editor_reorder_up">Move Up</string>
-    <string name="editor_reorder_down">Move Down</string>
+    <string name="editor_reorder">Reordenar</string>
+    <string name="editor_reorder_up">Puja</string>
+    <string name="editor_reorder_down">Baixa</string>
     <string name="editor_create">Crear nou</string>
     <string name="editor_delete">Eliminar</string>
     <string name="editor_id_automatic">Automàtic</string>
