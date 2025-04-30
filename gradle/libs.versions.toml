@@ -8,7 +8,7 @@ coil = "3.1.0"
 compose-maps = "6.6.0"
 compose-navigation = "2.9.0-alpha17"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
-compose-plugin = "1.8.0-rc01"
+compose-plugin = "1.9.0+dev2409"
 compose-richeditor = "1.0.0-rc11"
 compose-ui = "1.8.0"
 compose-viewModel = "2.8.4"
