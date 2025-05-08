@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="choose">Tria</string>
+    <string name="link_view_area">Veure Àrea</string>
+    <string name="link_view_sector">Veure Sector</string>
+    <string name="link_view_path">Veure Via</string>
+    <string name="gender_masculine">Masculí</string>
+    <string name="gender_feminine">Femení</string>
+    <string name="gender_neuter">Neutre</string>
+    <string name="intro_0_title">Hola!</string>
+    <string name="intro_0_message">Com prefereixes que ens dirigim a tú?</string>
+    <string name="app_name">Escalar Alcoia i Comtat</string>
+    <string name="link_view_zone">Veure Zona</string>
+    <string name="downloading_update_progress">Descarregant... %.2f%%</string>
+</resources>
