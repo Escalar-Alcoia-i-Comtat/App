@@ -184,7 +184,7 @@ fun SettingsPage(
                     else
                         stringResource(
                             Res.string.settings_app_info_last_sync_running_progress,
-                            syncStatus.progress
+                            (syncStatus.progress * 100).toInt()
                         )
                 } else lastSyncTime?.let { time ->
                     val localDateTime = Instant.fromEpochMilliseconds(time)
