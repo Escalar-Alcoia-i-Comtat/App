@@ -108,6 +108,19 @@ jobs:
             ./composeApp/build/outputs/**/*.aab
             ./composeApp/build/outputs/**/*.apk
 
+      - name: Upload to Play Store
+        id: upload_play_store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_GOOGLE_CLOUD_JSON }}
+          packageName: org.escalaralcoiaicomtat.android
+          releaseFiles: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
+          track: "production"
+          inAppUpdatePriority: 2
+          # mappingFile: ./base/build/outputs/mapping/release/mapping.txt
+          # whatsNewDirectory: ./changelog
+          status: completed
+
   build-desktop:
     name: Build for Desktop
     runs-on: ${{ matrix.os }}
