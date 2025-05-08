@@ -222,4 +222,13 @@
         <item quantity="many">Se tarda aproximadamente %1$d minutos a pie desde el parking hasta el sector.</item>
         <item quantity="other">Se tarda aproximadamente %1$d minutos a pie desde el parking hasta el sector.</item>
     </plurals>
+    <string name="intro_credits_title">Gracias!</string>
+    <string name="intro_credits_message">Este proyecto es posible gracias al co-financiamiento del Centre Excursionista d\'Alcoi.</string>
+    <string name="settings_app_info_intro_message">Toca para volver a mostrar la intro.</string>
+    <string name="update_error_update_code">No se ha podido actualizar. Código de error: %1$s</string>
+    <string name="settings_app_info_intro_title">Intro</string>
+    <string name="settings_credits_message">Proyecto co-financiado por el Centre Excursionista d\'Alcoi.</string>
+    <string name="settings_credits_website">Página Web</string>
+    <string name="update_action_dismiss">Cerrar</string>
+    <string name="update_error_title">Error</string>
 </resources>
