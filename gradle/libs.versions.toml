@@ -6,7 +6,7 @@ androidx-sqlite-bundled = "2.5.1"
 buildkonfig = "0.17.1"
 coil = "3.1.0"
 compose-maps = "6.6.0"
-compose-navigation = "2.9.0-alpha17"
+compose-navigation = "2.9.10-alpha01"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.8.0"
 compose-richeditor = "1.0.0-rc11"
