@@ -10,6 +10,7 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
+import io.ktor.http.Url
 import io.ktor.utils.io.copyTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,6 +78,7 @@ actual object Updates {
      * [updateAvailable] is true.
      */
     actual val latestVersion: MutableStateFlow<String?> = MutableStateFlow(null)
+    private var latestRelease: Release? = null
 
     /**
      * If not null, specifies the download progress of the latest version.
@@ -134,6 +136,7 @@ actual object Updates {
             Napier.e(e) { "Could not check for updates." }
             return null
         }
+        latestRelease = updates.lastOrNull()
         val versions = updates.joinToString(", ") { it.tagName }
         Napier.d { "Available versions: $versions" }
         val latestVersion = updates.last().tagName.toVersion()
@@ -203,10 +206,12 @@ actual object Updates {
         if (osType == OSType.Other) {
             setError(Error.UNKNOWN_OS)
             return@launch
+        } else if (osType == OSType.Linux) {
+            launchUrl(Url("https://github.com/Escalar-Alcoia-i-Comtat/App/releases/latest"))
+            return@launch
         }
 
-        val versions = getVersions() ?: return@launch
-        val version = versions.last()
+        val version = latestRelease ?: return@launch Napier.e { "latestRelease is null" }
         if (version.assets.isEmpty()) {
             setError(Error.NO_ASSETS)
             return@launch
