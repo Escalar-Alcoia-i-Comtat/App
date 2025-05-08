@@ -216,7 +216,7 @@ private fun <DT : DataType> EditorScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (isLoading) {
-                    if (progress != null) {
+                    if (progress != null && !progress.isNaN()) {
                         LinearProgressIndicator(
                             progress = { progress },
                             modifier = Modifier.fillMaxWidth()
