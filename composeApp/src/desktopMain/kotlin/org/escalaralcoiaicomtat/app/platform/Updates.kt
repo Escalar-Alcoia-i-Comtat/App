@@ -136,7 +136,7 @@ actual object Updates {
 
         val skipVersion = settings.getStringOrNull(SettingsKeys.SKIP_VERSION) == latestVersion.toString()
 
-        withContext(Dispatchers.Main) {
+        withContext(Dispatchers.Default) {
             this@Updates.updateAvailable.emit(!skipVersion && latestVersion > installedVersion)
             this@Updates.latestVersion.emit(latestVersion.toString())
         }
@@ -178,11 +178,11 @@ actual object Updates {
         }
     }
 
-    private suspend fun setProgress(progress: Float?) = withContext(Dispatchers.Main) {
+    private suspend fun setProgress(progress: Float?) = withContext(Dispatchers.Default) {
         downloadProgress.emit(progress)
     }
 
-    private suspend fun setError(error: Error) = withContext(Dispatchers.Main) {
+    private suspend fun setError(error: Error) = withContext(Dispatchers.Default) {
         updateError.emit(error)
     }
 
