@@ -228,4 +228,7 @@
     <string name="settings_app_info_intro_message">Toca per a veure la introducció altra vegada.</string>
     <string name="settings_credits_message">Projecte co-finançat pel Centre Excursionista d\'Alcoi.</string>
     <string name="update_error_update_code">No s\'ha pogut actualitzar. Codi d\'error: %1$s</string>
+    <string name="settings_credits_website">Lloc web</string>
+    <string name="update_action_dismiss">Tancar</string>
+    <string name="update_error_title">Error</string>
 </resources>
