@@ -107,7 +107,7 @@
     <string name="sector_information_title">Sector Information</string>
     <string name="sector_information_location">Sector Location</string>
     <string name="sector_walking_time">Walking Time</string>
-    <plurals name="sector_walking_time">
+    <plurals name="sector_walking_time_description">
         <item quantity="one">It takes approximately %1$d minute by foot from the parking to the sector.</item>
         <item quantity="other">It takes approximately %1$d minutes by foot from the parking to the sector.</item>
     </plurals>

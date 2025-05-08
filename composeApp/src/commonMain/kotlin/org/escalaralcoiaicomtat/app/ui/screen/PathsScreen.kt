@@ -252,7 +252,7 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
                     icon = Icons.AutoMirrored.Filled.DirectionsWalk,
                     text = stringResource(Res.string.sector_walking_time),
                     message = pluralStringResource(
-                        Res.plurals.sector_walking_time,
+                        Res.plurals.sector_walking_time_description,
                         sector.walkingTime.toInt(),
                         sector.walkingTime
                     ) + (gpxDownloadUrl?.let {
