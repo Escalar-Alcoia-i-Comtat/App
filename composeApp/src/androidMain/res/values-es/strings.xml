@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="app_name">Escalar Alcoia i Comtat</string>
+    <string name="intro_0_title">Hola!</string>
+    <string name="choose">Escoje</string>
+    <string name="link_view_area">Ver Área</string>
+    <string name="link_view_zone">Ver Zona</string>
+    <string name="link_view_sector">Ver Sector</string>
+    <string name="link_view_path">Ver Vía</string>
+    <string name="gender_masculine">Masculino</string>
+    <string name="gender_feminine">Femenino</string>
+    <string name="gender_neuter">Neutro</string>
+    <string name="intro_0_message">En qué género quieres que nos refiramos a ti?</string>
+    <string name="downloading_update_progress">Descargando... %.2f%%</string>
+</resources>
