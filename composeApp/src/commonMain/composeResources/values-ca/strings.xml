@@ -93,8 +93,9 @@
     <string name="sector_information_location">Ubicació del Sector</string>
     <string name="sector_walking_time">Temps a Peu</string>
     <plurals name="sector_walking_time">
-        <item quantity="one">Es tarda aproximadament %1$d minut a peu des del lloc d\'aparcament fins al sector.</item>
-        <item quantity="other">Es tarda aproximadament %1$d minuts a peu des del lloc d\'aparcament fins al sector.</item>
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
     </plurals>
     <string name="sector_sun_none_label">Sense Sol</string>
     <string name="sector_sun_none_description">El sector està a la ombra tot el dia.</string>
