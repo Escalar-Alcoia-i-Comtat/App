@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,7 +67,10 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
-fun SettingsPage(model: SettingsModel = viewModel { SettingsModel() }) {
+fun SettingsPage(
+    model: SettingsModel = viewModel { SettingsModel() },
+    onNavigateToIntroRequested: () -> Unit,
+) {
     val unitsConfiguration = LocalUnitsConfiguration.current
     val units by unitsConfiguration.unitsLive.collectAsState(DistanceUnits.METER)
 
@@ -85,6 +89,7 @@ fun SettingsPage(model: SettingsModel = viewModel { SettingsModel() }) {
         onLockRequest = model::lock,
         onUnlockRequest = model::unlock,
         distanceUnits = units,
+        onIntroRequested = { model.onIntroRequested(onNavigateToIntroRequested) }
     )
 }
 
@@ -99,6 +104,7 @@ fun SettingsPage(
     onLockRequest: (onLock: () -> Unit) -> Unit,
     onUnlockRequest: (apiKey: String, onUnlock: () -> Unit) -> Unit,
     distanceUnits: DistanceUnits,
+    onIntroRequested: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val unitsConfiguration = LocalUnitsConfiguration.current
@@ -217,6 +223,7 @@ fun SettingsPage(
                     }
                 }
             )
+            HorizontalDivider()
             SettingsRow(
                 headline = stringResource(Res.string.settings_app_info_version_code),
                 summary = "${BuildKonfig.VERSION_NAME} (${BuildKonfig.VERSION_CODE})",
@@ -227,6 +234,13 @@ fun SettingsPage(
                 headline = stringResource(Res.string.settings_app_info_build_date),
                 summary = BuildKonfig.BUILD_DATE,
                 icon = Icons.Outlined.Event
+            )
+            HorizontalDivider()
+            SettingsRow(
+                headline = stringResource(Res.string.settings_app_info_intro_title),
+                summary = stringResource(Res.string.settings_app_info_intro_message),
+                icon = Icons.Outlined.Smartphone,
+                onClick = onIntroRequested,
             )
 
             Spacer(Modifier.height(16.dp))

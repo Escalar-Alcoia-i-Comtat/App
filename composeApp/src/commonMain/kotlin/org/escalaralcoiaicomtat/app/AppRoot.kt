@@ -148,6 +148,9 @@ fun SharedTransitionScope.NavigationController(
                         onCreateAreaRequested = {
                             navController.navigateTo(Destinations.Editor(DataTypes.Area, null))
                         }.takeIf { editAllowed },
+                        onNavigateToIntroRequested = {
+                            navController.navigateTo(Destinations.Intro)
+                        },
                         scrollToId = initial.id
                     )
                 }
