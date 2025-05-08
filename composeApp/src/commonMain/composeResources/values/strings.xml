@@ -64,6 +64,8 @@
     <string name="settings_app_info_version">App Version</string>
     <string name="settings_app_info_version_code">App Version and Code</string>
     <string name="settings_app_info_build_date">Build Date</string>
+    <string name="settings_credits_message">Project co-financed by the Centre Excursionista d'Alcoi.</string>
+    <string name="settings_credits_website">Website</string>
 
     <string name="settings_category_storage">Storage</string>
     <string name="settings_storage_images">Images Cache Size</string>
