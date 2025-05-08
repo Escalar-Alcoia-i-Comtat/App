@@ -34,6 +34,7 @@ jobs:
       - name: Build distribution
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN_PLATFORM }}
         run: |
           ./gradlew :composeApp:wasmJsBrowserDevelopmentExecutableDistribution --stacktrace --no-daemon
 

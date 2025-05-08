@@ -435,7 +435,7 @@ buildkonfig {
 
     targetConfigs {
         create("platform") {
-            buildConfigField(STRING, "SENTRY_DSN", localProperties!!.getProperty("SENTRY_DSN"), nullable = true)
+            buildConfigField(STRING, "SENTRY_DSN", localProperties?.getProperty("SENTRY_DSN") ?: System.getenv("SENTRY_DSN"), nullable = true)
         }
         create("desktop") {
             buildConfigField(
