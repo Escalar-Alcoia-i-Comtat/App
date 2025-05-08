@@ -235,7 +235,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
 
                 // Ktor client
-                implementation(libs.ktor.client.java)
+                implementation(libs.ktor.client.cio)
 
                 // XML Parsing
                 implementation(libs.ksoup)
