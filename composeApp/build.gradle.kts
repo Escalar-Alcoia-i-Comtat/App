@@ -175,7 +175,7 @@ kotlin {
 
             dependencies {
                 // Push Notifications
-                implementation(libs.kmpnotifier)
+                api(libs.kmpnotifier)
             }
         }
 
