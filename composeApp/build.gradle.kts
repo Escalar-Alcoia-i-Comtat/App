@@ -287,7 +287,6 @@ android {
         targetSdk = 36
 
         versionName = appVersionName
-        versionNameSuffix = "_instant"
         versionCode = appVersionCode.toInt()
 
         val localProperties = readProperties("local.properties")
