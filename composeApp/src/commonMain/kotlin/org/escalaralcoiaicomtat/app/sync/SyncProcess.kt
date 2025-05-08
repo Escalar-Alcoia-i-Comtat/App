@@ -37,6 +37,8 @@ abstract class SyncProcess {
                 val progress = if (isIndeterminate) "INDETERMINATE" else "${(progress*100).toInt()}%"
                 return "RUNNING[$progress]"
             }
+
+            fun hasProgress() = !isIndeterminate && !progress.isNaN()
         }
 
         data object FINISHED : Status()
