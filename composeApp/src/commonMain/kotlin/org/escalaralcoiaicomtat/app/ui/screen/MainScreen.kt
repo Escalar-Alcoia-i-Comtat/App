@@ -38,7 +38,7 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                if (status is SyncProcess.Status.RUNNING && !status.isIndeterminate) {
+                if (status is SyncProcess.Status.RUNNING && status.hasProgress()) {
                     CircularProgressIndicator({ status.progress })
                 } else {
                     CircularProgressIndicator()
