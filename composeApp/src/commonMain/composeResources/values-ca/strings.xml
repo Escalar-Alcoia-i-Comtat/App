@@ -217,4 +217,9 @@
     <string name="editor_reorder_up">Moure Amunt</string>
     <string name="editor_reorder_down">Moure Avall</string>
     <string name="editor_reorder">Reordenar</string>
+    <plurals name="sector_walking_time_description">
+        <item quantity="one">Es tarda aproximadament %1$d minut a peu des del parking fins al sector.</item>
+        <item quantity="many">Es tarda aproximadament %1$d minuts a peu des del parking fins al sector.</item>
+        <item quantity="other">Es tarda aproximadament %1$d minuts a peu des del parking fins al sector.</item>
+    </plurals>
 </resources>
