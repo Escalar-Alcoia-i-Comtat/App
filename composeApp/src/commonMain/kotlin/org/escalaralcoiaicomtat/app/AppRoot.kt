@@ -34,8 +34,6 @@ import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.ConnectivityStatusObserver
 import org.escalaralcoiaicomtat.app.platform.Updates
-import org.escalaralcoiaicomtat.app.platform.initialDestination
-import org.escalaralcoiaicomtat.app.platform.onNavigate
 import org.escalaralcoiaicomtat.app.sync.DataSync
 import org.escalaralcoiaicomtat.app.ui.composition.LocalAnimatedContentScope
 import org.escalaralcoiaicomtat.app.ui.composition.LocalSharedTransitionScope
@@ -115,7 +113,6 @@ fun SharedTransitionScope.NavigationController(
     val initial = remember {
         if (!shownIntro) Destinations.Intro else startDestination ?: Destinations.Root
     }
-    LaunchedEffect(initial) { initialDestination(initial) }
 
     val apiKey by settings.getStringOrNullFlow(SettingsKeys.API_KEY).collectAsState(null)
     val editAllowed = apiKey != null
@@ -127,8 +124,6 @@ fun SharedTransitionScope.NavigationController(
             modifier = modifier,
         ) {
             composable<Destinations.Root> {
-                LaunchedEffect(Unit) { onNavigate(Destinations.Root) }
-
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     AppScreen(
                         onAreaRequested = { areaId ->
@@ -158,8 +153,6 @@ fun SharedTransitionScope.NavigationController(
                 }
             }
             composable<Destinations.Intro> {
-                LaunchedEffect(Unit) { onNavigate(Destinations.Intro) }
-
                 IntroScreen(
                     onIntroFinished = {
                         navController.navigateTo(Destinations.Root)
@@ -168,7 +161,6 @@ fun SharedTransitionScope.NavigationController(
             }
             composable<Destinations.Area> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Area>()
-                LaunchedEffect(Unit) { onNavigate(route) }
 
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     ZonesScreen(
@@ -191,7 +183,6 @@ fun SharedTransitionScope.NavigationController(
             }
             composable<Destinations.Zone> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Zone>()
-                LaunchedEffect(Unit) { onNavigate(route) }
 
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     SectorsScreen(
@@ -220,7 +211,6 @@ fun SharedTransitionScope.NavigationController(
             }
             composable<Destinations.Sector> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Sector>()
-                LaunchedEffect(Unit) { onNavigate(route) }
 
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     PathsScreen(
@@ -248,7 +238,6 @@ fun SharedTransitionScope.NavigationController(
             }
             composable<Destinations.Editor> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Editor>()
-                LaunchedEffect(Unit) { onNavigate(route) }
                 val dataTypes = remember(route) { DataTypes.Companion.valueOf(route.dataTypes) }
 
                 EditorScreen(dataTypes, route.id, route.parentId) { navController.navigateUp() }
