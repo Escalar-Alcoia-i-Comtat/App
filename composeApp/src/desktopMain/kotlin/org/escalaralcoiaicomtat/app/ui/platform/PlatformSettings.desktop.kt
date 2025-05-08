@@ -35,7 +35,7 @@ actual fun ColumnScope.PlatformSettings() {
 
     var performingUpdate by remember { mutableStateOf(false) }
     val downloadProgress by Updates.downloadProgress.collectAsState()
-    val updateError by Updates.updateError.collectAsState()
+    val updateError by Updates.updateErrorType.collectAsState()
 
     fun checkForUpdates() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -51,7 +51,7 @@ actual fun ColumnScope.PlatformSettings() {
 
     updateError?.let { error ->
         AlertDialog(
-            onDismissRequest = { Updates.updateError.tryEmit(null) },
+            onDismissRequest = { Updates.updateErrorType.tryEmit(null) },
             title = { Text(stringResource(Res.string.settings_updates_error_title)) },
             text = {
                 val errorRes = when (error) {
@@ -66,7 +66,7 @@ actual fun ColumnScope.PlatformSettings() {
             },
             confirmButton = {
                 TextButton(
-                    onClick = { Updates.updateError.tryEmit(null) }
+                    onClick = { Updates.updateErrorType.tryEmit(null) }
                 ) { Text(stringResource(Res.string.action_close)) }
             }
         )

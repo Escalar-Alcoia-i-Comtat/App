@@ -18,12 +18,17 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.mmk.kmpnotifier.extensions.onCreateOrOnNewIntent
 import com.mmk.kmpnotifier.notification.NotifierManager
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.FileKit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.AppRoot
 import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.ui.navigation.Destination
 import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
+import org.jetbrains.compose.resources.getString as getStringCMP
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -36,7 +41,12 @@ class MainActivity : AppCompatActivity() {
     ) { result ->
         if (result.resultCode != RESULT_OK) {
             Napier.e { "Update failed. Code: ${result.resultCode}" }
-            // TODO: Notify the user
+
+            CoroutineScope(Dispatchers.IO).launch {
+                Updates.updateError.tryEmit(
+                    getStringCMP(Res.string.update_error_update_code, result.resultCode.toString())
+                )
+            }
         }
     }
 

@@ -9,6 +9,7 @@ import com.russhwolf.settings.set
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
+import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.utils.format
 import org.jetbrains.compose.resources.stringResource
 
@@ -31,7 +32,8 @@ fun UpdateAvailableDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = { /*TODO*/ }
+                // TODO: Observe progress
+                onClick = { Updates.requestUpdate() }
             ) { Text(stringResource(Res.string.action_update)) }
         },
         dismissButton = {

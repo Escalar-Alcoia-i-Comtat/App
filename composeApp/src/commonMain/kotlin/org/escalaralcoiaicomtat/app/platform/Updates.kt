@@ -16,6 +16,11 @@ expect object Updates {
     val updateAvailable: MutableStateFlow<Boolean>
 
     /**
+     * If any, the error that occurred during the update or the checking for updates.
+     */
+    val updateError: MutableStateFlow<String?>
+
+    /**
      * If supported, holds the name of the latest version available. Only applies if
      * [updateAvailable] is true.
      */

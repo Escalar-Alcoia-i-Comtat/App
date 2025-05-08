@@ -19,6 +19,8 @@ actual object Updates {
      */
     actual val updateAvailable: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
+    actual val updateError: MutableStateFlow<String?> = MutableStateFlow(null)
+
     /**
      * Requests the device to update to the latest version available.
      *

@@ -38,6 +38,7 @@ import org.escalaralcoiaicomtat.app.sync.DataSync
 import org.escalaralcoiaicomtat.app.ui.composition.LocalAnimatedContentScope
 import org.escalaralcoiaicomtat.app.ui.composition.LocalSharedTransitionScope
 import org.escalaralcoiaicomtat.app.ui.dialog.UpdateAvailableDialog
+import org.escalaralcoiaicomtat.app.ui.dialog.UpdateErrorDialog
 import org.escalaralcoiaicomtat.app.ui.navigation.Destination
 import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
 import org.escalaralcoiaicomtat.app.ui.navigation.navigateTo
@@ -83,10 +84,14 @@ fun AppRoot(
     AppTheme {
         val updateAvailable by Updates.updateAvailable.collectAsState()
         val latestVersion by Updates.latestVersion.collectAsState()
+        val updateError by Updates.updateError.collectAsState()
         if (updateAvailable) {
             UpdateAvailableDialog(latestVersion) {
                 Updates.updateAvailable.tryEmit(false)
             }
+        }
+        updateError?.let {
+            UpdateErrorDialog(it) { Updates.updateError.tryEmit(null) }
         }
 
         SharedTransitionLayout(

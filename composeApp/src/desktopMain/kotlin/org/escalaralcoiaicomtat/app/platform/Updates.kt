@@ -68,6 +68,11 @@ actual object Updates {
     actual val updateAvailable: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     /**
+     * Stores the error that happened during the update, if any.
+     */
+    actual val updateError: MutableStateFlow<String?> = MutableStateFlow(null)
+
+    /**
      * If supported, holds the name of the latest version available. Only applies if
      * [updateAvailable] is true.
      */
@@ -81,7 +86,7 @@ actual object Updates {
     /**
      * Stores the error that happened during the update, if any.
      */
-    val updateError: MutableStateFlow<Error?> = MutableStateFlow(null)
+    val updateErrorType: MutableStateFlow<Error?> = MutableStateFlow(null)
 
     private suspend fun getVersions(): List<Release>? {
         Napier.v { "Fetching versions from GitHub..." }
@@ -183,7 +188,7 @@ actual object Updates {
     }
 
     private suspend fun setError(error: Error) = withContext(Dispatchers.Default) {
-        updateError.emit(error)
+        updateErrorType.emit(error)
     }
 
     /**
