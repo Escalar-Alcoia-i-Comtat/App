@@ -93,7 +93,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_GOOGLE_CLOUD_JSON }}
           packageName: org.escalaralcoiaicomtat.android
           releaseFiles: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
-          track: "qa"
+          track: "internal"
           inAppUpdatePriority: 2
           # mappingFile: ./base/build/outputs/mapping/release/mapping.txt
           # whatsNewDirectory: ./changelog
