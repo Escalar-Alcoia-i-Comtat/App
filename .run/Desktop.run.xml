@@ -3,7 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="BASE_URL" value="https://beta-backend.escalaralcoiaicomtat.org" />
+          <entry key="BASE_URL" value="https://backend.escalaralcoiaicomtat.org" />
         </map>
       </option>
       <option name="executionName" />
