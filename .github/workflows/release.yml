@@ -126,7 +126,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-24.04, ubuntu-22.04, macos-latest, windows-latest]
 
     needs: update-version-name
 
@@ -149,6 +149,10 @@ jobs:
 
       - name: Build
         run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS
+
+      - name: Rename deb
+        if: startsWith(matrix.os, 'ubuntu')
+        run: mv composeApp/build/compose/binaries/main-release/deb/*.deb composeApp/build/compose/binaries/main-release/deb/escalar-alcoia-i-comtat_${{ matrix.os }}_amd64.deb
 
       - name: Release
         uses: softprops/action-gh-release@v2
