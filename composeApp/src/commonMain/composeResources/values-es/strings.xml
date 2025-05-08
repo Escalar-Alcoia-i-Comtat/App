@@ -92,11 +92,6 @@
     <string name="sector_information_title">Información del Sector</string>
     <string name="sector_information_location">Ubicación del sector</string>
     <string name="sector_walking_time">Tiempo de caminata</string>
-    <plurals name="sector_walking_time">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <string name="sector_sun_none_label">Sin Sol</string>
     <string name="sector_sun_none_description">Este sector está todo el día en la sombra.</string>
     <string name="sector_sun_morning_label">Sol por la mañana</string>
