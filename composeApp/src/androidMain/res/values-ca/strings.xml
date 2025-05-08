@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name"></string>
+    <string name="choose"></string>
+    <string name="link_view_area"></string>
+    <string name="link_view_zone"></string>
+    <string name="link_view_sector"></string>
+    <string name="link_view_path"></string>
+    <string name="gender_masculine"></string>
+    <string name="gender_feminine"></string>
+    <string name="gender_neuter"></string>
+    <string name="intro_0_title"></string>
+    <string name="intro_0_message"></string>
+    <string name="downloading_update_progress"></string>
+</resources>
