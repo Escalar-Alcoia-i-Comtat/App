@@ -218,4 +218,7 @@
     <string name="editor_error_message_exception">Excepción:</string>
     <string name="editor_error_message_message">Mensaje:</string>
     <string name="editor_error_message_trace">Traza de la Pila:</string>
+    <string name="editor_reorder_down">Mover Abajo</string>
+    <string name="editor_reorder">Reordenar</string>
+    <string name="editor_reorder_up">Mover Arriba</string>
 </resources>
