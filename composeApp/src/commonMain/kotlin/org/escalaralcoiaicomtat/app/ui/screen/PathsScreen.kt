@@ -69,6 +69,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -78,6 +79,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.mxalbert.zoomable.Zoomable
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
@@ -85,7 +88,6 @@ import io.github.aakira.napier.Napier
 import io.ktor.http.URLParserException
 import io.ktor.http.Url
 import kotlinx.coroutines.launch
-import org.escalaralcoiaicomtat.app.cache.ImageStorage
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
@@ -392,17 +394,31 @@ fun PathsList(
                     Zoomable(
                         modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds()
                     ) {
-                        val image by ImageStorage.collectStateOf(parent.image!!)
+                        val painter = rememberAsyncImagePainter(parent.imageUrl())
+                        val state by painter.state.collectAsState()
 
-                        image?.let { bitmap ->
-                            Image(
-                                bitmap = bitmap,
-                                contentDescription = parent.displayName,
-                                modifier = Modifier
-                                    .aspectRatio(bitmap.width.toFloat() / bitmap.height.toFloat())
-                                    .fillMaxSize()
-                            )
-                        } ?: CircularProgressIndicator()
+                        when (state) {
+                            is AsyncImagePainter.State.Empty,
+                            is AsyncImagePainter.State.Loading -> {
+                                CircularProgressIndicator()
+                            }
+
+                            is AsyncImagePainter.State.Success -> {
+                                val (width, height) = painter.intrinsicSize
+                                Image(
+                                    painter = painter,
+                                    contentDescription = parent.displayName,
+                                    modifier = Modifier
+                                        .aspectRatio(width / height)
+                                        .fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+                            is AsyncImagePainter.State.Error -> {
+                                // Show some error UI.
+                            }
+                        }
                     }
 
                     AnimatedVisibility(
