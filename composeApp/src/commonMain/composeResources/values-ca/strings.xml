@@ -218,4 +218,7 @@
     <string name="editor_error_message_exception">Excepció:</string>
     <string name="editor_error_message_message">Missatge:</string>
     <string name="editor_error_message_trace">Traça de Pila:</string>
+    <string name="editor_reorder_up">Moure Amunt</string>
+    <string name="editor_reorder_down">Moure Avall</string>
+    <string name="editor_reorder">Reordenar</string>
 </resources>
