@@ -16,6 +16,7 @@ import org.escalaralcoiaicomtat.app.database.entity.ZoneEntity
 import org.escalaralcoiaicomtat.app.database.migrations.Migration1To2
 
 @Database(
+    exportSchema = true,
     entities = [AreaEntity::class, ZoneEntity::class, SectorEntity::class, PathEntity::class],
     version = 2,
     autoMigrations = [
