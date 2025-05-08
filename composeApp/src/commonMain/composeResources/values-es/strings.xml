@@ -217,4 +217,9 @@
     <string name="editor_reorder_down">Mover Abajo</string>
     <string name="editor_reorder">Reordenar</string>
     <string name="editor_reorder_up">Mover Arriba</string>
+    <plurals name="sector_walking_time_description">
+        <item quantity="one">Se tarda aproximadamente %1$d minuto a pie desde el parking hasta el sector.</item>
+        <item quantity="many">Se tarda aproximadamente %1$d minutos a pie desde el parking hasta el sector.</item>
+        <item quantity="other">Se tarda aproximadamente %1$d minutos a pie desde el parking hasta el sector.</item>
+    </plurals>
 </resources>
