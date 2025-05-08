@@ -168,6 +168,8 @@ jobs:
     runs-on: ubuntu-latest
 
     needs: update-version-name
+    # Disable jar release
+    if: false
 
     steps:
       - uses: actions/checkout@v4
