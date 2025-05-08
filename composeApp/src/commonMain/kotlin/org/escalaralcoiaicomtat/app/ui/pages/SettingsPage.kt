@@ -1,11 +1,14 @@
 package org.escalaralcoiaicomtat.app.ui.pages
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,11 +20,15 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -55,11 +62,15 @@ import org.escalaralcoiaicomtat.app.ui.reusable.settings.SettingsRow
 import org.escalaralcoiaicomtat.app.ui.reusable.settings.SettingsSelector
 import org.escalaralcoiaicomtat.app.utils.IO
 import org.escalaralcoiaicomtat.app.utils.unit.DistanceUnits
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
-fun SettingsPage(model: SettingsModel = viewModel { SettingsModel() }) {
+fun SettingsPage(
+    model: SettingsModel = viewModel { SettingsModel() },
+    onNavigateToIntroRequested: () -> Unit,
+) {
     val unitsConfiguration = LocalUnitsConfiguration.current
     val units by unitsConfiguration.unitsLive.collectAsState(DistanceUnits.METER)
 
@@ -78,6 +89,7 @@ fun SettingsPage(model: SettingsModel = viewModel { SettingsModel() }) {
         onLockRequest = model::lock,
         onUnlockRequest = model::unlock,
         distanceUnits = units,
+        onIntroRequested = { model.onIntroRequested(onNavigateToIntroRequested) }
     )
 }
 
@@ -92,6 +104,7 @@ fun SettingsPage(
     onLockRequest: (onLock: () -> Unit) -> Unit,
     onUnlockRequest: (apiKey: String, onUnlock: () -> Unit) -> Unit,
     distanceUnits: DistanceUnits,
+    onIntroRequested: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val unitsConfiguration = LocalUnitsConfiguration.current
@@ -210,6 +223,7 @@ fun SettingsPage(
                     }
                 }
             )
+            HorizontalDivider()
             SettingsRow(
                 headline = stringResource(Res.string.settings_app_info_version_code),
                 summary = "${BuildKonfig.VERSION_NAME} (${BuildKonfig.VERSION_CODE})",
@@ -220,6 +234,13 @@ fun SettingsPage(
                 headline = stringResource(Res.string.settings_app_info_build_date),
                 summary = BuildKonfig.BUILD_DATE,
                 icon = Icons.Outlined.Event
+            )
+            HorizontalDivider()
+            SettingsRow(
+                headline = stringResource(Res.string.settings_app_info_intro_title),
+                summary = stringResource(Res.string.settings_app_info_intro_message),
+                icon = Icons.Outlined.Smartphone,
+                onClick = onIntroRequested,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -248,7 +269,37 @@ fun SettingsPage(
                 headline = stringResource(Res.string.settings_links_crowdin),
                 summary = stringResource(Res.string.settings_links_tap),
                 icon = Icons.Outlined.Language
-            ) { uriHandler.openUri("https://crowdin.com/project/escalar-alcoia-i-comtat") }
+            ) { uriHandler.openUri("https://translate.arnyminerz.com/projects/escalar-alcoia-i-comtat/") }
+
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.cea),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(92.dp)
+                            .padding(8.dp),
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f).padding(end = 8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.settings_credits_message),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedButton(
+                            onClick = { uriHandler.openUri("https://centrexcursionistalcoi.org/") },
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        ) { Text(stringResource(Res.string.settings_credits_website)) }
+                    }
+                }
+            }
         }
     }
 }

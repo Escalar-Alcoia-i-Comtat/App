@@ -43,6 +43,8 @@
     <string name="intro_4_message">If you climb with your children, make sure it's safe for them. Use proper equipment, warn them about the hazards of climbing, and make sure they are well informed. Each sector has information to make sure there's a safe place to stay.</string>
     <string name="intro_5_title">Enjoy!</string>
     <string name="intro_5_message">You are ready to access the app! Don't hesitate in contacting us if you find any data wrong or inaccurate.</string>
+    <string name="intro_credits_title">Thanks!</string>
+    <string name="intro_credits_message">This project is possible thanks to the co-financing from the Centre Excursionista d'Alcoi.</string>
 
     <string name="settings_category_general">General Configuration</string>
     <string name="settings_units_distance">Distance Units</string>
@@ -64,6 +66,10 @@
     <string name="settings_app_info_version">App Version</string>
     <string name="settings_app_info_version_code">App Version and Code</string>
     <string name="settings_app_info_build_date">Build Date</string>
+    <string name="settings_app_info_intro_title">Intro</string>
+    <string name="settings_app_info_intro_message">Tap to show the intro message again.</string>
+    <string name="settings_credits_message">Project co-financed by the Centre Excursionista d'Alcoi.</string>
+    <string name="settings_credits_website">Website</string>
 
     <string name="settings_category_storage">Storage</string>
     <string name="settings_storage_images">Images Cache Size</string>

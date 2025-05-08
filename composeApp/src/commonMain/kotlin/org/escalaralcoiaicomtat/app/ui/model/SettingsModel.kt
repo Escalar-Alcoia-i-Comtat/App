@@ -54,4 +54,9 @@ class SettingsModel : ViewModelBase() {
             }
         }
     }
+
+    fun onIntroRequested(onNavigateToIntroRequested: () -> Unit) {
+        settings.remove(SettingsKeys.SHOWN_INTRO)
+        onNavigateToIntroRequested()
+    }
 }

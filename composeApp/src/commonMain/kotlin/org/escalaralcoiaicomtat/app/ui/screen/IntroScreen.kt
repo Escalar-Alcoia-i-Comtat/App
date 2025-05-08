@@ -97,7 +97,14 @@ private val pages: List<@Composable () -> Unit> = listOfNotNull(
             title = stringResource(Res.string.intro_5_title),
             message = stringResource(Res.string.intro_5_message)
         )
-    }
+    },
+    {
+        IntroPage<Any>(
+            icon = painterResource(Res.drawable.cea).icon,
+            title = stringResource(Res.string.intro_credits_title),
+            message = stringResource(Res.string.intro_credits_message)
+        )
+    },
 )
 
 @Composable

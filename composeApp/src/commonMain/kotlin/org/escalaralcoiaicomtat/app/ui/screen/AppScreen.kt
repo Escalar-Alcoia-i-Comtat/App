@@ -79,6 +79,7 @@ fun AppScreen(
     onSectorRequested: (parentAreaId: Long, parentZoneId: Long, sectorId: Long, pathId: Long?) -> Unit,
     onEditRequested: ((area: Area) -> Unit)?,
     onCreateAreaRequested: (() -> Unit)?,
+    onNavigateToIntroRequested: () -> Unit,
     appScreenModel: AppScreenModel = viewModel { AppScreenModel() },
     searchModel: SearchModel = viewModel<SearchModel> { SearchModel() },
     scrollToId: Long? = null
@@ -195,7 +196,9 @@ fun AppScreen(
         when (page) {
             0 -> MainScreen(areas, syncStatus, onAreaRequested, onEditRequested, scrollToId)
 
-            1 -> SettingsPage()
+            1 -> SettingsPage(
+                onNavigateToIntroRequested = onNavigateToIntroRequested,
+            )
 
             else -> Text("This is page $page")
         }
