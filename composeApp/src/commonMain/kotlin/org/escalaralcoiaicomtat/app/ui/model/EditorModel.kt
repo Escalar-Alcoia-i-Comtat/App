@@ -2,9 +2,10 @@ package org.escalaralcoiaicomtat.app.ui.model
 
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.escalaralcoiaicomtat.app.data.Area
@@ -33,14 +34,18 @@ class EditorModel<DT : DataType>(
     private val _item = MutableStateFlow<DT?>(null)
     val item get() = _item.asStateFlow()
 
-    val isDirty = _item.map { it != originalItem }
-
     private val _parents = MutableStateFlow<List<DataType>?>(null)
     val parents get() = _parents.asStateFlow()
 
     private val _files = MutableStateFlow<Map<String, PlatformFile>>(emptyMap())
     val files get() = _files.asStateFlow()
     private val filesMutex = Semaphore(1)
+
+    private val _modifiedFiles = MutableStateFlow<Set<String>>(emptySet())
+
+    val isDirty: Flow<Boolean> = combine(item, _modifiedFiles) { item, modifiedFiles ->
+        item != originalItem || modifiedFiles.isNotEmpty()
+    }
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading get() = _isLoading.asStateFlow()
@@ -97,12 +102,18 @@ class EditorModel<DT : DataType>(
         launch {
             filesMutex.withPermit {
                 val files = _files.value.toMutableMap()
+                val modifiedFiles = _modifiedFiles.value.toMutableSet()
                 if (file == null) {
                     files -= key
+                    // Unmark the file key as modified
+                    modifiedFiles -= key
                 } else {
                     files[key] = file
+                    // Mark the file key as modified
+                    modifiedFiles += key
                 }
                 _files.tryEmit(files)
+                _modifiedFiles.tryEmit(modifiedFiles)
             }
         }
     }
