@@ -112,7 +112,8 @@ class EditorModel<DT : DataType>(
                     // Mark the file key as modified
                     modifiedFiles += key
                 }
-                _files.tryEmit(files)
+                _files.emit(files)
+                _modifiedFiles.emit(modifiedFiles)
             }
         }
     }
