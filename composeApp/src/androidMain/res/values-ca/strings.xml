@@ -11,5 +11,5 @@
     <string name="intro_0_message">Com prefereixes que ens dirigim a tú?</string>
     <string name="app_name">Escalar Alcoia i Comtat</string>
     <string name="link_view_zone">Veure Zona</string>
-    <string name="downloading_update_progress">Descarregant... %.2f%%</string>
+    <string name="downloading_update_progress">Descarregant...</string>
 </resources>

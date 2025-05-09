@@ -15,5 +15,5 @@
     <string name="intro_0_title">Hello!</string>
     <string name="intro_0_message">How do you prefer that we refer to you?</string>
 
-    <string name="downloading_update_progress">Downloading… %.2f%%</string>
+    <string name="downloading_update_progress">Downloading…</string>
 </resources>
