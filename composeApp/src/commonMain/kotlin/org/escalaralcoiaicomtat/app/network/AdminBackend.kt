@@ -90,7 +90,7 @@ object AdminBackend : Backend() {
 
         val int = DatabaseInterface.byType(type)
         val stored = int.get(item.id)
-        if (stored == item) {
+        if (stored == item && image == null && kmz == null && gpx == null) {
             Napier.i { "Tried to patch an unmodified $type." }
             return null
         }

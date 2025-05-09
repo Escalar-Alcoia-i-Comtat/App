@@ -200,6 +200,7 @@ class EditorModel<DT : DataType>(
                         originalItem = modifiedItem
                         _item.emit(modifiedItem)
                         _files.emit(emptyMap())
+                        _modifiedFiles.emit(emptySet())
                     }
 
                     onComplete()
