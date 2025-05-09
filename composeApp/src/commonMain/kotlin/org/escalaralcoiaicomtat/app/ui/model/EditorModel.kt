@@ -41,7 +41,7 @@ class EditorModel<DT : DataType>(
     val files get() = _files.asStateFlow()
     private val filesMutex = Semaphore(1)
 
-    private val _modifiedFiles = MutableStateFlow<List<String>>(emptyList())
+    private val _modifiedFiles = MutableStateFlow<Set<String>>(emptySet())
 
     val isDirty: Flow<Boolean> = combine(item, _modifiedFiles) { item, modifiedFiles ->
         item != originalItem || modifiedFiles.isNotEmpty()
@@ -102,7 +102,7 @@ class EditorModel<DT : DataType>(
         launch {
             filesMutex.withPermit {
                 val files = _files.value.toMutableMap()
-                val modifiedFiles = _modifiedFiles.value.toMutableList()
+                val modifiedFiles = _modifiedFiles.value.toMutableSet()
                 if (file == null) {
                     files -= key
                     // Unmark the file key as modified
