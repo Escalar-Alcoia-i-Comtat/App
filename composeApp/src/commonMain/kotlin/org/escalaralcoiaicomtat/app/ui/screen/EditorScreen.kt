@@ -81,6 +81,7 @@ import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
+import org.escalaralcoiaicomtat.app.exception.StringException
 import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.platform.clipEntryOf
 import org.escalaralcoiaicomtat.app.ui.dialog.DeleteConfirmationDialog
@@ -721,35 +722,42 @@ fun ErrorDialog(
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    stringResource(Res.string.editor_error_message_exception)
-                )
-                Text(
-                    text = error::class.simpleName ?: "N/A",
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    fontFamily = FontFamily.Monospace,
-                )
-
-                Text(
-                    stringResource(
-                        Res.string.editor_error_message_message,
-                        error.message ?: "N/A"
+                if (error is StringException) {
+                    Text(
+                        text = error.message ?: "N/A",
+                        modifier = Modifier.fillMaxWidth(),
                     )
-                )
-                Text(
-                    text = error.message ?: "N/A",
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    fontFamily = FontFamily.Monospace,
-                )
+                } else {
+                    Text(
+                        stringResource(Res.string.editor_error_message_exception)
+                    )
+                    Text(
+                        text = error::class.simpleName ?: "N/A",
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        fontFamily = FontFamily.Monospace,
+                    )
 
-                Text(
-                    stringResource(Res.string.editor_error_message_trace)
-                )
-                Text(
-                    text = error.stackTraceToString(),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    fontFamily = FontFamily.Monospace,
-                )
+                    Text(
+                        stringResource(
+                            Res.string.editor_error_message_message,
+                            error.message ?: "N/A"
+                        )
+                    )
+                    Text(
+                        text = error.message ?: "N/A",
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        fontFamily = FontFamily.Monospace,
+                    )
+
+                    Text(
+                        stringResource(Res.string.editor_error_message_trace)
+                    )
+                    Text(
+                        text = error.stackTraceToString(),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        fontFamily = FontFamily.Monospace,
+                    )
+                }
             }
         },
         confirmButton = {
