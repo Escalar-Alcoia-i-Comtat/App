@@ -80,7 +80,7 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
 
-            export(libs.kmpnotifier)
+            // export(libs.kmpnotifier)
 
             // Room - Required when using NativeSQLiteDriver
             linkerOpts.add("-lsqlite3")
@@ -166,7 +166,7 @@ kotlin {
                 implementation(libs.room.runtime)
 
                 // Sentry for Kotlin Multiplatform is not available for WASM
-                implementation(libs.sentry)
+                // implementation(libs.sentry)
             }
         }
 
@@ -175,7 +175,7 @@ kotlin {
 
             dependencies {
                 // Push Notifications
-                api(libs.kmpnotifier)
+                // api(libs.kmpnotifier)
             }
         }
 
@@ -204,6 +204,13 @@ kotlin {
 
                 // App Update Check
                 implementation(libs.play.appupdate)
+
+                implementation(libs.sentry)
+
+                // Firebase (analytics+push)
+                implementation(platform(libs.firebase.bom.get()))
+                implementation(libs.firebase.analytics)
+                implementation(libs.firebase.messaging)
             }
         }
 
@@ -246,6 +253,8 @@ kotlin {
 
                 // Semantic Versioning
                 implementation(libs.semver)
+
+                implementation(libs.sentry)
             }
         }
 

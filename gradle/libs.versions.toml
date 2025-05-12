@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.0"
+agp = "8.9.2"
 androidx-activityCompose = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-sqlite-bundled = "2.5.1"
@@ -14,6 +14,7 @@ compose-ui = "1.8.1"
 compose-viewModel = "2.8.4"
 compose-windowSizeClass = "0.5.0"
 filekit = "0.8.8"
+firebase-bom = "33.13.0"
 gms = "4.4.2"
 kmpio = "0.1.6"
 kmpnotifier = "1.5.1"
@@ -53,6 +54,9 @@ compose-richeditor = { module = "com.mohamedrejeb.richeditor:richeditor-compose"
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 kmpio = { module = "io.github.skolson:kmp-io", version.ref = "kmpio" }
 kmpnotifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "kmpnotifier" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -89,6 +93,7 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 gms = { id = "com.google.gms.google-services", version.ref = "gms" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
