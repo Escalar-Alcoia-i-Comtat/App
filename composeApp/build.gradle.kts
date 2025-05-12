@@ -208,7 +208,7 @@ kotlin {
                 implementation(libs.sentry)
 
                 // Firebase (analytics+push)
-                implementation(platform(libs.firebase.bom.get()))
+                implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.firebase.analytics)
                 implementation(libs.firebase.messaging)
             }
