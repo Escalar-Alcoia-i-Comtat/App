@@ -8,5 +8,5 @@ import io.ktor.client.plugins.cache.storage.CacheStorage
  * operations.
  */
 actual fun httpCacheStorage(name: String): CacheStorage {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException("iOS does not support file-based cache")
 }
