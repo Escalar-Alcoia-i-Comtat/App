@@ -20,3 +20,4 @@ captures
 keystore.jks
 .kotlin
 google-services.json
+*.bak
