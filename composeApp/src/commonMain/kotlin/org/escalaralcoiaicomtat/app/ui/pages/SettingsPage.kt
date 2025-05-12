@@ -46,9 +46,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import build.BuildKonfig
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -61,7 +58,6 @@ import org.escalaralcoiaicomtat.app.ui.platform.PlatformSettings
 import org.escalaralcoiaicomtat.app.ui.reusable.settings.SettingsCategory
 import org.escalaralcoiaicomtat.app.ui.reusable.settings.SettingsRow
 import org.escalaralcoiaicomtat.app.ui.reusable.settings.SettingsSelector
-import org.escalaralcoiaicomtat.app.utils.IO
 import org.escalaralcoiaicomtat.app.utils.unit.DistanceUnits
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -218,11 +214,7 @@ fun SettingsPage(
                         )
                 } ?: stringResource(Res.string.settings_app_info_last_sync_never),
                 icon = Icons.Outlined.Info,
-                onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        SyncManager.run(DataSync.Cause.Manual)
-                    }
-                }
+                onClick = { SyncManager.run(DataSync.Cause.Manual) }
             )
             HorizontalDivider()
             SettingsRow(
