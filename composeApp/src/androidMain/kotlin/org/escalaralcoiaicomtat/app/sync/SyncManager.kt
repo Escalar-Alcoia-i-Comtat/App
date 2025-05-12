@@ -43,7 +43,7 @@ actual object SyncManager {
             .setInputData(
                 workDataOf(
                     DataSync.ARG_CAUSE to cause.name,
-                    DataSync.ARG_TYPE to syncId?.first,
+                    DataSync.ARG_TYPE to syncId?.first?.name,
                     DataSync.ARG_ID to syncId?.second,
                 )
             )
