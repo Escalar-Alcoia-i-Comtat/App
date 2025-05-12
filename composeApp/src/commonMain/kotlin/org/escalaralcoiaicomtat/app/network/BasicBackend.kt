@@ -20,6 +20,7 @@ import org.escalaralcoiaicomtat.app.network.response.data.FileListRequestData
 import org.escalaralcoiaicomtat.app.network.response.data.FileRequestData
 import org.escalaralcoiaicomtat.app.network.response.data.PathData
 import org.escalaralcoiaicomtat.app.network.response.data.SectorData
+import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
 import org.escalaralcoiaicomtat.app.network.response.data.ZoneData
 import kotlin.uuid.Uuid
 
@@ -70,6 +71,12 @@ object BasicBackend : Backend() {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): Path? {
         return getOrNull(PathData.serializer(), "path", id, progress = progress)?.asPath()
+    }
+
+    suspend fun serverInfo(
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null
+    ): ServerInfoResponseData {
+        return get(ServerInfoResponseData.serializer(), "info", progress = progress)
     }
 
     /**

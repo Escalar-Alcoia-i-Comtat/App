@@ -4,6 +4,7 @@
     <string name="navigation_settings">Settings</string>
 
     <string name="status_network_unavailable">Network not available</string>
+    <string name="status_loading">Loading...</string>
 
     <string name="action_cancel">Cancel</string>
     <string name="action_clear">Clear</string>
@@ -71,6 +72,10 @@
     <string name="settings_app_info_intro_message">Tap to show the intro message again.</string>
     <string name="settings_credits_message">Project co-financed by the Centre Excursionista d'Alcoi.</string>
     <string name="settings_credits_website">Website</string>
+
+    <string name="settings_category_server_info">Server Information</string>
+    <string name="settings_server_info_uuid_title">Server UUID</string>
+    <string name="settings_server_info_update_title">Last Update</string>
 
     <string name="settings_category_storage">Storage</string>
     <string name="settings_storage_images">Images Cache Size</string>

@@ -1,4 +1,3 @@
-import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
@@ -435,9 +434,8 @@ buildkonfig {
 
     defaultConfigs {
         buildConfigField(STRING, "BASE_URL", System.getenv("BASE_URL"), nullable = true)
-        buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", null, nullable = true)
-        buildConfigField(STRING, "SENTRY_DSN", null, nullable = true)
-        buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "false")
+        buildConfigField(STRING, "MAPBOX_ACCESS_TOKEN", localProperties?.getProperty("MAPBOX_ACCESS_TOKEN") ?: System.getenv("MAPBOX_ACCESS_TOKEN"), nullable = true)
+        buildConfigField(STRING, "SENTRY_DSN", localProperties?.getProperty("SENTRY_DSN") ?: System.getenv("SENTRY_DSN"), nullable = true)
 
         buildConfigField(STRING, "VERSION_NAME", appVersionName)
         buildConfigField(INT, "VERSION_CODE", appVersionCode)
@@ -456,21 +454,6 @@ buildkonfig {
             "BUILD_DATE",
             "${date.year}/${date.month}/${date.day} ${date.hour}:${date.minute}:${date.second}"
         )
-    }
-
-    targetConfigs {
-        create("platform") {
-            buildConfigField(STRING, "SENTRY_DSN", localProperties?.getProperty("SENTRY_DSN") ?: System.getenv("SENTRY_DSN"), nullable = true)
-        }
-        create("desktop") {
-            buildConfigField(
-                STRING,
-                "MAPBOX_ACCESS_TOKEN",
-                localProperties?.getProperty("MAPBOX_ACCESS_TOKEN") ?: System.getenv("MAPBOX_ACCESS_TOKEN"),
-                nullable = true
-            )
-            buildConfigField(BOOLEAN, "FILE_BASED_CACHE", "true")
-        }
     }
 }
 
