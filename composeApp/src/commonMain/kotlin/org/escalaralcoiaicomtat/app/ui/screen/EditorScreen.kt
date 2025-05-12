@@ -464,7 +464,9 @@ private fun <DT : DataType> EditorContent(
             onValueChange = { value ->
                 sketchId = value
                 if (value.isBlank()) {
-                    val number = value.toUIntOrNull() ?: return@FormField
+                    onUpdateItem(item.copy(sketchId = item.sketchId))
+                } else {
+                    val number = value.toUIntOrNull() ?: item.sketchId
                     onUpdateItem(item.copy(sketchId = number))
                 }
             },
