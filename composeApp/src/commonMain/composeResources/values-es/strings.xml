@@ -231,4 +231,5 @@
     <string name="settings_credits_website">Página Web</string>
     <string name="update_action_dismiss">Cerrar</string>
     <string name="update_error_title">Error</string>
+    <string name="status_loading">Cargando...</string>
 </resources>
