@@ -260,7 +260,6 @@
     <string name="editor_error_message_exception">Exception:</string>
     <string name="editor_error_message_message">Message:</string>
     <string name="editor_error_message_trace">Stack Trace:</string>
-    <string name="editor_error_png_required">Only PNG image files are supported.</string>
 
     <string name="map_title">Map</string>
 </resources>
