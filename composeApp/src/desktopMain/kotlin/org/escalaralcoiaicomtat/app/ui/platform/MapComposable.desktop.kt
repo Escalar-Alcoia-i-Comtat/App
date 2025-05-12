@@ -2,6 +2,7 @@ package org.escalaralcoiaicomtat.app.ui.platform
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -68,7 +69,9 @@ actual fun MapComposable(
                     Image(
                         bitmap = mapImage.decodeToImageBitmap(),
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(enabled = onMapClick != null) { onMapClick?.invoke() },
                         contentScale = ContentScale.Crop
                     )
                 }
