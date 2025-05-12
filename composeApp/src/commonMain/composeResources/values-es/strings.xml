@@ -232,4 +232,9 @@
     <string name="update_action_dismiss">Cerrar</string>
     <string name="update_error_title">Error</string>
     <string name="status_loading">Cargando...</string>
+    <string name="action_back">Volver</string>
+    <string name="settings_category_server_info">Información del Servidor</string>
+    <string name="settings_server_info_uuid_title">UUID del Servidor</string>
+    <string name="settings_server_info_update_title">Última Actualización</string>
+    <string name="map_title">Mapa</string>
 </resources>
