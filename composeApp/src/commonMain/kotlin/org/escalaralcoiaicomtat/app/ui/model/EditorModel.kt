@@ -1,9 +1,7 @@
 package org.escalaralcoiaicomtat.app.ui.model
 
-import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.PlatformFile
-import io.github.vinceglb.filekit.core.extension
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,9 +17,7 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.Zone
 import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 import org.escalaralcoiaicomtat.app.database.byType
-import org.escalaralcoiaicomtat.app.exception.StringException
 import org.escalaralcoiaicomtat.app.network.AdminBackend
-import org.jetbrains.compose.resources.getString
 
 class EditorModel<DT : DataType>(
     val type: DataTypes<DT>,
@@ -105,13 +101,6 @@ class EditorModel<DT : DataType>(
     fun setFile(key: String, file: PlatformFile?) {
         launch {
             filesMutex.withPermit {
-                if (key == FILE_KEY_IMAGE && file?.extension != "png") {
-                    _error.emit(
-                        StringException(getString(Res.string.editor_error_png_required))
-                    )
-                    return@launch
-                }
-
                 val files = _files.value.toMutableMap()
                 val modifiedFiles = _modifiedFiles.value.toMutableSet()
                 if (file == null) {
