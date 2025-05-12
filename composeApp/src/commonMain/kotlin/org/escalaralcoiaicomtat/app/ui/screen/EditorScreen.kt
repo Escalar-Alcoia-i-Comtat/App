@@ -40,7 +40,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -52,8 +51,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.mohamedrejeb.richeditor.ui.material3.OutlinedRichTextEditor
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
@@ -86,7 +83,7 @@ import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.platform.clipEntryOf
 import org.escalaralcoiaicomtat.app.ui.dialog.DeleteConfirmationDialog
 import org.escalaralcoiaicomtat.app.ui.model.EditorModel
-import org.escalaralcoiaicomtat.app.ui.reusable.editor.RichTextStyleRow
+import org.escalaralcoiaicomtat.app.ui.reusable.editor.RichTextEditor
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormDropdown
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormField
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormFilePicker
@@ -650,16 +647,6 @@ private fun <DT : DataType> EditorContent(
 
         HorizontalDivider()
 
-        val state = rememberRichTextState()
-        LaunchedEffect(Unit) {
-            item.description?.let(state::setMarkdown)
-            snapshotFlow { state.annotatedString }
-                .collect {
-                    onUpdateItem(
-                        item.copy(description = state.toMarkdown().takeUnless { it.isBlank() })
-                    )
-                }
-        }
         FormToggleSwitch(
             checked = item.showDescription,
             onCheckedChange = { onUpdateItem(item.copy(showDescription = it)) },
@@ -672,15 +659,10 @@ private fun <DT : DataType> EditorContent(
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier.fillMaxWidth(),
         )
-        RichTextStyleRow(
-            state = state,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading,
-        )
-        OutlinedRichTextEditor(
-            state = state,
-            enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+        RichTextEditor(
+            markdownText = item.description,
+            onMarkdownTextChange = { onUpdateItem(item.copy(description = it)) },
+            isEnabled = !isLoading
         )
 
         HorizontalDivider()

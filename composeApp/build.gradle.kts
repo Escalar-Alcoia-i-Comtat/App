@@ -117,9 +117,6 @@ kotlin {
             // Compose - Navigation
             implementation(libs.compose.navigation)
 
-            // Compose - Rich Text Editor
-            implementation(libs.compose.richeditor)
-
             // Compose - View Model
             implementation(libs.compose.viewModel)
 
@@ -170,6 +167,16 @@ kotlin {
             }
         }
 
+        // Desktop & Android
+        val jvmMain by creating {
+            dependsOn(platformMain)
+
+            dependencies {
+                // Compose - Rich Text Editor
+                implementation(libs.compose.richeditor)
+            }
+        }
+
         val mobileMain by creating {
             dependsOn(platformMain)
 
@@ -181,6 +188,7 @@ kotlin {
 
         val androidMain by getting {
             dependsOn(mobileMain)
+            dependsOn(jvmMain)
 
             dependencies {
                 implementation(libs.androidx.activity.compose)
@@ -239,7 +247,7 @@ kotlin {
         }
 
         val desktopMain by getting {
-            dependsOn(platformMain)
+            dependsOn(jvmMain)
 
             dependencies {
                 implementation(compose.desktop.currentOs)
