@@ -1,6 +1,5 @@
 package org.escalaralcoiaicomtat.app.ui.model
 
-import androidx.lifecycle.viewModelScope
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getLongOrNullFlow
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
@@ -9,10 +8,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.AdminBackend
+import org.escalaralcoiaicomtat.app.network.BasicBackend
+import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
 import org.escalaralcoiaicomtat.app.sync.DataSync
 import org.escalaralcoiaicomtat.app.utils.IO
 
@@ -24,11 +24,21 @@ class SettingsModel : ViewModelBase() {
 
     val apiKey = settings.getStringOrNullFlow(SettingsKeys.API_KEY)
 
+    private val _serverInfo = MutableStateFlow<ServerInfoResponseData?>(null)
+    val serverInfo: StateFlow<ServerInfoResponseData?> get() = _serverInfo.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
 
+    fun load() {
+        launch(Dispatchers.IO) {
+            val response = BasicBackend.serverInfo()
+            _serverInfo.emit(response)
+        }
+    }
+
     private fun operate(block: suspend () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launch(Dispatchers.IO) {
             try {
                 _isLoading.emit(true)
                 block()

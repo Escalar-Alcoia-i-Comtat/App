@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Event
@@ -33,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +52,7 @@ import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
 import org.escalaralcoiaicomtat.app.sync.DataSync
 import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.sync.SyncProcess
@@ -75,7 +79,10 @@ fun SettingsPage(
     val lastSyncTime by model.lastSyncTime.collectAsState(null)
     val lastSyncCause by model.lastSyncCause.collectAsState(null)
     val syncStatus by model.syncStatus.collectAsState()
+    val serverInfo by model.serverInfo.collectAsState()
     val apiKey by model.apiKey.collectAsState(null)
+
+    LaunchedEffect(Unit) { model.load() }
 
     SettingsPage(
         isLoading = isLoading,
@@ -83,6 +90,7 @@ fun SettingsPage(
         lastSyncCause = lastSyncCause,
         syncStatus = syncStatus,
         apiKey = apiKey,
+        serverInfo = serverInfo,
         onLockRequest = model::lock,
         onUnlockRequest = model::unlock,
         distanceUnits = units,
@@ -98,6 +106,7 @@ fun SettingsPage(
     lastSyncCause: String?,
     syncStatus: SyncProcess.Status?,
     apiKey: String?,
+    serverInfo: ServerInfoResponseData?,
     onLockRequest: (onLock: () -> Unit) -> Unit,
     onUnlockRequest: (apiKey: String, onUnlock: () -> Unit) -> Unit,
     distanceUnits: DistanceUnits,
@@ -238,6 +247,24 @@ fun SettingsPage(
 
             Spacer(Modifier.height(16.dp))
             SettingsCategory(
+                text = stringResource(Res.string.settings_category_server_info)
+            )
+            SettingsRow(
+                headline = stringResource(Res.string.settings_server_info_uuid_title),
+                summary = serverInfo?.uuid ?: stringResource(Res.string.status_loading),
+                icon = Icons.Default.Code,
+            )
+            HorizontalDivider()
+            SettingsRow(
+                headline = stringResource(Res.string.settings_server_info_update_title),
+                summary = serverInfo?.lastUpdate
+                    ?.let(Instant::fromEpochSeconds)
+                    ?.let(::instantToString) ?: stringResource(Res.string.status_loading),
+                icon = Icons.Default.Event,
+            )
+
+            Spacer(Modifier.height(16.dp))
+            SettingsCategory(
                 text = stringResource(Res.string.settings_category_links)
             )
             SettingsRow(
@@ -336,4 +363,22 @@ fun APIKeyDialog(
             ) { Text(stringResource(Res.string.action_confirm)) }
         },
     )
+}
+
+private fun instantToString(instant: Instant): String {
+    return instant
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .let {
+            StringBuilder()
+                .append(it.year)
+                .append('/')
+                .append(it.monthNumber.toString().padStart(2, '0'))
+                .append('/')
+                .append(it.dayOfMonth.toString().padStart(2, '0'))
+                .append(' ')
+                .append(it.hour.toString().padStart(2, '0'))
+                .append(':')
+                .append(it.minute.toString().padStart(2, '0'))
+                .toString()
+        }
 }
