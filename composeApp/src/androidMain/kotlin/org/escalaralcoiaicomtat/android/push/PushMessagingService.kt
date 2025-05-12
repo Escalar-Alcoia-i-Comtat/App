@@ -5,11 +5,9 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.firebase.messaging.ktx.messaging
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.sync.DataSync
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 
 class PushMessagingService: FirebaseMessagingService() {
     companion object {
@@ -56,9 +54,7 @@ class PushMessagingService: FirebaseMessagingService() {
             TYPE_PATH -> DataTypes.Path
             else -> return Napier.e { "Received a push notification with an unknown type: $type" }
         }
-        CoroutineScope(Dispatchers.IO).launch {
-            Napier.i { "Scheduling sync for $dataType..." }
-            DataSync.start(DataSync.Cause.Push, dataType to id)
-        }
+        Napier.i { "Scheduling sync for $dataType..." }
+        SyncManager.run(DataSync.Cause.Push, dataType to id)
     }
 }
