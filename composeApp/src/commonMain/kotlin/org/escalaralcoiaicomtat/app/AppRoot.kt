@@ -35,6 +35,7 @@ import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.ConnectivityStatusObserver
 import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.sync.DataSync
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.composition.LocalAnimatedContentScope
 import org.escalaralcoiaicomtat.app.ui.composition.LocalSharedTransitionScope
 import org.escalaralcoiaicomtat.app.ui.dialog.UpdateAvailableDialog
@@ -75,7 +76,7 @@ fun AppRoot(
 
             // Synchronize if never synced, or every 12 hours
             if (lastSync == null || (now - lastSync).inWholeHours > 12) {
-                DataSync.start(DataSync.Cause.Scheduled)
+                SyncManager.run(DataSync.Cause.Scheduled)
             } else {
                 Napier.d { "Won't run synchronization. Last run: ${(now - lastSync).inWholeHours} hours ago" }
             }

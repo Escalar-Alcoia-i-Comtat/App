@@ -53,6 +53,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.escalaralcoiaicomtat.app.sync.DataSync
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.sync.SyncProcess
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
 import org.escalaralcoiaicomtat.app.ui.model.SettingsModel
@@ -219,7 +220,7 @@ fun SettingsPage(
                 icon = Icons.Outlined.Info,
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        DataSync.start(DataSync.Cause.Manual)
+                        SyncManager.run(DataSync.Cause.Manual)
                     }
                 }
             )
