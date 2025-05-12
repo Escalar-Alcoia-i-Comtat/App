@@ -6,8 +6,4 @@ import io.ktor.client.engine.darwin.Darwin
 
 actual fun createHttpClient(commonConfig: HttpClientConfig<*>.() -> Unit): HttpClient = HttpClient(Darwin) {
     commonConfig()
-
-    engine {
-        pipelining = true
-    }
 }

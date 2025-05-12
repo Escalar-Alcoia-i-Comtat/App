@@ -1,7 +1,6 @@
 package org.escalaralcoiaicomtat.app.network
 
 import io.github.aakira.napier.Napier
-import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,7 @@ actual class ConnectivityStatus {
 
     private val isStarted = MutableStateFlow(false)
 
-    private val client = HttpClient()
+    private val client = createHttpClient()
 
     private var loopingJob: Job? = null
 
