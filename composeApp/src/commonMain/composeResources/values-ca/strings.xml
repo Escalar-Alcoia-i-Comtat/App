@@ -236,4 +236,5 @@
     <string name="settings_server_info_update_title">Última Actualització</string>
     <string name="action_back">Tornar</string>
     <string name="map_title">Mapa</string>
+    <string name="status_loading">Carregant...</string>
 </resources>
