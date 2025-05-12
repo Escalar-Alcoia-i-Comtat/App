@@ -368,7 +368,7 @@ fun PathsList(
                                     BottomSheetContents(
                                         path,
                                         false,
-                                        onEditRequested = { onEditRequested?.invoke(path) },
+                                        onEditRequested = onEditRequested?.let { { it(path) } },
                                         onDismissRequested = { onPathClicked(null) }
                                     )
                                 }
@@ -383,7 +383,7 @@ fun PathsList(
                             BottomSheetContents(
                                 path,
                                 isModal = true,
-                                onEditRequested = { onEditRequested?.invoke(path) },
+                                onEditRequested = onEditRequested?.let { { it(path) } },
                             ) { onPathClicked(null) }
                         }
                     }
