@@ -16,8 +16,6 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.mmk.kmpnotifier.extensions.onCreateOrOnNewIntent
-import com.mmk.kmpnotifier.notification.NotifierManager
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
 import io.github.vinceglb.filekit.core.FileKit
@@ -73,9 +71,6 @@ class MainActivity : AppCompatActivity() {
 
         instance = this
 
-        // Send intent to handle notifications
-        NotifierManager.onCreateOrOnNewIntent(intent)
-
         // Initialize the file picker
         FileKit.init(this)
 
@@ -115,13 +110,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         instance = null
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-
-        // Send intent to handle notifications
-        NotifierManager.onCreateOrOnNewIntent(intent)
     }
 
 
