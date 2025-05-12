@@ -156,7 +156,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                 imageHeight = 200.dp,
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
-                                    .padding(bottom = 12.dp)
+                                    .padding(bottom = 22.dp)
                                     .widthIn(max = 600.dp)
                                     .fillMaxWidth()
                                     .animateItem(),
