@@ -10,9 +10,9 @@ import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.BasicBackend
 
 object DataSync : SyncProcess() {
-    private const val ARG_CAUSE = "cause"
-    private const val ARG_ID = "id"
-    private const val ARG_TYPE = "type"
+    const val ARG_CAUSE = "cause"
+    const val ARG_ID = "id"
+    const val ARG_TYPE = "type"
 
     enum class Cause {
         Push, Scheduled, Manual

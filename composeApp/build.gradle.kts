@@ -93,7 +93,7 @@ kotlin {
         }
     }
 
-    @Suppress("UnusedPrivateProperty")
+    @Suppress("UnusedPrivateProperty", "unused")
     sourceSets {
         all {
             languageSettings {
@@ -198,6 +198,9 @@ kotlin {
 
                 // KotlinX coroutines
                 implementation(libs.kotlinx.coroutines.android)
+
+                // WorkManager
+                implementation(libs.androidx.work.runtime)
 
                 // Instant Apps Support
                 implementation(libs.play.instantapps)
