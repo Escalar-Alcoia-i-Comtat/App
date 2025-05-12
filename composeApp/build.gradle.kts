@@ -174,6 +174,7 @@ kotlin {
             dependencies {
                 // Compose - Rich Text Editor
                 implementation(libs.compose.richeditor)
+                implementation(compose.material)
             }
         }
 
