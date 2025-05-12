@@ -40,7 +40,7 @@ actual fun MapComposable(
             CircularProgressIndicator()
         }
 
-        if (onMapClick != null) {
+        if (onMapClick != null && !blockInteractions) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
