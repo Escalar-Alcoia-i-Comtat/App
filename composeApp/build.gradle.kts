@@ -80,10 +80,10 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
 
-            export(libs.kmpnotifier)
+            // export(libs.kmpnotifier)
 
             // Room - Required when using NativeSQLiteDriver
-            linkerOpts.add("-lsqlite3")
+            linkerOpts += "-lsqlite3"
         }
     }
 
@@ -116,9 +116,6 @@ kotlin {
 
             // Compose - Navigation
             implementation(libs.compose.navigation)
-
-            // Compose - Rich Text Editor
-            implementation(libs.compose.richeditor)
 
             // Compose - View Model
             implementation(libs.compose.viewModel)
@@ -166,7 +163,17 @@ kotlin {
                 implementation(libs.room.runtime)
 
                 // Sentry for Kotlin Multiplatform is not available for WASM
-                implementation(libs.sentry)
+                // implementation(libs.sentry)
+            }
+        }
+
+        // Desktop & Android
+        val jvmMain by creating {
+            dependsOn(platformMain)
+
+            dependencies {
+                // Compose - Rich Text Editor
+                implementation(libs.compose.richeditor)
             }
         }
 
@@ -175,12 +182,13 @@ kotlin {
 
             dependencies {
                 // Push Notifications
-                implementation(libs.kmpnotifier)
+                // api(libs.kmpnotifier)
             }
         }
 
         val androidMain by getting {
             dependsOn(mobileMain)
+            dependsOn(jvmMain)
 
             dependencies {
                 implementation(libs.androidx.activity.compose)
@@ -207,6 +215,13 @@ kotlin {
 
                 // App Update Check
                 implementation(libs.play.appupdate)
+
+                implementation(libs.sentry)
+
+                // Firebase (analytics+push)
+                implementation(project.dependencies.platform(libs.firebase.bom))
+                implementation(libs.firebase.analytics)
+                implementation(libs.firebase.messaging)
             }
         }
 
@@ -232,7 +247,7 @@ kotlin {
         }
 
         val desktopMain by getting {
-            dependsOn(platformMain)
+            dependsOn(jvmMain)
 
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -249,6 +264,8 @@ kotlin {
 
                 // Semantic Versioning
                 implementation(libs.semver)
+
+                implementation(libs.sentry)
             }
         }
 
