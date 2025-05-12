@@ -20,9 +20,7 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.Area
@@ -35,6 +33,7 @@ import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.ConnectivityStatusObserver
 import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.sync.DataSync
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.composition.LocalAnimatedContentScope
 import org.escalaralcoiaicomtat.app.ui.composition.LocalSharedTransitionScope
 import org.escalaralcoiaicomtat.app.ui.dialog.UpdateAvailableDialog
@@ -50,7 +49,6 @@ import org.escalaralcoiaicomtat.app.ui.screen.PathsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.SectorsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.ZonesScreen
 import org.escalaralcoiaicomtat.app.ui.theme.AppTheme
-import org.escalaralcoiaicomtat.app.utils.IO
 import org.escalaralcoiaicomtat.app.utils.createStore
 
 val store = CoroutineScope(SupervisorJob()).createStore()
@@ -67,18 +65,16 @@ fun AppRoot(
     val shownIntro = remember { settings.getBoolean(SettingsKeys.SHOWN_INTRO, false) }
 
     LaunchedEffect(Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val lastSync = settings
-                .getLongOrNull(SettingsKeys.LAST_SYNC_TIME)
-                ?.let { Instant.fromEpochMilliseconds(it) }
-            val now = Clock.System.now()
+        val lastSync = settings
+            .getLongOrNull(SettingsKeys.LAST_SYNC_TIME)
+            ?.let { Instant.fromEpochMilliseconds(it) }
+        val now = Clock.System.now()
 
-            // Synchronize if never synced, or every 12 hours
-            if (lastSync == null || (now - lastSync).inWholeHours > 12) {
-                DataSync.start(DataSync.Cause.Scheduled)
-            } else {
-                Napier.d { "Won't run synchronization. Last run: ${(now - lastSync).inWholeHours} hours ago" }
-            }
+        // Synchronize if never synced, or every 12 hours
+        if (lastSync == null || (now - lastSync).inWholeHours > 12) {
+            SyncManager.run(DataSync.Cause.Scheduled)
+        } else {
+            Napier.d { "Won't run synchronization. Last run: ${(now - lastSync).inWholeHours} hours ago" }
         }
     }
 

@@ -4,13 +4,10 @@ import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.PayloadData
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.sync.DataSync
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 
 object PushNotifications {
     private const val TOPIC_CREATED = "created"
@@ -43,10 +40,8 @@ object PushNotifications {
                     TYPE_PATH -> DataTypes.Path
                     else -> return Napier.e { "Received a push notification with an unknown type: $type" }
                 }
-                CoroutineScope(Dispatchers.IO).launch {
-                    Napier.i { "Scheduling sync for $dataType..." }
-                    DataSync.start(DataSync.Cause.Push, dataType to id)
-                }
+                Napier.i { "Scheduling sync for $dataType..." }
+                SyncManager.run(DataSync.Cause.Push, dataType to id)
             }
         })
         NotifierManager.getPushNotifier().apply {
