@@ -11,8 +11,8 @@ for f in "${files[@]}"; do
   if [[ -f "$f" ]]; then
     # Use double quotes so we can embed the single-quote replacement directly
     #   s/\\'/\'/g   → match backslash+single-quote, replace with single-quote
-    sed -i.bak "s/\\\\'/\'/g" "$f"
-    echo "Processed: $f (backup saved as $f.bak)"
+    sed -i "s/\\\\'/\'/g" "$f"
+    echo "Processed: $f"
   else
     echo "Warning: File not found: $f" >&2
   fi
