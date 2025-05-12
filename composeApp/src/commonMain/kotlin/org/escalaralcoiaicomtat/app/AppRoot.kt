@@ -45,6 +45,7 @@ import org.escalaralcoiaicomtat.app.ui.navigation.navigateTo
 import org.escalaralcoiaicomtat.app.ui.screen.AppScreen
 import org.escalaralcoiaicomtat.app.ui.screen.EditorScreen
 import org.escalaralcoiaicomtat.app.ui.screen.IntroScreen
+import org.escalaralcoiaicomtat.app.ui.screen.MapScreen
 import org.escalaralcoiaicomtat.app.ui.screen.PathsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.SectorsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.ZonesScreen
@@ -214,6 +215,9 @@ fun SharedTransitionScope.NavigationController(
                                 Destinations.Editor(DataTypes.Sector, null, route.id)
                             )
                         }.takeIf { editAllowed },
+                        onMapClicked = {
+                            navController.navigateTo(Destinations.Map(it))
+                        },
                     )
                 }
             }
@@ -249,6 +253,14 @@ fun SharedTransitionScope.NavigationController(
                 val dataTypes = remember(route) { DataTypes.Companion.valueOf(route.dataTypes) }
 
                 EditorScreen(dataTypes, route.id, route.parentId) { navController.navigateUp() }
+            }
+            composable<Destinations.Map> { navBackStackEntry ->
+                val route = navBackStackEntry.toRoute<Destinations.Map>()
+
+                MapScreen(
+                    kmz = route.kmz,
+                    onBackRequested = { navController.navigateUp() }
+                )
             }
         }
     }

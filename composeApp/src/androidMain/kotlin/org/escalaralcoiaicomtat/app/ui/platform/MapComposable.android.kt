@@ -1,6 +1,7 @@
 package org.escalaralcoiaicomtat.app.ui.platform
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -10,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.zIndex
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
@@ -24,6 +26,8 @@ actual fun MapComposable(
     viewModel: MapViewModel,
     modifier: Modifier,
     kmz: Uuid?,
+    blockInteractions: Boolean,
+    onMapClick: (() -> Unit)?,
 ) {
     val context = LocalContext.current
 
@@ -36,6 +40,15 @@ actual fun MapComposable(
             CircularProgressIndicator()
         }
 
+        if (onMapClick != null && !blockInteractions) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(10f)
+                    .clickable(onClick = onMapClick)
+            )
+        }
+
         GoogleMap(
             cameraPositionState = cameraPositionState,
             modifier = Modifier.fillMaxSize(),
@@ -43,17 +56,19 @@ actual fun MapComposable(
                 compassEnabled = false,
                 mapToolbarEnabled = false,
                 myLocationButtonEnabled = false,
-                rotationGesturesEnabled = false,
-                scrollGesturesEnabled = false,
-                scrollGesturesEnabledDuringRotateOrZoom = false,
+                rotationGesturesEnabled = !blockInteractions,
+                scrollGesturesEnabled = !blockInteractions,
+                scrollGesturesEnabledDuringRotateOrZoom = !blockInteractions,
                 tiltGesturesEnabled = false,
-                zoomGesturesEnabled = false,
+                zoomGesturesEnabled = !blockInteractions,
                 zoomControlsEnabled = false
             )
         ) {
             MapEffect(Unit) {
-                // Skip default marker events
-                it.setOnMarkerClickListener { true }
+                if (blockInteractions) {
+                    // Skip default marker events
+                    it.setOnMarkerClickListener { true }
+                }
             }
 
             MapEffect(kmz) { googleMap ->

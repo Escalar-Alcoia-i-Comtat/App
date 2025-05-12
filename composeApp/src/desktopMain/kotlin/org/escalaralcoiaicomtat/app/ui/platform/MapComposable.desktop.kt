@@ -2,6 +2,7 @@ package org.escalaralcoiaicomtat.app.ui.platform
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -25,7 +26,13 @@ import org.jetbrains.compose.resources.decodeToImageBitmap
 import kotlin.uuid.Uuid
 
 @Composable
-actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmz: Uuid?) {
+actual fun MapComposable(
+    viewModel: MapViewModel,
+    modifier: Modifier,
+    kmz: Uuid?,
+    blockInteractions: Boolean,
+    onMapClick: (() -> Unit)?,
+) {
     // Require that the Mapbox access token is set
     BuildKonfig.MAPBOX_ACCESS_TOKEN ?: return
 
@@ -62,7 +69,9 @@ actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmz: Uuid?
                     Image(
                         bitmap = mapImage.decodeToImageBitmap(),
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(enabled = onMapClick != null) { onMapClick?.invoke() },
                         contentScale = ContentScale.Crop
                     )
                 }
