@@ -1,18 +1,20 @@
 package org.escalaralcoiaicomtat.android
 
 import android.app.Application
-import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.escalaralcoiaicomtat.app.cache.StorageProvider
 import org.escalaralcoiaicomtat.app.cache.storageProvider
 import org.escalaralcoiaicomtat.app.database.getDatabaseBuilder
 import org.escalaralcoiaicomtat.app.database.roomDatabaseBuilder
-import push.PushNotifications
+import org.escalaralcoiaicomtat.app.initializeSentry
 
 class App: Application() {
     override fun onCreate() {
         super.onCreate()
+
+        // Initialize crash reports
+        initializeSentry()
 
         // Initialize the logging library
         Napier.base(DebugAntilog())
@@ -24,13 +26,5 @@ class App: Application() {
 
         // Initialize the Room Database Builder
         roomDatabaseBuilder = getDatabaseBuilder(this)
-
-        // Configure Push Notifications
-        PushNotifications.initialize(
-            configuration = NotificationPlatformConfiguration.Android(
-                notificationIconResId = R.drawable.ic_launcher_foreground,
-                showPushNotification = false
-            )
-        )
     }
 }

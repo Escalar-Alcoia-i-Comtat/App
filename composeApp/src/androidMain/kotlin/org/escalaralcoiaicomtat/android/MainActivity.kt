@@ -25,7 +25,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.AppRoot
-import org.escalaralcoiaicomtat.app.initializeSentry
 import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.navigation.Destination
@@ -79,9 +78,6 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize the file picker
         FileKit.init(this)
-
-        // Initialize crash reports
-        initializeSentry()
 
         val startDestination = computeStartDestination()
         setContent {
