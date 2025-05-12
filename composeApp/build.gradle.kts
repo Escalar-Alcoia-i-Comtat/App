@@ -273,6 +273,10 @@ kotlin {
         wasmJsMain {
             dependencies {
                 implementation(libs.kotlinx.browser)
+
+                // Compose - Rich Text Editor
+                implementation(libs.compose.richeditor)
+                implementation(compose.material)
             }
         }
     }

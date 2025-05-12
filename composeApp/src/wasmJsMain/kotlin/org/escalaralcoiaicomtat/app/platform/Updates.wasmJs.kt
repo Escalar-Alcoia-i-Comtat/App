@@ -16,6 +16,11 @@ actual object Updates {
     actual val updateAvailable: MutableStateFlow<Boolean> get() = MutableStateFlow(false)
 
     /**
+     * If any, the error that occurred during the update or the checking for updates.
+     */
+    actual val updateError: MutableStateFlow<String?> = MutableStateFlow(null)
+
+    /**
      * If supported, holds the name of the latest version available. Only applies if
      * [updateAvailable] is true.
      */
