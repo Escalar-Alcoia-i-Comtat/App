@@ -43,7 +43,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: 'Updated Version'
-          file_pattern: 'version.properties strings.xml'
+          file_pattern: 'version.properties composeApp/src/commonMain/composeResources/values-*/strings.xml'
           branch: master
 
   publish_internal_release:
