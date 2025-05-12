@@ -30,7 +30,13 @@ data class MapData(
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmz: Uuid?) {
+actual fun MapComposable(
+    viewModel: MapViewModel,
+    modifier: Modifier,
+    kmz: Uuid?,
+    blockInteractions: Boolean,
+    onMapClick: (() -> Unit)?,
+) {
     var mapData by remember { mutableStateOf<MapData?>(null) }
 
     LaunchedEffect(kmz) {

@@ -2,6 +2,7 @@ package org.escalaralcoiaicomtat.app.ui.navigation
 
 import kotlinx.serialization.Serializable
 import org.escalaralcoiaicomtat.app.data.DataTypes
+import kotlin.uuid.Uuid
 
 object Destinations {
     @Serializable
@@ -79,6 +80,20 @@ object Destinations {
         }
     }
 
+    @Serializable
+    data class Map(private val _kmz: String? = null) : Destination() {
+        constructor(kmz: Uuid? = null): this(kmz?.toString())
+
+        override val id: Long? = null
+        override val name: String = "Map"
+
+        val kmz: Uuid? get() = _kmz?.let { Uuid.parse(it) }
+
+        override fun toString(): String {
+            return "map${_kmz?.let { "/$it" } ?: ""}"
+        }
+    }
+
     fun parse(path: String): Destination {
         val pieces = path.removePrefix("#").split('/').filter(String::isNotEmpty)
         return when {
@@ -87,6 +102,7 @@ object Destinations {
             pieces[0] == Root.name.lowercase() -> Root
             pieces[0] == Intro.name.lowercase() -> Intro
             pieces[0] == "editor" -> Editor(pieces[1], pieces[2].toLongOrNull(), pieces.getOrNull(3)?.toLongOrNull())
+            pieces[0] == "map" -> Map(pieces.getOrNull(1)?.let { Uuid.parse(it) })
 
             pieces.size == 1 -> Area(pieces[0].toLong())
             pieces.size == 2 -> Zone(pieces[0].toLong(), pieces[1].toLong())

@@ -59,6 +59,7 @@ import org.escalaralcoiaicomtat.app.ui.list.LocationCard
 import org.escalaralcoiaicomtat.app.ui.platform.MapComposable
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.jetbrains.compose.resources.stringResource
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +74,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     isLoading: Boolean = false,
     onItemMoved: ((fromIndex: Int, toIndex: Int) -> Unit)? = null,
     onFinishSorting: (() -> Unit)? = null,
+    onMapClicked: (kmz: Uuid?) -> Unit = {},
     onNavigateUp: () -> Unit,
 ) {
     val state = rememberLazyListState()
@@ -143,7 +145,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    if (data is Zone) display(data)
+                    if (data is Zone) display(data) { onMapClicked(data.kmz) }
 
                     if (children != null) {
                         itemsIndexed(
@@ -156,7 +158,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                 imageHeight = 200.dp,
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
-                                    .padding(bottom = 12.dp)
+                                    .padding(bottom = 22.dp)
                                     .widthIn(max = 600.dp)
                                     .fillMaxWidth()
                                     .animateItem(),
@@ -198,7 +200,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     }
 }
 
-private fun LazyListScope.display(zone: Zone) {
+private fun LazyListScope.display(zone: Zone, onMapClicked: () -> Unit) {
     item(key = "zone-map-${zone.id}", contentType = "zone-map") {
         MapComposable(
             modifier = Modifier
@@ -209,7 +211,8 @@ private fun LazyListScope.display(zone: Zone) {
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .shadow(3.dp),
-            kmz = zone.kmz
+            kmz = zone.kmz,
+            onMapClick = onMapClicked,
         )
     }
     if (zone.hasAnyMetadata()) {

@@ -11,5 +11,5 @@
     <string name="gender_feminine">Femenino</string>
     <string name="gender_neuter">Neutro</string>
     <string name="intro_0_message">En qué género quieres que nos refiramos a ti?</string>
-    <string name="downloading_update_progress">Descargando... %.2f%%</string>
+    <string name="downloading_update_progress">Descargando...</string>
 </resources>

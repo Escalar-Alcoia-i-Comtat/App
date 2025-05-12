@@ -53,12 +53,9 @@ class MainActivity : AppCompatActivity() {
     private val updateListener = InstallStateUpdatedListener { state ->
         val status = state.installStatus()
         if (status == InstallStatus.DOWNLOADING) {
-            val bytesDownloaded = state.bytesDownloaded()
-            val totalBytesToDownload = state.totalBytesToDownload()
-            val progress = bytesDownloaded.toFloat() / totalBytesToDownload.toFloat()
             Toast.makeText(
                 this,
-                getString(R.string.downloading_update_progress, progress),
+                getString(R.string.downloading_update_progress),
                 Toast.LENGTH_LONG
             ).show()
         } else if (status == InstallStatus.DOWNLOADED) {

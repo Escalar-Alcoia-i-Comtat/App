@@ -10,4 +10,6 @@ expect fun MapComposable(
     viewModel: MapViewModel = viewModel { MapViewModel() },
     modifier: Modifier = Modifier,
     kmz: Uuid? = null,
+    blockInteractions: Boolean = true,
+    onMapClick: (() -> Unit)? = null,
 )
