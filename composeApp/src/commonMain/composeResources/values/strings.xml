@@ -18,6 +18,7 @@
     <string name="action_add">Add</string>
     <string name="action_tap_to_see_more">Tap to know more</string>
     <string name="action_copy">Copy</string>
+    <string name="action_back">Back</string>
 
     <string name="message_copied">Copied to clipboard</string>
 

@@ -25,7 +25,13 @@ import org.jetbrains.compose.resources.decodeToImageBitmap
 import kotlin.uuid.Uuid
 
 @Composable
-actual fun MapComposable(viewModel: MapViewModel, modifier: Modifier, kmz: Uuid?) {
+actual fun MapComposable(
+    viewModel: MapViewModel,
+    modifier: Modifier,
+    kmz: Uuid?,
+    blockInteractions: Boolean,
+    onMapClick: (() -> Unit)?,
+) {
     // Require that the Mapbox access token is set
     BuildKonfig.MAPBOX_ACCESS_TOKEN ?: return
 

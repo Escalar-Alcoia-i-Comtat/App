@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.ui.model.SectorsScreenModel
+import kotlin.uuid.Uuid
 
 @Composable
 fun SectorsScreen(
@@ -18,6 +19,7 @@ fun SectorsScreen(
     onEditZoneRequested: (() -> Unit)?,
     onEditSectorRequested: ((sector: Sector) -> Unit)?,
     onCreateSectorRequested: (() -> Unit)?,
+    onMapClicked: (Uuid?) -> Unit,
     viewModel: SectorsScreenModel = viewModel { SectorsScreenModel() },
     scrollToId: Long? = null
 ) {
@@ -42,6 +44,7 @@ fun SectorsScreen(
         isLoading = isLoading,
         onItemMoved = viewModel::moveItem.takeIf { editAllowed },
         onFinishSorting = viewModel::saveMovedItems,
-        onNavigateUp = onBackRequested
+        onNavigateUp = onBackRequested,
+        onMapClicked = onMapClicked,
     )
 }
