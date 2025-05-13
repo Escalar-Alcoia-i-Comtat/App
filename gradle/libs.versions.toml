@@ -5,7 +5,7 @@ androidx-appcompat = "1.7.0"
 androidx-sqlite-bundled = "2.5.1"
 androidx-work = "2.10.1"
 buildkonfig = "0.17.1"
-coil = "3.1.0"
+coil = "3.2.0"
 compose-maps = "6.6.0"
 compose-navigation = "2.9.10-alpha01"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
