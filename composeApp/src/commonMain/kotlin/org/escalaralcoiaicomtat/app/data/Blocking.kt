@@ -13,7 +13,7 @@ data class Blocking(
     val type: BlockingTypes,
     val recurrence: BlockingRecurrenceYearly? = null,
     @SerialName("end_date") val endDate: LocalDateTime? = null,
-    @SerialName("path_id") val pathId: Int,
+    @SerialName("path_id") val pathId: Long,
 ) : Entity {
     override fun copy(
         id: Long,

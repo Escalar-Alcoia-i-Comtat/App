@@ -1,17 +1,14 @@
 package org.escalaralcoiaicomtat.app.ui.model
 
-import androidx.lifecycle.viewModelScope
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.escalaralcoiaicomtat.app.data.DataType
 import org.escalaralcoiaicomtat.app.data.DataTypeWithImage
 import org.escalaralcoiaicomtat.app.data.DataTypeWithParent
-import org.escalaralcoiaicomtat.app.utils.IO
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWithParent>(
     protected val childrenListAccessor: suspend (parentId: Long) -> List<Children>,
@@ -37,7 +34,11 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
     val displayingChild: StateFlow<Children?> get() = _displayingChild.asStateFlow()
     private val _displayingChild = MutableStateFlow<Children?>(null)
 
-    fun load(id: Long, onNotFound: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun load(id: Long, onNotFound: () -> Unit) = launch {
+        loadData(id, onNotFound)
+    }
+
+    protected open suspend fun loadData(id: Long, onNotFound: () -> Unit) {
         originalChildren = childrenListAccessor(id)
         _children.emit(
             if (sortChildren) originalChildren!!.sorted()

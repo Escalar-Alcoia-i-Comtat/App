@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.generic.color
 
@@ -28,6 +30,8 @@ private const val HighlightColor = 0xffffff00
 @ExperimentalMaterial3Api
 fun PathListItem(
     path: Path,
+    /** The blocks of the given [path]. */
+    pathBlocks: List<Blocking>,
     modifier: Modifier = Modifier,
     highlight: Boolean = false,
     onClick: () -> Unit
@@ -45,7 +49,15 @@ fun PathListItem(
     OutlinedCard(
         modifier = modifier,
         border = BorderStroke(1.dp, borderColor),
-        onClick = onClick
+        colors = if (pathBlocks.isEmpty()) {
+            CardDefaults.outlinedCardColors()
+        } else {
+            CardDefaults.outlinedCardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            )
+        },
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
