@@ -6,7 +6,6 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -30,7 +29,6 @@ import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.ConnectivityStatusObserver
 import org.escalaralcoiaicomtat.app.platform.Updates
-import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.composition.LocalAnimatedContentScope
 import org.escalaralcoiaicomtat.app.ui.composition.LocalSharedTransitionScope
 import org.escalaralcoiaicomtat.app.ui.dialog.UpdateAvailableDialog
@@ -60,10 +58,6 @@ fun AppRoot(
     ConnectivityStatusObserver()
 
     val shownIntro = remember { settings.getBoolean(SettingsKeys.SHOWN_INTRO, false) }
-
-    LaunchedEffect(Unit) {
-        SyncManager.schedule()
-    }
 
     AppTheme {
         val updateAvailable by Updates.updateAvailable.collectAsState()

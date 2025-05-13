@@ -13,6 +13,7 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.escalaralcoiaicomtat.app.cache.StorageProvider
 import org.escalaralcoiaicomtat.app.cache.storageProvider
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.Locales
 import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
 import org.escalaralcoiaicomtat.app.ui.navigation.navigateTo
@@ -23,6 +24,8 @@ fun main() {
     Napier.base(DebugAntilog())
 
     storageProvider = StorageProvider()
+
+    SyncManager.schedule()
 
     val body = document.body ?: return
 
