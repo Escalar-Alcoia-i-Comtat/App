@@ -3,6 +3,7 @@ package org.escalaralcoiaicomtat.app.sync
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -31,7 +32,7 @@ actual object SyncManager {
 
     @OptIn(DelicateCoroutinesApi::class)
     actual fun schedule() {
-        GlobalScope.promise<Unit> {
+        GlobalScope.launch {
             runIfSchedulePermits(SettingsKeys.LAST_SYNC_TIME, DataSync)
             runIfSchedulePermits(SettingsKeys.LAST_BLOCK_SYNC_TIME, BlockingSync)
         }
