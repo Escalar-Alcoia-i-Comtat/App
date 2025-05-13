@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Event
@@ -75,9 +76,10 @@ fun SettingsPage(
     val units by unitsConfiguration.unitsLive.collectAsState(DistanceUnits.METER)
 
     val isLoading by model.isLoading.collectAsState(false)
-    val lastSyncTime by model.lastSyncTime.collectAsState(null)
-    val lastSyncCause by model.lastSyncCause.collectAsState(null)
-    val syncStatus by model.syncStatus.collectAsState()
+    val lastDataSync by model.lastDataSync.collectAsState(null)
+    val dataSyncStatus by model.dataSyncStatus.collectAsState()
+    val lastBlockingSync by model.lastBlockingSync.collectAsState(null)
+    val blockingSyncStatus by model.blockingSyncStatus.collectAsState()
     val serverInfo by model.serverInfo.collectAsState()
     val apiKey by model.apiKey.collectAsState(null)
 
@@ -85,9 +87,10 @@ fun SettingsPage(
 
     SettingsPage(
         isLoading = isLoading,
-        lastSyncTime = lastSyncTime,
-        lastSyncCause = lastSyncCause,
-        syncStatus = syncStatus,
+        lastDataSync = lastDataSync,
+        dataSyncStatus = dataSyncStatus,
+        lastBlockingSync = lastBlockingSync,
+        blockingSyncStatus = blockingSyncStatus,
         apiKey = apiKey,
         serverInfo = serverInfo,
         onLockRequest = model::lock,
@@ -101,9 +104,10 @@ fun SettingsPage(
 @OptIn(ExperimentalMaterial3Api::class)
 fun SettingsPage(
     isLoading: Boolean,
-    lastSyncTime: Long?,
-    lastSyncCause: String?,
-    syncStatus: SyncProcess.Status?,
+    lastDataSync: Pair<Instant, SyncProcess.Cause>?,
+    dataSyncStatus: SyncProcess.Status?,
+    lastBlockingSync: Pair<Instant, SyncProcess.Cause>?,
+    blockingSyncStatus: SyncProcess.Status?,
     apiKey: String?,
     serverInfo: ServerInfoResponseData?,
     onLockRequest: (onLock: () -> Unit) -> Unit,
@@ -113,6 +117,11 @@ fun SettingsPage(
 ) {
     val uriHandler = LocalUriHandler.current
     val unitsConfiguration = LocalUnitsConfiguration.current
+
+    val lastDataSyncTime = lastDataSync?.first
+    val lastDataSyncCause = lastDataSync?.second
+    val lastBlockingSyncTime = lastBlockingSync?.first
+    val lastBlockingSyncCause = lastBlockingSync?.second
 
     Column(
         modifier = Modifier
@@ -183,32 +192,17 @@ fun SettingsPage(
             )
             SettingsRow(
                 headline = stringResource(Res.string.settings_app_info_last_sync_title),
-                summary = if (syncStatus is SyncProcess.Status.RUNNING) {
-                    if (syncStatus.isIndeterminate)
+                summary = if (dataSyncStatus is SyncProcess.Status.RUNNING) {
+                    if (dataSyncStatus.isIndeterminate)
                         stringResource(Res.string.settings_app_info_last_sync_running)
                     else
                         stringResource(
                             Res.string.settings_app_info_last_sync_running_progress,
-                            (syncStatus.progress * 100).toInt()
+                            (dataSyncStatus.progress * 100).toInt()
                         )
-                } else lastSyncTime?.let { time ->
-                    val localDateTime = Instant.fromEpochMilliseconds(time)
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .let {
-                            StringBuilder()
-                                .append(it.year)
-                                .append('/')
-                                .append(it.monthNumber.toString().padStart(2, '0'))
-                                .append('/')
-                                .append(it.dayOfMonth.toString().padStart(2, '0'))
-                                .append(' ')
-                                .append(it.hour.toString().padStart(2, '0'))
-                                .append(':')
-                                .append(it.minute.toString().padStart(2, '0'))
-                                .toString()
-                        }
-                    lastSyncCause
-                        ?.let { cause -> SyncProcess.Cause.entries.find { it.name == cause } }
+                } else lastDataSyncTime?.let { time ->
+                    val localDateTime = instantToString(time)
+                    lastDataSyncCause
                         ?.let { cause ->
                             stringResource(
                                 Res.string.settings_app_info_last_sync_message,
@@ -221,8 +215,37 @@ fun SettingsPage(
                             localDateTime
                         )
                 } ?: stringResource(Res.string.settings_app_info_last_sync_never),
-                icon = Icons.Outlined.Info,
-                onClick = { SyncManager.run(SyncProcess.Cause.Manual) }
+                icon = Icons.Default.Sync,
+                onClick = { SyncManager.runDataSync(SyncProcess.Cause.Manual) }
+            )
+            HorizontalDivider()
+            SettingsRow(
+                headline = stringResource(Res.string.settings_app_info_blocking_last_sync_title),
+                summary = if (blockingSyncStatus is SyncProcess.Status.RUNNING) {
+                    if (blockingSyncStatus.isIndeterminate)
+                        stringResource(Res.string.settings_app_info_last_sync_running)
+                    else
+                        stringResource(
+                            Res.string.settings_app_info_last_sync_running_progress,
+                            (blockingSyncStatus.progress * 100).toInt()
+                        )
+                } else lastBlockingSyncTime?.let { time ->
+                    val localDateTime = instantToString(time)
+                    lastBlockingSyncCause
+                        ?.let { cause ->
+                            stringResource(
+                                Res.string.settings_app_info_last_sync_message,
+                                localDateTime,
+                                cause.name
+                            )
+                        }
+                        ?: stringResource(
+                            Res.string.settings_app_info_last_sync_no_cause,
+                            localDateTime
+                        )
+                } ?: stringResource(Res.string.settings_app_info_last_sync_never),
+                icon = Icons.Default.Sync,
+                onClick = { SyncManager.runBlockingSync(SyncProcess.Cause.Manual) }
             )
             HorizontalDivider()
             SettingsRow(

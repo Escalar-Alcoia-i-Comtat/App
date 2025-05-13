@@ -50,4 +50,16 @@ actual object SyncManager {
             }
         }
     }
+
+    actual fun runDataSync(cause: Cause, syncId: Pair<DataTypes<*>, Int>?) {
+        CoroutineScope(Dispatchers.IO).launch {
+            DataSync.start(cause, syncId)
+        }
+    }
+
+    actual fun runBlockingSync(cause: Cause, pathId: Int?) {
+        CoroutineScope(Dispatchers.IO).launch {
+            BlockingSync.start(cause, pathId)
+        }
+    }
 }

@@ -12,6 +12,7 @@ import org.escalaralcoiaicomtat.android.BlockingSyncWorker
 import org.escalaralcoiaicomtat.android.DataSyncWorker
 import org.escalaralcoiaicomtat.android.applicationContext
 import org.escalaralcoiaicomtat.app.data.DataTypes
+import org.escalaralcoiaicomtat.app.sync.SyncProcess.Cause
 import java.util.concurrent.TimeUnit
 
 actual object SyncManager {
@@ -52,9 +53,20 @@ actual object SyncManager {
         )
     }
 
-    actual fun run(cause: SyncProcess.Cause, syncId: Pair<DataTypes<*>, Int>?) {
-        val wm = WorkManager.getInstance(applicationContext)
+    actual fun run(cause: Cause, syncId: Pair<DataTypes<*>, Int>?) {
+        runDataSync(cause, syncId)
 
+        if (syncId == null) {
+            runBlockingSync(cause)
+        } else {
+            if (syncId.first == DataTypes.Path) {
+                runBlockingSync(cause, syncId.second)
+            }
+        }
+    }
+
+    actual fun runDataSync(cause: Cause, syncId: Pair<DataTypes<*>, Int>?) {
+        val wm = WorkManager.getInstance(applicationContext)
         wm.enqueueUniqueWork(
             UNIQUE_WORK_NAME,
             ExistingWorkPolicy.REPLACE,
@@ -73,24 +85,26 @@ actual object SyncManager {
                 )
                 .build(),
         )
-        if (syncId?.first == DataTypes.Path) {
-            wm.enqueueUniqueWork(
-                BLOCKING_UNIQUE_WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                OneTimeWorkRequestBuilder<BlockingSyncWorker>()
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build()
+    }
+
+    actual fun runBlockingSync(cause: Cause, pathId: Int?) {
+        val wm = WorkManager.getInstance(applicationContext)
+        wm.enqueueUniqueWork(
+            BLOCKING_UNIQUE_WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            OneTimeWorkRequestBuilder<BlockingSyncWorker>()
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                )
+                .setInputData(
+                    workDataOf(
+                        SyncProcess.ARG_CAUSE to cause.name,
+                        SyncProcess.ARG_ID to pathId,
                     )
-                    .setInputData(
-                        workDataOf(
-                            SyncProcess.ARG_CAUSE to cause.name,
-                            SyncProcess.ARG_ID to syncId.second,
-                        )
-                    )
-                    .build(),
-            )
-        }
+                )
+                .build(),
+        )
     }
 }

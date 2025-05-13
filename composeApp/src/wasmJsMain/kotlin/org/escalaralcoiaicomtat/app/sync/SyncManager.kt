@@ -53,4 +53,18 @@ actual object SyncManager {
             }
         }
     }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    actual fun runDataSync(cause: SyncProcess.Cause, syncId: Pair<DataTypes<*>, Int>?) {
+        GlobalScope.launch {
+            DataSync.start(cause, syncId)
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    actual fun runBlockingSync(cause: Cause, pathId: Int?) {
+        GlobalScope.launch {
+            BlockingSync.start(cause, pathId)
+        }
+    }
 }
