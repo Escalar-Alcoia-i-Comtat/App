@@ -17,8 +17,6 @@ import org.escalaralcoiaicomtat.app.database.indexeddb.indexedDB
 import org.escalaralcoiaicomtat.app.exception.JavaScriptException.Companion.toJavaScriptException
 import org.escalaralcoiaicomtat.app.interop.DOMException
 import org.escalaralcoiaicomtat.app.json
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 import kotlin.js.Promise
 
 object Database {
@@ -27,37 +25,40 @@ object Database {
 
     private lateinit var db: IDBDatabase
 
-    suspend fun open() = suspendCoroutine<Unit> { cont ->
-        val indexedDB = indexedDB
-        if (indexedDB == null) {
-            cont.resumeWithException(UnsupportedOperationException("IndexedDB not supported"))
-            return@suspendCoroutine
-        }
-        Napier.i { "Opening database $DATABASE_NAME @ $DATABASE_VERSION..." }
-        val openRequest = indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
-        openRequest.onupgradeneeded = { event ->
-            val db = getDatabase(event)
-            Napier.w { "Upgrade is needed. Old: ${event.oldVersion}, New: ${event.newVersion}" }
-            if (event.oldVersion == 0) {
-                // Create the store
-                Napier.i { "Initializing database..." }
-                createObjectStores(db)
-            } else if (event.oldVersion < DATABASE_VERSION) {
-                // Delete the store, and create it again
-                Napier.i { "Database needs upgrade, deleting and creating again..." }
-                indexedDB.deleteDatabase(DATABASE_NAME)
-                createObjectStores(db)
+    fun open(): Promise<JsAny?> {
+        return Promise<JsAny?> { resolve, reject ->
+            val indexedDB = indexedDB
+            if (indexedDB == null) {
+                // UnsupportedOperationException("IndexedDB not supported")
+                reject("IndexedDB not supported".toJsString())
+                return@Promise
             }
-        }
-        openRequest.onerror = {
-            Napier.e { "Could not open database: ${openRequest.error}" }
-            cont.resumeWithException(
-                Exception("Could not open database: ${openRequest.error}")
-            )
-        }
-        openRequest.onsuccess = {
-            Napier.i { "Database opened successfully" }
-            db = openRequest.result
+            Napier.i { "Opening database $DATABASE_NAME @ $DATABASE_VERSION..." }
+            val openRequest = indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
+            openRequest.onupgradeneeded = { event ->
+                val db = getDatabase(event)
+                Napier.w { "Upgrade is needed. Old: ${event.oldVersion}, New: ${event.newVersion}" }
+                if (event.oldVersion == 0) {
+                    // Create the store
+                    Napier.i { "Initializing database..." }
+                    createObjectStores(db)
+                } else if (event.oldVersion < DATABASE_VERSION) {
+                    // Delete the store, and create it again
+                    Napier.i { "Database needs upgrade, deleting and creating again..." }
+                    indexedDB.deleteDatabase(DATABASE_NAME)
+                    createObjectStores(db)
+                }
+            }
+            openRequest.onerror = {
+                Napier.e { "Could not open database: ${openRequest.error}" }
+                // Exception("Could not open database: ${openRequest.error}")
+                reject("Could not open database: ${openRequest.error}".toJsString())
+            }
+            openRequest.onsuccess = {
+                Napier.i { "Database opened successfully" }
+                db = openRequest.result
+                resolve(null)
+            }
         }
     }
 
@@ -89,14 +90,15 @@ object Database {
         }
     }
 
-    suspend fun <R, T: Entity> transaction(
+    suspend fun <R, T : Entity> transaction(
         ddti: DatabaseEntityInterface<T>,
         isWrite: Boolean = false,
         block: suspend TransactionContext<T>.() -> R
     ): R {
         await()
 
-        val transaction = db.transaction(ddti.objectStoreName, if (isWrite) "readwrite" else "readonly")
+        val transaction =
+            db.transaction(ddti.objectStoreName, if (isWrite) "readwrite" else "readonly")
 
         var error: JsAny? = null
         var isComplete = false
@@ -180,7 +182,7 @@ object Database {
         }
     }
 
-    suspend fun <T: Entity> TransactionContext<T>.get(id: Long): T? {
+    suspend fun <T : Entity> TransactionContext<T>.get(id: Long): T? {
         val jsonObject = store.request {
             val key = IDBKey(id.toInt())
             store.get(key)
@@ -219,7 +221,8 @@ object Database {
 
     suspend fun <T : Entity> TransactionContext<T>.allByIndex(parentId: Long): List<T> {
         val key = IDBKey(parentId.toInt())
-        val jsonArray = store.request { index(ddti.parentKeyIndexName()).getAll(key) }?.toString() ?: "[]"
+        val jsonArray =
+            store.request { index(ddti.parentKeyIndexName()).getAll(key) }?.toString() ?: "[]"
         return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)
     }
 

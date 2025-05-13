@@ -1,8 +1,5 @@
 package org.escalaralcoiaicomtat.app.database
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.data.Area
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
@@ -10,9 +7,7 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.Zone
 
 actual object DatabaseInterface {
-    init {
-        CoroutineScope(Dispatchers.Default).launch { Database.open() }
-    }
+    init { Database.open() }
 
     actual fun areas(): DataTypeInterface<Area> = areasInterface
 
