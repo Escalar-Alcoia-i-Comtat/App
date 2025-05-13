@@ -15,26 +15,37 @@ import org.escalaralcoiaicomtat.app.sync.SyncProcess.Cause
 actual object SyncManager {
     private suspend fun runIfSchedulePermits(
         settingsKey: String,
+        period: Long,
         process: SyncProcess,
     ) {
         val lastSync = settings
             .getLongOrNull(settingsKey)
-            ?.let { Instant.fromEpochMilliseconds(it) }
+            ?.let(Instant::fromEpochMilliseconds)
         val now = Clock.System.now()
 
         // Synchronize if never synced, or every 12 hours
         if (lastSync == null || (now - lastSync).inWholeHours > DataSync.SYNC_PERIOD_HOURS) {
             process.start(mapOf(SyncProcess.ARG_TYPE to Cause.Scheduled))
         } else {
-            Napier.d { "Won't run synchronization ($settingsKey). Last run: ${(now - lastSync).inWholeHours} hours ago" }
+            Napier.d {
+                "Won't run synchronization ($settingsKey).\nLast run: ${(now - lastSync).inWholeHours} hours ago\nRun every $period hours."
+            }
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     actual fun schedule() {
         GlobalScope.launch {
-            runIfSchedulePermits(SettingsKeys.LAST_SYNC_TIME, DataSync)
-            runIfSchedulePermits(SettingsKeys.LAST_BLOCK_SYNC_TIME, BlockingSync)
+            runIfSchedulePermits(
+                SettingsKeys.LAST_SYNC_TIME,
+                DataSync.SYNC_PERIOD_HOURS,
+                DataSync,
+            )
+            runIfSchedulePermits(
+                SettingsKeys.LAST_BLOCK_SYNC_TIME,
+                BlockingSync.SYNC_PERIOD_HOURS,
+                BlockingSync,
+            )
         }
     }
 
