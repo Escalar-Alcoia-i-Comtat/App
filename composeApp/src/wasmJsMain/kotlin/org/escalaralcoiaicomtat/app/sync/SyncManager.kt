@@ -55,7 +55,7 @@ actual object SyncManager {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    actual fun runDataSync(cause: SyncProcess.Cause, syncId: Pair<DataTypes<*>, Int>?) {
+    actual fun runDataSync(cause: Cause, syncId: Pair<DataTypes<*>, Int>?) {
         GlobalScope.launch {
             DataSync.start(cause, syncId)
         }
