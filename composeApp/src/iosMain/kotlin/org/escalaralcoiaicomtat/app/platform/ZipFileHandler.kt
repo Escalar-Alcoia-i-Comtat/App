@@ -26,7 +26,7 @@ actual object ZipFileHandler {
             ZipFile(KMPFile(file.asFile.path)).use { zip ->
                 zip.entries.also { Napier.d { "  There are ${it.size} entries." } }.forEach { entry ->
                     zip.readEntry(entry) { entry, content, count, last ->
-                        output.write(entry.name, content)
+                        output.append(entry.name, content)
                         Napier.d { "  Written $count bytes into ${entry.directory.name}." }
                     }
                 }

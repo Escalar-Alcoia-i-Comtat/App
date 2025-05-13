@@ -7,6 +7,10 @@ class ZipFile {
         files[name] = data
     }
 
+    fun append(name: String, data: ByteArray) {
+        files[name] = (files[name] ?: byteArrayOf()) + data
+    }
+
     fun read(name: String): ByteArray? {
         return files[name]
     }
