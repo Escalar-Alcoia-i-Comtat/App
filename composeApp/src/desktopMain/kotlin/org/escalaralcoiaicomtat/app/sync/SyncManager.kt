@@ -11,9 +11,18 @@ actual object SyncManager {
         throw OperationNotSupportedException("Desktop doesn't support scheduling periodic works.")
     }
 
-    actual fun run(cause: DataSync.Cause, syncId: Pair<DataTypes<*>, Int>?) {
+    actual fun run(cause: SyncProcess.Cause, syncId: Pair<DataTypes<*>, Int>?) {
         CoroutineScope(Dispatchers.IO).launch {
             DataSync.start(cause, syncId)
+
+            if (syncId != null) {
+                val (dataType, id) = syncId
+                if (dataType == DataTypes.Path) {
+                    BlockingSync.start(cause, pathId = id)
+                }
+            } else {
+                BlockingSync.start(cause)
+            }
         }
     }
 }

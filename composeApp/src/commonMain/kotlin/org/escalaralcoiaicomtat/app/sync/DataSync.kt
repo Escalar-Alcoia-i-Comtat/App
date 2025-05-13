@@ -10,13 +10,7 @@ import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.BasicBackend
 
 object DataSync : SyncProcess() {
-    const val ARG_CAUSE = "cause"
-    const val ARG_ID = "id"
-    const val ARG_TYPE = "type"
-
-    enum class Cause {
-        Push, Scheduled, Manual
-    }
+    const val SYNC_PERIOD_HOURS = 12L
 
     suspend fun start(
         cause: Cause,

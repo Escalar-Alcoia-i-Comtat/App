@@ -4,9 +4,8 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import org.escalaralcoiaicomtat.app.sync.DataSync
 
-class SyncWorker(
+abstract class SyncWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ): CoroutineWorker(appContext, workerParams) {
@@ -18,7 +17,7 @@ class SyncWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            DataSync.start(arguments = inputData.keyValueMap)
+            operation(arguments = inputData.keyValueMap)
             Result.success()
         } catch (e: Exception) {
             Result.failure(
@@ -30,4 +29,6 @@ class SyncWorker(
             )
         }
     }
+
+    abstract suspend fun operation(arguments: Map<String, Any?>? = null)
 }

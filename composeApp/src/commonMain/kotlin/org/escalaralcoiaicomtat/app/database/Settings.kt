@@ -16,6 +16,16 @@ object SettingsKeys {
     const val LAST_SYNC_CAUSE = "last_sync_cause"
 
     /**
+     * The timestamp of the moment the last blocking synchronization was run.
+     */
+    const val LAST_BLOCK_SYNC_TIME = "last_block_sync_time"
+
+    /**
+     * The cause that triggered the last blocking synchronization.
+     */
+    const val LAST_BLOCK_SYNC_CAUSE = "last_block_sync_cause"
+
+    /**
      * Whether the intro screen has been shown or not.
      */
     const val SHOWN_INTRO = "shown_intro"

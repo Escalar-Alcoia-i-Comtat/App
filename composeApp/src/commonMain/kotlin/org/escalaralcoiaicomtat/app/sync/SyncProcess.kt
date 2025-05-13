@@ -11,6 +11,16 @@ import kotlinx.datetime.until
  * Provides a template for objects to define synchronization routines.
  */
 abstract class SyncProcess {
+    companion object {
+        const val ARG_CAUSE = "cause"
+        const val ARG_ID = "id"
+        const val ARG_TYPE = "type"
+    }
+
+    enum class Cause {
+        Push, Scheduled, Manual
+    }
+
     sealed class Status {
         data object WAITING : Status()
         open class RUNNING(

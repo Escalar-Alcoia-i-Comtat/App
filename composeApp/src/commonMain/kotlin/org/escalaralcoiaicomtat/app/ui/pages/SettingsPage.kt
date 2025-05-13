@@ -53,7 +53,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
-import org.escalaralcoiaicomtat.app.sync.DataSync
 import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.sync.SyncProcess
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
@@ -209,7 +208,7 @@ fun SettingsPage(
                                 .toString()
                         }
                     lastSyncCause
-                        ?.let { cause -> DataSync.Cause.entries.find { it.name == cause } }
+                        ?.let { cause -> SyncProcess.Cause.entries.find { it.name == cause } }
                         ?.let { cause ->
                             stringResource(
                                 Res.string.settings_app_info_last_sync_message,
@@ -223,7 +222,7 @@ fun SettingsPage(
                         )
                 } ?: stringResource(Res.string.settings_app_info_last_sync_never),
                 icon = Icons.Outlined.Info,
-                onClick = { SyncManager.run(DataSync.Cause.Manual) }
+                onClick = { SyncManager.run(SyncProcess.Cause.Manual) }
             )
             HorizontalDivider()
             SettingsRow(

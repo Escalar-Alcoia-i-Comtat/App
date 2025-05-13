@@ -9,6 +9,7 @@ import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
 import io.ktor.utils.io.ByteReadChannel
 import org.escalaralcoiaicomtat.app.data.Area
+import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.Zone
@@ -16,6 +17,7 @@ import org.escalaralcoiaicomtat.app.exception.ServerException
 import org.escalaralcoiaicomtat.app.network.response.DataResponse
 import org.escalaralcoiaicomtat.app.network.response.data.AreaData
 import org.escalaralcoiaicomtat.app.network.response.data.AreasData
+import org.escalaralcoiaicomtat.app.network.response.data.BlockListResponse
 import org.escalaralcoiaicomtat.app.network.response.data.FileListRequestData
 import org.escalaralcoiaicomtat.app.network.response.data.FileRequestData
 import org.escalaralcoiaicomtat.app.network.response.data.PathData
@@ -71,6 +73,19 @@ object BasicBackend : Backend() {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): Path? {
         return getOrNull(PathData.serializer(), "path", id, progress = progress)?.asPath()
+    }
+
+    suspend fun blocking(
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): List<Blocking> {
+        return get(BlockListResponse.serializer(), "blocks", progress = progress).blocks
+    }
+
+    suspend fun blocking(
+        pathId: Int,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ): List<Blocking> {
+        return get(BlockListResponse.serializer(), "block", pathId, progress = progress).blocks
     }
 
     suspend fun serverInfo(
