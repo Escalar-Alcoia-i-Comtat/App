@@ -21,6 +21,7 @@ import org.escalaralcoiaicomtat.app.database.getDatabaseBuilder
 import org.escalaralcoiaicomtat.app.database.roomDatabaseBuilder
 import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.platform.backEventReceiver
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.state.KeyEventCollector
 import org.jetbrains.compose.resources.painterResource
 
@@ -33,6 +34,8 @@ fun main() {
 
     storageProvider = StorageProvider()
     roomDatabaseBuilder = getDatabaseBuilder()
+
+    SyncManager.schedule()
 
     CoroutineScope(Dispatchers.IO).launch {
         Updates.checkForUpdates()

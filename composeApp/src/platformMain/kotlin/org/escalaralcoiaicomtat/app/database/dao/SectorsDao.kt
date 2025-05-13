@@ -8,7 +8,7 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.database.entity.SectorEntity
 
 @Dao
-interface SectorsDao : BaseDao<Sector, SectorEntity> {
+interface SectorsDao : DataTypeDao<Sector, SectorEntity> {
     @Query("SELECT * FROM SectorEntity")
     override suspend fun all(): List<SectorEntity>
 

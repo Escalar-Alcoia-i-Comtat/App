@@ -30,8 +30,12 @@ data class Area(
         return displayName.compareTo(other.displayName)
     }
 
-    override fun copy(id: Long, timestamp: Long, displayName: String): Area {
+    override fun copy(id: Long, timestamp: Long): Area {
         return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
+    }
+
+    override fun copy(displayName: String): Area {
+        return copy(id = id, displayName = displayName)
     }
 
     override fun copy(image: Uuid): Area {

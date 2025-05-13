@@ -8,8 +8,9 @@ import org.escalaralcoiaicomtat.app.cache.storageProvider
 import org.escalaralcoiaicomtat.app.database.getDatabaseBuilder
 import org.escalaralcoiaicomtat.app.database.roomDatabaseBuilder
 import org.escalaralcoiaicomtat.app.initializeSentry
+import org.escalaralcoiaicomtat.app.sync.SyncManager
 
-class App: Application() {
+class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
@@ -26,5 +27,8 @@ class App: Application() {
 
         // Initialize the Room Database Builder
         roomDatabaseBuilder = getDatabaseBuilder(this)
+
+        // Schedule the sync workers
+        SyncManager.scheduleWorker()
     }
 }

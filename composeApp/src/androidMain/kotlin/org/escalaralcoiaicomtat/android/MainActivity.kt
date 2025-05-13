@@ -24,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.AppRoot
 import org.escalaralcoiaicomtat.app.platform.Updates
-import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.navigation.Destination
 import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
 import org.jetbrains.compose.resources.getString as getStringCMP
@@ -93,8 +92,6 @@ class MainActivity : AppCompatActivity() {
                 Updates.updateAvailable.tryEmit(true)
             }
         }
-
-        SyncManager.schedule()
     }
 
     override fun onResume() {

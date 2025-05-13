@@ -1,6 +1,7 @@
 package org.escalaralcoiaicomtat.app.database
 
 import org.escalaralcoiaicomtat.app.data.Area
+import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.DataType
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.data.Path
@@ -12,16 +13,18 @@ expect object DatabaseInterface {
     fun zones(): DataTypeInterface<Zone>
     fun sectors(): DataTypeInterface<Sector>
     fun paths(): DataTypeInterface<Path>
+
+    fun blocking(): EntityInterface<Blocking>
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <DT : DataType> DatabaseInterface.byType(type: DataTypes<DT>): DataTypeInterface<DT> =
+fun <DT : DataType> DatabaseInterface.byType(type: DataTypes<DT>): EntityInterface<DT> =
     when (type) {
         DataTypes.Area -> areas()
         DataTypes.Zone -> zones()
         DataTypes.Sector -> sectors()
         DataTypes.Path -> paths()
-    } as DataTypeInterface<DT>
+    } as EntityInterface<DT>
 
 /**
  * Should return the parent interface of this one, eg, the interface that fetches the parents
@@ -29,16 +32,16 @@ fun <DT : DataType> DatabaseInterface.byType(type: DataTypes<DT>): DataTypeInter
  *
  * If parents are not supported by the data type, [UnsupportedOperationException] shall be thrown.
  *
- * @param childType The type of the current [DataTypeInterface].
+ * @param childType The type of the current [EntityInterface].
  *
  * @return The interface that can fetch the [childType]'s parent.
  *
  * @throws UnsupportedOperationException If the [childType] doesn't have parents.
  */
 @Suppress("UnusedReceiverParameter")
-fun <DT : DataType> DataTypeInterface<DT>.parentInterface(
+fun <DT : DataType> EntityInterface<DT>.parentInterface(
     childType: DataTypes<DT>
-): DataTypeInterface<DataType> {
+): EntityInterface<DataType> {
     val int = when (childType) {
         DataTypes.Area -> throw UnsupportedOperationException()
         DataTypes.Zone -> DatabaseInterface.areas()
@@ -46,5 +49,5 @@ fun <DT : DataType> DataTypeInterface<DT>.parentInterface(
         DataTypes.Path -> DatabaseInterface.sectors()
     }
     @Suppress("UNCHECKED_CAST")
-    return int as DataTypeInterface<DataType>
+    return int as EntityInterface<DataType>
 }

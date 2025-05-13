@@ -6,7 +6,6 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -21,8 +20,6 @@ import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.Area
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.data.Path
@@ -32,8 +29,6 @@ import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.ConnectivityStatusObserver
 import org.escalaralcoiaicomtat.app.platform.Updates
-import org.escalaralcoiaicomtat.app.sync.DataSync
-import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.composition.LocalAnimatedContentScope
 import org.escalaralcoiaicomtat.app.ui.composition.LocalSharedTransitionScope
 import org.escalaralcoiaicomtat.app.ui.dialog.UpdateAvailableDialog
@@ -63,20 +58,6 @@ fun AppRoot(
     ConnectivityStatusObserver()
 
     val shownIntro = remember { settings.getBoolean(SettingsKeys.SHOWN_INTRO, false) }
-
-    LaunchedEffect(Unit) {
-        val lastSync = settings
-            .getLongOrNull(SettingsKeys.LAST_SYNC_TIME)
-            ?.let { Instant.fromEpochMilliseconds(it) }
-        val now = Clock.System.now()
-
-        // Synchronize if never synced, or every 12 hours
-        if (lastSync == null || (now - lastSync).inWholeHours > 12) {
-            SyncManager.run(DataSync.Cause.Scheduled)
-        } else {
-            Napier.d { "Won't run synchronization. Last run: ${(now - lastSync).inWholeHours} hours ago" }
-        }
-    }
 
     AppTheme {
         val updateAvailable by Updates.updateAvailable.collectAsState()

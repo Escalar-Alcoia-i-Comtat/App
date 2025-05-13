@@ -8,19 +8,47 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.AdminBackend
 import org.escalaralcoiaicomtat.app.network.BasicBackend
 import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
+import org.escalaralcoiaicomtat.app.sync.BlockingSync
 import org.escalaralcoiaicomtat.app.sync.DataSync
+import org.escalaralcoiaicomtat.app.sync.SyncProcess
 import org.escalaralcoiaicomtat.app.utils.IO
 
 @OptIn(ExperimentalSettingsApi::class)
 class SettingsModel : ViewModelBase() {
-    val lastSyncTime = settings.getLongOrNullFlow(SettingsKeys.LAST_SYNC_TIME)
-    val lastSyncCause = settings.getStringOrNullFlow(SettingsKeys.LAST_SYNC_CAUSE)
-    val syncStatus = DataSync.status
+    private val lastDataSyncTime = settings.getLongOrNullFlow(SettingsKeys.LAST_SYNC_TIME)
+        .map { epoch -> epoch?.let { Instant.fromEpochMilliseconds(it) } }
+    private val lastDataSyncCause = settings.getStringOrNullFlow(SettingsKeys.LAST_SYNC_CAUSE)
+        .map { cause -> cause?.let { SyncProcess.Cause.valueOf(it) } }
+    val lastDataSync = combine(lastDataSyncTime, lastDataSyncCause) { time, cause ->
+        if (time != null && cause != null) {
+            time to cause
+        } else {
+            null
+        }
+    }
+
+    private val lastBlockingSyncTime = settings.getLongOrNullFlow(SettingsKeys.LAST_BLOCK_SYNC_TIME)
+        .map { epoch -> epoch?.let { Instant.fromEpochMilliseconds(it) } }
+    private val lastBlockingSyncCause = settings.getStringOrNullFlow(SettingsKeys.LAST_BLOCK_SYNC_CAUSE)
+        .map { cause -> cause?.let { SyncProcess.Cause.valueOf(it) } }
+    val lastBlockingSync = combine(lastBlockingSyncTime, lastBlockingSyncCause) { time, cause ->
+        if (time != null && cause != null) {
+            time to cause
+        } else {
+            null
+        }
+    }
+
+    val dataSyncStatus = DataSync.status
+    val blockingSyncStatus = BlockingSync.status
 
     val apiKey = settings.getStringOrNullFlow(SettingsKeys.API_KEY)
 

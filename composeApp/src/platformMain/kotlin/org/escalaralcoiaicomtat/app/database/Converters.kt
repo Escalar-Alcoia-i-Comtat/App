@@ -2,8 +2,10 @@ package org.escalaralcoiaicomtat.app.database
 
 import androidx.room.TypeConverter
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import org.escalaralcoiaicomtat.app.data.generic.BlockingRecurrenceYearly
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
@@ -20,6 +22,16 @@ object Converters {
     @TypeConverter
     fun instantToTimestamp(instant: Instant?): Long? {
         return instant?.toEpochMilliseconds()
+    }
+
+    @TypeConverter
+    fun fromLocalDateTime(value: String?): LocalDateTime? {
+        return value?.let { LocalDateTime.parse(it) }
+    }
+
+    @TypeConverter
+    fun toLocalDateTime(localDateTime: LocalDateTime?): String? {
+        return localDateTime?.toString()
     }
 
 
@@ -41,6 +53,16 @@ object Converters {
     @TypeConverter
     fun toUuid(value: Uuid?): String? {
         return value?.toString()
+    }
+
+    @TypeConverter
+    fun fromBlockingRecurrenceYearly(value: String?): BlockingRecurrenceYearly? {
+        return value?.let { Json.decodeFromString(BlockingRecurrenceYearly.serializer(), it) }
+    }
+
+    @TypeConverter
+    fun toBlockingRecurrenceYearly(value: BlockingRecurrenceYearly?): String? {
+        return value?.let { Json.encodeToString(BlockingRecurrenceYearly.serializer(), it) }
     }
 
 
