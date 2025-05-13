@@ -1,9 +1,9 @@
 package org.escalaralcoiaicomtat.app.database.entity
 
 import kotlinx.datetime.Instant
-import org.escalaralcoiaicomtat.app.data.DataType
+import org.escalaralcoiaicomtat.app.data.Entity
 
-interface DatabaseEntity<Type: DataType> {
+interface DatabaseEntity<Type: Entity> {
     val id: Long
     val timestamp: Instant
 

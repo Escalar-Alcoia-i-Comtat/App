@@ -2,13 +2,13 @@ package org.escalaralcoiaicomtat.app.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import org.escalaralcoiaicomtat.app.data.Zone
-import org.escalaralcoiaicomtat.app.database.entity.ZoneEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
+import org.escalaralcoiaicomtat.app.data.Zone
+import org.escalaralcoiaicomtat.app.database.entity.ZoneEntity
 
 @Dao
-interface ZonesDao : BaseDao<Zone, ZoneEntity> {
+interface ZonesDao : DataTypeDao<Zone, ZoneEntity> {
     @Query("SELECT * FROM ZoneEntity")
     override suspend fun all(): List<ZoneEntity>
 

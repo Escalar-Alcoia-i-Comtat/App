@@ -8,7 +8,7 @@ import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.database.entity.PathEntity
 
 @Dao
-interface PathsDao : BaseDao<Path, PathEntity> {
+interface PathsDao : DataTypeDao<Path, PathEntity> {
     @Query("SELECT * FROM PathEntity")
     override suspend fun all(): List<PathEntity>
 

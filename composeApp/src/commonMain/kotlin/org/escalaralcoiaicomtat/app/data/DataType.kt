@@ -5,10 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface DataType : Comparable<DataType> {
-    val id: Long
-    val timestamp: Long
-
+sealed interface DataType : Entity, Comparable<DataType> {
     @SerialName("display_name")
     val displayName: String
 
@@ -16,9 +13,5 @@ sealed interface DataType : Comparable<DataType> {
 
     fun refreshTimestamp() = copy(timestamp = Clock.System.now().toEpochMilliseconds())
 
-    fun copy(
-        id: Long = this.id,
-        timestamp: Long = this.timestamp,
-        displayName: String = this.displayName
-    ): DataType
+    fun copy(displayName: String = this.displayName): DataType
 }

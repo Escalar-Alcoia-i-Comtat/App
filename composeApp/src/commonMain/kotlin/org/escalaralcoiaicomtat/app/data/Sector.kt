@@ -62,8 +62,12 @@ data class Sector(
         return super.hasAnyMetadata() || !tracks.isNullOrEmpty()
     }
 
-    override fun copy(id: Long, timestamp: Long, displayName: String): Sector {
-        return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
+    override fun copy(id: Long, timestamp: Long): Sector {
+        return copy(id = id, timestamp = timestamp, image = image)
+    }
+
+    override fun copy(displayName: String): Sector {
+        return copy(id = id, displayName = displayName)
     }
 
     override fun copy(image: Uuid): Sector {

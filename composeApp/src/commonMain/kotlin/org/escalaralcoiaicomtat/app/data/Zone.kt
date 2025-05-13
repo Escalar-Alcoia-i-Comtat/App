@@ -46,8 +46,12 @@ data class Zone(
         return super.hasAnyMetadata() || points.isNotEmpty()
     }
 
-    override fun copy(id: Long, timestamp: Long, displayName: String): Zone {
-        return copy(id = id, timestamp = timestamp, displayName = displayName, image = image)
+    override fun copy(id: Long, timestamp: Long): Zone {
+        return copy(id = id, timestamp = timestamp, image = image)
+    }
+
+    override fun copy(displayName: String): Zone {
+        return copy(id = id, displayName = displayName)
     }
 
     override fun copy(image: Uuid): Zone {

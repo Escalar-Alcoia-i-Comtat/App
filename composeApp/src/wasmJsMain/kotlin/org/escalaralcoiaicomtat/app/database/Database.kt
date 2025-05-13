@@ -6,7 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.builtins.ListSerializer
-import org.escalaralcoiaicomtat.app.data.DataType
+import org.escalaralcoiaicomtat.app.data.Entity
 import org.escalaralcoiaicomtat.app.database.indexeddb.IDBDatabase
 import org.escalaralcoiaicomtat.app.database.indexeddb.IDBKey
 import org.escalaralcoiaicomtat.app.database.indexeddb.IDBObjectStore
@@ -23,7 +23,7 @@ import kotlin.js.Promise
 
 object Database {
     private const val DATABASE_NAME = "escalar-alcoia-i-comtat"
-    private const val DATABASE_VERSION = 1
+    private const val DATABASE_VERSION = 2
 
     private lateinit var db: IDBDatabase
 
@@ -71,9 +71,9 @@ object Database {
         for (int in interfaces) createObjectStore(database, int)
     }
 
-    private fun <T : DataType> createObjectStore(
+    private fun <T : Entity> createObjectStore(
         database: IDBDatabase,
-        int: DatabaseDataTypeInterface<T>
+        int: DatabaseEntityInterface<T>
     ) {
         Napier.d { "Creating Object Store for ${int.objectStoreName}" }
         try {
@@ -89,8 +89,8 @@ object Database {
         }
     }
 
-    suspend fun <R, T: DataType> transaction(
-        ddti: DatabaseDataTypeInterface<T>,
+    suspend fun <R, T: Entity> transaction(
+        ddti: DatabaseEntityInterface<T>,
         isWrite: Boolean = false,
         block: suspend TransactionContext<T>.() -> R
     ): R {
@@ -148,9 +148,9 @@ object Database {
         for (item in list) item()
     }
 
-    class TransactionContext<T : DataType>(
+    class TransactionContext<T : Entity>(
         val store: IDBObjectStore,
-        val ddti: DatabaseDataTypeInterface<T>
+        val ddti: DatabaseEntityInterface<T>
     )
 
     private suspend fun <R : JsAny?> IDBObjectStore.request(
@@ -180,7 +180,7 @@ object Database {
         }
     }
 
-    suspend fun <T: DataType> TransactionContext<T>.get(id: Long): T? {
+    suspend fun <T: Entity> TransactionContext<T>.get(id: Long): T? {
         val jsonObject = store.request {
             val key = IDBKey(id.toInt())
             store.get(key)
@@ -189,7 +189,7 @@ object Database {
         return json.decodeFromString(ddti.serializer, jsonObject.toString())
     }
 
-    fun <T : DataType> TransactionContext<T>.insertAll(data: List<T>) {
+    fun <T : Entity> TransactionContext<T>.insertAll(data: List<T>) {
         store.requestBatch(data) { item ->
             val jsonString = json.encodeToString(ddti.serializer, item)
             val obj: JsAny = jsonParse(jsonString)
@@ -197,7 +197,7 @@ object Database {
         }
     }
 
-    fun <T : DataType> TransactionContext<T>.updateAll(data: List<T>) {
+    fun <T : Entity> TransactionContext<T>.updateAll(data: List<T>) {
         store.requestBatch(data) { item ->
             val jsonString = json.encodeToString(ddti.serializer, item)
             val obj: JsAny = jsonParse(jsonString)
@@ -205,19 +205,19 @@ object Database {
         }
     }
 
-    fun <T : DataType> TransactionContext<T>.deleteAll(ids: List<Long>) {
+    fun <T : Entity> TransactionContext<T>.deleteAll(ids: List<Long>) {
         store.requestBatch(ids) { id ->
             val key = IDBKey(id.toInt())
             delete(key)
         }
     }
 
-    suspend fun <T : DataType> TransactionContext<T>.all(): List<T> {
+    suspend fun <T : Entity> TransactionContext<T>.all(): List<T> {
         val jsonArray = store.request { getAll() }?.toString() ?: "[]"
         return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)
     }
 
-    suspend fun <T : DataType> TransactionContext<T>.allByIndex(parentId: Long): List<T> {
+    suspend fun <T : Entity> TransactionContext<T>.allByIndex(parentId: Long): List<T> {
         val key = IDBKey(parentId.toInt())
         val jsonArray = store.request { index(ddti.parentKeyIndexName()).getAll(key) }?.toString() ?: "[]"
         return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)

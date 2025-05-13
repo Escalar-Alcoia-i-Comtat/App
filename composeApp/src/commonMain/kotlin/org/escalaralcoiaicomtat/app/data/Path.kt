@@ -72,8 +72,12 @@ data class Path(
 
     override val parentId: Long get() = parentSectorId
 
-    override fun copy(id: Long, timestamp: Long, displayName: String): Path {
-        return copy(id = id, timestamp = timestamp, displayName = displayName, sketchId = sketchId)
+    override fun copy(id: Long, timestamp: Long): Path {
+        return copy(id = id, timestamp = timestamp, sketchId = sketchId)
+    }
+
+    override fun copy(displayName: String): Path {
+        return copy(id = id, displayName = displayName)
     }
 
     override fun copy(parentId: Long): Path {
