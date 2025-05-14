@@ -22,6 +22,7 @@ class PushMessagingService: FirebaseMessagingService() {
         private const val TYPE_ZONE = "ZONE"
         private const val TYPE_SECTOR = "SECTOR"
         private const val TYPE_PATH = "PATH"
+        private const val TYPE_BLOCKING = "BLOCKING"
     }
 
     override fun onCreate() {
@@ -44,7 +45,7 @@ class PushMessagingService: FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         val data = message.data
-        val type = data[DATA_TYPE] ?: return
+        val type = data[DATA_TYPE]
         val idStr = data[DATA_ID] ?: return
         val id = idStr.toIntOrNull() ?: return
         val dataType = when (type) {
@@ -52,6 +53,12 @@ class PushMessagingService: FirebaseMessagingService() {
             TYPE_ZONE -> DataTypes.Zone
             TYPE_SECTOR -> DataTypes.Sector
             TYPE_PATH -> DataTypes.Path
+            TYPE_BLOCKING -> {
+                Napier.i { "Scheduling sync for blocking ($id)..." }
+                SyncManager.runBlockingSync(Cause.Push, id)
+                return
+            }
+            null -> return
             else -> return Napier.e { "Received a push notification with an unknown type: $type" }
         }
         Napier.i { "Scheduling sync for $dataType..." }
