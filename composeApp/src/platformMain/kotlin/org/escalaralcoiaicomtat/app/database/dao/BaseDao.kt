@@ -23,6 +23,8 @@ interface BaseDao<Type: AppEntity, Entity: DatabaseEntity<Type>> {
 
     suspend fun all(): List<Entity>
 
+    suspend fun count(): Int
+
     fun allLive(): Flow<List<Entity>>
 
     suspend fun get(id: Long): Entity?
@@ -48,6 +50,8 @@ interface BaseDao<Type: AppEntity, Entity: DatabaseEntity<Type>> {
         }
 
         override suspend fun all(): List<Type> = dao.all().map { it.convert() }
+
+        override suspend fun count(): Int = dao.count()
 
         override fun allLive(): Flow<List<Type>> = dao.allLive().map { list ->
             list.map { it.convert() }

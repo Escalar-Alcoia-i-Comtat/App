@@ -77,6 +77,11 @@
     <string name="settings_category_server_info">Server Information</string>
     <string name="settings_server_info_uuid_title">Server UUID</string>
     <string name="settings_server_info_update_title">Last Update</string>
+    <string name="settings_server_info_stats_title">Statistics</string>
+    <string name="settings_server_info_stats_areas">Areas: %1$d</string>
+    <string name="settings_server_info_stats_zones">Zones: %1$d</string>
+    <string name="settings_server_info_stats_sectors">Sectors: %1$d</string>
+    <string name="settings_server_info_stats_paths">Paths: %1$d</string>
 
     <string name="settings_category_storage">Storage</string>
     <string name="settings_storage_images">Images Cache Size</string>

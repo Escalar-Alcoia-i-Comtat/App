@@ -219,6 +219,11 @@ object Database {
         return json.decodeFromString(ListSerializer(ddti.serializer), jsonArray)
     }
 
+    suspend fun <T : Entity> TransactionContext<T>.count(): Int {
+        val number = store.request { count() }?.toString() ?: "0"
+        return number.toInt()
+    }
+
     suspend fun <T : Entity> TransactionContext<T>.allByIndex(parentId: Long): List<T> {
         val key = IDBKey(parentId.toInt())
         val jsonArray =

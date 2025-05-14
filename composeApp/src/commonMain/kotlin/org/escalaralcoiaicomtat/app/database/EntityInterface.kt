@@ -13,6 +13,8 @@ interface EntityInterface<Type : Entity> {
 
     suspend fun all(): List<Type>
 
+    suspend fun count(): Int
+
     fun allLive(): Flow<List<Type>>
 
     suspend fun get(id: Long): Type?
