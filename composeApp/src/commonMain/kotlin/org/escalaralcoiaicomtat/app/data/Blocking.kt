@@ -10,6 +10,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.escalaralcoiaicomtat.app.data.generic.BlockingRecurrenceYearly
 import org.escalaralcoiaicomtat.app.data.generic.BlockingTypes
+import org.escalaralcoiaicomtat.app.network.request.AddBlockRequest
 
 @Serializable
 data class Blocking(
@@ -48,5 +49,9 @@ data class Blocking(
             }
             else -> true
         }
+    }
+
+    fun asAddBlockRequest(): AddBlockRequest {
+        return AddBlockRequest(type, recurrence, endDate)
     }
 }

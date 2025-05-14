@@ -32,12 +32,14 @@ import org.jetbrains.compose.resources.stringResource
 fun EditBlockingDialog(
     blocking: Blocking,
     onBlockingChange: (Blocking) -> Unit,
+    isLoading: Boolean,
     onDeleteRequested: () -> Unit,
+    onSaveRequested: () -> Unit,
     onDismissRequested: () -> Unit,
 ) {
     val isEdit = blocking.id > 0
     AlertDialog(
-        onDismissRequest = onDismissRequested,
+        onDismissRequest = { if (!isLoading) onDismissRequested() },
         title = {
             Text(
                 text = stringResource(
@@ -58,6 +60,7 @@ fun EditBlockingDialog(
                     modifier = Modifier.fillMaxWidth(),
                     toString = { stringResource(it.displayName) },
                     icon = { it.icon },
+                    enabled = !isLoading,
                 )
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                     SegmentedButton(
@@ -78,7 +81,8 @@ fun EditBlockingDialog(
                                     )
                                 }
                             )
-                        }
+                        },
+                        enabled = !isLoading,
                     ) { Text(stringResource(Res.string.editor_blocking_end_date)) }
                     SegmentedButton(
                         selected = blocking.recurrence != null,
@@ -97,7 +101,8 @@ fun EditBlockingDialog(
                                     )
                                 }
                             )
-                        }
+                        },
+                        enabled = !isLoading,
                     ) { Text(stringResource(Res.string.editor_blocking_recurrence)) }
                     SegmentedButton(
                         selected = blocking.endDate == null && blocking.recurrence == null,
@@ -109,7 +114,8 @@ fun EditBlockingDialog(
                                     recurrence = null,
                                 )
                             )
-                        }
+                        },
+                        enabled = !isLoading,
                     ) { Text(stringResource(Res.string.editor_blocking_forever)) }
                 }
                 blocking.endDate?.let { endDate ->
@@ -124,6 +130,7 @@ fun EditBlockingDialog(
                         modifier = Modifier.fillMaxWidth(),
                         // Only allow future dates
                         selectableDates = futureSelectableDates(),
+                        enabled = !isLoading,
                     )
                 }
                 blocking.recurrence?.let { recurrence ->
@@ -148,13 +155,15 @@ fun EditBlockingDialog(
                         modifier = Modifier.fillMaxWidth(),
                         // Only allow future dates
                         selectableDates = futureSelectableDates(),
+                        enabled = !isLoading,
                     )
                 }
             }
         },
         confirmButton = {
             TextButton(
-                onClick = onDeleteRequested,
+                onClick = onSaveRequested,
+                enabled = !isLoading,
             ) {
                 Text(stringResource(Res.string.action_save))
             }
@@ -163,6 +172,7 @@ fun EditBlockingDialog(
             {
                 TextButton(
                     onClick = onDeleteRequested,
+                    enabled = !isLoading,
                 ) {
                     Text(stringResource(Res.string.editor_delete))
                 }

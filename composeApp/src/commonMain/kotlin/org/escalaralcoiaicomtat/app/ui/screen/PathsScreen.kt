@@ -133,6 +133,7 @@ fun PathsScreen(
     val blocks by viewModel.blocks.collectAsState()
     val selectedPath by viewModel.displayingChild.collectAsState()
     val editingBlocking by viewModel.editingBlocking.collectAsState()
+    val isLoadingBlockingEdit by viewModel.isLoadingBlockingEdit.collectAsState()
 
     LaunchedEffect(sectorId) {
         viewModel.load(sectorId) {
@@ -150,6 +151,9 @@ fun PathsScreen(
         selectedPath = selectedPath,
         highlightPathId = highlightPathId,
         editingBlocking = editingBlocking,
+        isLoadingBlockingEdit = isLoadingBlockingEdit,
+        onBlockingDeleteRequested = viewModel::deleteBlocking,
+        onBlockingSaveRequested = viewModel::saveBlocking,
         onBackRequested = onBackRequested,
         onEditSectorRequested = onEditSectorRequested,
         onEditPathRequested = onEditPathRequested,
@@ -169,6 +173,9 @@ private fun PathsScreen(
     selectedPath: Path?,
     highlightPathId: Long?,
     editingBlocking: Blocking?,
+    isLoadingBlockingEdit: Boolean,
+    onBlockingDeleteRequested: () -> Unit,
+    onBlockingSaveRequested: () -> Unit,
     onBackRequested: () -> Unit,
     onEditSectorRequested: (() -> Unit)?,
     onEditPathRequested: ((Path) -> Unit)?,
@@ -186,7 +193,9 @@ private fun PathsScreen(
         EditBlockingDialog(
             blocking = it,
             onBlockingChange = onEditBlockingRequested ?: {},
-            onDeleteRequested = { /*TODO*/ },
+            isLoading = isLoadingBlockingEdit,
+            onDeleteRequested = onBlockingDeleteRequested,
+            onSaveRequested = onBlockingSaveRequested,
             onDismissRequested = onEditBlockingStopRequested,
         )
     }

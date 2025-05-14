@@ -10,6 +10,7 @@ import io.ktor.http.appendPathSegments
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import org.escalaralcoiaicomtat.app.data.Area
+import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.DataType
 import org.escalaralcoiaicomtat.app.data.DataTypeWithGPX
 import org.escalaralcoiaicomtat.app.data.DataTypeWithImage
@@ -30,8 +31,11 @@ import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.byType
 import org.escalaralcoiaicomtat.app.database.parentInterface
 import org.escalaralcoiaicomtat.app.database.settings
+import org.escalaralcoiaicomtat.app.network.request.AddBlockRequest
 import org.escalaralcoiaicomtat.app.network.response.data.DataResponseType
 import org.escalaralcoiaicomtat.app.network.response.data.UpdateResponseData
+import org.escalaralcoiaicomtat.app.sync.BlockingSync
+import org.escalaralcoiaicomtat.app.sync.SyncProcess
 import org.escalaralcoiaicomtat.app.utils.append
 import org.escalaralcoiaicomtat.app.utils.appendOrRemove
 import org.escalaralcoiaicomtat.app.utils.appendSerializable
@@ -374,5 +378,71 @@ object AdminBackend : Backend() {
         path: Path,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
     ): Path = create(path, DataTypes.Path, Path.serializer(), progress)
+
+
+    suspend fun create(
+        blocking: Blocking,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ) {
+        require(blocking.id <= 0) { "Blocking has an id. It must not exist yet to be created." }
+
+        val token = settings.getStringOrNull(SettingsKeys.API_KEY)
+        checkNotNull(token) { "There isn't any stored token." }
+
+        post(
+            blocking.asAddBlockRequest(),
+            AddBlockRequest.serializer(),
+            UpdateResponseData.serializer(Blocking.serializer()),
+            "block", blocking.pathId,
+            progress = progress,
+            requestBuilder = {
+                bearerAuth(token)
+            },
+        )
+
+        BlockingSync.start(SyncProcess.Cause.Edit, blocking.pathId.toInt())
+    }
+
+    suspend fun patch(
+        blocking: Blocking,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+    ) {
+        require(blocking.id > 0) { "Blocking doesn't have an id. It must exist to be patched." }
+
+        val token = settings.getStringOrNull(SettingsKeys.API_KEY)
+        checkNotNull(token) { "There isn't any stored token." }
+
+        patch(
+            blocking.asAddBlockRequest(),
+            AddBlockRequest.serializer(),
+            UpdateResponseData.serializer(Blocking.serializer()),
+            "block", blocking.id,
+            progress = progress,
+            requestBuilder = {
+                bearerAuth(token)
+            },
+        )
+
+        BlockingSync.start(SyncProcess.Cause.Edit, blocking.pathId.toInt())
+    }
+
+    suspend fun delete(blocking: Blocking) {
+        val token = settings.getStringOrNull(SettingsKeys.API_KEY)
+        checkNotNull(token) { "There isn't any stored token." }
+
+        val int = DatabaseInterface.blocking()
+        val stored = int.get(blocking.id)
+        requireNotNull(stored) { "Could not find the blocking#$blocking.id in the database." }
+
+        delete(
+            DataResponseType.serializer(),
+            "block", blocking.id,
+            requestBuilder = {
+                bearerAuth(token)
+            },
+        )
+
+        int.delete(listOf(stored))
+    }
 
 }

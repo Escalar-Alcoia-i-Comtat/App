@@ -18,7 +18,7 @@ abstract class SyncProcess {
     }
 
     enum class Cause {
-        Push, Scheduled, Manual
+        Push, Scheduled, Manual, Edit
     }
 
     sealed class Status {
