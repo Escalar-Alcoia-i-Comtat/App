@@ -21,6 +21,9 @@ interface PathsDao : DataTypeDao<Path, PathEntity> {
     @Query("SELECT * FROM PathEntity WHERE id = :id")
     override suspend fun get(id: Long): PathEntity?
 
+    @Query("SELECT COUNT(id) FROM PathEntity")
+    override suspend fun count(): Int
+
     override suspend fun getByParentId(parentId: Long): List<PathEntity> = findBySectorId(parentId.toLong())
 
     override fun constructor(type: Path): PathEntity {

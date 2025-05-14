@@ -22,6 +22,9 @@ interface BlockingDao : BaseDao<Blocking, BlockingEntity> {
     @Query("SELECT * FROM BlockingEntity WHERE id = :id")
     override suspend fun get(id: Long): BlockingEntity?
 
+    @Query("SELECT COUNT(id) FROM BlockingEntity")
+    override suspend fun count(): Int
+
     override fun constructor(type: Blocking): BlockingEntity = BlockingEntity(type)
 
     override fun asInterface(): BlockingInterface = BlockingInterfaceImpl(this)

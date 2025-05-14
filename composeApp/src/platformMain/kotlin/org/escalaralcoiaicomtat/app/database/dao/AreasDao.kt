@@ -18,6 +18,9 @@ interface AreasDao : DataTypeDao<Area, AreaEntity> {
     @Query("SELECT * FROM AreaEntity WHERE id = :id")
     override suspend fun get(id: Long): AreaEntity?
 
+    @Query("SELECT COUNT(id) FROM AreaEntity")
+    override suspend fun count(): Int
+
     override suspend fun getByParentId(parentId: Long): List<AreaEntity> {
         throw UnsupportedOperationException("Areas do not have parents.")
     }

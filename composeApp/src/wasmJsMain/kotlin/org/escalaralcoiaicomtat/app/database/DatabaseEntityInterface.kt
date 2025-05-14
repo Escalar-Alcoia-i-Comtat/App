@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.serialization.KSerializer
 import org.escalaralcoiaicomtat.app.data.Entity
 import org.escalaralcoiaicomtat.app.database.Database.all
+import org.escalaralcoiaicomtat.app.database.Database.count
 import org.escalaralcoiaicomtat.app.database.Database.deleteAll
 import org.escalaralcoiaicomtat.app.database.Database.get
 import org.escalaralcoiaicomtat.app.database.Database.insertAll
@@ -63,6 +64,8 @@ open class DatabaseEntityInterface<T : Entity>(
     }
 
     override suspend fun all(): List<T> = transaction { all() }
+
+    override suspend fun count(): Int = transaction { count() }
 
     override fun allLive(): Flow<List<T>> = allFlow()
 

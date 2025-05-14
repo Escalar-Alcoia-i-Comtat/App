@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Sync
@@ -81,6 +82,7 @@ fun SettingsPage(
     val lastBlockingSync by model.lastBlockingSync.collectAsState(null)
     val blockingSyncStatus by model.blockingSyncStatus.collectAsState()
     val serverInfo by model.serverInfo.collectAsState()
+    val serverStats by model.serverStats.collectAsState()
     val apiKey by model.apiKey.collectAsState(null)
 
     LaunchedEffect(Unit) { model.load() }
@@ -93,6 +95,7 @@ fun SettingsPage(
         blockingSyncStatus = blockingSyncStatus,
         apiKey = apiKey,
         serverInfo = serverInfo,
+        serverStats = serverStats,
         onLockRequest = model::lock,
         onUnlockRequest = model::unlock,
         distanceUnits = units,
@@ -110,6 +113,7 @@ fun SettingsPage(
     blockingSyncStatus: SyncProcess.Status?,
     apiKey: String?,
     serverInfo: ServerInfoResponseData?,
+    serverStats: SettingsModel.ServerStats?,
     onLockRequest: (onLock: () -> Unit) -> Unit,
     onUnlockRequest: (apiKey: String, onUnlock: () -> Unit) -> Unit,
     distanceUnits: DistanceUnits,
@@ -267,6 +271,47 @@ fun SettingsPage(
                 onClick = onIntroRequested,
             )
 
+            var showServerInfoStatsDialog by remember { mutableStateOf(false) }
+            if (showServerInfoStatsDialog) {
+                AlertDialog(
+                    onDismissRequest = { showServerInfoStatsDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = { showServerInfoStatsDialog = false }) {
+                            Text(stringResource(Res.string.action_close))
+                        }
+                    },
+                    title = { Text(stringResource(Res.string.settings_server_info_stats_title)) },
+                    text = {
+                        Column {
+                            Text(
+                                text = stringResource(
+                                    Res.string.settings_server_info_stats_areas,
+                                    serverStats?.areasCount ?: 0
+                                )
+                            )
+                            Text(
+                                text = stringResource(
+                                    Res.string.settings_server_info_stats_zones,
+                                    serverStats?.zonesCount ?: 0
+                                )
+                            )
+                            Text(
+                                text = stringResource(
+                                    Res.string.settings_server_info_stats_sectors,
+                                    serverStats?.sectorsCount ?: 0
+                                )
+                            )
+                            Text(
+                                text = stringResource(
+                                    Res.string.settings_server_info_stats_paths,
+                                    serverStats?.pathsCount ?: 0
+                                )
+                            )
+                        }
+                    },
+                )
+            }
+
             Spacer(Modifier.height(16.dp))
             SettingsCategory(
                 text = stringResource(Res.string.settings_category_server_info)
@@ -283,6 +328,13 @@ fun SettingsPage(
                     ?.let(Instant::fromEpochSeconds)
                     ?.let(::instantToString) ?: stringResource(Res.string.status_loading),
                 icon = Icons.Default.Event,
+            )
+            HorizontalDivider()
+            SettingsRow(
+                headline = stringResource(Res.string.settings_category_server_info),
+                summary = stringResource(Res.string.settings_links_tap),
+                icon = Icons.AutoMirrored.Filled.ShowChart,
+                onClick = { showServerInfoStatsDialog = true },
             )
 
             Spacer(Modifier.height(16.dp))

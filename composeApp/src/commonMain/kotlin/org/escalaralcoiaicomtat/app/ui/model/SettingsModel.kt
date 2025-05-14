@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
+import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.AdminBackend
@@ -55,6 +56,9 @@ class SettingsModel : ViewModelBase() {
     private val _serverInfo = MutableStateFlow<ServerInfoResponseData?>(null)
     val serverInfo: StateFlow<ServerInfoResponseData?> get() = _serverInfo.asStateFlow()
 
+    private val _serverStats = MutableStateFlow<ServerStats?>(null)
+    val serverStats: StateFlow<ServerStats?> get() = _serverStats.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
 
@@ -62,6 +66,15 @@ class SettingsModel : ViewModelBase() {
         launch(Dispatchers.IO) {
             val response = BasicBackend.serverInfo()
             _serverInfo.emit(response)
+
+            _serverStats.emit(
+                ServerStats(
+                    DatabaseInterface.areas().count(),
+                    DatabaseInterface.zones().count(),
+                    DatabaseInterface.sectors().count(),
+                    DatabaseInterface.paths().count(),
+                )
+            )
         }
     }
 
@@ -97,4 +110,11 @@ class SettingsModel : ViewModelBase() {
         settings.remove(SettingsKeys.SHOWN_INTRO)
         onNavigateToIntroRequested()
     }
+
+    data class ServerStats(
+        val areasCount: Int,
+        val zonesCount: Int,
+        val sectorsCount: Int,
+        val pathsCount: Int,
+    )
 }
