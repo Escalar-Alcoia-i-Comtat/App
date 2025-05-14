@@ -47,7 +47,7 @@
     <string name="settings_admin_lock_lock_description">¿Quieres bloquear el acceso de administrador?</string>
     <string name="settings_admin_lock_api_key">Clave API</string>
     <string name="settings_category_app_info">Información de la aplicación</string>
-    <string name="settings_app_info_last_sync_title">Datos Sincronizados</string>
+    <string name="settings_app_info_last_sync_title">Sincronización de Datos</string>
     <string name="settings_app_info_last_sync_never">No sincronizado nunca</string>
     <string name="settings_app_info_last_sync_no_cause">Última sincronización: %1$s</string>
     <string name="settings_app_info_last_sync_message">Última sincronización: %1$s. Causa: %2$s</string>
@@ -237,4 +237,14 @@
     <string name="settings_server_info_uuid_title">UUID del Servidor</string>
     <string name="settings_server_info_update_title">Última Actualización</string>
     <string name="map_title">Mapa</string>
+    <string name="path_blocking_title">Atención</string>
+    <string name="path_blocking_dry_message">Esta vía acaba de ser equipada, y los seguros se están secando. Por favor, espera antes de escalarla.</string>
+    <string name="path_blocking_build_message">Esta vía está siendo equipada o reequipada.</string>
+    <string name="path_blocking_bird_message">Esta vía tiene un nido cerca. La escalada está prohibida.</string>
+    <string name="path_blocking_old_message">Esta vía es muy vieja, y no está mantenida. Por favor, ten precaución al escalarla, pueden caer piedras, o haber seguros sueltos.</string>
+    <string name="path_blocking_rope_message">Esta vía es muy larga, ve con cuidado con la longitud de la cuerda que uses.</string>
+    <string name="path_blocking_recurrent">Todos los años desde %1$s hasta %2$s.</string>
+    <string name="path_blocking_date">Acaba el %1$s.</string>
+    <string name="settings_app_info_blocking_last_sync_title">Sincronización de Alertas</string>
+    <string name="path_blocking_plants_message">Esta vía no tiene mantenimiento, y puede tener plantas, tierra o raíces en el recorrido.</string>
 </resources>
