@@ -243,8 +243,22 @@
     <string name="path_blocking_build_message">Aquesta via està sent equipada o reequipada.</string>
     <string name="path_blocking_bird_message">Aquesta via té un niu prop. Està prohibida la seua escalada.</string>
     <string name="path_blocking_plants_message">Aquesta via no té molt de manteniment i pot tindre plantes, terra i o arrels pel camí.</string>
-    <string name="path_blocking_rope_message">Aquesta via és molt llarga, ves amb cura amb la corda que fas servir.</string>
+    <string name="path_blocking_rope_message">Longitud de Corda</string>
     <string name="path_blocking_recurrent">Tots els anys des de %1$s fins a %2$s.</string>
     <string name="path_blocking_date">Acaba el %1$s.</string>
     <string name="path_blocking_old_message">Aquesta via és molt antiga, i no està mantinguda. Per favor, ves amb cura a l\'escalar-la, poden caure pedres, o haver segurs solts.</string>
+    <string name="path_blocking_dry_display_name">Assecant</string>
+    <string name="path_blocking_build_display_name">Equipant/Reequipant</string>
+    <string name="path_blocking_bird_display_name">Nidificació</string>
+    <string name="path_blocking_old_display_name">Vella</string>
+    <string name="path_blocking_plants_display_name">Plantes</string>
+    <string name="path_blocking_rope_display_name">Via llarga</string>
+    <string name="path_blocking_create">Crea una nova alerta</string>
+    <string name="editor_blocking_create_title">Crea una nova alerta</string>
+    <string name="editor_blocking_edit_title">Edita una alerta existent</string>
+    <string name="editor_blocking_type">Tipus de bloqueig</string>
+    <string name="editor_blocking_end_date">Data de fi</string>
+    <string name="editor_blocking_recurrence">Recurrència</string>
+    <string name="editor_blocking_forever">Per sempre</string>
+    <string name="editor_blocking_date_range">Rang de dates</string>
 </resources>
