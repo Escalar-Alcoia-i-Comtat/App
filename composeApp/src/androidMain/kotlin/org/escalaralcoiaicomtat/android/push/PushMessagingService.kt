@@ -6,8 +6,8 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.firebase.messaging.ktx.messaging
 import io.github.aakira.napier.Napier
 import org.escalaralcoiaicomtat.app.data.DataTypes
-import org.escalaralcoiaicomtat.app.sync.DataSync
 import org.escalaralcoiaicomtat.app.sync.SyncManager
+import org.escalaralcoiaicomtat.app.sync.SyncProcess.Cause
 
 class PushMessagingService: FirebaseMessagingService() {
     companion object {
@@ -55,6 +55,6 @@ class PushMessagingService: FirebaseMessagingService() {
             else -> return Napier.e { "Received a push notification with an unknown type: $type" }
         }
         Napier.i { "Scheduling sync for $dataType..." }
-        SyncManager.run(DataSync.Cause.Push, dataType to id)
+        SyncManager.run(Cause.Push, dataType to id)
     }
 }
