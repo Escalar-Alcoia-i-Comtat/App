@@ -550,10 +550,30 @@ private fun BottomSheetContents(
             MetaCard(
                 icon = blocking.type.icon,
                 text = stringResource(Res.string.path_blocking_title),
-                message = "Type: ${blocking.type.name}",
+                message = StringBuilder().apply {
+                    appendLine(stringResource(blocking.type.message))
+                    blocking.endDate?.let { endDate ->
+                        append(
+                            stringResource(Res.string.path_blocking_date, endDate.toString())
+                        )
+                    }
+                    blocking.recurrence?.let { recurrence ->
+                        append(
+                            stringResource(
+                                Res.string.path_blocking_recurrent,
+                                recurrence.from(),
+                                recurrence.to(),
+                            )
+                        )
+                    }
+                }.toString(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp)
+                    .padding(vertical = 4.dp),
+                colors = CardDefaults.outlinedCardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
             )
         }
         child.height?.let { height ->

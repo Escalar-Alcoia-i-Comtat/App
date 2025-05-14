@@ -18,9 +18,11 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
     override suspend fun loadData(id: Long, onNotFound: () -> Unit) {
         super.loadData(id, onNotFound)
 
-        val blocks = originalChildren.orEmpty().flatMap { path ->
-            DatabaseInterface.blocking().getByPathId(path.id)
-        }
+        val blocks = originalChildren.orEmpty()
+            .flatMap { path ->
+                DatabaseInterface.blocking().getByPathId(path.id)
+            }
+            .filter { it.isActive() }
         _blocks.emit(blocks)
     }
 }
