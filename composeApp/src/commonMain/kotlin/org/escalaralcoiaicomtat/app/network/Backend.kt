@@ -6,22 +6,29 @@ import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.onDownload
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.delete
 import io.ktor.client.request.forms.FormBuilder
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
+import io.ktor.http.ContentType
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.http.content.PartData
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.charsets.Charsets
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationStrategy
 import org.escalaralcoiaicomtat.app.exception.ServerException
 import org.escalaralcoiaicomtat.app.json
 import org.escalaralcoiaicomtat.app.network.response.DataResponse
@@ -224,8 +231,8 @@ abstract class Backend {
             formData = formData,
         ) {
             requestBuilder()
-            onDownload { bytesSentTotal, contentLength ->
-                contentLength ?: return@onDownload
+            onUpload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onUpload
                 length = contentLength
                 progress?.invoke(bytesSentTotal, contentLength)
             }
@@ -263,6 +270,53 @@ abstract class Backend {
                 .also { Napier.v("PATCH :: $it") },
         ) {
             requestBuilder()
+            onUpload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onUpload
+                length = contentLength
+                progress?.invoke(bytesSentTotal, contentLength)
+            }
+        }
+        progress?.invoke(length, length)
+        decodeBody(response, serializer, false)
+    }
+
+    /**
+     * Makes a POST request to the endpoint defined by the path components given.
+     *
+     * @param data The data to be sent on the body of the request.
+     * @param requestSerializer The serializer to be used for serializing [data].
+     * @param responseDeserializer The serializer to use for the response.
+     * @param pathComponents The components of the path to request. If not [String], will be
+     * converted into one automatically using the class's `toString` function.
+     * @param progress If not null, will be called with the progress of the request.
+     *
+     * @return The response given by the server, of the type desired.
+     *
+     * @throws ServerException If the server responded with an exception, or the body of the body of
+     * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
+     */
+    protected suspend fun <RT, DT: DataResponseType> post(
+        data: RT,
+        requestSerializer: SerializationStrategy<RT>,
+        responseDeserializer: DeserializationStrategy<DT>,
+        vararg pathComponents: Any,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+        requestBuilder: HttpRequestBuilder.() -> Unit = {}
+    ) {
+        var length: Long = 0
+        progress?.invoke(0, length)
+        val response = client.post(
+            url = URLBuilder(baseUrl)
+                .appendPathSegments(pathComponents.map { it.toString() })
+                .build()
+                .also { Napier.v("PATCH :: $it") },
+        ) {
+            contentType(ContentType.Application.Json)
+            setBody(json.encodeToString(requestSerializer, data))
+
+            requestBuilder()
+
             onDownload { bytesSentTotal, contentLength ->
                 contentLength ?: return@onDownload
                 length = contentLength
@@ -270,6 +324,53 @@ abstract class Backend {
             }
         }
         progress?.invoke(length, length)
-        decodeBody(response, serializer, false)
+        decodeBody(response, responseDeserializer, false)
+    }
+
+    /**
+     * Makes a PATCH request to the endpoint defined by the path components given.
+     *
+     * @param data The data to be sent on the body of the request.
+     * @param requestSerializer The serializer to be used for serializing [data].
+     * @param responseDeserializer The serializer to use for the response.
+     * @param pathComponents The components of the path to request. If not [String], will be
+     * converted into one automatically using the class's `toString` function.
+     * @param progress If not null, will be called with the progress of the request.
+     *
+     * @return The response given by the server, of the type desired.
+     *
+     * @throws ServerException If the server responded with an exception, or the body of the body of
+     * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
+     */
+    protected suspend fun <RT, DT: DataResponseType> patch(
+        data: RT,
+        requestSerializer: SerializationStrategy<RT>,
+        responseDeserializer: DeserializationStrategy<DT>,
+        vararg pathComponents: Any,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+        requestBuilder: HttpRequestBuilder.() -> Unit = {}
+    ) {
+        var length: Long = 0
+        progress?.invoke(0, length)
+        val response = client.patch(
+            url = URLBuilder(baseUrl)
+                .appendPathSegments(pathComponents.map { it.toString() })
+                .build()
+                .also { Napier.v("PATCH :: $it") },
+        ) {
+            contentType(ContentType.Application.Json)
+            setBody(json.encodeToString(requestSerializer, data))
+
+            requestBuilder()
+
+            onDownload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onDownload
+                length = contentLength
+                progress?.invoke(bytesSentTotal, contentLength)
+            }
+        }
+        progress?.invoke(length, length)
+        decodeBody(response, responseDeserializer, false)
     }
 }

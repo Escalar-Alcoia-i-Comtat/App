@@ -20,6 +20,7 @@ import org.jetbrains.compose.resources.StringResource
 @Serializable
 enum class BlockingTypes(
     val icon: ImageVector,
+    val displayName: StringResource,
     val message: StringResource,
     /**
      * The seriousness of the blocking.
@@ -29,12 +30,42 @@ enum class BlockingTypes(
      */
     val level: Int,
 ) {
-    DRY(Icons.Default.WbSunny, Res.string.path_blocking_dry_message, 2),
-    BUILD(Icons.Default.Construction, Res.string.path_blocking_build_message, 2),
-    BIRD(Icons.Default.Egg, Res.string.path_blocking_bird_message, 2),
-    OLD(Icons.Default.Landslide, Res.string.path_blocking_old_message, 1),
-    PLANTS(Icons.Default.Grass, Res.string.path_blocking_plants_message, 0),
-    ROPE_LENGTH(Icons.Default.Rope, Res.string.path_blocking_rope_message, 0);
+    DRY(
+        Icons.Default.WbSunny,
+        Res.string.path_blocking_dry_display_name,
+        Res.string.path_blocking_dry_message,
+        2,
+    ),
+    BUILD(
+        Icons.Default.Construction,
+        Res.string.path_blocking_build_display_name,
+        Res.string.path_blocking_build_message,
+        2,
+    ),
+    BIRD(
+        Icons.Default.Egg,
+        Res.string.path_blocking_bird_display_name,
+        Res.string.path_blocking_bird_message,
+        2,
+    ),
+    OLD(
+        Icons.Default.Landslide,
+        Res.string.path_blocking_old_display_name,
+        Res.string.path_blocking_old_message,
+        1,
+    ),
+    PLANTS(
+        Icons.Default.Grass,
+        Res.string.path_blocking_plants_display_name,
+        Res.string.path_blocking_plants_message,
+        0,
+    ),
+    ROPE_LENGTH(
+        Icons.Default.Rope,
+        Res.string.path_blocking_rope_display_name,
+        Res.string.path_blocking_rope_message,
+        0,
+    );
 
     @Composable
     fun cardColors(): CardColors = CardDefaults.outlinedCardColors(

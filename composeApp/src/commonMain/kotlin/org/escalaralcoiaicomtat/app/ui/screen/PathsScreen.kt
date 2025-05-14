@@ -34,6 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.SwipeDownAlt
 import androidx.compose.material.icons.outlined.Add
@@ -99,6 +100,7 @@ import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.platform.launchUrl
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
+import org.escalaralcoiaicomtat.app.ui.dialog.EditBlockingDialog
 import org.escalaralcoiaicomtat.app.ui.icons.ClimbingAnchor
 import org.escalaralcoiaicomtat.app.ui.icons.ClimbingHelmet
 import org.escalaralcoiaicomtat.app.ui.icons.ClimbingShoes
@@ -130,6 +132,8 @@ fun PathsScreen(
     val paths by viewModel.children.collectAsState()
     val blocks by viewModel.blocks.collectAsState()
     val selectedPath by viewModel.displayingChild.collectAsState()
+    val editingBlocking by viewModel.editingBlocking.collectAsState()
+    val isLoadingBlockingEdit by viewModel.isLoadingBlockingEdit.collectAsState()
 
     LaunchedEffect(sectorId) {
         viewModel.load(sectorId) {
@@ -146,10 +150,16 @@ fun PathsScreen(
         blocks = blocks,
         selectedPath = selectedPath,
         highlightPathId = highlightPathId,
+        editingBlocking = editingBlocking,
+        isLoadingBlockingEdit = isLoadingBlockingEdit,
+        onBlockingDeleteRequested = viewModel::deleteBlocking,
+        onBlockingSaveRequested = viewModel::saveBlocking,
         onBackRequested = onBackRequested,
         onEditSectorRequested = onEditSectorRequested,
         onEditPathRequested = onEditPathRequested,
         onCreatePathRequested = onCreatePathRequested,
+        onEditBlockingRequested = viewModel::editBlocking,
+        onEditBlockingStopRequested = viewModel::stopEditingBlocking,
         onPathClicked = viewModel::selectChild
     )
 }
@@ -162,15 +172,32 @@ private fun PathsScreen(
     blocks: List<Blocking>?,
     selectedPath: Path?,
     highlightPathId: Long?,
+    editingBlocking: Blocking?,
+    isLoadingBlockingEdit: Boolean,
+    onBlockingDeleteRequested: () -> Unit,
+    onBlockingSaveRequested: () -> Unit,
     onBackRequested: () -> Unit,
     onEditSectorRequested: (() -> Unit)?,
     onEditPathRequested: ((Path) -> Unit)?,
     onCreatePathRequested: (() -> Unit)?,
+    onEditBlockingRequested: ((Blocking) -> Unit)?,
+    onEditBlockingStopRequested: () -> Unit,
     onPathClicked: (path: Path?) -> Unit
 ) {
     var showingBottomSheet by remember { mutableStateOf(false) }
     if (showingBottomSheet && sector != null) {
         SectorInformationBottomSheet(sector) { showingBottomSheet = false }
+    }
+
+    editingBlocking?.let {
+        EditBlockingDialog(
+            blocking = it,
+            onBlockingChange = onEditBlockingRequested ?: {},
+            isLoading = isLoadingBlockingEdit,
+            onDeleteRequested = onBlockingDeleteRequested,
+            onSaveRequested = onBlockingSaveRequested,
+            onDismissRequested = onEditBlockingStopRequested,
+        )
     }
 
     Scaffold(
@@ -217,6 +244,7 @@ private fun PathsScreen(
             highlightPathId,
             modifier = Modifier.padding(paddingValues),
             onEditRequested = onEditPathRequested,
+            onEditBlockingRequested = onEditBlockingRequested,
             onPathClicked = onPathClicked
         )
     }
@@ -312,6 +340,7 @@ fun PathsList(
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
     onEditRequested: ((Path) -> Unit)?,
+    onEditBlockingRequested: ((Blocking) -> Unit)?,
     onPathClicked: (path: Path?) -> Unit
 ) {
     val windowSizeClass = calculateWindowSizeClass()
@@ -379,6 +408,7 @@ fun PathsList(
                                         blocks = blocks.orEmpty().filter { it.pathId == path.id },
                                         isModal = false,
                                         onEditRequested = onEditRequested?.let { { it(path) } },
+                                        onEditBlockingRequested = onEditBlockingRequested,
                                         onDismissRequested = { onPathClicked(null) }
                                     )
                                 }
@@ -395,6 +425,7 @@ fun PathsList(
                                 blocks = blocks.orEmpty().filter { it.pathId == path.id },
                                 isModal = true,
                                 onEditRequested = onEditRequested?.let { { it(path) } },
+                                onEditBlockingRequested = onEditBlockingRequested,
                             ) { onPathClicked(null) }
                         }
                     }
@@ -513,6 +544,7 @@ private fun BottomSheetContents(
     blocks: List<Blocking>,
     isModal: Boolean,
     onEditRequested: (() -> Unit)?,
+    onEditBlockingRequested: ((Blocking) -> Unit)?,
     onDismissRequested: () -> Unit
 ) {
     val localUnitsConfiguration = LocalUnitsConfiguration.current
@@ -531,6 +563,13 @@ private fun BottomSheetContents(
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f)
             )
+            if (onEditBlockingRequested != null) {
+                IconButton(
+                    onClick = { onEditBlockingRequested(Blocking.new(pathId = child.id)) },
+                ) {
+                    Icon(Icons.Default.NotificationAdd, stringResource(Res.string.path_blocking_create))
+                }
+            }
             if (onEditRequested != null) {
                 IconButton(
                     onClick = onEditRequested,
@@ -571,6 +610,7 @@ private fun BottomSheetContents(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 colors = blocking.type.cardColors(),
+                onClick = onEditBlockingRequested?.let { { it(blocking) } },
             )
         }
         child.height?.let { height ->

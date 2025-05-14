@@ -158,9 +158,16 @@
     <string name="path_blocking_bird_message">This path has a nest nearby. Climbing is forbidden.</string>
     <string name="path_blocking_old_message">This path is very old, and under-maintained. Please be careful while climbing, rocks may fall off.</string>
     <string name="path_blocking_plants_message">This path is under-maintained and may have plants, dirt or roots on the way.</string>
-    <string name="path_blocking_rope_message">This path is very long, be careful with the rope you use.</string>
+    <string name="path_blocking_rope_message">Rope length</string>
+    <string name="path_blocking_dry_display_name">Drying</string>
+    <string name="path_blocking_build_display_name">Under construction</string>
+    <string name="path_blocking_bird_display_name">Nesting</string>
+    <string name="path_blocking_old_display_name">Old</string>
+    <string name="path_blocking_plants_display_name">Plants</string>
+    <string name="path_blocking_rope_display_name">Long path</string>
     <string name="path_blocking_recurrent">Every year from %1$s to %2$s.</string>
     <string name="path_blocking_date">Ends the %1$s.</string>
+    <string name="path_blocking_create">Create new blocking</string>
 
     <string name="point_default">Place</string>
     <string name="point_parking">Parking</string>
@@ -263,6 +270,14 @@
     <string name="editor_error_uint">Must be a positive number.</string>
     <string name="editor_updated">Updated successfully</string>
     <string name="editor_created">Created successfully</string>
+
+    <string name="editor_blocking_create_title">Create new alert</string>
+    <string name="editor_blocking_edit_title">Edit existing alert</string>
+    <string name="editor_blocking_type">Blocking type</string>
+    <string name="editor_blocking_end_date">End Date</string>
+    <string name="editor_blocking_recurrence">Recurrence</string>
+    <string name="editor_blocking_forever">Forever</string>
+    <string name="editor_blocking_date_range">Date Range</string>
 
     <string name="editor_delete_dialog_title">Delete confirmation</string>
     <string name="editor_delete_dialog_message">Are you sure that you want to delete %1$s? This action is permanent and cannot be undone.</string>
