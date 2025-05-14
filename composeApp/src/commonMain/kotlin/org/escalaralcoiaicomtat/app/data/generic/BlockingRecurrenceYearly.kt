@@ -1,8 +1,14 @@
 package org.escalaralcoiaicomtat.app.data.generic
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Clock.System
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,6 +18,22 @@ data class BlockingRecurrenceYearly(
     val toDay: UShort,
     val toMonth: Month,
 ) {
+    companion object {
+        fun new(
+            clock: Clock = System,
+            timeZone: TimeZone = TimeZone.currentSystemDefault(),
+        ): BlockingRecurrenceYearly {
+            val now = clock.now().toLocalDateTime(timeZone).date
+            val nextMonth = now.plus(31, DateTimeUnit.DAY)
+            return BlockingRecurrenceYearly(
+                now.dayOfMonth.toUShort(),
+                now.month,
+                nextMonth.dayOfMonth.toUShort(),
+                nextMonth.month,
+            )
+        }
+    }
+
     /**
      * Checks whether the given date is inside the defined range.
      */

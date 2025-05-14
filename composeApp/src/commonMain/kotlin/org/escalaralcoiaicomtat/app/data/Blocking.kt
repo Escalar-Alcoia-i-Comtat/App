@@ -20,6 +20,15 @@ data class Blocking(
     @SerialName("end_date") val endDate: LocalDateTime? = null,
     @SerialName("path_id") val pathId: Long,
 ) : Entity {
+    companion object {
+        fun new(pathId: Long, clock: Clock = System) = Blocking(
+            id = 0,
+            timestamp = clock.now().toEpochMilliseconds(),
+            type = BlockingTypes.entries.first(),
+            pathId = pathId,
+        )
+    }
+
     override fun copy(
         id: Long,
         timestamp: Long,

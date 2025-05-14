@@ -15,6 +15,9 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
     private val _blocks = MutableStateFlow<List<Blocking>?>(null)
     val blocks: StateFlow<List<Blocking>?> get() = _blocks.asStateFlow()
 
+    private val _editingBlocking = MutableStateFlow<Blocking?>(null)
+    val editingBlocking: StateFlow<Blocking?> get() = _editingBlocking.asStateFlow()
+
     override suspend fun loadData(id: Long, onNotFound: () -> Unit) {
         super.loadData(id, onNotFound)
 
@@ -24,5 +27,13 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
             }
             .filter { it.isActive() }
         _blocks.emit(blocks)
+    }
+
+    fun editBlocking(blocking: Blocking) {
+        _editingBlocking.tryEmit(blocking)
+    }
+
+    fun stopEditingBlocking() {
+        _editingBlocking.tryEmit(null)
     }
 }
