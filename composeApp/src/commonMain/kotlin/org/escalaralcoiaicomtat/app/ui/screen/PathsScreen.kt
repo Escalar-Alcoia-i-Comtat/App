@@ -570,10 +570,7 @@ private fun BottomSheetContents(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
-                colors = CardDefaults.outlinedCardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                )
+                colors = blocking.type.cardColors(),
             )
         }
         child.height?.let { height ->

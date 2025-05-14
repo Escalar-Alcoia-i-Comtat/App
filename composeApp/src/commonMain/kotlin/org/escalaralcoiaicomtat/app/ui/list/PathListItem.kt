@@ -52,10 +52,7 @@ fun PathListItem(
         colors = if (pathBlocks.isEmpty()) {
             CardDefaults.outlinedCardColors()
         } else {
-            CardDefaults.outlinedCardColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer,
-            )
+            pathBlocks.maxBy { it.type.level }.type.cardColors()
         },
         onClick = onClick,
     ) {
