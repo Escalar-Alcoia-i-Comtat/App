@@ -40,6 +40,8 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -88,6 +90,7 @@ import io.github.aakira.napier.Napier
 import io.ktor.http.URLParserException
 import io.ktor.http.Url
 import kotlinx.coroutines.launch
+import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
@@ -125,6 +128,7 @@ fun PathsScreen(
 ) {
     val sector by viewModel.parent.collectAsState()
     val paths by viewModel.children.collectAsState()
+    val blocks by viewModel.blocks.collectAsState()
     val selectedPath by viewModel.displayingChild.collectAsState()
 
     LaunchedEffect(sectorId) {
@@ -139,6 +143,7 @@ fun PathsScreen(
     PathsScreen(
         sector = sector,
         paths = paths,
+        blocks = blocks,
         selectedPath = selectedPath,
         highlightPathId = highlightPathId,
         onBackRequested = onBackRequested,
@@ -154,6 +159,7 @@ fun PathsScreen(
 private fun PathsScreen(
     sector: Sector?,
     paths: List<Path>?,
+    blocks: List<Blocking>?,
     selectedPath: Path?,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
@@ -206,6 +212,7 @@ private fun PathsScreen(
         PathsList(
             sector,
             paths,
+            blocks,
             selectedPath,
             highlightPathId,
             modifier = Modifier.padding(paddingValues),
@@ -300,6 +307,7 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
 fun PathsList(
     sector: Sector?,
     paths: List<Path>?,
+    blocks: List<Blocking>?,
     selectedPath: Path?,
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
@@ -341,6 +349,7 @@ fun PathsList(
                     ) {
                         PathsListView(
                             paths = paths,
+                            blocks = blocks,
                             highlightPathId = highlightPathId,
                             modifier = Modifier.fillMaxHeight().weight(1f),
                             onEditRequested = onEditRequested,
@@ -367,7 +376,8 @@ fun PathsList(
                                 ) {
                                     BottomSheetContents(
                                         path,
-                                        false,
+                                        blocks = blocks.orEmpty().filter { it.pathId == path.id },
+                                        isModal = false,
                                         onEditRequested = onEditRequested?.let { { it(path) } },
                                         onDismissRequested = { onPathClicked(null) }
                                     )
@@ -382,6 +392,7 @@ fun PathsList(
                         ) {
                             BottomSheetContents(
                                 path,
+                                blocks = blocks.orEmpty().filter { it.pathId == path.id },
                                 isModal = true,
                                 onEditRequested = onEditRequested?.let { { it(path) } },
                             ) { onPathClicked(null) }
@@ -426,6 +437,7 @@ fun PathsList(
                     ) {
                         PathsListView(
                             paths = paths,
+                            blocks = blocks,
                             highlightPathId = highlightPathId,
                             modifier = Modifier.fillMaxWidth()
                                 .fillMaxHeight(0.3f)
@@ -444,6 +456,7 @@ fun PathsList(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PathsListView(
     paths: List<Path>?,
+    blocks: List<Blocking>?,
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
     onEditRequested: ((Path) -> Unit)?,
@@ -481,6 +494,7 @@ private fun PathsListView(
             ) {
                 PathListItem(
                     path = path,
+                    pathBlocks = blocks.orEmpty().filter { it.pathId == path.id },
                     modifier = Modifier
                         .widthIn(max = 600.dp)
                         .fillMaxWidth()
@@ -496,6 +510,7 @@ private fun PathsListView(
 @OptIn(ExperimentalSettingsApi::class)
 private fun BottomSheetContents(
     child: Path,
+    blocks: List<Blocking>,
     isModal: Boolean,
     onEditRequested: (() -> Unit)?,
     onDismissRequested: () -> Unit
@@ -530,6 +545,33 @@ private fun BottomSheetContents(
                     Icon(Icons.Rounded.Close, null)
                 }
             }
+        }
+        blocks.forEach { blocking ->
+            MetaCard(
+                icon = blocking.type.icon,
+                text = stringResource(Res.string.path_blocking_title),
+                message = StringBuilder().apply {
+                    appendLine(stringResource(blocking.type.message))
+                    blocking.endDate?.let { endDate ->
+                        append(
+                            stringResource(Res.string.path_blocking_date, endDate.toString())
+                        )
+                    }
+                    blocking.recurrence?.let { recurrence ->
+                        append(
+                            stringResource(
+                                Res.string.path_blocking_recurrent,
+                                recurrence.from(),
+                                recurrence.to(),
+                            )
+                        )
+                    }
+                }.toString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                colors = blocking.type.cardColors(),
+            )
         }
         child.height?.let { height ->
             MetaCard(
@@ -700,6 +742,7 @@ private fun MetaCard(
     bigTextColor: Color = Color.Unspecified,
     dialogText: AnnotatedString? = null,
     message: String? = null,
+    colors: CardColors = CardDefaults.outlinedCardColors(),
     onClick: (() -> Unit)? = null
 ) {
     var showingDialog by remember { mutableStateOf(false) }
@@ -727,7 +770,8 @@ private fun MetaCard(
                     onClick()
                 }
             }
-            .then(modifier)
+            .then(modifier),
+        colors = colors,
     ) {
         Row {
             Icon(

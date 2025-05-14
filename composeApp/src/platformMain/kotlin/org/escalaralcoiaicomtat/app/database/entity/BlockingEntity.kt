@@ -27,7 +27,7 @@ data class BlockingEntity(
     val type: BlockingTypes,
     val recurrence: BlockingRecurrenceYearly? = null,
     val endDate: LocalDateTime? = null,
-    val pathId: Int,
+    val pathId: Long,
 ) : DatabaseEntity<Blocking> {
     constructor(blocking: Blocking) : this(
         blocking.id,

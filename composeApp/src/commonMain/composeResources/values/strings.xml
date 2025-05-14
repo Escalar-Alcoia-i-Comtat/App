@@ -152,6 +152,15 @@
     <string name="path_builder_date">on %s</string>
     <string name="path_builder_name_date">by %s on %s</string>
     <string name="path_ending">Path Ending</string>
+    <string name="path_blocking_title">Warning</string>
+    <string name="path_blocking_dry_message">This path has just been built, and the anchors are drying out, please wait before climbing the route.</string>
+    <string name="path_blocking_build_message">This path is under construction or being repaired.</string>
+    <string name="path_blocking_bird_message">This path has a nest nearby. Climbing is forbidden.</string>
+    <string name="path_blocking_old_message">This path is very old, and under-maintained. Please be careful while climbing, rocks may fall off.</string>
+    <string name="path_blocking_plants_message">This path is under-maintained and may have plants, dirt or roots on the way.</string>
+    <string name="path_blocking_rope_message">This path is very long, be careful with the rope you use.</string>
+    <string name="path_blocking_recurrent">Every year from %1$s to %2$s.</string>
+    <string name="path_blocking_date">Ends the %1$s.</string>
 
     <string name="point_default">Place</string>
     <string name="point_parking">Parking</string>

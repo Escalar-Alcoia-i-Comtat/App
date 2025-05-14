@@ -1,7 +1,6 @@
 package org.escalaralcoiaicomtat.app.database
 
 import org.escalaralcoiaicomtat.app.data.Area
-import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.DataType
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.data.Path
@@ -14,7 +13,7 @@ expect object DatabaseInterface {
     fun sectors(): DataTypeInterface<Sector>
     fun paths(): DataTypeInterface<Path>
 
-    fun blocking(): EntityInterface<Blocking>
+    fun blocking(): BlockingInterface
 }
 
 @Suppress("UNCHECKED_CAST")
