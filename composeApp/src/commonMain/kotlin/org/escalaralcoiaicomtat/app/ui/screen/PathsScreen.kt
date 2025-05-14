@@ -158,7 +158,7 @@ fun PathsScreen(
         onEditSectorRequested = onEditSectorRequested,
         onEditPathRequested = onEditPathRequested,
         onCreatePathRequested = onCreatePathRequested,
-        onEditBlockingRequested = viewModel::editBlocking,
+        onEditBlockingRequested = viewModel::editBlocking.takeIf { onCreatePathRequested != null },
         onEditBlockingStopRequested = viewModel::stopEditingBlocking,
         onPathClicked = viewModel::selectChild
     )
