@@ -261,4 +261,14 @@
     <string name="editor_blocking_recurrence">Recurrencia</string>
     <string name="editor_blocking_forever">Para siempre</string>
     <string name="editor_blocking_date_range">Rango de fechas</string>
+    <string name="settings_server_info_stats_title">Estadísticas</string>
+    <string name="settings_server_info_stats_areas">Áreas: %1$d</string>
+    <string name="settings_server_info_stats_zones">Zonas: %1$d</string>
+    <string name="settings_server_info_stats_sectors">Sectores: %1$d</string>
+    <string name="settings_server_info_stats_paths">Vías: %1$d</string>
+    <string name="ending_equipped">Equipado</string>
+    <string name="ending_clean">Limpio</string>
+    <string name="inclination_vertical">Vertical</string>
+    <string name="inclination_horizontal">Horizontal</string>
+    <string name="inclination_diagonal">Diagonal</string>
 </resources>
