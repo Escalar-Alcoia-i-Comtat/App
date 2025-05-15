@@ -156,7 +156,7 @@
     <string name="path_builder_name">by %s</string>
     <string name="path_builder_date">on %s</string>
     <string name="path_builder_name_date">by %s on %s</string>
-    <string name="path_ending">Path Ending</string>
+    <string name="path_ending">Belay Station</string>
     <string name="path_blocking_title">Warning</string>
     <string name="path_blocking_dry_message">This path has just been built, and the anchors are drying out, please wait before climbing the route.</string>
     <string name="path_blocking_build_message">This path is under construction or being repaired.</string>
@@ -208,13 +208,14 @@
     <string name="ending_piton">Piton</string>
     <string name="ending_lanyard">Lanyard</string>
     <string name="ending_walking">Walking</string>
-    <string name="ending_rappel">Rappel</string>
-    <string name="ending_equipped">Equipped</string>
-    <string name="ending_clean">Clean</string>
+    <string name="ending_rappel">Rappelable Anchor</string>
+    <string name="ending_equipped">Equipped Stance</string>
+    <string name="ending_clean">No Anchor</string>
 
-    <string name="inclination_vertical">Vertical</string>
-    <string name="inclination_horizontal">Horizontal</string>
-    <string name="inclination_diagonal">Diagonal</string>
+    <!-- Reunió vertical, Repisa, Reunió inclinada -->
+    <string name="inclination_vertical">Vertical Stance</string>
+    <string name="inclination_horizontal">Horizontal Stance</string>
+    <string name="inclination_diagonal">Diagonal Stance</string>
 
     <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">More Info</string>
 
@@ -246,7 +247,7 @@
     <string name="editor_sketch_id_label">Sketch ID</string>
     <string name="editor_height_label">Height</string>
     <string name="editor_grade_label">Grade</string>
-    <string name="editor_ending_label">Ending</string>
+    <string name="editor_ending_label">Belay Station</string>
     <string name="editor_string_count_label">String Count</string>
     <string name="editor_parabolt_count_label">Parabolt Count</string>
     <string name="editor_buril_count_label">Buril Count</string>
@@ -274,9 +275,9 @@
     <string name="editor_pitch_info_pitch_label">Pitch</string>
     <string name="editor_pitch_info_grade_label">Grade</string>
     <string name="editor_pitch_info_height_label">Height</string>
-    <string name="editor_pitch_info_ending_label">Ending</string>
-    <string name="editor_pitch_info_ending_info_label">Ending Info</string>
-    <string name="editor_pitch_info_ending_inclination_label">Ending Inclination</string>
+    <string name="editor_pitch_info_ending_label">Belay Station</string>
+    <string name="editor_pitch_info_ending_info_label">Stance Info</string>
+    <string name="editor_pitch_info_ending_inclination_label">Stance Inclination</string>
     <string name="editor_error_coordinate" comment="Shown when introducing an invalid latitude or longitude on a field.">Must be a valid coordinate.</string>
     <string name="editor_error_uint">Must be a positive number.</string>
     <string name="editor_updated">Updated successfully</string>
