@@ -1,8 +1,10 @@
 package org.escalaralcoiaicomtat.app
 
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -10,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -104,6 +107,15 @@ fun SharedTransitionScope.NavigationController(
         NavHost(
             navController = navController,
             startDestination = initial,
+            popExitTransition = {
+                scaleOut(
+                    targetScale = 0.9f,
+                    transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.5f)
+                )
+            },
+            popEnterTransition = {
+                EnterTransition.None
+            },
             modifier = modifier,
         ) {
             composable<Destinations.Root> {
