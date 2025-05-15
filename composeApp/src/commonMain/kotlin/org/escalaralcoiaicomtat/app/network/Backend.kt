@@ -20,7 +20,9 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.URLBuilder
+import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
 import io.ktor.http.content.PartData
 import io.ktor.http.contentType
@@ -241,6 +243,39 @@ abstract class Backend {
         return decodeBody(response, serializer)!!
     }
 
+    private suspend fun <RT, DT: DataResponseType> makeRequestWithBody(
+        method: HttpMethod,
+        operation: suspend (Url, HttpRequestBuilder.() -> Unit) -> HttpResponse,
+        data: RT,
+        requestSerializer: SerializationStrategy<RT>,
+        responseDeserializer: DeserializationStrategy<DT>,
+        vararg pathComponents: Any,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+        requestBuilder: HttpRequestBuilder.() -> Unit = {}
+    ) {
+        var length: Long = 0
+        progress?.invoke(0, length)
+        val response = operation(
+            URLBuilder(baseUrl)
+                .appendPathSegments(pathComponents.map { it.toString() })
+                .build()
+                .also { Napier.v("${method.value} :: $it") },
+        ) {
+            contentType(ContentType.Application.Json)
+            setBody(json.encodeToString(requestSerializer, data))
+
+            requestBuilder()
+
+            onDownload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onDownload
+                length = contentLength
+                progress?.invoke(bytesSentTotal, contentLength)
+            }
+        }
+        progress?.invoke(length, length)
+        decodeBody(response, responseDeserializer, false)
+    }
+
     /**
      * Makes a DELETE request to the endpoint defined by the path components given.
      *
@@ -304,27 +339,16 @@ abstract class Backend {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
         requestBuilder: HttpRequestBuilder.() -> Unit = {}
     ) {
-        var length: Long = 0
-        progress?.invoke(0, length)
-        val response = client.post(
-            url = URLBuilder(baseUrl)
-                .appendPathSegments(pathComponents.map { it.toString() })
-                .build()
-                .also { Napier.v("PATCH :: $it") },
-        ) {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(requestSerializer, data))
-
-            requestBuilder()
-
-            onDownload { bytesSentTotal, contentLength ->
-                contentLength ?: return@onDownload
-                length = contentLength
-                progress?.invoke(bytesSentTotal, contentLength)
-            }
-        }
-        progress?.invoke(length, length)
-        decodeBody(response, responseDeserializer, false)
+        return makeRequestWithBody(
+            HttpMethod.Post,
+            client::post,
+            data,
+            requestSerializer,
+            responseDeserializer,
+            *pathComponents,
+            progress = progress,
+            requestBuilder = requestBuilder,
+        )
     }
 
     /**
@@ -351,26 +375,15 @@ abstract class Backend {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null,
         requestBuilder: HttpRequestBuilder.() -> Unit = {}
     ) {
-        var length: Long = 0
-        progress?.invoke(0, length)
-        val response = client.patch(
-            url = URLBuilder(baseUrl)
-                .appendPathSegments(pathComponents.map { it.toString() })
-                .build()
-                .also { Napier.v("PATCH :: $it") },
-        ) {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(requestSerializer, data))
-
-            requestBuilder()
-
-            onDownload { bytesSentTotal, contentLength ->
-                contentLength ?: return@onDownload
-                length = contentLength
-                progress?.invoke(bytesSentTotal, contentLength)
-            }
-        }
-        progress?.invoke(length, length)
-        decodeBody(response, responseDeserializer, false)
+        return makeRequestWithBody(
+            HttpMethod.Patch,
+            client::patch,
+            data,
+            requestSerializer,
+            responseDeserializer,
+            *pathComponents,
+            progress = progress,
+            requestBuilder = requestBuilder,
+        )
     }
 }
