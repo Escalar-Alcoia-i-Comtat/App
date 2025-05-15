@@ -212,7 +212,6 @@
     <string name="ending_equipped">Equipped Stance</string>
     <string name="ending_clean">No Anchor</string>
 
-    <!-- Reunió vertical, Repisa, Reunió inclinada -->
     <string name="inclination_vertical">Vertical Stance</string>
     <string name="inclination_horizontal">Horizontal Stance</string>
     <string name="inclination_diagonal">Diagonal Stance</string>
