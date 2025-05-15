@@ -1,5 +1,6 @@
 package org.escalaralcoiaicomtat.app.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,13 +19,16 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -78,6 +82,7 @@ import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
+import org.escalaralcoiaicomtat.app.data.generic.color
 import org.escalaralcoiaicomtat.app.exception.StringException
 import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.platform.clipEntryOf
@@ -492,7 +497,7 @@ private fun <DT : DataType> EditorContent(
         )
         FormDropdown(
             selection = item.grade,
-            onSelectionChanged = { onUpdateItem(item.copy(gradeValue = it.name)) },
+            onSelectionChanged = { onUpdateItem(item.copy(grade = it)) },
             label = stringResource(Res.string.editor_grade_label),
             options = SportsGrade.entries,
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -874,7 +879,7 @@ private fun PointListEditor(
             )
         },
         title = stringResource(Res.string.editor_points_label),
-        elementRender = { (icon, latLng, label), edit, delete ->
+        elementRender = { (icon, latLng, label), _, edit, delete ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
                     .padding(vertical = 2.dp),
@@ -948,7 +953,7 @@ private fun ExternalTracksEditor(
             )
         },
         title = stringResource(Res.string.editor_external_tracks_label),
-        elementRender = { (type, url), edit, delete ->
+        elementRender = { (type, url), _, edit, delete ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
                     .padding(vertical = 2.dp),
@@ -1008,7 +1013,7 @@ private fun ReBuildersEditor(
             )
         },
         title = stringResource(Res.string.editor_re_builder_label),
-        elementRender = { (name, date), edit, delete ->
+        elementRender = { (name, date), _, edit, delete ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
                     .padding(vertical = 2.dp),
@@ -1094,6 +1099,7 @@ private fun PitchesEditor(
                 label = stringResource(Res.string.editor_pitch_info_ending_label),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
+                toString = { stringResource(it.displayName) },
             )
             FormDropdown(
                 selection = value.info,
@@ -1102,6 +1108,8 @@ private fun PitchesEditor(
                 label = stringResource(Res.string.editor_pitch_info_ending_info_label),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
+                icon = { it.icon },
+                toString = { stringResource(it.stringRes) },
             )
             FormDropdown(
                 selection = value.inclination,
@@ -1110,10 +1118,12 @@ private fun PitchesEditor(
                 label = stringResource(Res.string.editor_pitch_info_ending_inclination_label),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
+                icon = { it.icon },
+                toString = { stringResource(it.stringRes) },
             )
         },
         title = stringResource(Res.string.editor_pitch_info_label),
-        elementRender = { pitch, edit, delete ->
+        elementRender = { pitch, isLast, edit, delete ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
                     .padding(vertical = 2.dp),
@@ -1122,35 +1132,47 @@ private fun PitchesEditor(
                 Column(
                     modifier = Modifier.padding(start = 4.dp).weight(1f),
                 ) {
-                    Text(
-                        text = pitch.pitch,
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                    )
-                    Text(
-                        text = pitch.grade?.toString() ?: "N/A",
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Badge {
+                            Text("L${pitch.pitch}")
+                        }
+                        Text(
+                            text = pitch.grade?.toString() ?: "N/A",
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            fontStyle = if (pitch.grade == null) FontStyle.Italic else FontStyle.Normal,
+                            color = pitch.grade?.color?.current ?: LocalContentColor.current,
+                        )
+                        Text(
+                            text = pitch.height.takeUnless { it.isBlank() }?.let { "$it m" } ?: "N/A",
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            fontStyle = if (pitch.height.isBlank()) FontStyle.Italic else FontStyle.Normal,
+                        )
+                        Text(
+                            text = pitch.ending?.let { stringResource(it.displayName) } ?: "N/A",
+                            modifier = Modifier.weight(1f),
+                            fontStyle = if (pitch.ending == null) FontStyle.Italic else FontStyle.Normal,
+                        )
+                    }
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        fontStyle = if (pitch.grade == null) FontStyle.Italic else FontStyle.Normal,
-                    )
-                    Text(
-                        text = pitch.height.takeUnless { it.isBlank() } ?: "N/A",
-                        modifier = Modifier.fillMaxWidth(),
-                        fontStyle = if (pitch.height.isBlank()) FontStyle.Italic else FontStyle.Normal,
-                    )
-                    Text(
-                        text = pitch.ending?.displayName?.let { stringResource(it) } ?: "N/A",
-                        modifier = Modifier.fillMaxWidth(),
-                        fontStyle = if (pitch.ending == null) FontStyle.Italic else FontStyle.Normal,
-                    )
-                    Text(
-                        text = pitch.info?.toString() ?: "N/A",
-                        modifier = Modifier.fillMaxWidth(),
-                        fontStyle = if (pitch.info == null) FontStyle.Italic else FontStyle.Normal,
-                    )
-                    Text(
-                        text = pitch.inclination?.toString() ?: "N/A",
-                        modifier = Modifier.fillMaxWidth(),
-                        fontStyle = if (pitch.inclination == null) FontStyle.Italic else FontStyle.Normal,
-                    )
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Image(pitch.info?.icon ?: Icons.Default.Remove, null)
+                        Text(
+                            text = pitch.info?.let { stringResource(it.stringRes) } ?: "N/A",
+                            modifier = Modifier.weight(1f),
+                            fontStyle = if (pitch.info == null) FontStyle.Italic else FontStyle.Normal,
+                        )
+                        Image(pitch.inclination?.icon ?: Icons.Default.Remove, null)
+                        Text(
+                            text = pitch.inclination?.let { stringResource(it.stringRes) } ?: "N/A",
+                            modifier = Modifier.weight(1f),
+                            fontStyle = if (pitch.inclination == null) FontStyle.Italic else FontStyle.Normal,
+                        )
+                    }
                 }
 
                 IconButton(
@@ -1167,6 +1189,7 @@ private fun PitchesEditor(
                     )
                 }
             }
+            if (!isLast) HorizontalDivider()
         },
         modifier = modifier,
     )
