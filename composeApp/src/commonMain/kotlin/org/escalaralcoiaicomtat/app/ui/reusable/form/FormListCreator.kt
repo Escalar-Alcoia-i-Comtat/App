@@ -90,7 +90,7 @@ fun <T> FormListCreator(
         for (element in elements) {
             elementRender(
                 element,
-                elements.last() == element,
+                elements.lastOrNull() == element,
                 {
                     modifying = element
                     editing = element
