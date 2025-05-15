@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,14 +24,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
@@ -41,11 +42,13 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -94,6 +97,7 @@ import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
+import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import org.escalaralcoiaicomtat.app.data.generic.color
 import org.escalaralcoiaicomtat.app.platform.BackHandler
@@ -112,6 +116,7 @@ import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
 import org.escalaralcoiaicomtat.app.utils.format
 import org.escalaralcoiaicomtat.app.utils.unit.meters
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -392,7 +397,7 @@ fun PathsList(
                             }
                         ) { path ->
                             if (path != null) {
-                                Column(
+                                LazyColumn(
                                     modifier = Modifier
                                         .widthIn(max = sidePathInformationPanelMaxWidth)
                                         .fillMaxWidth()
@@ -401,9 +406,9 @@ fun PathsList(
                                             RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                                         )
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                                        .verticalScroll(rememberScrollState())
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
                                 ) {
-                                    BottomSheetContents(
+                                    bottomSheetContents(
                                         path,
                                         blocks = blocks.orEmpty().filter { it.pathId == path.id },
                                         isModal = false,
@@ -420,13 +425,19 @@ fun PathsList(
                         ModalBottomSheet(
                             onDismissRequest = { onPathClicked(null) }
                         ) {
-                            BottomSheetContents(
-                                path,
-                                blocks = blocks.orEmpty().filter { it.pathId == path.id },
-                                isModal = true,
-                                onEditRequested = onEditRequested?.let { { it(path) } },
-                                onEditBlockingRequested = onEditBlockingRequested,
-                            ) { onPathClicked(null) }
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                            ) {
+                                bottomSheetContents(
+                                    path,
+                                    blocks = blocks.orEmpty().filter { it.pathId == path.id },
+                                    isModal = true,
+                                    onEditRequested = onEditRequested?.let { { it(path) } },
+                                    onEditBlockingRequested = onEditBlockingRequested,
+                                ) { onPathClicked(null) }
+                            }
                         }
                     }
                 }
@@ -537,9 +548,8 @@ private fun PathsListView(
     }
 }
 
-@Composable
 @OptIn(ExperimentalSettingsApi::class)
-private fun BottomSheetContents(
+private fun LazyListScope.bottomSheetContents(
     child: Path,
     blocks: List<Blocking>,
     isModal: Boolean,
@@ -547,13 +557,7 @@ private fun BottomSheetContents(
     onEditBlockingRequested: ((Blocking) -> Unit)?,
     onDismissRequested: () -> Unit
 ) {
-    val localUnitsConfiguration = LocalUnitsConfiguration.current
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
+    item {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -585,120 +589,143 @@ private fun BottomSheetContents(
                 }
             }
         }
-        blocks.forEach { blocking ->
-            MetaCard(
-                icon = blocking.type.icon,
-                text = stringResource(Res.string.path_blocking_title),
-                message = StringBuilder().apply {
-                    appendLine(stringResource(blocking.type.message))
-                    blocking.endDate?.let { endDate ->
-                        append(
-                            stringResource(Res.string.path_blocking_date, endDate.toString())
+    }
+    items(blocks) { blocking ->
+        MetaCard(
+            icon = blocking.type.icon,
+            text = stringResource(Res.string.path_blocking_title),
+            message = StringBuilder().apply {
+                appendLine(stringResource(blocking.type.message))
+                blocking.endDate?.let { endDate ->
+                    append(
+                        stringResource(Res.string.path_blocking_date, endDate.toString())
+                    )
+                }
+                blocking.recurrence?.let { recurrence ->
+                    append(
+                        stringResource(
+                            Res.string.path_blocking_recurrent,
+                            recurrence.from(),
+                            recurrence.to(),
                         )
-                    }
-                    blocking.recurrence?.let { recurrence ->
-                        append(
-                            stringResource(
-                                Res.string.path_blocking_recurrent,
-                                recurrence.from(),
-                                recurrence.to(),
+                    )
+                }
+            }.toString(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            colors = blocking.type.cardColors(),
+            onClick = onEditBlockingRequested?.let { { it(blocking) } },
+        )
+    }
+    if (child.height != null) item {
+        val localUnitsConfiguration = LocalUnitsConfiguration.current
+        MetaCard(
+            icon = Icons.Filled.Rope,
+            text = stringResource(Res.string.path_height),
+            bigText = with(localUnitsConfiguration) {
+                child.height.meters.asDistanceValue()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+    }
+    if (child.grade != null && child.grade != SportsGrade.UNKNOWN) item {
+        val grade = child.grade
+        MetaCard(
+            icon = Icons.Filled.ClimbingShoes,
+            text = stringResource(Res.string.path_grade),
+            bigText = grade.toString(),
+            bigTextColor = grade.color.current,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+    }
+    countMetaCard(child)
+    if (child.ending != null) item {
+        MetaCard(
+            icon = Icons.Filled.SwipeDownAlt,
+            text = stringResource(Res.string.path_ending),
+            bigText = stringResource(child.ending.displayName),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+    }
+    if (child.pitches != null) item {
+        val pitches = child.pitches.sortedBy { it.pitch }
+        MetaCard(
+            icon = Icons.AutoMirrored.Filled.ListAlt,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            content = {
+                for (pitch in pitches) {
+                    PitchInfoRow(
+                        pitch,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    if (pitches.lastOrNull() != pitch) HorizontalDivider()
+                }
+            },
+        )
+    }
+    val pathBuilder = child.builder?.orNull()
+    val pathReBuilders = child.reBuilders?.mapNotNull { it.orNull() }
+    if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) {
+        item {
+            var text by remember { mutableStateOf("") }
+            LaunchedEffect(Unit) {
+                val name = pathBuilder?.name
+                val date = pathBuilder?.date
+                text = StringBuilder().apply {
+                    if (name != null || date != null) {
+                        appendLine(
+                            getString(Res.string.path_builder_message).format(
+                                if (name != null && date != null) {
+                                    getString(Res.string.path_builder_name_date).format(name, date)
+                                } else if (name == null && date != null) {
+                                    getString(Res.string.path_builder_date).format(date)
+                                } else if (name != null && date == null) {
+                                    getString(Res.string.path_builder_name).format(name)
+                                } else {
+                                    "" // never reached
+                                }
                             )
                         )
                     }
-                }.toString(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                colors = blocking.type.cardColors(),
-                onClick = onEditBlockingRequested?.let { { it(blocking) } },
-            )
-        }
-        child.height?.let { height ->
-            MetaCard(
-                icon = Icons.Filled.Rope,
-                text = stringResource(Res.string.path_height),
-                bigText = with(localUnitsConfiguration) {
-                    height.meters.asDistanceValue()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            )
-        }
-        child.grade?.takeIf { it != SportsGrade.UNKNOWN }?.let { grade ->
-            MetaCard(
-                icon = Icons.Filled.ClimbingShoes,
-                text = stringResource(Res.string.path_grade),
-                bigText = grade.toString(),
-                bigTextColor = grade.color.current,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            )
-        }
-        CountMetaCard(child)
-        child.ending?.let { ending ->
-            MetaCard(
-                icon = Icons.Filled.SwipeDownAlt,
-                text = stringResource(Res.string.path_ending),
-                bigText = stringResource(ending.displayName),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            )
-        }
-        val pathBuilder = child.builder?.orNull()
-        val pathReBuilders = child.reBuilders?.mapNotNull { it.orNull() }
-        if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) {
-            val name = pathBuilder?.name
-            val date = pathBuilder?.date
-
-            val text = StringBuilder()
-            if (name != null || date != null) {
-                text.appendLine(
-                    stringResource(Res.string.path_builder_message).format(
-                        if (name != null && date != null) {
-                            stringResource(Res.string.path_builder_name_date).format(name, date)
-                        } else if (name == null && date != null) {
-                            stringResource(Res.string.path_builder_date).format(date)
-                        } else if (name != null && date == null) {
-                            stringResource(Res.string.path_builder_name).format(name)
-                        } else {
-                            "" // never reached
-                        }
-                    )
-                )
+                    pathReBuilders?.forEach { builder ->
+                        appendLine(
+                            getString(Res.string.path_re_builder_message).format(
+                                if (builder.name != null && builder.date != null) {
+                                    getString(Res.string.path_builder_name_date)
+                                        .format(builder.name, builder.date)
+                                } else if (builder.name == null && builder.date != null) {
+                                    getString(Res.string.path_builder_date)
+                                        .format(builder.date)
+                                } else if (builder.name != null && builder.date == null) {
+                                    getString(Res.string.path_builder_name)
+                                        .format(builder.name)
+                                } else {
+                                    "" // never reached
+                                }
+                            )
+                        )
+                    }
+                }.toString()
             }
-            pathReBuilders?.forEach { builder ->
-                text.appendLine(
-                    stringResource(Res.string.path_re_builder_message).format(
-                        if (builder.name != null && builder.date != null) {
-                            stringResource(Res.string.path_builder_name_date)
-                                .format(builder.name, builder.date)
-                        } else if (builder.name == null && builder.date != null) {
-                            stringResource(Res.string.path_builder_date)
-                                .format(builder.date)
-                        } else if (builder.name != null && builder.date == null) {
-                            stringResource(Res.string.path_builder_name)
-                                .format(builder.name)
-                        } else {
-                            "" // never reached
-                        }
-                    )
-                )
-            }
-
             MetaCard(
                 icon = Icons.Filled.ClimbingHelmet,
-                text = text.toString(),
+                text = text,
                 modifier = Modifier.fillMaxWidth()
             )
         }
     }
-    child.description?.takeIf { child.showDescription }?.let { description ->
+
+    if (child.showDescription && child.description != null) item {
         MetaCard(
             icon = Icons.Filled.Description,
-            text = description,
+            text = child.description,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -707,9 +734,8 @@ private fun BottomSheetContents(
     }
 }
 
-@Composable
-private fun CountMetaCard(path: Path) {
-    if (path.hasAnyCount) {
+private fun LazyListScope.countMetaCard(path: Path) {
+    if (path.hasAnyCount) item {
         MetaCard(
             icon = Icons.Filled.ClimbingAnchor,
             text = stringResource(Res.string.path_quickdraws_title),
@@ -775,14 +801,15 @@ private fun CountMetaCard(path: Path) {
 @Composable
 private fun MetaCard(
     icon: ImageVector,
-    text: String,
     modifier: Modifier = Modifier,
+    text: String? = null,
     iconContentDescription: String? = null,
     bigText: String? = null,
     bigTextColor: Color = Color.Unspecified,
     dialogText: AnnotatedString? = null,
     message: String? = null,
     colors: CardColors = CardDefaults.outlinedCardColors(),
+    content: (@Composable ColumnScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
     var showingDialog by remember { mutableStateOf(false) }
@@ -827,11 +854,13 @@ private fun MetaCard(
                     .padding(start = 4.dp, end = 12.dp)
                     .padding(vertical = 8.dp)
             ) {
-                Text(
-                    text = text,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                text?.let { it ->
+                    Text(
+                        text = it,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
                 bigText?.let { text ->
                     Text(
                         text = text,
@@ -856,6 +885,62 @@ private fun MetaCard(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
+                content?.invoke(this)
+            }
+        }
+    }
+}
+
+@Composable
+fun PitchInfoRow(
+    pitch: PitchInfo,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Badge {
+                Text("L${pitch.pitch}")
+            }
+            pitch.grade?.let { grade ->
+                Text(
+                    text = grade.toString(),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    color = pitch.grade.color.current,
+                )
+            }
+            pitch.height?.let { height ->
+                Text(
+                    text = "$height m",
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+            }
+            pitch.ending?.let { ending ->
+                Text(
+                    text = stringResource(ending.displayName),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            pitch.info?.let { info ->
+                Image(info.icon, stringResource(info.stringRes))
+                Text(
+                    text = stringResource(info.stringRes),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            pitch.inclination?.let { inclination ->
+                Image(inclination.icon, stringResource(inclination.stringRes))
+                Text(
+                    text = stringResource(inclination.stringRes),
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
