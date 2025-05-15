@@ -53,10 +53,8 @@ import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.Zone
 import org.escalaralcoiaicomtat.app.network.connectivityStatus
-import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.search.Filter
 import org.escalaralcoiaicomtat.app.sync.DataSync
-import org.escalaralcoiaicomtat.app.ui.composition.LocalLifecycleManager
 import org.escalaralcoiaicomtat.app.ui.dialog.SearchFiltersDialog
 import org.escalaralcoiaicomtat.app.ui.model.AppScreenModel
 import org.escalaralcoiaicomtat.app.ui.model.SearchModel
@@ -105,8 +103,8 @@ fun AppScreen(
         }
     }
 
-    val lifecycleManager = LocalLifecycleManager.current
-    BackHandler { lifecycleManager.finish() }
+    // val lifecycleManager = LocalLifecycleManager.current
+    // BackHandler { lifecycleManager.finish() }
 
     AdaptiveNavigationScaffold(
         items = listOf(

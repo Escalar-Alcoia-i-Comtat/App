@@ -6,7 +6,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.escalaralcoiaicomtat.app.data.Zone
-import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.ui.model.ZonesScreenModel
 
 @Composable
@@ -26,8 +25,6 @@ fun ZonesScreen(
     LaunchedEffect(areaId) {
         viewModel.load(areaId, onBackRequested)
     }
-
-    BackHandler(onBack = onBackRequested)
 
     DataList(
         parent = area,

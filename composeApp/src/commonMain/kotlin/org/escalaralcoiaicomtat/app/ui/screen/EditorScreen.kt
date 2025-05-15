@@ -84,7 +84,6 @@ import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
 import org.escalaralcoiaicomtat.app.data.generic.color
 import org.escalaralcoiaicomtat.app.exception.StringException
-import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.platform.clipEntryOf
 import org.escalaralcoiaicomtat.app.ui.dialog.DeleteConfirmationDialog
 import org.escalaralcoiaicomtat.app.ui.model.EditorModel
@@ -117,8 +116,6 @@ fun <DT : DataType> EditorScreen(
     val error by model.error.collectAsState()
 
     LaunchedEffect(Unit) { model.load(onBackRequested) }
-
-    BackHandler { onBackRequested() }
 
     LaunchedKeyEvent { event ->
         if (event.key == Key.Escape && event.type == KeyEventType.KeyUp) {
