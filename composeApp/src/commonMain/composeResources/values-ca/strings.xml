@@ -147,7 +147,7 @@
     <string name="ending_piton">Claus</string>
     <string name="ending_lanyard">Cordí</string>
     <string name="ending_walking">Caminant</string>
-    <string name="ending_rappel">Rappel</string>
+    <string name="ending_rappel">Reunió Rapelable</string>
     <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">Més informació</string>
     <string name="file_picker_hint">Clica per a triar</string>
     <string name="editor_yes">Sí</string>
@@ -266,9 +266,9 @@
     <string name="settings_server_info_stats_zones">Zones: %1$d</string>
     <string name="settings_server_info_stats_sectors">Sectors: %1$d</string>
     <string name="settings_server_info_stats_paths">Vies: %1$d</string>
-    <string name="ending_equipped">Equipat</string>
-    <string name="ending_clean">Net</string>
-    <string name="inclination_vertical">Vertical</string>
-    <string name="inclination_horizontal">Horitzontal</string>
-    <string name="inclination_diagonal">Diagonal</string>
+    <string name="ending_equipped">Reunió Equipada</string>
+    <string name="ending_clean">Reunió Neta</string>
+    <string name="inclination_vertical">Reunió Vertical</string>
+    <string name="inclination_horizontal">Reunió Horitzontal</string>
+    <string name="inclination_diagonal">Reunió Inclinada</string>
 </resources>
