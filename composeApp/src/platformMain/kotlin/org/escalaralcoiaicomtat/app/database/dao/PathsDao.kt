@@ -34,7 +34,7 @@ interface PathsDao : DataTypeDao<Path, PathEntity> {
                 displayName,
                 sketchId.toInt(),
                 height?.toInt(),
-                gradeValue,
+                grade,
                 ending,
                 pitches,
                 stringCount?.toInt(),

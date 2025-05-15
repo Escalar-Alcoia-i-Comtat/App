@@ -16,6 +16,7 @@ import org.escalaralcoiaicomtat.app.database.entity.PathEntity
 import org.escalaralcoiaicomtat.app.database.entity.SectorEntity
 import org.escalaralcoiaicomtat.app.database.entity.ZoneEntity
 import org.escalaralcoiaicomtat.app.database.migrations.Migration1To2
+import org.escalaralcoiaicomtat.app.database.migrations.Migration3To4
 
 @Database(
     exportSchema = true,
@@ -26,10 +27,11 @@ import org.escalaralcoiaicomtat.app.database.migrations.Migration1To2
         PathEntity::class,
         BlockingEntity::class,
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = Migration1To2::class),
         AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4, spec = Migration3To4::class),
     ]
 )
 @TypeConverters(Converters::class)

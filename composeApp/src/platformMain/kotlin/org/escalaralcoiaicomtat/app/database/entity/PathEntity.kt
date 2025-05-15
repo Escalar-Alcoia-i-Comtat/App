@@ -8,6 +8,7 @@ import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
+import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import kotlin.uuid.Uuid
 
@@ -30,7 +31,7 @@ data class PathEntity(
     val sketchId: Int,
 
     val height: Int? = null,
-    val gradeValue: String? = null,
+    val grade: GradeValue? = null,
     val ending: Ending? = null,
     val pitches: List<PitchInfo>? = null,
 
@@ -65,7 +66,7 @@ data class PathEntity(
         displayName,
         sketchId.toUInt(),
         height?.toUInt(),
-        gradeValue,
+        grade,
         ending,
         pitches,
         stringCount?.toUInt(),

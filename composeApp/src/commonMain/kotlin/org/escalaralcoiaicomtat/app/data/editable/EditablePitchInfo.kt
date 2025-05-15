@@ -33,7 +33,7 @@ data class EditablePitchInfo(
     override fun build(): PitchInfo {
         return PitchInfo(
             pitch = pitch.toUInt(),
-            grade = grade.toString(),
+            grade = grade,
             height = height.toUIntOrNull(),
             ending = ending,
             info = info,

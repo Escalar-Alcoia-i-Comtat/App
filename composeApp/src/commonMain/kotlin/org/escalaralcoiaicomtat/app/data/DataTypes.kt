@@ -79,7 +79,7 @@ sealed class DataTypes<out DT : DataType>(
             displayName = "",
             sketchId = 0u,
             height = null,
-            gradeValue = null,
+            grade = null,
             ending = null,
             pitches = null,
             stringCount = null,

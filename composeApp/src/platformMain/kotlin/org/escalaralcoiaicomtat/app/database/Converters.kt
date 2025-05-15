@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import org.escalaralcoiaicomtat.app.data.generic.BlockingRecurrenceYearly
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
+import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
@@ -63,6 +64,16 @@ object Converters {
     @TypeConverter
     fun toBlockingRecurrenceYearly(value: BlockingRecurrenceYearly?): String? {
         return value?.let { Json.encodeToString(BlockingRecurrenceYearly.serializer(), it) }
+    }
+
+    @TypeConverter
+    fun fromGradeValue(value: String?): GradeValue? {
+        return value?.let(GradeValue::fromString)
+    }
+
+    @TypeConverter
+    fun toGradeValue(value: GradeValue?): String? {
+        return value?.name
     }
 
 
