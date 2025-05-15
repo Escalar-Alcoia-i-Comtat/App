@@ -42,6 +42,8 @@ fun SectorsScreen(
         onItemMoved = viewModel::moveItem.takeIf { editAllowed },
         onFinishSorting = viewModel::saveMovedItems,
         onNavigateUp = onBackRequested,
+        parentAnimationKey = { "zone-${zoneId}" },
+        childAnimationKey = { "sector-${it.id}" },
         onMapClicked = onMapClicked,
     )
 }

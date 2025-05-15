@@ -1,6 +1,7 @@
 package org.escalaralcoiaicomtat.app.ui.screen
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import org.escalaralcoiaicomtat.app.data.Area
 import org.escalaralcoiaicomtat.app.sync.SyncProcess
 import org.escalaralcoiaicomtat.app.ui.list.DataCard
+import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 
 @Composable
 fun MainScreen(
@@ -51,6 +53,7 @@ fun MainScreen(
 }
 
 @Composable
+@OptIn(ExperimentalSharedTransitionApi::class)
 private fun AreasList(
     areas: List<Area>,
     onAreaRequested: (areaId: Long) -> Unit,
@@ -84,7 +87,8 @@ private fun AreasList(
                     .padding(horizontal = 8.dp)
                     .padding(bottom = 12.dp)
                     .widthIn(max = 600.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .sharedElement("area-${area.id}"),
                 onEdit = onEditRequested?.let { { it(area) } }
             ) { onAreaRequested(area.id) }
         }

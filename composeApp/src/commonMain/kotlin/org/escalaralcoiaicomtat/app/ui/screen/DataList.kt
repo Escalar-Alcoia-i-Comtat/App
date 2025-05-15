@@ -2,6 +2,7 @@ package org.escalaralcoiaicomtat.app.ui.screen
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -56,12 +57,13 @@ import org.escalaralcoiaicomtat.app.data.Zone
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.ui.list.DataCard
 import org.escalaralcoiaicomtat.app.ui.list.LocationCard
+import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 import org.escalaralcoiaicomtat.app.ui.platform.MapComposable
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.jetbrains.compose.resources.stringResource
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     parent: Parent?,
@@ -75,6 +77,8 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     onItemMoved: ((fromIndex: Int, toIndex: Int) -> Unit)? = null,
     onFinishSorting: (() -> Unit)? = null,
     onMapClicked: (kmz: Uuid?) -> Unit = {},
+    parentAnimationKey: () -> String,
+    childAnimationKey: (ChildrenType) -> String,
     onNavigateUp: () -> Unit,
 ) {
     val state = rememberLazyListState()
@@ -90,7 +94,15 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { parent?.let { Text(it.displayName) } },
+                title = {
+                    parent?.let {
+                        Text(
+                            text = it.displayName,
+                            modifier = Modifier
+                                .sharedElement(key = parentAnimationKey())
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
@@ -161,7 +173,7 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                     .padding(bottom = 22.dp)
                                     .widthIn(max = 600.dp)
                                     .fillMaxWidth()
-                                    .animateItem(),
+                                    .sharedElement(key = childAnimationKey(child)),
                                 onEdit = onEditChildRequested?.let { { it(child) } },
                                 prefixContent = {
                                     AnimatedVisibility(

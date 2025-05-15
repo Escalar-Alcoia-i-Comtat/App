@@ -34,6 +34,8 @@ fun ZonesScreen(
         onEditRequested = onEditAreaRequested,
         onEditChildRequested = onEditZoneRequested,
         onCreateRequested = onCreateZoneRequested,
+        parentAnimationKey = { "area-${areaId}" },
+        childAnimationKey = { "zone-${it.id}" },
         onNavigateUp = onBackRequested,
     )
 }
