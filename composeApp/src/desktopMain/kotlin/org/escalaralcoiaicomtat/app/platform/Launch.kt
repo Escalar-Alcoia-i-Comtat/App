@@ -15,7 +15,11 @@ import org.escalaralcoiaicomtat.app.data.generic.LatLng
  */
 actual fun launchPoint(point: LatLng, label: String?): Boolean {
     val url = URLBuilder("https://www.google.com")
-        .appendPathSegments("org/escalaralcoiaicomtat/app/maps", "@${point.latitude},${point.longitude},15z")
+        .appendPathSegments("maps", "search", "")
+        .apply {
+            parameters["api"] = "1"
+            parameters["query"] = "${point.latitude},${point.longitude}"
+        }
         .build()
 
     return launchUrl(url)
