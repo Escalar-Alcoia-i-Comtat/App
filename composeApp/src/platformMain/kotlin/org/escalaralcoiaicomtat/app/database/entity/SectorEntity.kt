@@ -9,7 +9,6 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
-import org.escalaralcoiaicomtat.app.database.appDatabase
 import kotlin.uuid.Uuid
 
 @Entity(
@@ -37,8 +36,6 @@ data class SectorEntity(
     val sunTime: SunTime,
     val parentZoneId: Long,
 ) : DatabaseEntity<Sector> {
-    suspend fun paths(): List<PathEntity> = appDatabase.paths().findBySectorId(id)
-
     override suspend fun convert(): Sector = Sector(
         id,
         timestamp.toEpochMilliseconds(),
@@ -52,6 +49,5 @@ data class SectorEntity(
         point,
         sunTime,
         parentZoneId,
-        paths().map { it.convert() }
     )
 }

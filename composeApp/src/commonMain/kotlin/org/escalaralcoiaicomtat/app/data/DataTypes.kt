@@ -36,7 +36,6 @@ sealed class DataTypes<out DT : DataType>(
             timestamp = Clock.System.now().toEpochMilliseconds(),
             displayName = "",
             image = Uuid.random(),
-            zones = emptyList()
         )
     }
 
@@ -50,7 +49,6 @@ sealed class DataTypes<out DT : DataType>(
             point = null,
             points = emptyList(),
             parentAreaId = 0,
-            sectors = emptyList()
         )
     }
 
@@ -68,7 +66,6 @@ sealed class DataTypes<out DT : DataType>(
             point = null,
             sunTime = SunTime.None,
             parentZoneId = 0,
-            paths = emptyList()
         )
     }
 
