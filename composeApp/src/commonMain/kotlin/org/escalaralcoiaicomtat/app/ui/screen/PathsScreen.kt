@@ -662,7 +662,7 @@ private fun LazyListScope.bottomSheetContents(
                 .padding(vertical = 4.dp)
         )
     }
-    if (child.pitches != null) item {
+    if (!child.pitches.isNullOrEmpty()) item {
         val pitches = child.pitches.sortedBy { it.pitch }
         MetaCard(
             icon = Icons.AutoMirrored.Filled.ListAlt,
