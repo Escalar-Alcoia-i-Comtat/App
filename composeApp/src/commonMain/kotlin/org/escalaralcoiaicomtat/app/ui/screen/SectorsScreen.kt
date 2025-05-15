@@ -6,7 +6,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.escalaralcoiaicomtat.app.data.Sector
-import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.ui.model.SectorsScreenModel
 import kotlin.uuid.Uuid
 
@@ -30,8 +29,6 @@ fun SectorsScreen(
     LaunchedEffect(zoneId) {
         viewModel.load(zoneId, onBackRequested)
     }
-
-    BackHandler(onBack = onBackRequested)
 
     DataList(
         parent = zone,

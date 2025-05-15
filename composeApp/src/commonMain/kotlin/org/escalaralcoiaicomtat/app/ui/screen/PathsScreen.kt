@@ -100,7 +100,6 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import org.escalaralcoiaicomtat.app.data.generic.color
-import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.platform.launchUrl
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
@@ -146,8 +145,6 @@ fun PathsScreen(
             onBackRequested()
         }
     }
-
-    BackHandler(onBack = onBackRequested)
 
     PathsScreen(
         sector = sector,

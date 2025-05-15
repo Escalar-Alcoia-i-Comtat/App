@@ -24,9 +24,7 @@ import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
-import org.escalaralcoiaicomtat.app.platform.BackHandler
 import org.escalaralcoiaicomtat.app.platform.IntroScreenPages
-import org.escalaralcoiaicomtat.app.ui.composition.LocalLifecycleManager
 import org.escalaralcoiaicomtat.app.ui.reusable.IntroPage
 import org.escalaralcoiaicomtat.app.ui.reusable.icon
 import org.jetbrains.compose.resources.painterResource
@@ -112,9 +110,6 @@ fun IntroScreen(onIntroFinished: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState { pages.size }
-
-    val lifecycleManager = LocalLifecycleManager.current
-    BackHandler { lifecycleManager.finish() }
 
     Scaffold(
         floatingActionButton = {
