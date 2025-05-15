@@ -172,9 +172,9 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                                     .padding(horizontal = 8.dp)
                                     .padding(bottom = 22.dp)
                                     .widthIn(max = 600.dp)
-                                    .fillMaxWidth()
-                                    .sharedElement(key = childAnimationKey(child)),
+                                    .fillMaxWidth(),
                                 onEdit = onEditChildRequested?.let { { it(child) } },
+                                animationKey = { childAnimationKey(child) },
                                 prefixContent = {
                                     AnimatedVisibility(
                                         visible = canSort,

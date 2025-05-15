@@ -1,5 +1,6 @@
 package org.escalaralcoiaicomtat.app.ui.list
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,17 +40,20 @@ import escalaralcoiaicomtat.composeapp.generated.resources.*
 import org.escalaralcoiaicomtat.app.data.DataTypeWithImage
 import org.escalaralcoiaicomtat.app.data.DataTypeWithPoint
 import org.escalaralcoiaicomtat.app.platform.launchPoint
+import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
+@OptIn(ExperimentalSharedTransitionApi::class)
 fun <T : DataTypeWithImage> DataCard(
     item: T,
     imageHeight: Dp,
     modifier: Modifier = Modifier,
     prefixContent: (@Composable RowScope.() -> Unit)? = null,
     onEdit: (() -> Unit)?,
-    onClick: () -> Unit
+    animationKey: () -> String,
+    onClick: () -> Unit,
 ) {
     ContextMenu(
         enabled = onEdit != null,
@@ -75,7 +79,10 @@ fun <T : DataTypeWithImage> DataCard(
                     text = item.displayName,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f).padding(start = 4.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                        .sharedElement(animationKey()),
                     fontSize = 20.sp
                 )
             }
