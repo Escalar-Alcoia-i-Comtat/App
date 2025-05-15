@@ -1,10 +1,14 @@
 package org.escalaralcoiaicomtat.app
 
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -107,14 +111,30 @@ fun SharedTransitionScope.NavigationController(
         NavHost(
             navController = navController,
             startDestination = initial,
+            // → when popping the back stack, scale the outgoing screen down slightly
             popExitTransition = {
                 scaleOut(
-                    targetScale = 0.9f,
-                    transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.5f)
+                    animationSpec = tween(
+                        durationMillis = 250,
+                        easing = FastOutSlowInEasing
+                    ),
+                    targetScale = 0.92f,
+                    transformOrigin = TransformOrigin.Center
+                ) + fadeOut(
+                    animationSpec = tween(200)
                 )
             },
+            // → when the previous screen re‐enters, slide it in from the left + fade in
             popEnterTransition = {
-                EnterTransition.None
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth / 3 },
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = FastOutSlowInEasing
+                    )
+                ) + fadeIn(
+                    animationSpec = tween(250)
+                )
             },
             modifier = modifier,
         ) {

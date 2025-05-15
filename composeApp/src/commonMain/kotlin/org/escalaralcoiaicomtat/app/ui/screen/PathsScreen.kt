@@ -2,6 +2,7 @@ package org.escalaralcoiaicomtat.app.ui.screen
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -110,6 +111,7 @@ import org.escalaralcoiaicomtat.app.ui.icons.ClimbingShoes
 import org.escalaralcoiaicomtat.app.ui.icons.Rope
 import org.escalaralcoiaicomtat.app.ui.list.PathListItem
 import org.escalaralcoiaicomtat.app.ui.model.PathsScreenModel
+import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
 import org.escalaralcoiaicomtat.app.utils.format
@@ -167,7 +169,7 @@ fun PathsScreen(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 private fun PathsScreen(
     sector: Sector?,
     paths: List<Path>?,
@@ -205,7 +207,14 @@ private fun PathsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { sector?.let { Text(it.displayName) } },
+                title = {
+                    sector?.let {
+                        Text(
+                            text = it.displayName,
+                            modifier = Modifier.sharedElement("sector-${it.id}")
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackRequested) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
