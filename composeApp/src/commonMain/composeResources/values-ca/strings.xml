@@ -266,4 +266,9 @@
     <string name="settings_server_info_stats_zones">Zones: %1$d</string>
     <string name="settings_server_info_stats_sectors">Sectors: %1$d</string>
     <string name="settings_server_info_stats_paths">Vies: %1$d</string>
+    <string name="ending_equipped">Equipat</string>
+    <string name="ending_clean">Net</string>
+    <string name="inclination_vertical">Vertical</string>
+    <string name="inclination_horizontal">Horitzontal</string>
+    <string name="inclination_diagonal">Diagonal</string>
 </resources>
