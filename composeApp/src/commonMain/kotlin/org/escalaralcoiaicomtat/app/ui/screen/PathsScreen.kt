@@ -89,6 +89,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import com.mxalbert.zoomable.Zoomable
+import com.mxalbert.zoomable.rememberZoomableState
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
@@ -451,7 +452,8 @@ fun PathsList(
                     modifier = Modifier.fillMaxHeight().weight(1f)
                 ) {
                     Zoomable(
-                        modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds()
+                        modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds(),
+                        state = rememberZoomableState(maxScale = 5f),
                     ) {
                         val painter = rememberAsyncImagePainter(parent.imageUrl())
                         val state by painter.state.collectAsState()
