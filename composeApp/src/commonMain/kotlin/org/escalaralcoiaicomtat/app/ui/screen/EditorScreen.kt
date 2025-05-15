@@ -1061,7 +1061,7 @@ private fun PitchesEditor(
     modifier: Modifier = Modifier,
 ) {
     FormListCreator(
-        elements = list.map { it.editable() },
+        elements = list.sortedBy { it.pitch }.map { it.editable() },
         onElementsChange = { onUpdateItem(it.map(EditablePitchInfo::build)) },
         constructor = { EditablePitchInfo() },
         validate = { true },

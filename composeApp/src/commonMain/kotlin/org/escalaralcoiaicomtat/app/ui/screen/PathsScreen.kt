@@ -655,7 +655,7 @@ private fun LazyListScope.bottomSheetContents(
         )
     }
     if (child.pitches != null) item {
-        val pitches = child.pitches
+        val pitches = child.pitches.sortedBy { it.pitch }
         MetaCard(
             icon = Icons.AutoMirrored.Filled.ListAlt,
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -665,7 +665,7 @@ private fun LazyListScope.bottomSheetContents(
                         pitch,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    if (pitches.lastOrNull() == pitch) HorizontalDivider()
+                    if (pitches.lastOrNull() != pitch) HorizontalDivider()
                 }
             },
         )
