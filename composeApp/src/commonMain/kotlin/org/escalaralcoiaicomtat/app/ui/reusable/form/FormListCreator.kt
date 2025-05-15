@@ -33,7 +33,7 @@ fun <T> FormListCreator(
     creator: @Composable ColumnScope.(value: T, onChangeValue: (T) -> Unit) -> Unit,
     validate: (T) -> Boolean,
     title: String,
-    elementRender: @Composable (T, onEditRequested: () -> Unit, onRemoveRequested: () -> Unit) -> Unit,
+    elementRender: @Composable (T, isLast: Boolean, onEditRequested: () -> Unit, onRemoveRequested: () -> Unit) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
@@ -90,6 +90,7 @@ fun <T> FormListCreator(
         for (element in elements) {
             elementRender(
                 element,
+                elements.lastOrNull() == element,
                 {
                     modifying = element
                     editing = element
