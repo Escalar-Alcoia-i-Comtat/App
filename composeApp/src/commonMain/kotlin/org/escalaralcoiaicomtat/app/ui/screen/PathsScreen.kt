@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
@@ -41,11 +43,13 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -94,6 +98,7 @@ import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
+import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import org.escalaralcoiaicomtat.app.data.generic.color
 import org.escalaralcoiaicomtat.app.platform.BackHandler
@@ -647,6 +652,21 @@ private fun BottomSheetContents(
                     .padding(vertical = 4.dp)
             )
         }
+        child.pitches?.let { pitches ->
+            MetaCard(
+                icon = Icons.AutoMirrored.Filled.ListAlt,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                content = {
+                    for (pitch in pitches) {
+                        PitchInfoRow(
+                            pitch,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        if (pitches.lastOrNull() == pitch) HorizontalDivider()
+                    }
+                },
+            )
+        }
         val pathBuilder = child.builder?.orNull()
         val pathReBuilders = child.reBuilders?.mapNotNull { it.orNull() }
         if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) {
@@ -775,14 +795,15 @@ private fun CountMetaCard(path: Path) {
 @Composable
 private fun MetaCard(
     icon: ImageVector,
-    text: String,
     modifier: Modifier = Modifier,
+    text: String? = null,
     iconContentDescription: String? = null,
     bigText: String? = null,
     bigTextColor: Color = Color.Unspecified,
     dialogText: AnnotatedString? = null,
     message: String? = null,
     colors: CardColors = CardDefaults.outlinedCardColors(),
+    content: (@Composable ColumnScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
     var showingDialog by remember { mutableStateOf(false) }
@@ -827,11 +848,13 @@ private fun MetaCard(
                     .padding(start = 4.dp, end = 12.dp)
                     .padding(vertical = 8.dp)
             ) {
-                Text(
-                    text = text,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                text?.let { it ->
+                    Text(
+                        text = it,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
                 bigText?.let { text ->
                     Text(
                         text = text,
@@ -856,6 +879,62 @@ private fun MetaCard(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
+                content?.invoke(this)
+            }
+        }
+    }
+}
+
+@Composable
+fun PitchInfoRow(
+    pitch: PitchInfo,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Badge {
+                Text("L${pitch.pitch}")
+            }
+            pitch.grade?.let { grade ->
+                Text(
+                    text = grade.toString(),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    color = pitch.grade.color.current,
+                )
+            }
+            pitch.height?.let { height ->
+                Text(
+                    text = "$height m",
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+            }
+            pitch.ending?.let { ending ->
+                Text(
+                    text = stringResource(ending.displayName),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            pitch.info?.let { info ->
+                Image(info.icon, stringResource(info.stringRes))
+                Text(
+                    text = stringResource(info.stringRes),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            pitch.inclination?.let { inclination ->
+                Image(inclination.icon, stringResource(inclination.stringRes))
+                Text(
+                    text = stringResource(inclination.stringRes),
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
