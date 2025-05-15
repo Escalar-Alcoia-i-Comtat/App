@@ -8,7 +8,9 @@ import kotlinx.serialization.UseSerializers
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
+import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
+import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
 import org.escalaralcoiaicomtat.app.data.serialization.UuidSerializer
 import kotlin.uuid.Uuid
 
@@ -21,7 +23,7 @@ data class PathData(
     @SerialName("sketch_id") val sketchId: UInt,
 
     val height: UInt?,
-    @SerialName("grade") val gradeValue: String?,
+    @Serializable(GradeSerializer::class) val grade: GradeValue?,
     val ending: Ending?,
     val pitches: List<PitchInfo>?,
 
@@ -59,7 +61,7 @@ data class PathData(
         displayName,
         sketchId,
         height,
-        gradeValue,
+        grade,
         ending,
         pitches,
         stringCount,

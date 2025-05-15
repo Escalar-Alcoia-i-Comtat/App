@@ -26,6 +26,7 @@ import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
+import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
 import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.byType
@@ -172,7 +173,7 @@ object AdminBackend : Backend() {
                     if (stored.sketchId != item.sketchId) append("sketchId", item.sketchId.toInt())
 
                     if (stored.height != item.height) appendOrRemove("height", item.height?.toInt())
-                    if (stored.grade != item.grade) appendOrRemove("grade", item.gradeValue)
+                    if (stored.grade != item.grade) appendOrRemove("grade", item.grade, GradeSerializer)
                     if (stored.ending != item.ending) appendOrRemove("ending", item.ending?.name)
 
                     if (stored.pitches != item.pitches) appendOrRemove("pitches", item.pitches, ListSerializer(
@@ -292,7 +293,7 @@ object AdminBackend : Backend() {
                 append("sketchId", item.sketchId.toInt())
 
                 if (item.height != null) append("height", item.height.toInt())
-                if (item.gradeValue != null) append("grade", item.gradeValue)
+                if (item.grade != null) appendSerializable("grade", item.grade, GradeSerializer)
                 if (item.ending != null) append("ending", item.ending.name)
 
                 if (item.pitches != null) appendSerializable("pitches", item.pitches, ListSerializer(

@@ -9,6 +9,7 @@ import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
 import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
+import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
 import org.escalaralcoiaicomtat.app.data.serialization.UuidSerializer
 import org.escalaralcoiaicomtat.app.utils.isNotNullOrZero
 import kotlin.uuid.Uuid
@@ -22,7 +23,7 @@ data class Path(
     @SerialName("sketch_id") val sketchId: UInt,
 
     val height: UInt? = null,
-    @SerialName("grade") val gradeValue: String? = null,
+    @Serializable(GradeSerializer::class) val grade: GradeValue? = null,
     val ending: Ending? = null,
     val pitches: List<PitchInfo>? = null,
 
@@ -51,8 +52,6 @@ data class Path(
 
     @SerialName("sector_id") val parentSectorId: Long
 ) : DataType, DataTypeWithParent {
-    val grade: GradeValue? get() = gradeValue?.let(GradeValue.Companion::fromString)
-
     val hasAnyTypeCount: Boolean = paraboltCount.isNotNullOrZero() ||
         burilCount.isNotNullOrZero() ||
         pitonCount.isNotNullOrZero() ||
