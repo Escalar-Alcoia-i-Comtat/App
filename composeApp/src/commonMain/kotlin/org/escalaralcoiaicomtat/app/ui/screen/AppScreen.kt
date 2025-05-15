@@ -103,9 +103,6 @@ fun AppScreen(
         }
     }
 
-    // val lifecycleManager = LocalLifecycleManager.current
-    // BackHandler { lifecycleManager.finish() }
-
     AdaptiveNavigationScaffold(
         items = listOf(
             NavigationItem(
