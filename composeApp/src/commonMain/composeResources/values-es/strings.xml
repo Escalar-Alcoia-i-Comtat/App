@@ -147,7 +147,7 @@
     <string name="ending_piton">Clavos</string>
     <string name="ending_lanyard">Cordino</string>
     <string name="ending_walking">A pie</string>
-    <string name="ending_rappel">Rappel</string>
+    <string name="ending_rappel">Reunión Rapelable</string>
     <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">Más información</string>
     <string name="file_picker_hint">Clic para elegir</string>
     <string name="editor_yes">Sí</string>
@@ -266,9 +266,9 @@
     <string name="settings_server_info_stats_zones">Zonas: %1$d</string>
     <string name="settings_server_info_stats_sectors">Sectores: %1$d</string>
     <string name="settings_server_info_stats_paths">Vías: %1$d</string>
-    <string name="ending_equipped">Equipado</string>
-    <string name="ending_clean">Limpio</string>
-    <string name="inclination_vertical">Vertical</string>
-    <string name="inclination_horizontal">Horizontal</string>
-    <string name="inclination_diagonal">Diagonal</string>
+    <string name="ending_equipped">Reunión Equipada</string>
+    <string name="ending_clean">Reunión Limpia</string>
+    <string name="inclination_vertical">Reunión Vertical</string>
+    <string name="inclination_horizontal">Reunión Horizontal</string>
+    <string name="inclination_diagonal">Reunión Inclinada</string>
 </resources>
