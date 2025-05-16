@@ -7,6 +7,7 @@ androidx-work = "2.10.1"
 buildkonfig = "0.17.1"
 coil = "3.2.0"
 compose-maps = "6.6.0"
+compose-markdown = "0.34.0"
 compose-navigation = "2.9.10-alpha01"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.8.0"
@@ -49,6 +50,8 @@ coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "co
 compose-filekit = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
 compose-maps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-maps" }
 compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-maps" }
+compose-markdown-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "compose-markdown" }
+compose-markdown-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "compose-markdown" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
 compose-viewModel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewModel" }
 compose-windowSizeClass = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "compose-windowSizeClass" }

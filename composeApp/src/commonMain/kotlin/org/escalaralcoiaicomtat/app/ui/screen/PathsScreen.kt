@@ -88,6 +88,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
+import com.mikepenz.markdown.m3.Markdown
 import com.mxalbert.zoomable.Zoomable
 import com.mxalbert.zoomable.rememberZoomableState
 import com.russhwolf.settings.ExperimentalSettingsApi
@@ -731,7 +732,7 @@ private fun LazyListScope.bottomSheetContents(
     if (child.showDescription && child.description != null) item {
         MetaCard(
             icon = Icons.Filled.Description,
-            text = child.description,
+            textMarkdown = child.description,
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
         )
     }
@@ -806,6 +807,7 @@ private fun MetaCard(
     icon: ImageVector,
     modifier: Modifier = Modifier,
     text: String? = null,
+    textMarkdown: String? = null,
     iconContentDescription: String? = null,
     bigText: String? = null,
     bigTextColor: Color = Color.Unspecified,
@@ -857,16 +859,22 @@ private fun MetaCard(
                     .padding(start = 4.dp, end = 12.dp)
                     .padding(vertical = 8.dp)
             ) {
-                text?.let { it ->
+                if (text != null) {
                     Text(
-                        text = it,
+                        text = text,
                         modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-                bigText?.let { text ->
+                if (textMarkdown != null) {
+                    Markdown(
+                        content = textMarkdown,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                if (bigText != null) {
                     Text(
-                        text = text,
+                        text = bigText,
                         color = bigTextColor,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
