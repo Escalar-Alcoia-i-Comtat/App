@@ -113,6 +113,10 @@ kotlin {
             implementation(libs.compose.windowSizeClass)
             implementation(libs.compose.filekit)
 
+            // Compose - Markdown
+            implementation(libs.compose.markdown.coil3)
+            implementation(libs.compose.markdown.m3)
+
             // Compose - Navigation
             implementation(libs.compose.navigation)
 
