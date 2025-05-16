@@ -183,7 +183,7 @@ fun SharedTransitionScope.NavigationController(
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     ZonesScreen(
                         areaId = route.areaId,
-                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onBackRequested = { navController.navigateUp() },
                         onZoneRequested = { navController.navigateTo(route.down(it)) },
                         onEditAreaRequested = {
                             navController.navigateTo(Destinations.Editor(DataTypes.Area, route.id))
@@ -206,7 +206,7 @@ fun SharedTransitionScope.NavigationController(
                     SectorsScreen(
                         zoneId = route.zoneId,
                         editAllowed = editAllowed,
-                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onBackRequested = { navController.navigateUp() },
                         onSectorRequested = { navController.navigateTo(route.down(it)) },
                         onEditZoneRequested = {
                             navController.navigateTo(Destinations.Editor(DataTypes.Zone, route.id))
@@ -237,7 +237,7 @@ fun SharedTransitionScope.NavigationController(
                     PathsScreen(
                         sectorId = route.sectorId,
                         highlightPathId = route.pathId,
-                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onBackRequested = { navController.navigateUp() },
                         onEditSectorRequested = {
                             navController.navigateTo(
                                 Destinations.Editor(DataTypes.Sector, route.id, route.parentZoneId)
