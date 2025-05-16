@@ -766,20 +766,32 @@ private fun LatLngEditor(
         var longitude by remember { mutableStateOf(point?.longitude?.toString() ?: "") }
 
         fun update(lat: String?, lon: String?) {
-            val (newLat, newLon) = if (lat != null) {
-                latitude = lat
-                lat.toDoubleOrNull() to point?.longitude
-            } else if (lon != null) {
-                longitude = lon
-                point?.latitude to lon.toDoubleOrNull()
-            } else {
-                // Won't happen, but must be handled
-                point?.latitude to point?.longitude
+            latitude = lat ?: latitude
+            longitude = lon ?: longitude
+
+            if (latitude.isEmpty() && longitude.isEmpty()) {
+                // If both fields are empty, set the point to null
+                onUpdateItem(null)
             }
+
+            val newLat = latitude.toDoubleOrNull()
+            val newLon = longitude.toDoubleOrNull()
+
             if (newLat != null && newLon != null) {
+                // if there's a valid point set,
+                // update the point with the new position
                 onUpdateItem(LatLng(newLat, newLon))
             } else {
-                onUpdateItem(null)
+                // if there's no valid point set
+                if (point == null) {
+                    // and there was no point set
+                    // set the point to null
+                    onUpdateItem(null)
+                } else {
+                    // and there was a point set
+                    // update the value to the original one
+                    onUpdateItem(point)
+                }
             }
         }
 
