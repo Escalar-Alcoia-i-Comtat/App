@@ -680,64 +680,59 @@ private fun LazyListScope.bottomSheetContents(
     }
     val pathBuilder = child.builder?.orNull()
     val pathReBuilders = child.reBuilders?.mapNotNull { it.orNull() }
-    if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) {
-        item {
-            var text by remember { mutableStateOf("") }
-            LaunchedEffect(Unit) {
-                val name = pathBuilder?.name
-                val date = pathBuilder?.date
-                text = StringBuilder().apply {
-                    if (name != null || date != null) {
-                        appendLine(
-                            getString(Res.string.path_builder_message).format(
-                                if (name != null && date != null) {
-                                    getString(Res.string.path_builder_name_date).format(name, date)
-                                } else if (name == null && date != null) {
-                                    getString(Res.string.path_builder_date).format(date)
-                                } else if (name != null && date == null) {
-                                    getString(Res.string.path_builder_name).format(name)
-                                } else {
-                                    "" // never reached
-                                }
-                            )
+    if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) item {
+        var text by remember { mutableStateOf("") }
+        LaunchedEffect(Unit) {
+            val name = pathBuilder?.name
+            val date = pathBuilder?.date
+            text = StringBuilder().apply {
+                if (name != null || date != null) {
+                    appendLine(
+                        getString(Res.string.path_builder_message).format(
+                            if (name != null && date != null) {
+                                getString(Res.string.path_builder_name_date).format(name, date)
+                            } else if (name == null && date != null) {
+                                getString(Res.string.path_builder_date).format(date)
+                            } else if (name != null && date == null) {
+                                getString(Res.string.path_builder_name).format(name)
+                            } else {
+                                "" // never reached
+                            }
                         )
-                    }
-                    pathReBuilders?.forEach { builder ->
-                        appendLine(
-                            getString(Res.string.path_re_builder_message).format(
-                                if (builder.name != null && builder.date != null) {
-                                    getString(Res.string.path_builder_name_date)
-                                        .format(builder.name, builder.date)
-                                } else if (builder.name == null && builder.date != null) {
-                                    getString(Res.string.path_builder_date)
-                                        .format(builder.date)
-                                } else if (builder.name != null && builder.date == null) {
-                                    getString(Res.string.path_builder_name)
-                                        .format(builder.name)
-                                } else {
-                                    "" // never reached
-                                }
-                            )
+                    )
+                }
+                pathReBuilders?.forEach { builder ->
+                    appendLine(
+                        getString(Res.string.path_re_builder_message).format(
+                            if (builder.name != null && builder.date != null) {
+                                getString(Res.string.path_builder_name_date)
+                                    .format(builder.name, builder.date)
+                            } else if (builder.name == null && builder.date != null) {
+                                getString(Res.string.path_builder_date)
+                                    .format(builder.date)
+                            } else if (builder.name != null && builder.date == null) {
+                                getString(Res.string.path_builder_name)
+                                    .format(builder.name)
+                            } else {
+                                "" // never reached
+                            }
                         )
-                    }
-                }.toString()
-            }
-            MetaCard(
-                icon = Icons.Filled.ClimbingHelmet,
-                text = text,
-                modifier = Modifier.fillMaxWidth()
-            )
+                    )
+                }
+            }.toString()
         }
+        MetaCard(
+            icon = Icons.Filled.ClimbingHelmet,
+            text = text,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        )
     }
 
     if (child.showDescription && child.description != null) item {
         MetaCard(
             icon = Icons.Filled.Description,
             text = child.description,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
         )
     }
 }
