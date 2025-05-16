@@ -20,4 +20,5 @@ captures
 keystore.jks
 .kotlin
 google-services.json
+GoogleService-Info.plist
 *.bak
