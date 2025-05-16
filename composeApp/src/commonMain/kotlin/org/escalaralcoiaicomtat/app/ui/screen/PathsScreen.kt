@@ -213,7 +213,8 @@ private fun PathsScreen(
                     sector?.let {
                         Text(
                             text = it.displayName,
-                            modifier = Modifier.sharedElement("sector-${it.id}")
+                            modifier = Modifier.sharedElement("sector-${it.id}"),
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 },
