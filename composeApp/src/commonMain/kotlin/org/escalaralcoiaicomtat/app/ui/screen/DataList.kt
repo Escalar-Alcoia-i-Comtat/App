@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import org.escalaralcoiaicomtat.app.data.DataTypeWithImage
@@ -98,8 +99,8 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                     parent?.let {
                         Text(
                             text = it.displayName,
-                            modifier = Modifier
-                                .sharedElement(key = parentAnimationKey())
+                            modifier = Modifier.sharedElement(key = parentAnimationKey()),
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 },
