@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.serialization.Serializable
+import org.escalaralcoiaicomtat.app.ui.icons.Rock
 import org.escalaralcoiaicomtat.app.ui.icons.Rope
 import org.jetbrains.compose.resources.StringResource
 
@@ -64,6 +65,12 @@ enum class BlockingTypes(
         Icons.Default.Rope,
         Res.string.path_blocking_rope_display_name,
         Res.string.path_blocking_rope_message,
+        0,
+    ),
+    LOOSE_ROCKS(
+        Icons.Default.Rock,
+        Res.string.path_blocking_loose_rocks_display_name,
+        Res.string.path_blocking_loose_rocks_message,
         0,
     );
 
