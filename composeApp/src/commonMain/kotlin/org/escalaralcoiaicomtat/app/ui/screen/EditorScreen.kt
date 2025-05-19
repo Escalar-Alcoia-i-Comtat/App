@@ -105,7 +105,8 @@ fun <DT : DataType> EditorScreen(
     id: Long?, // If null, a new item will be created
     parentId: Long?,
     model: EditorModel<DT> = viewModel { EditorModel(dataType, id, parentId) },
-    onBackRequested: () -> Unit
+    onBackRequested: () -> Unit,
+    onHomeRequested: () -> Unit,
 ) {
     val item by model.item.collectAsState()
     val files by model.files.collectAsState()
@@ -143,7 +144,7 @@ fun <DT : DataType> EditorScreen(
         onClearErrorRequested = model::clearError,
         onSaveRequested = model::save,
         onDeleteRequested = {
-            model.delete(onBackRequested)
+            model.delete(onHomeRequested)
         },
         onBackRequested = onBackRequested,
     )
