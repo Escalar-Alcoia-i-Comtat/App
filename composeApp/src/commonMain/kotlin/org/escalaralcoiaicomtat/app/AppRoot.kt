@@ -261,7 +261,13 @@ fun SharedTransitionScope.NavigationController(
                 val route = navBackStackEntry.toRoute<Destinations.Editor>()
                 val dataTypes = remember(route) { DataTypes.Companion.valueOf(route.dataTypes) }
 
-                EditorScreen(dataTypes, route.id, route.parentId) { navController.navigateUp() }
+                EditorScreen(
+                    dataTypes,
+                    route.id,
+                    route.parentId,
+                    onBackRequested = navController::navigateUp,
+                    onHomeRequested = { navController.navigateTo(Destinations.Root, true) },
+                )
             }
             composable<Destinations.Map> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Map>()
