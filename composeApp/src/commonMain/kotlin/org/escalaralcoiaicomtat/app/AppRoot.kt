@@ -25,8 +25,6 @@ import androidx.navigation.toRoute
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import org.escalaralcoiaicomtat.app.data.Area
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.data.Path
@@ -51,9 +49,6 @@ import org.escalaralcoiaicomtat.app.ui.screen.PathsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.SectorsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.ZonesScreen
 import org.escalaralcoiaicomtat.app.ui.theme.AppTheme
-import org.escalaralcoiaicomtat.app.utils.createStore
-
-val store = CoroutineScope(SupervisorJob()).createStore()
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -266,7 +261,18 @@ fun SharedTransitionScope.NavigationController(
                     route.id,
                     route.parentId,
                     onBackRequested = navController::navigateUp,
-                    onHomeRequested = { navController.navigateTo(Destinations.Root, true) },
+                    afterDelete = {
+                        val backStackEntry = navController.previousBackStackEntry
+                        if (route.parentId == null || backStackEntry == null) {
+                            navController.navigateTo(Destinations.Root, true)
+                            return@EditorScreen
+                        }
+                        val previousDestination = backStackEntry.toRoute<Destination>()
+                        // If popBackStack returns null, just navigate to root as single top
+                        if (!navController.popBackStack(previousDestination, false)) {
+                            navController.navigateTo(Destinations.Root, true)
+                        }
+                    },
                 )
             }
             composable<Destinations.Map> { navBackStackEntry ->
