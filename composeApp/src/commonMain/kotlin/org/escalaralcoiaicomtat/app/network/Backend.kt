@@ -81,6 +81,7 @@ abstract class Backend {
     ): DT? {
         return try {
             val url = response.request.url
+            val method = response.request.method
             val status = response.status.value
             val body = response.bodyAsText(fallbackCharset = Charsets.UTF_8)
 
@@ -103,7 +104,7 @@ abstract class Backend {
                 Napier.e(tag = "Backend") {
                     "Server responded with an exception.\nUrl: $url\nCode: $status. Body: $body"
                 }
-                json.decodeFromString<ErrorResponse>(body).throwException(url)
+                json.decodeFromString<ErrorResponse>(body).throwException(method, url)
             }
         } catch (exception: NoTransformationFoundException) {
             Napier.e(tag = "Backend", throwable = exception) {

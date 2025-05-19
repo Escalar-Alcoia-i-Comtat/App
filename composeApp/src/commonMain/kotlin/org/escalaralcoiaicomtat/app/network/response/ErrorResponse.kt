@@ -1,5 +1,6 @@
 package org.escalaralcoiaicomtat.app.network.response
 
+import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import kotlinx.serialization.Serializable
 import org.escalaralcoiaicomtat.app.exception.ServerException
@@ -15,7 +16,7 @@ data class ErrorResponse(
         val message: String? = null
     )
 
-    fun <R> throwException(url: Url?): R {
-        throw with(error) { ServerException(code, message, url) }
+    fun <R> throwException(method: HttpMethod?, url: Url?): R {
+        throw with(error) { ServerException(code, message, method, url) }
     }
 }
