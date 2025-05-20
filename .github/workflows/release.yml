@@ -2,6 +2,8 @@ name: Release Binaries
 
 on:
   release:
+    types:
+      - released
 
 jobs:
   update-version-name:
