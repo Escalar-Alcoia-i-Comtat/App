@@ -104,6 +104,7 @@ kotlin {
         commonMain.dependencies {
             // Compose - Base
             implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)

@@ -148,9 +148,11 @@
     <string name="path_height">Height</string>
     <string name="path_grade">Grade</string>
     <string name="path_quickdraws_title">You must bring at least</string>
-    <string name="path_quickdraws">%s Quickdraws</string>
+    <string name="path_quickdraws">%1$s Quickdraws</string>
     <string name="path_safes_none">We don't have more information about the safes installed in the path.</string>
     <string name="path_safes_count">The path has the following safes installed:</string>
+    <string name="path_safes_types">This route is equipped with %1$s</string>
+    <string name="path_safes_and">and</string>
     <string name="path_builder_message">This path was built %s.</string>
     <string name="path_re_builder_message">This path was re-built %s.</string>
     <string name="path_builder_name">by %s</string>
@@ -190,15 +192,15 @@
     <string name="unit_value_feet">%.0f ft.</string>
 
     <string name="path_safes_parabolts">Parabolts</string>
-    <string name="path_safes_parabolts_count">%d Parabolts</string>
+    <string name="path_safes_parabolts_count">%1$d Parabolts</string>
     <string name="path_safes_burils">Burils</string>
-    <string name="path_safes_burils_count">%d Burils</string>
+    <string name="path_safes_burils_count">%1$d Burils</string>
     <string name="path_safes_pitons">Pitons</string>
-    <string name="path_safes_pitons_count">%d Parabolts</string>
+    <string name="path_safes_pitons_count">%1$d Pitons</string>
     <string name="path_safes_spits">Spits</string>
-    <string name="path_safes_spits_count">%d Spits</string>
+    <string name="path_safes_spits_count">%1$d Spits</string>
     <string name="path_safes_tensors">Tensors</string>
-    <string name="path_safes_tensors_count">%d Tensors</string>
+    <string name="path_safes_tensors_count">%1$d Tensors</string>
 
     <string name="ending_none">None</string>
     <string name="ending_plate">Plate</string>

@@ -78,11 +78,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -101,6 +98,7 @@ import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
+import org.escalaralcoiaicomtat.app.data.generic.SafesCount
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
 import org.escalaralcoiaicomtat.app.data.generic.color
 import org.escalaralcoiaicomtat.app.platform.launchPoint
@@ -118,10 +116,10 @@ import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
 import org.escalaralcoiaicomtat.app.utils.format
 import org.escalaralcoiaicomtat.app.utils.unit.meters
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private val sidePathInformationPanelHeight: Dp = 500.dp
 private val sidePathInformationPanelMaxWidth: Dp = 500.dp
@@ -653,7 +651,7 @@ private fun LazyListScope.bottomSheetContents(
                 .padding(vertical = 4.dp)
         )
     }
-    countMetaCard(child)
+    countMetaCard(child.safes)
     if (child.ending != null) item {
         MetaCard(
             icon = Icons.Filled.SwipeDownAlt,
@@ -739,68 +737,70 @@ private fun LazyListScope.bottomSheetContents(
     }
 }
 
-private fun LazyListScope.countMetaCard(path: Path) {
-    if (path.hasAnyCount) item {
+private fun LazyListScope.countMetaCard(safes: SafesCount) {
+    if (safes.isNotNull) item {
         MetaCard(
             icon = Icons.Filled.ClimbingAnchor,
             text = stringResource(Res.string.path_quickdraws_title),
-            bigText = path.stringCount?.toInt()?.let {
-                stringResource(Res.string.path_quickdraws)
-                    .format(if (it <= 0) "¿?" else it.toString())
+            bigText = safes.stringCount?.toInt().let {
+                stringResource(
+                    Res.string.path_quickdraws,
+                    if (it == null || it <= 0) "¿?" else it.toString()
+                )
             },
-            dialogText = if (path.hasAnyTypeCount) {
-                buildAnnotatedString {
-                    appendLine(stringResource(Res.string.path_safes_count))
-
-                    @Composable
-                    fun add(amount: UInt?, singleRes: StringResource, countRes: StringResource) {
-                        amount?.toInt()
-                            ?.takeIf { it > 0 }
-                            ?.let {
-                                if (it <= 1 || it >= Int.MAX_VALUE) stringResource(singleRes)
-                                else stringResource(countRes).format(it)
-                            }
-                            ?.let { line ->
-                                append('•')
-                                append(' ')
-                                withStyle(
-                                    SpanStyle(fontWeight = FontWeight.Bold)
-                                ) {
-                                    appendLine(line)
-                                }
-                            }
-                    }
-                    add(
-                        amount = path.paraboltCount,
-                        singleRes = Res.string.path_safes_parabolts,
-                        countRes = Res.string.path_safes_parabolts_count
-                    )
-                    add(
-                        amount = path.burilCount,
-                        singleRes = Res.string.path_safes_burils,
-                        countRes = Res.string.path_safes_burils_count
-                    )
-                    add(
-                        amount = path.pitonCount,
-                        singleRes = Res.string.path_safes_pitons,
-                        countRes = Res.string.path_safes_pitons_count
-                    )
-                    add(
-                        amount = path.spitCount,
-                        singleRes = Res.string.path_safes_spits,
-                        countRes = Res.string.path_safes_spits_count
-                    )
-                    add(
-                        amount = path.tensorCount,
-                        singleRes = Res.string.path_safes_tensors,
-                        countRes = Res.string.path_safes_tensors_count
-                    )
-                }
-            } else {
-                null
-            }
+            dialogText = safes.toAnnotatedString(),
         )
     }
+}
+
+@Preview
+@Composable
+private fun countMetaCard_parabolts_unknownAmount_Preview() {
+    LazyColumn {
+        countMetaCard(
+            SafesCount(paraboltCount = 0u)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SafesCount_toAnnotatedString_parabolts_unknownAmount_Preview() {
+    Text(
+        SafesCount(paraboltCount = 0u).toAnnotatedString()!!
+    )
+}
+
+@Preview
+@Composable
+private fun SafesCount_toAnnotatedString_parabolts_amount_Preview() {
+    Text(
+        SafesCount(paraboltCount = 5u).toAnnotatedString()!!
+    )
+}
+
+@Preview
+@Composable
+private fun SafesCount_toAnnotatedString_multiple_unknownAmount_Preview() {
+    Text(
+        SafesCount(paraboltCount = 0u, burilCount = 0u).toAnnotatedString()!!
+    )
+}
+
+@Preview
+@Composable
+private fun SafesCount_toAnnotatedString_multiple_amount_Preview() {
+    Text(
+        SafesCount(paraboltCount = 5u, burilCount = 7u).toAnnotatedString()!!
+    )
+}
+
+@Preview
+@Composable
+private fun SafesCount_toAnnotatedString_multiple_unknownAndAmount_Preview() {
+    Text(
+        SafesCount(paraboltCount = 0u, burilCount = 7u).toAnnotatedString()!!
+    )
 }
 
 @Composable
