@@ -239,14 +239,14 @@
     <string name="status_loading">Carregant...</string>
     <string name="settings_app_info_blocking_last_sync_title">Sincronització d'Alertes</string>
     <string name="path_blocking_title">Atenció</string>
-    <string name="path_blocking_dry_message">Aquesta via acaba de ser equipada, i els segurs encara estan en procés d\'assecat. Per favor, espera abans d\'escalar-la.</string>
+    <string name="path_blocking_dry_message">Aquesta via acaba de ser equipada, i els segurs encara estan en procés d'assecat. Per favor, espera abans d'escalar-la.</string>
     <string name="path_blocking_build_message">Aquesta via està sent equipada o reequipada.</string>
     <string name="path_blocking_bird_message">Aquesta via té un niu prop. Està prohibida la seua escalada.</string>
     <string name="path_blocking_plants_message">Aquesta via no té molt de manteniment i pot tindre plantes, terra i o arrels pel camí.</string>
-    <string name="path_blocking_rope_message">Aquesta via és més llarga de l\'habitual. Per favor, ves amb cura amb la longitud de la corda.</string>
+    <string name="path_blocking_rope_message">Aquesta via és més llarga de l'habitual. Per favor, ves amb cura amb la longitud de la corda.</string>
     <string name="path_blocking_recurrent">Tots els anys des de %1$s fins a %2$s.</string>
     <string name="path_blocking_date">Acaba el %1$s.</string>
-    <string name="path_blocking_old_message">Aquesta via és molt antiga, i no està mantinguda. Per favor, ves amb cura a l\'escalar-la, poden caure pedres, o haver segurs solts.</string>
+    <string name="path_blocking_old_message">Aquesta via és molt antiga, i no està mantinguda. Per favor, ves amb cura a l'escalar-la, poden caure pedres, o haver segurs solts.</string>
     <string name="path_blocking_dry_display_name">Assecant</string>
     <string name="path_blocking_build_display_name">Equipant/Reequipant</string>
     <string name="path_blocking_bird_display_name">Nidificació</string>
