@@ -196,7 +196,7 @@
     <string name="path_safes_burils">Burils</string>
     <string name="path_safes_burils_count">%1$d Burils</string>
     <string name="path_safes_pitons">Pitons</string>
-    <string name="path_safes_pitons_count">%1$d Parabolts</string>
+    <string name="path_safes_pitons_count">%1$d Pitons</string>
     <string name="path_safes_spits">Spits</string>
     <string name="path_safes_spits_count">%1$d Spits</string>
     <string name="path_safes_tensors">Tensors</string>
