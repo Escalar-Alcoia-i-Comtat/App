@@ -25,8 +25,6 @@ import androidx.navigation.toRoute
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import org.escalaralcoiaicomtat.app.data.Area
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.data.Path
@@ -51,9 +49,6 @@ import org.escalaralcoiaicomtat.app.ui.screen.PathsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.SectorsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.ZonesScreen
 import org.escalaralcoiaicomtat.app.ui.theme.AppTheme
-import org.escalaralcoiaicomtat.app.utils.createStore
-
-val store = CoroutineScope(SupervisorJob()).createStore()
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -183,7 +178,7 @@ fun SharedTransitionScope.NavigationController(
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     ZonesScreen(
                         areaId = route.areaId,
-                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onBackRequested = { navController.navigateUp() },
                         onZoneRequested = { navController.navigateTo(route.down(it)) },
                         onEditAreaRequested = {
                             navController.navigateTo(Destinations.Editor(DataTypes.Area, route.id))
@@ -206,7 +201,7 @@ fun SharedTransitionScope.NavigationController(
                     SectorsScreen(
                         zoneId = route.zoneId,
                         editAllowed = editAllowed,
-                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onBackRequested = { navController.navigateUp() },
                         onSectorRequested = { navController.navigateTo(route.down(it)) },
                         onEditZoneRequested = {
                             navController.navigateTo(Destinations.Editor(DataTypes.Zone, route.id))
@@ -237,7 +232,7 @@ fun SharedTransitionScope.NavigationController(
                     PathsScreen(
                         sectorId = route.sectorId,
                         highlightPathId = route.pathId,
-                        onBackRequested = { navController.navigateTo(route.up()) },
+                        onBackRequested = { navController.navigateUp() },
                         onEditSectorRequested = {
                             navController.navigateTo(
                                 Destinations.Editor(DataTypes.Sector, route.id, route.parentZoneId)
@@ -261,7 +256,24 @@ fun SharedTransitionScope.NavigationController(
                 val route = navBackStackEntry.toRoute<Destinations.Editor>()
                 val dataTypes = remember(route) { DataTypes.Companion.valueOf(route.dataTypes) }
 
-                EditorScreen(dataTypes, route.id, route.parentId) { navController.navigateUp() }
+                EditorScreen(
+                    dataTypes,
+                    route.id,
+                    route.parentId,
+                    onBackRequested = navController::navigateUp,
+                    afterDelete = {
+                        val backStackEntry = navController.previousBackStackEntry
+                        if (route.parentId == null || backStackEntry == null) {
+                            navController.navigateTo(Destinations.Root, true)
+                            return@EditorScreen
+                        }
+                        val previousDestination = backStackEntry.toRoute<Destination>()
+                        // If popBackStack returns null, just navigate to root as single top
+                        if (!navController.popBackStack(previousDestination, false)) {
+                            navController.navigateTo(Destinations.Root, true)
+                        }
+                    },
+                )
             }
             composable<Destinations.Map> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Map>()

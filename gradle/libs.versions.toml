@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.2"
+agp = "8.9.3"
 androidx-activityCompose = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-sqlite-bundled = "2.5.1"
@@ -7,18 +7,18 @@ androidx-work = "2.10.1"
 buildkonfig = "0.17.1"
 coil = "3.2.0"
 compose-maps = "6.6.0"
+compose-markdown = "0.34.0"
 compose-navigation = "2.9.10-alpha01"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
-compose-plugin = "1.8.0"
+compose-plugin = "1.8.1"
 compose-richeditor = "1.0.0-rc11"
 compose-ui = "1.8.1"
 compose-viewModel = "2.8.4"
 compose-windowSizeClass = "0.5.0"
 filekit = "0.8.8"
-firebase-bom = "33.13.0"
+firebase-bom = "33.14.0"
 gms = "4.4.2"
 kmpio = "0.1.6"
-kmpnotifier = "1.5.1"
 kotlin = "2.1.21"
 kotlinx = "1.10.2"
 kotlinx-browser = "0.3"
@@ -34,7 +34,7 @@ napier = "2.7.1"
 play-appupdate = "2.1.0"
 play-instantapps = "18.1.0"
 room = "2.7.1"
-sentry-android = "5.5.0"
+sentry-android = "5.6.0"
 sentry-multiplatform = "0.12.0"
 semver = "3.0.0"
 zoomable = "1.7.0"
@@ -49,6 +49,8 @@ coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "co
 compose-filekit = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
 compose-maps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-maps" }
 compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-maps" }
+compose-markdown-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "compose-markdown" }
+compose-markdown-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "compose-markdown" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
 compose-viewModel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewModel" }
 compose-windowSizeClass = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "compose-windowSizeClass" }
@@ -60,7 +62,6 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 kmpio = { module = "io.github.skolson:kmp-io", version.ref = "kmpio" }
-kmpnotifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "kmpnotifier" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
@@ -95,7 +96,6 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 gms = { id = "com.google.gms.google-services", version.ref = "gms" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

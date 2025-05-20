@@ -52,7 +52,7 @@ object AdminBackend : Backend() {
                 .buildString(),
             formData = emptyList()
         ) {
-            bearerAuth(apiKey)
+            bearerAuth(apiKey.trim(' ', '\n'))
         }
         // Since we are not properly making the request, it will return BadRequest, but if it does,
         // it means that the key is correct.

@@ -33,12 +33,12 @@ fun FormBuilder.appendOrRemove(key: String, value: Boolean?) {
 }
 
 fun <T> FormBuilder.appendSerializable(key: String, value: T, serializer: SerializationStrategy<T>, headers: Headers = Headers.Empty) {
-    val str = json.encodeToString(serializer, value)
+    val str = json.encodeToString(serializer, value).trim('"')
     append(key, str, headers)
 }
 
 fun <T> FormBuilder.appendOrRemove(key: String, value: T?, serializer: SerializationStrategy<T>) {
-    val str = value?.let { json.encodeToString(serializer, it) }
+    val str = value?.let { json.encodeToString(serializer, it).trim('"') }
     appendOrRemove(key, str)
 }
 

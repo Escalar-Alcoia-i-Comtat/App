@@ -7,6 +7,7 @@ import org.escalaralcoiaicomtat.app.data.Zone
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
+import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
@@ -84,7 +85,7 @@ object DataTypeGenerator {
         displayName: String = "",
         sketchId: UInt = 0U,
         height: UInt? = null,
-        grade: String? = null,
+        grade: GradeValue? = null,
         ending: Ending? = null,
         pitches: List<PitchInfo>? = null,
         stringCount: UInt? = null,

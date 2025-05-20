@@ -9,9 +9,9 @@ import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
 import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
+import org.escalaralcoiaicomtat.app.data.generic.SafesCount
 import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
 import org.escalaralcoiaicomtat.app.data.serialization.UuidSerializer
-import org.escalaralcoiaicomtat.app.utils.isNotNullOrZero
 import kotlin.uuid.Uuid
 
 @Serializable
@@ -52,13 +52,7 @@ data class Path(
 
     @SerialName("sector_id") val parentSectorId: Long
 ) : DataType, DataTypeWithParent {
-    val hasAnyTypeCount: Boolean = paraboltCount.isNotNullOrZero() ||
-        burilCount.isNotNullOrZero() ||
-        pitonCount.isNotNullOrZero() ||
-        spitCount.isNotNullOrZero() ||
-        tensorCount.isNotNullOrZero()
-
-    val hasAnyCount: Boolean = stringCount.isNotNullOrZero() || hasAnyTypeCount
+    val safes: SafesCount get() = SafesCount(this)
 
     override fun compareTo(other: DataType): Int {
         return (other as? Path)

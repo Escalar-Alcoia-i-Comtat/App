@@ -17,7 +17,7 @@ object DataResponse {
         val element = json.decodeFromString<JsonElement>(value).jsonObject
         val success = element.getValue("success").jsonPrimitive.boolean
         if (!success) {
-            json.decodeFromString<ErrorResponse>(value).throwException<Unit>(null)
+            json.decodeFromString<ErrorResponse>(value).throwException<Unit>(null, null)
         }
         val data = element.getValue("data").jsonObject
         return json.decodeFromJsonElement(deserializer, data)
@@ -30,7 +30,7 @@ object DataResponse {
         val element = json.decodeFromString<JsonElement>(value).jsonObject
         val success = element.getValue("success").jsonPrimitive.boolean
         if (!success) {
-            json.decodeFromString<ErrorResponse>(value).throwException<Unit>(null)
+            json.decodeFromString<ErrorResponse>(value).throwException<Unit>(null, null)
         }
     }
 }

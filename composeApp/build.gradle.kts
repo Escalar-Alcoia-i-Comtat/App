@@ -104,6 +104,7 @@ kotlin {
         commonMain.dependencies {
             // Compose - Base
             implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
@@ -112,6 +113,10 @@ kotlin {
             // Compose - Utilities
             implementation(libs.compose.windowSizeClass)
             implementation(libs.compose.filekit)
+
+            // Compose - Markdown
+            implementation(libs.compose.markdown.coil3)
+            implementation(libs.compose.markdown.m3)
 
             // Compose - Navigation
             implementation(libs.compose.navigation)

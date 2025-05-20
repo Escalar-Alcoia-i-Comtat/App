@@ -1,6 +1,10 @@
 package org.escalaralcoiaicomtat.app.ui.modifier
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.escalaralcoiaicomtat.app.ui.composition.LocalAnimatedContentScope
@@ -14,9 +18,14 @@ fun Modifier.sharedElement(key: String): Modifier {
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
 
     return with(sharedTransitionScope) {
-        sharedElement(
-            rememberSharedContentState(key),
-            animatedVisibilityScope = animatedContentScope,
-        )
+        with(animatedContentScope) {
+            sharedElement(
+                rememberSharedContentState(key),
+                animatedVisibilityScope = animatedContentScope,
+            ).animateEnterExit(
+                enter = fadeIn() + slideInVertically { -it },
+                exit = fadeOut() + slideOutVertically { -it },
+            )
+        }
     }
 }
