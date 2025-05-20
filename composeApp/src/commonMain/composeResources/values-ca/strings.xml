@@ -107,7 +107,7 @@
     <string name="path_height">Altura</string>
     <string name="path_grade">Grau</string>
     <string name="path_quickdraws_title">Cal que portis com a mínim</string>
-    <string name="path_quickdraws">%s Express</string>
+    <string name="path_quickdraws">%1$s Express</string>
     <string name="path_safes_none">No tenim informació addicional sobre els segurs instal·lats a la via.</string>
     <string name="path_safes_count">La via té els següents segurs instal·lats:</string>
     <string name="path_builder_message">Aquesta via va ser equipada %s.</string>
@@ -128,15 +128,15 @@
     <string name="unit_label_feet">Peus</string>
     <string name="unit_value_feet">%.0f ft.</string>
     <string name="path_safes_parabolts">Parabolts</string>
-    <string name="path_safes_parabolts_count">%d Parabolts</string>
+    <string name="path_safes_parabolts_count">%1$d Parabolts</string>
     <string name="path_safes_burils">Burils</string>
-    <string name="path_safes_burils_count">%d Burils</string>
+    <string name="path_safes_burils_count">%1$d Burils</string>
     <string name="path_safes_pitons">Claus</string>
-    <string name="path_safes_pitons_count">%d Parabolts</string>
+    <string name="path_safes_pitons_count">%1$d Claus</string>
     <string name="path_safes_spits">Espits</string>
-    <string name="path_safes_spits_count">%d Espits</string>
+    <string name="path_safes_spits_count">%1$d Espits</string>
     <string name="path_safes_tensors">Tensors</string>
-    <string name="path_safes_tensors_count">%d Tensors</string>
+    <string name="path_safes_tensors_count">%1$d Tensors</string>
     <string name="ending_none">Cap</string>
     <string name="ending_plate">Placa</string>
     <string name="ending_plate_ring">Placa i Argolla</string>
@@ -239,14 +239,14 @@
     <string name="status_loading">Carregant...</string>
     <string name="settings_app_info_blocking_last_sync_title">Sincronització d'Alertes</string>
     <string name="path_blocking_title">Atenció</string>
-    <string name="path_blocking_dry_message">Aquesta via acaba de ser equipada, i els segurs encara estan en procés d'assecat. Per favor, espera abans d'escalar-la.</string>
+    <string name="path_blocking_dry_message">Aquesta via acaba de ser equipada, i els segurs encara estan en procés d\'assecat. Per favor, espera abans d\'escalar-la.</string>
     <string name="path_blocking_build_message">Aquesta via està sent equipada o reequipada.</string>
     <string name="path_blocking_bird_message">Aquesta via té un niu prop. Està prohibida la seua escalada.</string>
     <string name="path_blocking_plants_message">Aquesta via no té molt de manteniment i pot tindre plantes, terra i o arrels pel camí.</string>
-    <string name="path_blocking_rope_message">Longitud de Corda</string>
+    <string name="path_blocking_rope_message">Aquesta via és més llarga de l\'habitual. Per favor, ves amb cura amb la longitud de la corda.</string>
     <string name="path_blocking_recurrent">Tots els anys des de %1$s fins a %2$s.</string>
     <string name="path_blocking_date">Acaba el %1$s.</string>
-    <string name="path_blocking_old_message">Aquesta via és molt antiga, i no està mantinguda. Per favor, ves amb cura a l'escalar-la, poden caure pedres, o haver segurs solts.</string>
+    <string name="path_blocking_old_message">Aquesta via és molt antiga, i no està mantinguda. Per favor, ves amb cura a l\'escalar-la, poden caure pedres, o haver segurs solts.</string>
     <string name="path_blocking_dry_display_name">Assecant</string>
     <string name="path_blocking_build_display_name">Equipant/Reequipant</string>
     <string name="path_blocking_bird_display_name">Nidificació</string>
@@ -271,4 +271,8 @@
     <string name="inclination_vertical">Reunió Vertical</string>
     <string name="inclination_horizontal">Reunió Horitzontal</string>
     <string name="inclination_diagonal">Reunió Inclinada</string>
+    <string name="path_safes_and">i</string>
+    <string name="path_blocking_loose_rocks_message">Aquesta via pot tindre pedres soltes en el recorregut. Ves alerta amb la caiguda de pedres o subjeccions.</string>
+    <string name="path_blocking_loose_rocks_display_name">Pedres Soltes</string>
+    <string name="path_safes_types">Aquesta via està equipada amb %1$s</string>
 </resources>
