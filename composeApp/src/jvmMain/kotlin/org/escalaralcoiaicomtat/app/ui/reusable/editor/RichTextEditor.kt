@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
@@ -19,10 +18,9 @@ actual fun RichTextEditor(
     val state = rememberRichTextState()
     LaunchedEffect(Unit) {
         markdownText?.let(state::setMarkdown)
-        snapshotFlow { state.annotatedString }
-            .collect {
-                onMarkdownTextChange(state.toMarkdown().takeUnless { it.isBlank() })
-            }
+    }
+    LaunchedEffect(state.annotatedString) {
+        onMarkdownTextChange(state.toMarkdown().takeUnless { it.isBlank() })
     }
 
     RichTextStyleRow(
