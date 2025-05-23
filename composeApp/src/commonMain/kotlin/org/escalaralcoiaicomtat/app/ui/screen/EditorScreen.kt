@@ -497,9 +497,10 @@ private fun <DT : DataType> EditorContent(
             selection = item.grade,
             onSelectionChanged = { onUpdateItem(item.copy(grade = it)) },
             label = stringResource(Res.string.editor_grade_label),
-            options = SportsGrade.entries,
+            options = SportsGrade.entries + ArtificialGrade.entries,
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
+            color = { it.color.current },
         )
         FormDropdown(
             selection = item.ending,

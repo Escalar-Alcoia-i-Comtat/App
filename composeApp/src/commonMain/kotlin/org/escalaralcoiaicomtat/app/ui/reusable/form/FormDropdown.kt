@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,6 +28,7 @@ fun <T : Any> FormDropdown(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: (@Composable (T) -> ImageVector)? = null,
+    color: (@Composable (T) -> Color)? = null,
     toString: @Composable (T) -> String = { it.toString() }
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -52,6 +54,7 @@ fun <T : Any> FormDropdown(
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEach { option ->
+                val textColor = color?.invoke(option) ?: MaterialTheme.colorScheme.onSurface
                 DropdownMenuItem(
                     text = {
                         Text(
@@ -59,7 +62,7 @@ fun <T : Any> FormDropdown(
                             color = if (selection == option)
                                 MaterialTheme.colorScheme.primary
                             else
-                                MaterialTheme.colorScheme.onSurface
+                                textColor
                         )
                     },
                     leadingIcon = icon?.invoke(option)?.let {

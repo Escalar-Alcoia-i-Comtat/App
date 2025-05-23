@@ -76,5 +76,9 @@ enum class ArtificialGrade : GradeValue {
     A4, A4_PLUS,
     A5, A5_PLUS;
 
-    override fun toString(): String = name
+    override fun toString(): String {
+        var string = name
+        if (string.endsWith("_PLUS")) string = string.substringBeforeLast("_PLUS") + '+'
+        return string.uppercase()
+    }
 }

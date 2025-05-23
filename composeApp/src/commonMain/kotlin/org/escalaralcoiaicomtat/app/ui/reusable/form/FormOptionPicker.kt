@@ -9,6 +9,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
@@ -20,6 +21,7 @@ fun <T : Any> FormOptionPicker(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: (@Composable (T) -> ImageVector)? = null,
+    color: (@Composable (T) -> Color)? = null,
     toString: @Composable (T) -> String = { it.toString() }
 ) {
     if (options.size > 4) {
@@ -31,6 +33,7 @@ fun <T : Any> FormOptionPicker(
             modifier,
             enabled,
             icon,
+            color,
             toString
         )
     } else {
