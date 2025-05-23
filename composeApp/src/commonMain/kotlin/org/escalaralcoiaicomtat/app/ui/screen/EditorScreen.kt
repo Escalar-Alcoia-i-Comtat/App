@@ -855,6 +855,7 @@ private fun PointListEditor(
         onElementsChange = { list -> onUpdateItem(list.map(EditablePoint::build)) },
         constructor = { EditablePoint() },
         validate = EditablePoint::validate,
+        enabled = enabled,
         creator = { value, onChange ->
             val (icon, latLng, label) = value
             FormDropdown(
@@ -946,6 +947,7 @@ private fun ExternalTracksEditor(
         onElementsChange = { list -> onUpdateItem(list.map(EditableExternalTrack::build)) },
         constructor = { EditableExternalTrack() },
         validate = EditableExternalTrack::validate,
+        enabled = enabled,
         creator = { value, onChange ->
             FormDropdown(
                 selection = value.type,
@@ -1015,6 +1017,7 @@ private fun ReBuildersEditor(
         onElementsChange = onUpdateItem,
         constructor = { Builder() },
         validate = { true },
+        enabled = enabled,
         creator = { value, onChange ->
             BuilderEditor(
                 builder = value,
@@ -1076,6 +1079,7 @@ private fun PitchesEditor(
         onElementsChange = { onUpdateItem(it.map(EditablePitchInfo::build)) },
         constructor = { EditablePitchInfo() },
         validate = { true },
+        enabled = enabled,
         creator = { value, onChange ->
             FormField(
                 value = value.pitch,
