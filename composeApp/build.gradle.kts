@@ -121,6 +121,9 @@ kotlin {
             // Compose - Navigation
             implementation(libs.compose.navigation)
 
+            // Compose - Rich Text Editor
+            implementation(libs.compose.richeditor)
+
             // Compose - View Model
             implementation(libs.compose.viewModel)
 
@@ -174,12 +177,6 @@ kotlin {
         // Desktop & Android
         val jvmMain by creating {
             dependsOn(platformMain)
-
-            dependencies {
-                // Compose - Rich Text Editor
-                implementation(libs.compose.richeditor)
-                implementation(compose.material)
-            }
         }
 
         val mobileMain by creating {
@@ -277,10 +274,6 @@ kotlin {
         wasmJsMain {
             dependencies {
                 implementation(libs.kotlinx.browser)
-
-                // Compose - Rich Text Editor
-                implementation(libs.compose.richeditor)
-                implementation(compose.material)
             }
         }
     }
