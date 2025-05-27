@@ -167,6 +167,7 @@
     <string name="path_blocking_plants_message">This route is under-maintained and may have plants, dirt or roots on the way.</string>
     <string name="path_blocking_rope_message">This route is longer than other ones. Please, be cautious with the rope length.</string>
     <string name="path_blocking_loose_rocks_message">This route may have loose rocks on the way. Beware of falling rocks, and breaking holds.</string>
+    <string name="path_blocking_vandalism_message">This route has been vandalized. There may be missing safes. By any means try to climb it.</string>
     <string name="path_blocking_dry_display_name">Drying</string>
     <string name="path_blocking_build_display_name">Under construction</string>
     <string name="path_blocking_bird_display_name">Nesting</string>
@@ -174,6 +175,7 @@
     <string name="path_blocking_plants_display_name">Plants</string>
     <string name="path_blocking_rope_display_name">Long path</string>
     <string name="path_blocking_loose_rocks_display_name">Loose Rocks</string>
+    <string name="path_blocking_vandalism_display_name">Vandalism</string>
     <string name="path_blocking_recurrent">Every year from %1$s to %2$s.</string>
     <string name="path_blocking_date">Ends the %1$s.</string>
     <string name="path_blocking_create">Create new blocking</string>

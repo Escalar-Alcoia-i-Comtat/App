@@ -3,6 +3,7 @@ package org.escalaralcoiaicomtat.app.data.generic
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Construction
 import androidx.compose.material.icons.filled.Egg
+import androidx.compose.material.icons.filled.FrontHand
 import androidx.compose.material.icons.filled.Grass
 import androidx.compose.material.icons.filled.Landslide
 import androidx.compose.material.icons.filled.WbSunny
@@ -72,6 +73,12 @@ enum class BlockingTypes(
         Res.string.path_blocking_loose_rocks_display_name,
         Res.string.path_blocking_loose_rocks_message,
         0,
+    ),
+    VANDALISM(
+        Icons.Default.FrontHand,
+        Res.string.path_blocking_vandalism_display_name,
+        Res.string.path_blocking_vandalism_message,
+        2,
     );
 
     @Composable
