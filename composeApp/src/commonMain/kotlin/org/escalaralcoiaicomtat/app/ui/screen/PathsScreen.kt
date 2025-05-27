@@ -114,6 +114,7 @@ import org.escalaralcoiaicomtat.app.ui.model.PathsScreenModel
 import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
+import org.escalaralcoiaicomtat.app.ui.reusable.ReportButton
 import org.escalaralcoiaicomtat.app.utils.format
 import org.escalaralcoiaicomtat.app.utils.unit.meters
 import org.jetbrains.compose.resources.getString
@@ -129,6 +130,7 @@ fun PathsScreen(
     sectorId: Long,
     highlightPathId: Long?,
     onBackRequested: () -> Unit,
+    onReportRequested: (Path?) -> Unit,
     onEditSectorRequested: (() -> Unit)?,
     onEditPathRequested: ((Path) -> Unit)?,
     onCreatePathRequested: (() -> Unit)?,
@@ -159,6 +161,7 @@ fun PathsScreen(
         onBlockingDeleteRequested = viewModel::deleteBlocking,
         onBlockingSaveRequested = viewModel::saveBlocking,
         onBackRequested = onBackRequested,
+        onReportRequested = onReportRequested,
         onEditSectorRequested = onEditSectorRequested,
         onEditPathRequested = onEditPathRequested,
         onCreatePathRequested = onCreatePathRequested,
@@ -181,6 +184,7 @@ private fun PathsScreen(
     onBlockingDeleteRequested: () -> Unit,
     onBlockingSaveRequested: () -> Unit,
     onBackRequested: () -> Unit,
+    onReportRequested: (Path?) -> Unit,
     onEditSectorRequested: (() -> Unit)?,
     onEditPathRequested: ((Path) -> Unit)?,
     onCreatePathRequested: (() -> Unit)?,
@@ -222,6 +226,7 @@ private fun PathsScreen(
                     }
                 },
                 actions = {
+                    ReportButton { onReportRequested(null) }
                     IconButton(
                         onClick = { showingBottomSheet = true }
                     ) {
@@ -255,6 +260,7 @@ private fun PathsScreen(
             selectedPath,
             highlightPathId,
             modifier = Modifier.padding(paddingValues),
+            onReportRequested = onReportRequested,
             onEditRequested = onEditPathRequested,
             onEditBlockingRequested = onEditBlockingRequested,
             onPathClicked = onPathClicked
@@ -351,6 +357,7 @@ fun PathsList(
     selectedPath: Path?,
     highlightPathId: Long?,
     modifier: Modifier = Modifier,
+    onReportRequested: (Path) -> Unit,
     onEditRequested: ((Path) -> Unit)?,
     onEditBlockingRequested: ((Blocking) -> Unit)?,
     onPathClicked: (path: Path?) -> Unit
@@ -419,6 +426,7 @@ fun PathsList(
                                         path,
                                         blocks = blocks.orEmpty().filter { it.pathId == path.id },
                                         isModal = false,
+                                        onReportRequested = { onReportRequested(path) },
                                         onEditRequested = onEditRequested?.let { { it(path) } },
                                         onEditBlockingRequested = onEditBlockingRequested,
                                         onDismissRequested = { onPathClicked(null) }
@@ -441,6 +449,7 @@ fun PathsList(
                                     path,
                                     blocks = blocks.orEmpty().filter { it.pathId == path.id },
                                     isModal = true,
+                                    onReportRequested = { onReportRequested(path) },
                                     onEditRequested = onEditRequested?.let { { it(path) } },
                                     onEditBlockingRequested = onEditBlockingRequested,
                                 ) { onPathClicked(null) }
@@ -561,6 +570,7 @@ private fun LazyListScope.bottomSheetContents(
     child: Path,
     blocks: List<Blocking>,
     isModal: Boolean,
+    onReportRequested: () -> Unit,
     onEditRequested: (() -> Unit)?,
     onEditBlockingRequested: ((Blocking) -> Unit)?,
     onDismissRequested: () -> Unit
@@ -575,6 +585,7 @@ private fun LazyListScope.bottomSheetContents(
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f)
             )
+            ReportButton(onReportRequested)
             if (onEditBlockingRequested != null) {
                 IconButton(
                     onClick = { onEditBlockingRequested(Blocking.new(pathId = child.id)) },
@@ -593,7 +604,7 @@ private fun LazyListScope.bottomSheetContents(
                 IconButton(
                     onClick = onDismissRequested
                 ) {
-                    Icon(Icons.Rounded.Close, null)
+                    Icon(Icons.Rounded.Close, stringResource(Res.string.action_close))
                 }
             }
         }

@@ -21,6 +21,9 @@ interface PathsDao : DataTypeDao<Path, PathEntity> {
     @Query("SELECT * FROM PathEntity WHERE id = :id")
     override suspend fun get(id: Long): PathEntity?
 
+    @Query("SELECT * FROM PathEntity WHERE id = :id")
+    override fun getLive(id: Long): Flow<PathEntity?>
+
     @Query("SELECT COUNT(id) FROM PathEntity")
     override suspend fun count(): Int
 

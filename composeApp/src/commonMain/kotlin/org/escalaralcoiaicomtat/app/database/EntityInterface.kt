@@ -19,6 +19,8 @@ interface EntityInterface<Type : Entity> {
 
     suspend fun get(id: Long): Type?
 
+    fun getLive(id: Long): Flow<Type?>
+
     suspend fun updateOrInsert(item: Type) {
         if (get(item.id) == null) {
             update(listOf(item))

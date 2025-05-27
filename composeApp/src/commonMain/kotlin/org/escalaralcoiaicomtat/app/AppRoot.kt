@@ -46,6 +46,7 @@ import org.escalaralcoiaicomtat.app.ui.screen.EditorScreen
 import org.escalaralcoiaicomtat.app.ui.screen.IntroScreen
 import org.escalaralcoiaicomtat.app.ui.screen.MapScreen
 import org.escalaralcoiaicomtat.app.ui.screen.PathsScreen
+import org.escalaralcoiaicomtat.app.ui.screen.ReportScreen
 import org.escalaralcoiaicomtat.app.ui.screen.SectorsScreen
 import org.escalaralcoiaicomtat.app.ui.screen.ZonesScreen
 import org.escalaralcoiaicomtat.app.ui.theme.AppTheme
@@ -233,6 +234,14 @@ fun SharedTransitionScope.NavigationController(
                         sectorId = route.sectorId,
                         highlightPathId = route.pathId,
                         onBackRequested = { navController.navigateUp() },
+                        onReportRequested = { path ->
+                            navController.navigateTo(
+                                Destinations.Report(
+                                    sectorId = route.sectorId.takeIf { path == null },
+                                    pathId = path?.id,
+                                )
+                            )
+                        },
                         onEditSectorRequested = {
                             navController.navigateTo(
                                 Destinations.Editor(DataTypes.Sector, route.id, route.parentZoneId)
@@ -282,6 +291,22 @@ fun SharedTransitionScope.NavigationController(
                     kmz = route.kmz,
                     onBackRequested = { navController.navigateUp() }
                 )
+            }
+            composable<Destinations.Report> { navBackStackEntry ->
+                val route = navBackStackEntry.toRoute<Destinations.Report>()
+
+                if (route.isNull()) {
+                    navController.navigateUp()
+                    return@composable
+                }
+
+                CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                    ReportScreen(
+                        sectorId = route.sectorId,
+                        pathId = route.pathId,
+                        onBackRequested = navController::navigateUp,
+                    )
+                }
             }
         }
     }

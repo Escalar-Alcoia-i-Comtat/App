@@ -25,19 +25,21 @@ open class DatabaseEntityInterface<T : Entity>(
         block: suspend Database.TransactionContext<T>.() -> R
     ): R = Database.transaction(this, isWrite, block)
 
-    private fun allFlow(): Flow<List<T>> = channelFlow {
+    private fun <R> observe(
+        operation: suspend Database.TransactionContext<T>.() -> R
+    ) = channelFlow {
         var closed = false
         val flowReceiver = Database.ObserverCallback {
-            val all = transaction { all() }
-            trySend(all).onClosed {
+            val result = transaction(block = operation)
+            trySend(result).onClosed {
                 // channel is closed
                 closed = true
             }
         }
         Database.newFlow(objectStoreName, flowReceiver)
 
-        val all = transaction { all() }
-        send(all)
+        val result = transaction(block = operation)
+        send(result)
 
         // Lock current thread until the flow is closed
         while (!closed) {
@@ -46,6 +48,10 @@ open class DatabaseEntityInterface<T : Entity>(
 
         Database.removeFlow(objectStoreName, flowReceiver)
     }
+
+    private fun allFlow(): Flow<List<T>> = observe { all() }
+
+    private fun getFlow(id: Long): Flow<T?> = observe { get(id) }
 
     override suspend fun insert(items: List<T>) {
         if (items.isEmpty()) return
@@ -70,4 +76,6 @@ open class DatabaseEntityInterface<T : Entity>(
     override fun allLive(): Flow<List<T>> = allFlow()
 
     override suspend fun get(id: Long): T? = transaction { get(id) }
+
+    override fun getLive(id: Long): Flow<T?> = getFlow(id)
 }

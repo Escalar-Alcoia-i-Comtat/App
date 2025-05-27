@@ -66,6 +66,25 @@ object Destinations {
     }
 
     @Serializable
+    data class Report(
+        val sectorId: Long? = null,
+        val pathId: Long? = null,
+    ): Destination() {
+        override val name: String = "Report"
+        override val id: Long? = sectorId ?: pathId
+
+        override fun toString(): String {
+            return "report" + when {
+                sectorId != null -> "/sectors/$sectorId"
+                pathId != null -> "/paths/$pathId"
+                else -> ""
+            }
+        }
+
+        fun isNull(): Boolean = sectorId == null && pathId == null
+    }
+
+    @Serializable
     data class Editor(
         val dataTypes: String,
         override val id: Long?,
@@ -103,6 +122,10 @@ object Destinations {
             pieces[0] == Intro.name.lowercase() -> Intro
             pieces[0] == "editor" -> Editor(pieces[1], pieces[2].toLongOrNull(), pieces.getOrNull(3)?.toLongOrNull())
             pieces[0] == "map" -> Map(pieces.getOrNull(1)?.let { Uuid.parse(it) })
+            pieces[0] == "report" -> Report(
+                sectorId = pieces.getOrNull(2)?.toLongOrNull().takeIf { pieces.getOrNull(1) == "sectors" },
+                pathId = pieces.getOrNull(2)?.toLongOrNull().takeIf { pieces.getOrNull(1) == "paths" },
+            )
 
             pieces.size == 1 -> Area(pieces[0].toLong())
             pieces.size == 2 -> Zone(pieces[0].toLong(), pieces[1].toLong())

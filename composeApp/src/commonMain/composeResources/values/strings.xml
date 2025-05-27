@@ -20,6 +20,7 @@
     <string name="action_tap_to_see_more">Tap to know more</string>
     <string name="action_copy">Copy</string>
     <string name="action_back">Back</string>
+    <string name="action_report">Report</string>
 
     <string name="message_copied">Copied to clipboard</string>
 
@@ -304,4 +305,11 @@
     <string name="editor_error_message_trace">Stack Trace:</string>
 
     <string name="map_title">Map</string>
+
+    <string name="report_title">Report Issue</string>
+    <string name="report_send">Send Report</string>
+    <string name="report_element">Element</string>
+    <string name="report_name">Your Name</string>
+    <string name="report_email">Contact Email</string>
+    <string name="report_message">Message</string>
 </resources>
