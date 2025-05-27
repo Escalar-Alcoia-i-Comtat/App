@@ -277,4 +277,15 @@
     <string name="path_blocking_loose_rocks_message">Aquesta via pot tindre pedres soltes en el recorregut. Ves alerta amb la caiguda de pedres o subjeccions.</string>
     <string name="path_blocking_loose_rocks_display_name">Pedres Soltes</string>
     <string name="path_safes_types">Aquesta via està equipada amb %1$s</string>
+    <string name="action_report">Reportar</string>
+    <string name="file_picker_type_file">Fitxer</string>
+    <string name="report_title">Reportar Problema</string>
+    <string name="report_send">Enviar Informe</string>
+    <string name="report_element">Element</string>
+    <string name="report_name">El teu nom</string>
+    <string name="report_email">Correu Electrònic</string>
+    <string name="report_attachments">Adjunts</string>
+    <string name="report_message">Missatge (necessari)</string>
+    <string name="report_error_attachments_size">El tamany màxim dels adjunts és %1$s.</string>
+    <string name="report_sent">Informe enviat correctament.</string>
 </resources>

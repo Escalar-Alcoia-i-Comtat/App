@@ -277,4 +277,15 @@
     <string name="path_safes_and">y</string>
     <string name="path_blocking_loose_rocks_message">Esta vía puede tener piedras sueltas en el recorrido. Pueden caer piedras, o romperse agarres.</string>
     <string name="path_blocking_loose_rocks_display_name">Piedras Sueltas</string>
+    <string name="action_report">Reportar</string>
+    <string name="file_picker_type_file">Archivo</string>
+    <string name="report_title">Reportar Problema</string>
+    <string name="report_send">Enviar Informe</string>
+    <string name="report_element">Elemento</string>
+    <string name="report_name">tu nombre</string>
+    <string name="report_email">Correo Electrónico</string>
+    <string name="report_attachments">Adjuntos</string>
+    <string name="report_message">Mensaje (obligatorio)</string>
+    <string name="report_error_attachments_size">El tamaño máximo de los adjuntos es %1$s.</string>
+    <string name="report_sent">Informe enviado correctamente.</string>
 </resources>
