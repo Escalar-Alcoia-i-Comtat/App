@@ -109,6 +109,7 @@ fun FormMultipleFilePicker(
             items(files) { file ->
                 InputChip(
                     selected = true,
+                    enabled = enabled,
                     onClick = { onFileRemoved(file) },
                     label = { Text(file.name) },
                     avatar = {
