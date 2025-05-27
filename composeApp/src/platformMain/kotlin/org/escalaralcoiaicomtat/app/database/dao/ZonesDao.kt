@@ -21,6 +21,9 @@ interface ZonesDao : DataTypeDao<Zone, ZoneEntity> {
     @Query("SELECT * FROM ZoneEntity WHERE id = :id")
     override suspend fun get(id: Long): ZoneEntity?
 
+    @Query("SELECT * FROM ZoneEntity WHERE id = :id")
+    override fun getLive(id: Long): Flow<ZoneEntity?>
+
     @Query("SELECT COUNT(id) FROM ZoneEntity")
     override suspend fun count(): Int
 

@@ -21,6 +21,9 @@ interface SectorsDao : DataTypeDao<Sector, SectorEntity> {
     @Query("SELECT * FROM SectorEntity WHERE id = :id")
     override suspend fun get(id: Long): SectorEntity?
 
+    @Query("SELECT * FROM SectorEntity WHERE id = :id")
+    override fun getLive(id: Long): Flow<SectorEntity?>
+
     @Query("SELECT COUNT(id) FROM SectorEntity")
     override suspend fun count(): Int
 

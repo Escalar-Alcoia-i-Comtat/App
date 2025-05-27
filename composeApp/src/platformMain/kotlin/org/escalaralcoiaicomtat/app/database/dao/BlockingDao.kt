@@ -22,6 +22,9 @@ interface BlockingDao : BaseDao<Blocking, BlockingEntity> {
     @Query("SELECT * FROM BlockingEntity WHERE id = :id")
     override suspend fun get(id: Long): BlockingEntity?
 
+    @Query("SELECT * FROM BlockingEntity WHERE id = :id")
+    override fun getLive(id: Long): Flow<BlockingEntity?>
+
     @Query("SELECT COUNT(id) FROM BlockingEntity")
     override suspend fun count(): Int
 

@@ -18,6 +18,9 @@ interface AreasDao : DataTypeDao<Area, AreaEntity> {
     @Query("SELECT * FROM AreaEntity WHERE id = :id")
     override suspend fun get(id: Long): AreaEntity?
 
+    @Query("SELECT * FROM AreaEntity WHERE id = :id")
+    override fun getLive(id: Long): Flow<AreaEntity?>
+
     @Query("SELECT COUNT(id) FROM AreaEntity")
     override suspend fun count(): Int
 

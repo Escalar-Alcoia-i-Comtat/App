@@ -29,6 +29,8 @@ interface BaseDao<Type: AppEntity, Entity: DatabaseEntity<Type>> {
 
     suspend fun get(id: Long): Entity?
 
+    fun getLive(id: Long): Flow<Entity?>
+
     fun asInterface(): EntityInterface<Type> = EntityInterfaceImpl(this)
 
     open class EntityInterfaceImpl<Type: AppEntity, Entity: DatabaseEntity<Type>>(
@@ -58,5 +60,7 @@ interface BaseDao<Type: AppEntity, Entity: DatabaseEntity<Type>> {
         }
 
         override suspend fun get(id: Long): Type? = dao.get(id)?.convert()
+
+        override fun getLive(id: Long): Flow<Type?> = dao.getLive(id).map { it?.convert() }
     }
 }

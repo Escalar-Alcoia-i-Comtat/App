@@ -20,6 +20,7 @@
     <string name="action_tap_to_see_more">Tap to know more</string>
     <string name="action_copy">Copy</string>
     <string name="action_back">Back</string>
+    <string name="action_report">Report</string>
 
     <string name="message_copied">Copied to clipboard</string>
 
@@ -225,6 +226,7 @@
     <string name="dialog_more_information" comment="Shown as the title of the dialog that pops up in supported cards of a path information.">More Info</string>
 
     <string name="file_picker_hint">Click to pick</string>
+    <string name="file_picker_type_file">File</string>
 
     <string name="editor_yes">Yes</string>
     <string name="editor_no">No</string>
@@ -304,4 +306,14 @@
     <string name="editor_error_message_trace">Stack Trace:</string>
 
     <string name="map_title">Map</string>
+
+    <string name="report_title">Report Issue</string>
+    <string name="report_send">Send Report</string>
+    <string name="report_element">Element</string>
+    <string name="report_name">Your Name</string>
+    <string name="report_email">Contact Email</string>
+    <string name="report_attachments">Attachments</string>
+    <string name="report_message">Message (required)</string>
+    <string name="report_error_attachments_size">The maximum total size of the attachments is %1$s.</string>
+    <string name="report_sent">Report sent successfully.</string>
 </resources>
