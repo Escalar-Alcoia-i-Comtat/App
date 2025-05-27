@@ -315,4 +315,5 @@
     <string name="report_attachments">Attachments</string>
     <string name="report_message">Message (required)</string>
     <string name="report_error_attachments_size">The maximum total size of the attachments is %1$s.</string>
+    <string name="report_sent">Report sent successfully.</string>
 </resources>

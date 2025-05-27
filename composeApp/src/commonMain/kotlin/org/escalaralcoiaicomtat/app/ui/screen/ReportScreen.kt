@@ -16,10 +16,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -28,12 +31,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.Job
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.ui.model.ReportScreenModel
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormField
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormMultipleFilePicker
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -83,9 +88,11 @@ private fun ReportScreen(
     onRemoveFile: (PlatformFile) -> Unit,
     isLoading: Boolean,
 
-    onSendRequested: () -> Unit,
+    onSendRequested: (suspend () -> Unit) -> Job,
     onBackRequested: () -> Unit,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -102,7 +109,15 @@ private fun ReportScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = onSendRequested,
+                        onClick = {
+                            onSendRequested {
+                                snackbarHostState.showSnackbar(
+                                    getString(Res.string.report_sent)
+                                )
+                            }.invokeOnCompletion {
+                                onBackRequested()
+                            }
+                        },
                         enabled = !isLoading && message.isNotBlank(),
                     ) {
                         Icon(
@@ -112,7 +127,10 @@ private fun ReportScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
     ) { paddingValues ->
         AnimatedContent(
             targetState = sector to path,

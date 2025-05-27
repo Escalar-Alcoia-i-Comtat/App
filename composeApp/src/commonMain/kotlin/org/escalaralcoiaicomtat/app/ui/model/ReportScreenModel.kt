@@ -1,6 +1,7 @@
 package org.escalaralcoiaicomtat.app.ui.model
 
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -50,10 +51,10 @@ class ReportScreenModel(
         )
     }
 
-    fun send() {
+    fun send(onSuccess: suspend () -> Unit): Job {
         val state = state.value
 
-        launch {
+        return launch {
             try {
                 _isLoading.emit(true)
                 ContactBackend.sendReport(
@@ -62,7 +63,7 @@ class ReportScreenModel(
                     message = state.message,
                     files = state.files,
                 )
-                // TODO: Notify user
+                onSuccess()
             } finally {
                 _isLoading.emit(false)
             }
