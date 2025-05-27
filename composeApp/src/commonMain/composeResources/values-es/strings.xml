@@ -254,6 +254,8 @@
     <string name="path_blocking_plants_display_name">Plantas</string>
     <string name="path_blocking_rope_display_name">Vía larga</string>
     <string name="path_blocking_create">Crea un nuevo bloqueo</string>
+    <string name="path_blocking_vandalism_message">Esta vía ha sido vandalizada. Pueden faltar seguros. Bajo ningun concepto intentes escalarla.</string>
+    <string name="path_blocking_vandalism_display_name">Vandalismo</string>
     <string name="editor_blocking_create_title">Crea una nueva alerta</string>
     <string name="editor_blocking_edit_title">Edita una alerta existente</string>
     <string name="editor_blocking_type">Tipo de bloqueo</string>
