@@ -76,7 +76,7 @@ abstract class Backend {
      */
     private suspend fun <DT : DataResponseType> decodeBody(
         response: HttpResponse,
-        deserializer: DeserializationStrategy<DT>,
+        deserializer: DeserializationStrategy<DT>?,
         hasData: Boolean = true,
     ): DT? {
         return try {
@@ -90,7 +90,9 @@ abstract class Backend {
             }*/
 
             if (status in 200..299) {
-                if (hasData) {
+                if (deserializer == null) {
+                    null
+                } else if (hasData) {
                     DataResponse.decode(body, deserializer)
                 } else {
                     DataResponse.decode(body)
@@ -242,6 +244,62 @@ abstract class Backend {
         }
         progress?.invoke(length, length)
         return decodeBody(response, serializer)!!
+    }
+
+    /**
+     * Makes a POST request to the endpoint defined by the path components given, without decoding
+     * any response from the server.
+     *
+     * @param pathComponents The components of the path to request. If not [String], will be
+     * converted into one automatically using the class's `toString` function.
+     * @param progress If not null, will be called with the progress of the request.
+     *
+     * @return The response given by the server, of the type desired.
+     *
+     * @throws ServerException If the server responded with an exception, or the body of the body of
+     * the response didn't match a [DataResponse].
+     * @throws IllegalStateException If the server gave a response that could not be handled.
+     */
+    protected suspend fun submitForm(
+        vararg pathComponents: Any,
+        progress: (suspend (current: Long, total: Long) -> Unit)? = null,
+        requestBuilder: HttpRequestBuilder.() -> Unit = {},
+        formBuilder: FormBuilder.() -> Unit
+    ) {
+        var length: Long = 0
+        progress?.invoke(0, length)
+
+        val url = URLBuilder(baseUrl)
+            .appendPathSegments(pathComponents.map { it.toString() })
+            .buildString()
+        Napier.v("POST :: $url")
+
+        val formData = formData(formBuilder).also { parts ->
+            val data = StringBuilder()
+            for (part in parts) {
+                if (part is PartData.FormItem) {
+                    data.appendLine("- ${part.name}\n  ${part.value}")
+                } else {
+                    data.appendLine("- ${part.name} - Type: ${part.contentType}")
+                }
+            }
+            Napier.i { "Making request to $url\nData:\n$data" }
+        }
+        require(formData.isNotEmpty()) { "Form data is empty, nothing to send." }
+
+        val response = client.submitFormWithBinaryData(
+            url = url,
+            formData = formData,
+        ) {
+            requestBuilder()
+            onUpload { bytesSentTotal, contentLength ->
+                contentLength ?: return@onUpload
+                length = contentLength
+                progress?.invoke(bytesSentTotal, contentLength)
+            }
+        }
+        progress?.invoke(length, length)
+        decodeBody<DataResponseType>(response, null)
     }
 
     private suspend fun <RT, DT: DataResponseType> makeRequestWithBody(

@@ -26,11 +26,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import escalaralcoiaicomtat.composeapp.generated.resources.*
+import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PlatformFile
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.ui.model.ReportScreenModel
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormField
+import org.escalaralcoiaicomtat.app.ui.reusable.form.FormMultipleFilePicker
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -54,6 +57,9 @@ fun ReportScreen(
         onEmailChange = viewModel::onEmailChange,
         message = state.message,
         onMessageChange = viewModel::onMessageChange,
+        files = state.files,
+        onAddFile = viewModel::addFile,
+        onRemoveFile = viewModel::removeFile,
         isLoading = isLoading,
         onSendRequested = viewModel::send,
         onBackRequested = onBackRequested,
@@ -72,6 +78,9 @@ private fun ReportScreen(
     onEmailChange: (String) -> Unit,
     message: String,
     onMessageChange: (String) -> Unit,
+    files: List<PlatformFile>,
+    onAddFile: (PlatformFile) -> Unit,
+    onRemoveFile: (PlatformFile) -> Unit,
     isLoading: Boolean,
 
     onSendRequested: () -> Unit,
@@ -92,7 +101,10 @@ private fun ReportScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onSendRequested, enabled = !isLoading) {
+                    IconButton(
+                        onClick = onSendRequested,
+                        enabled = !isLoading && message.isNotBlank(),
+                    ) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
                             stringResource(Res.string.report_send)
@@ -122,6 +134,9 @@ private fun ReportScreen(
                         onEmailChange = onEmailChange,
                         message = message,
                         onMessageChange = onMessageChange,
+                        files = files,
+                        onAddFile = onAddFile,
+                        onRemoveFile = onRemoveFile,
                         isLoading = isLoading,
                     )
                 }
@@ -141,6 +156,9 @@ private fun ReportScreenContent(
     onEmailChange: (String) -> Unit,
     message: String,
     onMessageChange: (String) -> Unit,
+    files: List<PlatformFile>,
+    onAddFile: (PlatformFile) -> Unit,
+    onRemoveFile: (PlatformFile) -> Unit,
     isLoading: Boolean,
 ) {
     Column(
@@ -180,6 +198,25 @@ private fun ReportScreenContent(
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading,
             singleLine = false,
+        )
+
+        val filesSize = files.sumOf { it.getSize() ?: 0L }
+        FormMultipleFilePicker(
+            files = files,
+            onFilePicked = onAddFile,
+            onFileRemoved = onRemoveFile,
+            type = PickerType.ImageAndVideo,
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.report_attachments),
+            enabled = !isLoading,
+            error = if (filesSize >= ReportScreenModel.MAX_FILES_SIZE) {
+                stringResource(
+                    Res.string.report_error_attachments_size,
+                    (filesSize / 1024 / 1024).toString() + " MB",
+                )
+            } else {
+                null
+            },
         )
     }
 }
