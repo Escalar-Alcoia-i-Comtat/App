@@ -9,8 +9,8 @@ import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 import org.escalaralcoiaicomtat.app.network.ContactBackend
 
 class ReportScreenModel(
-    sectorId: Long?,
-    pathId: Long?,
+    private val sectorId: Long?,
+    private val pathId: Long?,
 ) : ViewModelBase() {
 
     private val sectorsInterface = DatabaseInterface.sectors()
@@ -61,6 +61,8 @@ class ReportScreenModel(
                     name = state.name,
                     email = state.email,
                     message = state.message,
+                    sectorId = sectorId,
+                    pathId = pathId,
                     files = state.files,
                 )
                 onSuccess()
