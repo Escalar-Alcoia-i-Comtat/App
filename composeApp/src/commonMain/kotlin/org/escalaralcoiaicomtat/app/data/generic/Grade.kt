@@ -2,6 +2,11 @@
 
 package org.escalaralcoiaicomtat.app.data.generic
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import org.escalaralcoiaicomtat.app.ui.color.ColorGroup
 import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade1
 import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade2
@@ -24,6 +29,13 @@ interface GradeValue {
     }
 
     val name: String
+
+    fun asString(): String
+
+    @Composable
+    fun toAnnotatedString(): AnnotatedString = buildAnnotatedString {
+        withStyle(SpanStyle(color = color.current)) { append(asString()) }
+    }
 }
 
 val GradeValue?.color: ColorGroup
@@ -58,7 +70,7 @@ enum class SportsGrade : GradeValue {
     G9A, G9A_PLUS, G9B, G9B_PLUS, G9C, G9C_PLUS,
     UNKNOWN;
 
-    override fun toString(): String {
+    override fun asString(): String {
         if (this == UNKNOWN) return "¿?"
         var string = name
         if (string.startsWith("G")) string = string.substring(1)
@@ -66,6 +78,8 @@ enum class SportsGrade : GradeValue {
         if (string.length == 1) string += 'º'
         return string.lowercase()
     }
+
+    override fun toString(): String = asString()
 }
 
 enum class AidGrade : GradeValue {
@@ -76,9 +90,11 @@ enum class AidGrade : GradeValue {
     A4, A4_PLUS,
     A5, A5_PLUS;
 
-    override fun toString(): String {
+    override fun asString(): String {
         var string = name
         if (string.endsWith("_PLUS")) string = string.substringBeforeLast("_PLUS") + '+'
         return string.uppercase()
     }
+
+    override fun toString(): String = asString()
 }

@@ -78,8 +78,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -651,15 +654,10 @@ private fun LazyListScope.bottomSheetContents(
         )
     }
     if ((child.grade != null && child.grade != SportsGrade.UNKNOWN) || child.aidGrade != null) item {
-
-    }
-    if (child.grade != null && child.grade != SportsGrade.UNKNOWN) item {
-        val grade = child.grade
         MetaCard(
             icon = Icons.Filled.ClimbingShoes,
             text = stringResource(Res.string.path_grade),
-            bigText = grade.toString(),
-            bigTextColor = grade.color.current,
+            bigText = child.grade(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -817,6 +815,7 @@ private fun SafesCount_toAnnotatedString_multiple_unknownAndAmount_Preview() {
     )
 }
 
+
 @Composable
 private fun MetaCard(
     icon: ImageVector,
@@ -826,6 +825,39 @@ private fun MetaCard(
     iconContentDescription: String? = null,
     bigText: String? = null,
     bigTextColor: Color = Color.Unspecified,
+    dialogText: AnnotatedString? = null,
+    message: String? = null,
+    colors: CardColors = CardDefaults.outlinedCardColors(),
+    content: (@Composable ColumnScope.() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
+) {
+    MetaCard(
+        icon = icon,
+        modifier = modifier,
+        text = text,
+        textMarkdown = textMarkdown,
+        iconContentDescription = iconContentDescription,
+        bigText = bigText?.let {
+            buildAnnotatedString {
+                withStyle(SpanStyle(color = bigTextColor)) { append(bigText) }
+            }
+        },
+        dialogText = dialogText,
+        message = message,
+        colors = colors,
+        content = content,
+        onClick = onClick,
+    )
+}
+
+@Composable
+private fun MetaCard(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    textMarkdown: String? = null,
+    iconContentDescription: String? = null,
+    bigText: AnnotatedString? = null,
     dialogText: AnnotatedString? = null,
     message: String? = null,
     colors: CardColors = CardDefaults.outlinedCardColors(),
@@ -890,7 +922,6 @@ private fun MetaCard(
                 if (bigText != null) {
                     Text(
                         text = bigText,
-                        color = bigTextColor,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge

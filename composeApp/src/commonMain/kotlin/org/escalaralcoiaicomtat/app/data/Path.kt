@@ -2,6 +2,9 @@
 
 package org.escalaralcoiaicomtat.app.data
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -76,5 +79,12 @@ data class Path(
 
     override fun copy(parentId: Long): Path {
         return copy(id = id, parentSectorId = parentId)
+    }
+
+    @Composable
+    fun grade(): AnnotatedString = buildAnnotatedString {
+        grade?.toAnnotatedString()?.let { append(it) }
+        if (grade != null && aidGrade != null) append('/')
+        aidGrade?.toAnnotatedString()?.let { append(it) }
     }
 }

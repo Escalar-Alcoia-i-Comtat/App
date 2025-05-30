@@ -19,10 +19,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
-import org.escalaralcoiaicomtat.app.data.generic.color
 
 private const val HighlightColor = 0xffffff00
 
@@ -73,16 +73,13 @@ fun PathListItem(
             val (grade, aidGrade) = path.grade to path.aidGrade
             if (grade != null || aidGrade != null) {
                 Text(
-                    text = when {
-                        // TODO: Should build annotated string for coloring each grade
-                        grade != null && aidGrade != null -> "$grade/$aidGrade"
-                        grade != null && aidGrade == null -> grade.toString()
-                        grade == null && aidGrade != null -> aidGrade.toString()
-                        else -> "" // edge case, won't happen
+                    text = buildAnnotatedString {
+                        grade?.toAnnotatedString()?.let { append(it) }
+                        if (grade != null && aidGrade != null) append('/')
+                        aidGrade?.toAnnotatedString()?.let { append(it) }
                     },
                     style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(start = 8.dp),
-                    color = grade.color.current
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
         }
