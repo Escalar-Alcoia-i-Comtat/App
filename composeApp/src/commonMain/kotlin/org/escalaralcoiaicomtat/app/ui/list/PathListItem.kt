@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
-import org.escalaralcoiaicomtat.app.data.generic.color
 
 private const val HighlightColor = 0xffffff00
 
@@ -70,12 +69,11 @@ fun PathListItem(
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.weight(1f)
             )
-            path.grade?.let {
+            if (path.grade != null || path.aidGrade != null) {
                 Text(
-                    text = it.toString(),
+                    text = path.grade(),
                     style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(start = 8.dp),
-                    color = path.grade.color.current
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
         }

@@ -27,11 +27,12 @@ import org.escalaralcoiaicomtat.app.database.migrations.Migration3To4
         PathEntity::class,
         BlockingEntity::class,
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = Migration1To2::class),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4, spec = Migration3To4::class),
+        // Migration from 4 to 5 is specified in Database.kt
     ]
 )
 @TypeConverters(Converters::class)

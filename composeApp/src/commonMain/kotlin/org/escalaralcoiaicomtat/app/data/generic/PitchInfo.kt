@@ -8,6 +8,7 @@ import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
 data class PitchInfo(
     val pitch: UInt,
     @Serializable(GradeSerializer::class) val grade: GradeValue? = null,
+    @Serializable(GradeSerializer::class) val aidGrade: GradeValue? = null,
     val height: UInt? = null,
     val ending: Ending? = null,
     val info: EndingInfo? = null,
@@ -16,6 +17,7 @@ data class PitchInfo(
     fun editable() = EditablePitchInfo(
         pitch,
         grade,
+        aidGrade,
         height,
         ending,
         info,

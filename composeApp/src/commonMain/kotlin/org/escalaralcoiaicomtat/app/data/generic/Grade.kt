@@ -2,6 +2,11 @@
 
 package org.escalaralcoiaicomtat.app.data.generic
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import org.escalaralcoiaicomtat.app.ui.color.ColorGroup
 import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade1
 import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade2
@@ -18,12 +23,19 @@ interface GradeValue {
                 .replace("+", "_PLUS")
                 .replace("º", "A")
             return SportsGrade.entries.find { it.name.endsWith(name) }
-                ?: ArtificialGrade.entries.find { it.name == name }
+                ?: AidGrade.entries.find { it.name == name }
                 ?: SportsGrade.UNKNOWN
         }
     }
 
     val name: String
+
+    fun asString(): String
+
+    @Composable
+    fun toAnnotatedString(): AnnotatedString = buildAnnotatedString {
+        withStyle(SpanStyle(color = color.current)) { append(asString()) }
+    }
 }
 
 val GradeValue?.color: ColorGroup
@@ -40,7 +52,7 @@ val GradeValue?.color: ColorGroup
                 ColorGrade3
             else
                 ColorGrade4
-        } else if (this is ArtificialGrade) {
+        } else if (this is AidGrade) {
             ColorGradeA
         } else {
             ColorGradeP
@@ -58,7 +70,7 @@ enum class SportsGrade : GradeValue {
     G9A, G9A_PLUS, G9B, G9B_PLUS, G9C, G9C_PLUS,
     UNKNOWN;
 
-    override fun toString(): String {
+    override fun asString(): String {
         if (this == UNKNOWN) return "¿?"
         var string = name
         if (string.startsWith("G")) string = string.substring(1)
@@ -66,9 +78,11 @@ enum class SportsGrade : GradeValue {
         if (string.length == 1) string += 'º'
         return string.lowercase()
     }
+
+    override fun toString(): String = asString()
 }
 
-enum class ArtificialGrade : GradeValue {
+enum class AidGrade : GradeValue {
     A0,
     A1, A1_PLUS,
     A2, A2_PLUS,
@@ -76,9 +90,11 @@ enum class ArtificialGrade : GradeValue {
     A4, A4_PLUS,
     A5, A5_PLUS;
 
-    override fun toString(): String {
+    override fun asString(): String {
         var string = name
         if (string.endsWith("_PLUS")) string = string.substringBeforeLast("_PLUS") + '+'
         return string.uppercase()
     }
+
+    override fun toString(): String = asString()
 }

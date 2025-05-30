@@ -174,6 +174,7 @@ object AdminBackend : Backend() {
 
                     if (stored.height != item.height) appendOrRemove("height", item.height?.toInt())
                     if (stored.grade != item.grade) appendOrRemove("grade", item.grade, GradeSerializer)
+                    if (stored.aidGrade != item.aidGrade) appendOrRemove("aidGrade", item.aidGrade, GradeSerializer)
                     if (stored.ending != item.ending) appendOrRemove("ending", item.ending?.name)
 
                     if (stored.pitches != item.pitches) appendOrRemove("pitches", item.pitches, ListSerializer(
@@ -294,6 +295,7 @@ object AdminBackend : Backend() {
 
                 if (item.height != null) append("height", item.height.toInt())
                 if (item.grade != null) appendSerializable("grade", item.grade, GradeSerializer)
+                if (item.aidGrade != null) appendSerializable("aidGrade", item.aidGrade, GradeSerializer)
                 if (item.ending != null) append("ending", item.ending.name)
 
                 if (item.pitches != null) appendSerializable("pitches", item.pitches, ListSerializer(

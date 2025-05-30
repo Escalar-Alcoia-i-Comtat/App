@@ -24,6 +24,7 @@ data class PathData(
 
     val height: UInt?,
     @Serializable(GradeSerializer::class) val grade: GradeValue?,
+    @Serializable(GradeSerializer::class) val aidGrade: GradeValue?,
     val ending: Ending?,
     val pitches: List<PitchInfo>?,
 
@@ -62,6 +63,7 @@ data class PathData(
         sketchId,
         height,
         grade,
+        aidGrade,
         ending,
         pitches,
         stringCount,

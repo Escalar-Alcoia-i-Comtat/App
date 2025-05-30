@@ -32,6 +32,7 @@ data class PathEntity(
 
     val height: Int? = null,
     val grade: GradeValue? = null,
+    val aidGrade: GradeValue? = null,
     val ending: Ending? = null,
     val pitches: List<PitchInfo>? = null,
 
@@ -67,6 +68,7 @@ data class PathEntity(
         sketchId.toUInt(),
         height?.toUInt(),
         grade,
+        aidGrade,
         ending,
         pitches,
         stringCount?.toUInt(),

@@ -11,6 +11,7 @@ import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 data class EditablePitchInfo(
     val pitch: String = "",
     val grade: GradeValue? = null,
+    val aidGrade: GradeValue? = null,
     val height: String = "",
     val ending: Ending? = null,
     val info: EndingInfo? = null,
@@ -19,11 +20,12 @@ data class EditablePitchInfo(
     constructor(
         pitch: UInt,
         grade: GradeValue?,
+        aidGrade: GradeValue?,
         height: UInt?,
         ending: Ending?,
         info: EndingInfo?,
         inclination: EndingInclination?
-    ) : this(pitch.toString(), grade, height?.toString() ?: "", ending, info, inclination)
+    ) : this(pitch.toString(), grade, aidGrade, height?.toString() ?: "", ending, info, inclination)
 
     override fun validate(): Boolean {
         val pitch = pitch.toIntOrNull() ?: return false
@@ -34,6 +36,7 @@ data class EditablePitchInfo(
         return PitchInfo(
             pitch = pitch.toUInt(),
             grade = grade,
+            aidGrade = aidGrade,
             height = height.toUIntOrNull(),
             ending = ending,
             info = info,

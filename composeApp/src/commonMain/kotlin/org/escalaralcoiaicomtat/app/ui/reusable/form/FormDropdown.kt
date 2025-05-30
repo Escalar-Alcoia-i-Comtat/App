@@ -18,13 +18,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T : Any> FormDropdown(
     selection: T?,
     onSelectionChanged: (T) -> Unit,
     options: List<T>,
     label: String?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: (@Composable (T) -> ImageVector)? = null,
+    color: (@Composable (T) -> Color)? = null,
+    toString: @Composable (T) -> String = { it.toString() }
+) {
+    FormDropdown(
+        selection = selection,
+        onSelectionChanged = { onSelectionChanged(it!!) },
+        options = options,
+        label = label,
+        modifier = modifier,
+        enabled = enabled,
+        canUnselect = false,
+        icon = icon,
+        color = color,
+        toString = toString
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T : Any> FormDropdown(
+    selection: T?,
+    onSelectionChanged: (T?) -> Unit,
+    options: List<T>,
+    label: String?,
+    canUnselect: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: (@Composable (T) -> ImageVector)? = null,
@@ -70,7 +97,11 @@ fun <T : Any> FormDropdown(
                     },
                     enabled = enabled,
                     onClick = {
-                        onSelectionChanged(option)
+                        if (canUnselect && option == selection) {
+                            onSelectionChanged(null)
+                        } else {
+                            onSelectionChanged(option)
+                        }
                         expanded = false
                     }
                 )
