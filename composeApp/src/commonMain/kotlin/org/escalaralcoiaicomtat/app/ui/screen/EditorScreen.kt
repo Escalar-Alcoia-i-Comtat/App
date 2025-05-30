@@ -501,6 +501,7 @@ private fun <DT : DataType> EditorContent(
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
             color = { it.color.current },
+            canUnselect = true,
         )
         FormDropdown(
             selection = item.aidGrade,
@@ -510,6 +511,7 @@ private fun <DT : DataType> EditorContent(
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
             color = { it.color.current },
+            canUnselect = true,
         )
         FormDropdown(
             selection = item.ending,
@@ -1106,6 +1108,7 @@ private fun PitchesEditor(
                 label = stringResource(Res.string.editor_pitch_info_grade_label),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
+                canUnselect = true,
             )
             FormDropdown(
                 selection = value.aidGrade,
@@ -1114,6 +1117,7 @@ private fun PitchesEditor(
                 label = stringResource(Res.string.editor_pitch_info_aid_grade_label),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
+                canUnselect = true,
             )
             FormField(
                 value = value.height,
