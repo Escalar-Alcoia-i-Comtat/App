@@ -71,7 +71,7 @@ import org.escalaralcoiaicomtat.app.data.Zone
 import org.escalaralcoiaicomtat.app.data.editable.EditableExternalTrack
 import org.escalaralcoiaicomtat.app.data.editable.EditablePitchInfo
 import org.escalaralcoiaicomtat.app.data.editable.EditablePoint
-import org.escalaralcoiaicomtat.app.data.generic.ArtificialGrade
+import org.escalaralcoiaicomtat.app.data.generic.AidGrade
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
 import org.escalaralcoiaicomtat.app.data.generic.EndingInclination
@@ -497,7 +497,16 @@ private fun <DT : DataType> EditorContent(
             selection = item.grade,
             onSelectionChanged = { onUpdateItem(item.copy(grade = it)) },
             label = stringResource(Res.string.editor_grade_label),
-            options = SportsGrade.entries + ArtificialGrade.entries,
+            options = SportsGrade.entries,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            enabled = !isLoading,
+            color = { it.color.current },
+        )
+        FormDropdown(
+            selection = item.aidGrade,
+            onSelectionChanged = { onUpdateItem(item.copy(aidGrade = it)) },
+            label = stringResource(Res.string.editor_aid_grade_label),
+            options = AidGrade.entries,
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
             color = { it.color.current },
@@ -1093,8 +1102,16 @@ private fun PitchesEditor(
             FormDropdown(
                 selection = value.grade,
                 onSelectionChanged = { onChange(value.copy(grade = it)) },
-                options = (SportsGrade.entries + ArtificialGrade.entries),
+                options = (SportsGrade.entries),
                 label = stringResource(Res.string.editor_pitch_info_grade_label),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+            FormDropdown(
+                selection = value.aidGrade,
+                onSelectionChanged = { onChange(value.copy(aidGrade = it)) },
+                options = (AidGrade.entries),
+                label = stringResource(Res.string.editor_pitch_info_aid_grade_label),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
             )
@@ -1159,6 +1176,12 @@ private fun PitchesEditor(
                             modifier = Modifier.padding(horizontal = 8.dp),
                             fontStyle = if (pitch.grade == null) FontStyle.Italic else FontStyle.Normal,
                             color = pitch.grade?.color?.current ?: LocalContentColor.current,
+                        )
+                        Text(
+                            text = pitch.aidGrade?.toString() ?: "N/A",
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            fontStyle = if (pitch.aidGrade == null) FontStyle.Italic else FontStyle.Normal,
+                            color = pitch.aidGrade?.color?.current ?: LocalContentColor.current,
                         )
                         Text(
                             text = pitch.height.takeUnless { it.isBlank() }?.let { "$it m" } ?: "N/A",

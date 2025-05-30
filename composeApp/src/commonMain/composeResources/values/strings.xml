@@ -254,6 +254,7 @@
     <string name="editor_sketch_id_label">Sketch ID</string>
     <string name="editor_height_label">Height</string>
     <string name="editor_grade_label">Grade</string>
+    <string name="editor_aid_grade_label">Aid Grade</string>
     <string name="editor_ending_label">Belay Station</string>
     <string name="editor_string_count_label">String Count</string>
     <string name="editor_parabolt_count_label">Parabolt Count</string>
@@ -281,6 +282,7 @@
     <string name="editor_pitch_info_label">Pitches</string>
     <string name="editor_pitch_info_pitch_label">Pitch</string>
     <string name="editor_pitch_info_grade_label">Grade</string>
+    <string name="editor_pitch_info_aid_grade_label">Aid Grade</string>
     <string name="editor_pitch_info_height_label">Height</string>
     <string name="editor_pitch_info_ending_label">Belay Station</string>
     <string name="editor_pitch_info_ending_info_label">Stance Info</string>

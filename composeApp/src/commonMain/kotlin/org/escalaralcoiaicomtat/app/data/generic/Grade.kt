@@ -18,7 +18,7 @@ interface GradeValue {
                 .replace("+", "_PLUS")
                 .replace("º", "A")
             return SportsGrade.entries.find { it.name.endsWith(name) }
-                ?: ArtificialGrade.entries.find { it.name == name }
+                ?: AidGrade.entries.find { it.name == name }
                 ?: SportsGrade.UNKNOWN
         }
     }
@@ -40,7 +40,7 @@ val GradeValue?.color: ColorGroup
                 ColorGrade3
             else
                 ColorGrade4
-        } else if (this is ArtificialGrade) {
+        } else if (this is AidGrade) {
             ColorGradeA
         } else {
             ColorGradeP
@@ -68,7 +68,7 @@ enum class SportsGrade : GradeValue {
     }
 }
 
-enum class ArtificialGrade : GradeValue {
+enum class AidGrade : GradeValue {
     A0,
     A1, A1_PLUS,
     A2, A2_PLUS,

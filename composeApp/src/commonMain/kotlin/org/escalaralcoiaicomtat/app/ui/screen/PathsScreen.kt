@@ -650,6 +650,9 @@ private fun LazyListScope.bottomSheetContents(
                 .padding(vertical = 4.dp)
         )
     }
+    if ((child.grade != null && child.grade != SportsGrade.UNKNOWN) || child.aidGrade != null) item {
+
+    }
     if (child.grade != null && child.grade != SportsGrade.UNKNOWN) item {
         val grade = child.grade
         MetaCard(

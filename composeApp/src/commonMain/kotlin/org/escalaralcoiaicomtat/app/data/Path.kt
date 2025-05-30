@@ -24,6 +24,7 @@ data class Path(
 
     val height: UInt? = null,
     @Serializable(GradeSerializer::class) val grade: GradeValue? = null,
+    @Serializable(GradeSerializer::class) @SerialName("aid_grade") val aidGrade: GradeValue? = null,
     val ending: Ending? = null,
     val pitches: List<PitchInfo>? = null,
 

@@ -4,6 +4,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.SQLiteDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import org.escalaralcoiaicomtat.app.database.migrations.Migration4To5
 
 expect val driver: SQLiteDriver
 
@@ -13,7 +14,7 @@ private fun getRoomDatabase(
     builder: RoomDatabase.Builder<AppDatabase> = roomDatabaseBuilder
 ): AppDatabase {
     return builder
-        .addMigrations()
+        .addMigrations(Migration4To5)
         .fallbackToDestructiveMigrationOnDowngrade(true)
         .setDriver(driver)
         .setQueryCoroutineContext(Dispatchers.IO)

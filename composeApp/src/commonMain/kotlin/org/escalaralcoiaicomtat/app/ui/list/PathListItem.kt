@@ -70,12 +70,19 @@ fun PathListItem(
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.weight(1f)
             )
-            path.grade?.let {
+            val (grade, aidGrade) = path.grade to path.aidGrade
+            if (grade != null || aidGrade != null) {
                 Text(
-                    text = it.toString(),
+                    text = when {
+                        // TODO: Should build annotated string for coloring each grade
+                        grade != null && aidGrade != null -> "$grade/$aidGrade"
+                        grade != null && aidGrade == null -> grade.toString()
+                        grade == null && aidGrade != null -> aidGrade.toString()
+                        else -> "" // edge case, won't happen
+                    },
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(start = 8.dp),
-                    color = path.grade.color.current
+                    color = grade.color.current
                 )
             }
         }
