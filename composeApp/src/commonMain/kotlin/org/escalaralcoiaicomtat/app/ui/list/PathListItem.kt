@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
@@ -70,14 +69,9 @@ fun PathListItem(
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.weight(1f)
             )
-            val (grade, aidGrade) = path.grade to path.aidGrade
-            if (grade != null || aidGrade != null) {
+            if (path.grade != null || path.aidGrade != null) {
                 Text(
-                    text = buildAnnotatedString {
-                        grade?.toAnnotatedString()?.let { append(it) }
-                        if (grade != null && aidGrade != null) append('/')
-                        aidGrade?.toAnnotatedString()?.let { append(it) }
-                    },
+                    text = path.grade(),
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(start = 8.dp)
                 )
