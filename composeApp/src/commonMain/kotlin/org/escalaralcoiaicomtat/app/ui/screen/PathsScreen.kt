@@ -584,6 +584,12 @@ private fun LazyListScope.bottomSheetContents(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
+                text = child.sketchId.toString(),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(end = 8.dp),
+            )
+            Text(
                 text = child.displayName,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f)
