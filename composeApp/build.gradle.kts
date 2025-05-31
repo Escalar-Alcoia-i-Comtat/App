@@ -127,8 +127,8 @@ kotlin {
             // Compose - View Model
             implementation(libs.compose.viewModel)
 
-            // Compose - Zoomable
-            implementation(libs.zoomable)
+            // Compose - Zoom Image
+            implementation(libs.zoomimage.coil3)
 
             // Coil
             implementation(libs.coil.compose)
