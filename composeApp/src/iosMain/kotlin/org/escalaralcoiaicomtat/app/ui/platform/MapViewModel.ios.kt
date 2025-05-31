@@ -24,7 +24,7 @@ actual class MapViewModel actual constructor() : ViewModelBase() {
             val placemarks = document.getElementsByTag("Folder")
                 .also { Napier.d { "Processing ${it.size} folders..." } }
                 .flatMap { folder ->
-                    folder.getElementsByTag("Placemark").map { Placemark.Companion.parse(it) }
+                    folder.getElementsByTag("Placemark").map { Placemark.parse(it) }
                 }
                 .filterNotNull()
             onDocumentLoaded(
