@@ -72,7 +72,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -87,9 +86,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
+import com.github.panpf.zoomimage.ZoomImage
 import com.mikepenz.markdown.m3.Markdown
-import com.mxalbert.zoomable.Zoomable
-import com.mxalbert.zoomable.rememberZoomableState
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
@@ -463,34 +461,29 @@ fun PathsList(
                 Column(
                     modifier = Modifier.fillMaxHeight().weight(1f)
                 ) {
-                    Zoomable(
-                        modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds(),
-                        state = rememberZoomableState(maxScale = 5f),
-                    ) {
-                        val painter = rememberAsyncImagePainter(parent.imageUrl())
-                        val state by painter.state.collectAsState()
+                    val painter = rememberAsyncImagePainter(parent.imageUrl())
+                    val state by painter.state.collectAsState()
 
-                        when (state) {
-                            is AsyncImagePainter.State.Empty,
-                            is AsyncImagePainter.State.Loading -> {
-                                CircularProgressIndicator()
-                            }
+                    when (state) {
+                        is AsyncImagePainter.State.Empty,
+                        is AsyncImagePainter.State.Loading -> {
+                            CircularProgressIndicator()
+                        }
 
-                            is AsyncImagePainter.State.Success -> {
-                                val (width, height) = painter.intrinsicSize
-                                Image(
-                                    painter = painter,
-                                    contentDescription = parent.displayName,
-                                    modifier = Modifier
-                                        .aspectRatio(width / height)
-                                        .fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
+                        is AsyncImagePainter.State.Success -> {
+                            val (width, height) = painter.intrinsicSize
+                            ZoomImage(
+                                painter = painter,
+                                contentDescription = parent.displayName,
+                                modifier = Modifier
+                                    .aspectRatio(width / height)
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
 
-                            is AsyncImagePainter.State.Error -> {
-                                // Show some error UI.
-                            }
+                        is AsyncImagePainter.State.Error -> {
+                            // TODO: Show some error UI.
                         }
                     }
 
