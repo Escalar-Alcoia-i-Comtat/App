@@ -45,7 +45,7 @@ actual fun ContextMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            items.map { item ->
+            items.forEach { item ->
                 DropdownMenuItem(
                     text = { Text(item.label()) },
                     onClick = item.onClick,
