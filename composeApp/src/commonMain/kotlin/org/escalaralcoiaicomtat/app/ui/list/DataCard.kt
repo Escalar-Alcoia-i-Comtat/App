@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -42,6 +41,7 @@ import org.escalaralcoiaicomtat.app.data.DataTypeWithPoint
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
+import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenuItem
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -57,12 +57,12 @@ fun <T : DataTypeWithImage> DataCard(
 ) {
     ContextMenu(
         enabled = onEdit != null,
-        dropdownContent = {
-            DropdownMenuItem(
-                text = { Text(stringResource(Res.string.editor_edit)) },
-                onClick = onEdit ?: {}
+        items = listOf(
+            ContextMenuItem(
+                label = { stringResource(Res.string.editor_edit) },
+                onClick = onEdit ?: {},
             )
-        }
+        ),
     ) {
         Column(
             modifier = modifier

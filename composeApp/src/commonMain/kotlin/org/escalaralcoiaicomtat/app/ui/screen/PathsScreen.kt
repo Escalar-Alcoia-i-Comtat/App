@@ -52,7 +52,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
@@ -117,6 +116,7 @@ import org.escalaralcoiaicomtat.app.ui.model.PathsScreenModel
 import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
+import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenuItem
 import org.escalaralcoiaicomtat.app.ui.reusable.ReportButton
 import org.escalaralcoiaicomtat.app.utils.format
 import org.escalaralcoiaicomtat.app.utils.unit.meters
@@ -543,16 +543,12 @@ private fun PathsListView(
         items(paths ?: emptyList()) { path ->
             ContextMenu(
                 enabled = onEditRequested != null,
-                dropdownContent = {
-                    ListItem(
-                        headlineContent = {
-                            Text(stringResource(Res.string.editor_edit))
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onEditRequested?.invoke(path) }
+                items = listOf(
+                    ContextMenuItem(
+                        label = { stringResource(Res.string.editor_edit) },
+                        onClick = { onEditRequested?.invoke(path) }
                     )
-                },
+                ),
             ) {
                 PathListItem(
                     path = path,
