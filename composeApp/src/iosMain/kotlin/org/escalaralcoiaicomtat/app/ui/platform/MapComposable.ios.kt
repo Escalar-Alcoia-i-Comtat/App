@@ -10,7 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
+import androidx.compose.ui.viewinterop.UIKitView
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
@@ -46,19 +50,24 @@ actual fun MapComposable(
     OutlinedCard(modifier) {
         AnimatedContent(mapData) { data ->
             if (data != null) {
+                val mapView = remember {
+                    MKMapView().apply {
+                        mapType = MKMapTypeSatellite
+                        // Disable all gestures
+                        zoomEnabled = false
+                        scrollEnabled = false
+                        pitchEnabled = false
+                        rotateEnabled = false
+                    }
+                }
                 UIKitView(
-                    modifier = Modifier.fillMaxSize(),
-                    factory = {
-                        MKMapView().apply {
-                            mapType = MKMapTypeSatellite
-                            // Disable all gestures
-                            zoomEnabled = false
-                            scrollEnabled = false
-                            pitchEnabled = false
-                            rotateEnabled = false
-                        }
-                    },
-                    update = { mapView ->
+                    factory = { mapView },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .semantics {
+                            role = Role.Image
+                        },
+                    update = {
                         // Clear all annotations
                         Napier.d { "Removing ${mapView.annotations.size} annotations..." }
                         for (annotation in mapView.annotations) {
@@ -75,10 +84,16 @@ actual fun MapComposable(
                         }
 
                         Napier.d { "Points: $points" }
-                        coordinateRegionOf(points).let {
-                            mapView.setRegion(it)
+                        if (points.isNotEmpty()) {
+                            coordinateRegionOf(points).let {
+                                mapView.setRegion(it)
+                            }
                         }
-                    }
+                    },
+                    properties = UIKitInteropProperties(
+                        isInteractive = false,
+                        isNativeAccessibilityEnabled = false,
+                    )
                 )
             } else {
                 CircularProgressIndicatorBox()
