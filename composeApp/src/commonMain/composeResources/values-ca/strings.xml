@@ -288,4 +288,8 @@
     <string name="report_message">Missatge (necessari)</string>
     <string name="report_error_attachments_size">El tamany màxim dels adjunts és %1$s.</string>
     <string name="report_sent">Informe enviat correctament.</string>
+    <string name="editor_pitch_info_aid_grade_label">Grau Artificial</string>
+    <string name="editor_aid_grade_label">Grau Artificial</string>
+    <string name="error_image_unknown">Error desconegut</string>
+    <string name="error_image_load_title">No s\'ha pogut carregar la imatge</string>
 </resources>
