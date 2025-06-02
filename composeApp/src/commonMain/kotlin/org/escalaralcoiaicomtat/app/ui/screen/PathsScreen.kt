@@ -16,7 +16,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -471,13 +470,12 @@ fun PathsList(
                         }
 
                         is AsyncImagePainter.State.Success -> {
-                            val (width, height) = painter.intrinsicSize
                             ZoomImage(
                                 painter = painter,
                                 contentDescription = parent.displayName,
                                 modifier = Modifier
-                                    .aspectRatio(width / height)
-                                    .fillMaxSize(),
+                                    .fillMaxWidth()
+                                    .weight(1f),
                                 contentScale = ContentScale.Crop
                             )
                         }
