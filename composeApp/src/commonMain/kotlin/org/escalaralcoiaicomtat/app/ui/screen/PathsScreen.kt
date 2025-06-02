@@ -114,6 +114,7 @@ import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
 import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
 import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenuItem
+import org.escalaralcoiaicomtat.app.ui.reusable.ImageLoadError
 import org.escalaralcoiaicomtat.app.ui.reusable.ReportButton
 import org.escalaralcoiaicomtat.app.utils.format
 import org.escalaralcoiaicomtat.app.utils.unit.meters
@@ -463,25 +464,32 @@ fun PathsList(
                     val painter = rememberAsyncImagePainter(parent.imageUrl())
                     val state by painter.state.collectAsState()
 
-                    when (state) {
-                        is AsyncImagePainter.State.Empty,
-                        is AsyncImagePainter.State.Loading -> {
-                            CircularProgressIndicator()
-                        }
+                    AnimatedContent(
+                        targetState = state
+                    ) { painterState ->
+                        when (painterState) {
+                            is AsyncImagePainter.State.Empty,
+                            is AsyncImagePainter.State.Loading -> {
+                                CircularProgressIndicator()
+                            }
 
-                        is AsyncImagePainter.State.Success -> {
-                            ZoomImage(
-                                painter = painter,
-                                contentDescription = parent.displayName,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                            is AsyncImagePainter.State.Success -> {
+                                ZoomImage(
+                                    painter = painter,
+                                    contentDescription = parent.displayName,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
 
-                        is AsyncImagePainter.State.Error -> {
-                            // TODO: Show some error UI.
+                            is AsyncImagePainter.State.Error -> {
+                                ImageLoadError(
+                                    throwable = painterState.result.throwable,
+                                    modifier = Modifier.fillMaxWidth().weight(1f)
+                                )
+                            }
                         }
                     }
 
