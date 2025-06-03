@@ -502,7 +502,7 @@ fun PathsList(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.ChevronLeft,
-                                        contentDescription = null
+                                        contentDescription = stringResource(Res.string.sector_previous),
                                     )
                                 }
                             }
@@ -512,7 +512,7 @@ fun PathsList(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.ChevronRight,
-                                        contentDescription = null
+                                        contentDescription = stringResource(Res.string.sector_next),
                                     )
                                 }
                             }
