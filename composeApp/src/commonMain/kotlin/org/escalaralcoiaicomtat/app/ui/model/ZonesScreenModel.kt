@@ -6,5 +6,5 @@ import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 
 class ZonesScreenModel : DataScreenModel<Area, Zone>(
     childrenListAccessor = { parentId -> DatabaseInterface.zones().getByParentId(parentId) },
-    parentListAccessor = { id -> DatabaseInterface.areas().get(id) }
+    parentAccessor = { id -> DatabaseInterface.areas().get(id) },
 )

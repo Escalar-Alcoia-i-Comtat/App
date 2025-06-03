@@ -12,7 +12,7 @@ import org.escalaralcoiaicomtat.app.data.DataTypeWithParent
 
 abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWithParent>(
     protected val childrenListAccessor: suspend (parentId: Long) -> List<Children>,
-    private val parentListAccessor: suspend (id: Long) -> Parent?
+    private val parentAccessor: suspend (id: Long) -> Parent?,
 ) : ViewModelBase() {
     /**
      * Whether the children should be ordered automatically upon fetch.
@@ -45,7 +45,7 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
             else originalChildren
         )
 
-        val dbParent = parentListAccessor(id)
+        val dbParent = parentAccessor(id)
         if (dbParent == null) {
             Napier.w { "Could not find #$id" }
             withContext(Dispatchers.Main) { onNotFound() }

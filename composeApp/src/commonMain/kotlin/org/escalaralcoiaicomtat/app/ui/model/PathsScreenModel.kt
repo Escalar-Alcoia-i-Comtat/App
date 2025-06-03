@@ -12,7 +12,7 @@ import org.escalaralcoiaicomtat.app.network.AdminBackend
 
 class PathsScreenModel : DataScreenModel<Sector, Path>(
     childrenListAccessor = { parentId -> DatabaseInterface.paths().getByParentId(parentId) },
-    parentListAccessor = { id -> DatabaseInterface.sectors().get(id) }
+    parentAccessor = { id -> DatabaseInterface.sectors().get(id) }
 ) {
     private val _blocks = MutableStateFlow<List<Blocking>?>(null)
     val blocks: StateFlow<List<Blocking>?> get() = _blocks.asStateFlow()

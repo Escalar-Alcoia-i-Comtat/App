@@ -10,7 +10,7 @@ import org.escalaralcoiaicomtat.app.network.AdminBackend
 
 class SectorsScreenModel : DataScreenModel<Zone, Sector>(
     childrenListAccessor = { parentId -> DatabaseInterface.sectors().getByParentId(parentId) },
-    parentListAccessor = { id -> DatabaseInterface.zones().get(id) }
+    parentAccessor = { id -> DatabaseInterface.zones().get(id) }
 ) {
     private val _isLoading = MutableStateFlow(false)
     val isLoading get() = _isLoading.asStateFlow()
