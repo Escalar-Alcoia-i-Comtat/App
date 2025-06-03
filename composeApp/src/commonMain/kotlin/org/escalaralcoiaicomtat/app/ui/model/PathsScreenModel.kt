@@ -23,6 +23,12 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
     private val _isLoadingBlockingEdit = MutableStateFlow<Boolean>(false)
     val isLoadingBlockingEdit: StateFlow<Boolean> get() = _isLoadingBlockingEdit.asStateFlow()
 
+    private val _previousParentId = MutableStateFlow<Long?>(null)
+    val previousParentId: StateFlow<Long?> get() = _previousParentId.asStateFlow()
+
+    private val _nextParentId = MutableStateFlow<Long?>(null)
+    val nextParentId: StateFlow<Long?> get() = _nextParentId.asStateFlow()
+
     override suspend fun loadData(id: Long, onNotFound: () -> Unit) {
         super.loadData(id, onNotFound)
 
@@ -32,6 +38,18 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
             }
             .filter { it.isActive() }
         _blocks.emit(blocks)
+
+        parent.value?.let { parent ->
+            // Fetch all the child sectors of the zone of the parent sector (brothers)
+            val sectors = DatabaseInterface.sectors()
+                .getByParentId(parent.parentZoneId)
+                .sorted()
+            val sectorIdx = sectors.indexOfFirst { it.id == id }
+            if (sectorIdx == 0) _previousParentId.tryEmit(null)
+            else _previousParentId.tryEmit(sectors[sectorIdx - 1].id)
+            if (sectorIdx +1 >= sectors.size) _nextParentId.tryEmit(null)
+            else _nextParentId.tryEmit(sectors[sectorIdx + 1].id)
+        }
     }
 
     fun editBlocking(blocking: Blocking) {

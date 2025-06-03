@@ -106,7 +106,10 @@ fun <Parent : DataTypeWithImage, ChildrenType : DataTypeWithImage> DataList(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(Res.string.action_back)
+                        )
                     }
                 },
                 actions = {

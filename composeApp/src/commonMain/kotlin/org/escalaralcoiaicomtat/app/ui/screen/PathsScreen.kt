@@ -13,6 +13,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
@@ -54,6 +57,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -134,6 +138,8 @@ fun PathsScreen(
     onEditSectorRequested: (() -> Unit)?,
     onEditPathRequested: ((Path) -> Unit)?,
     onCreatePathRequested: (() -> Unit)?,
+    onPreviousSectorRequested: ((id: Long) -> Unit),
+    onNextSectorRequested: ((id: Long) -> Unit),
     viewModel: PathsScreenModel = viewModel { PathsScreenModel() }
 ) {
     val sector by viewModel.parent.collectAsState()
@@ -142,6 +148,8 @@ fun PathsScreen(
     val selectedPath by viewModel.displayingChild.collectAsState()
     val editingBlocking by viewModel.editingBlocking.collectAsState()
     val isLoadingBlockingEdit by viewModel.isLoadingBlockingEdit.collectAsState()
+    val nextParentId by viewModel.nextParentId.collectAsState()
+    val previousParentId by viewModel.previousParentId.collectAsState()
 
     LaunchedEffect(sectorId) {
         viewModel.load(sectorId) {
@@ -167,7 +175,13 @@ fun PathsScreen(
         onCreatePathRequested = onCreatePathRequested,
         onEditBlockingRequested = viewModel::editBlocking.takeIf { onCreatePathRequested != null },
         onEditBlockingStopRequested = viewModel::stopEditingBlocking,
-        onPathClicked = viewModel::selectChild
+        onPathClicked = viewModel::selectChild,
+        onPreviousSectorRequested = onPreviousSectorRequested.takeIf { previousParentId != null }?.let {
+            { it(previousParentId!!) }
+        },
+        onNextSectorRequested = onNextSectorRequested.takeIf { nextParentId != null }?.let {
+            { it(nextParentId!!) }
+        },
     )
 }
 
@@ -190,7 +204,9 @@ private fun PathsScreen(
     onCreatePathRequested: (() -> Unit)?,
     onEditBlockingRequested: ((Blocking) -> Unit)?,
     onEditBlockingStopRequested: () -> Unit,
-    onPathClicked: (path: Path?) -> Unit
+    onPathClicked: (path: Path?) -> Unit,
+    onPreviousSectorRequested: (() -> Unit)?,
+    onNextSectorRequested: (() -> Unit)?,
 ) {
     var showingBottomSheet by remember { mutableStateOf(false) }
     if (showingBottomSheet && sector != null) {
@@ -222,7 +238,10 @@ private fun PathsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackRequested) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(Res.string.action_back)
+                        )
                     }
                 },
                 actions = {
@@ -263,7 +282,9 @@ private fun PathsScreen(
             onReportRequested = onReportRequested,
             onEditRequested = onEditPathRequested,
             onEditBlockingRequested = onEditBlockingRequested,
-            onPathClicked = onPathClicked
+            onPathClicked = onPathClicked,
+            onPreviousSectorRequested = onPreviousSectorRequested,
+            onNextSectorRequested = onNextSectorRequested,
         )
     }
 }
@@ -360,7 +381,9 @@ fun PathsList(
     onReportRequested: (Path) -> Unit,
     onEditRequested: ((Path) -> Unit)?,
     onEditBlockingRequested: ((Blocking) -> Unit)?,
-    onPathClicked: (path: Path?) -> Unit
+    onPathClicked: (path: Path?) -> Unit,
+    onPreviousSectorRequested: (() -> Unit)?,
+    onNextSectorRequested: (() -> Unit)?,
 ) {
     val windowSizeClass = calculateWindowSizeClass()
 
@@ -460,35 +483,38 @@ fun PathsList(
                 Column(
                     modifier = Modifier.fillMaxHeight().weight(1f)
                 ) {
-                    val painter = rememberAsyncImagePainter(parent.imageUrl())
-                    val state by painter.state.collectAsState()
-
-                    AnimatedContent(
-                        targetState = state,
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                    ) { painterState ->
-                        when (painterState) {
-                            is AsyncImagePainter.State.Empty,
-                            is AsyncImagePainter.State.Loading -> {
-                                CircularProgressIndicatorBox()
-                            }
+                            .weight(1f)
+                    ) {
+                        SectorImageView(
+                            sector = parent,
+                            modifier = Modifier.fillMaxSize()
+                        )
 
-                            is AsyncImagePainter.State.Success -> {
-                                ZoomImage(
-                                    painter = painter,
-                                    contentDescription = parent.displayName,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
+                        Row(
+                            modifier = Modifier.padding(8.dp).align(Alignment.BottomEnd)
+                        ) {
+                            onPreviousSectorRequested?.let {
+                                SmallFloatingActionButton(
+                                    onClick = it,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ChevronLeft,
+                                        contentDescription = stringResource(Res.string.sector_previous),
+                                    )
+                                }
                             }
-
-                            is AsyncImagePainter.State.Error -> {
-                                ImageLoadError(
-                                    throwable = painterState.result.throwable,
-                                    modifier = Modifier.fillMaxWidth().weight(1f)
-                                )
+                            onNextSectorRequested?.let {
+                                SmallFloatingActionButton(
+                                    onClick = it,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ChevronRight,
+                                        contentDescription = stringResource(Res.string.sector_next),
+                                    )
+                                }
                             }
                         }
                     }
@@ -508,6 +534,43 @@ fun PathsList(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectorImageView(
+    sector: Sector,
+    modifier: Modifier = Modifier
+) {
+    val painter = rememberAsyncImagePainter(sector.imageUrl())
+    val state by painter.state.collectAsState()
+
+    AnimatedContent(
+        targetState = state,
+        modifier = modifier,
+    ) { painterState ->
+        when (painterState) {
+            is AsyncImagePainter.State.Empty,
+            is AsyncImagePainter.State.Loading -> {
+                CircularProgressIndicatorBox()
+            }
+
+            is AsyncImagePainter.State.Success -> {
+                ZoomImage(
+                    painter = painter,
+                    contentDescription = sector.displayName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+
+            is AsyncImagePainter.State.Error -> {
+                ImageLoadError(
+                    throwable = painterState.result.throwable,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }

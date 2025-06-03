@@ -145,6 +145,8 @@
     <string name="sector_track_description">Tap to download the GPX track to use with an external application.</string>
     <string name="sector_track_external_title">Track available on %1$s</string>
     <string name="sector_track_external_description">Tap to open the URL.</string>
+    <string name="sector_previous">Previous Sector</string>
+    <string name="sector_next">Next Sector</string>
 
     <string name="path_height">Height</string>
     <string name="path_grade">Grade</string>

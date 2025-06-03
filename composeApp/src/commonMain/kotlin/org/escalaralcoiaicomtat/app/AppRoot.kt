@@ -25,6 +25,7 @@ import androidx.navigation.toRoute
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import io.github.aakira.napier.Napier
+import kotlinx.serialization.SerializationException
 import org.escalaralcoiaicomtat.app.data.Area
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.data.Path
@@ -228,6 +229,12 @@ fun SharedTransitionScope.NavigationController(
             }
             composable<Destinations.Sector> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Sector>()
+                val previousRoute = try {
+                    navController.previousBackStackEntry?.toRoute<Destinations.Zone>()
+                } catch (e: SerializationException) {
+                    Napier.e(e) { "Could not decode destination." }
+                    null
+                }
 
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     PathsScreen(
@@ -258,6 +265,18 @@ fun SharedTransitionScope.NavigationController(
                                 Destinations.Editor(DataTypes.Path, null, route.id)
                             )
                         }.takeIf { editAllowed },
+                        onNextSectorRequested = { id ->
+                            navController.navigateTo(
+                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id),
+                                popUpTo = previousRoute,
+                            )
+                        },
+                        onPreviousSectorRequested = { id ->
+                            navController.navigateTo(
+                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id),
+                                popUpTo = previousRoute,
+                            )
+                        }
                     )
                 }
             }
