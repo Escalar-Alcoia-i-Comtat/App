@@ -23,10 +23,10 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
     private val _isLoadingBlockingEdit = MutableStateFlow<Boolean>(false)
     val isLoadingBlockingEdit: StateFlow<Boolean> get() = _isLoadingBlockingEdit.asStateFlow()
 
-    private val _previousParentId = MutableStateFlow<Long?>(123)
+    private val _previousParentId = MutableStateFlow<Long?>(null)
     val previousParentId: StateFlow<Long?> get() = _previousParentId.asStateFlow()
 
-    private val _nextParentId = MutableStateFlow<Long?>(123)
+    private val _nextParentId = MutableStateFlow<Long?>(null)
     val nextParentId: StateFlow<Long?> get() = _nextParentId.asStateFlow()
 
     override suspend fun loadData(id: Long, onNotFound: () -> Unit) {
