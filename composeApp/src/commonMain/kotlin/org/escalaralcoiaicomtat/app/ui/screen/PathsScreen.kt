@@ -46,7 +46,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -465,21 +464,22 @@ fun PathsList(
                     val state by painter.state.collectAsState()
 
                     AnimatedContent(
-                        targetState = state
+                        targetState = state,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                     ) { painterState ->
                         when (painterState) {
                             is AsyncImagePainter.State.Empty,
                             is AsyncImagePainter.State.Loading -> {
-                                CircularProgressIndicator()
+                                CircularProgressIndicatorBox()
                             }
 
                             is AsyncImagePainter.State.Success -> {
                                 ZoomImage(
                                     painter = painter,
                                     contentDescription = parent.displayName,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .weight(1f),
+                                    modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
                                 )
                             }
