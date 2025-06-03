@@ -17,13 +17,13 @@ expect object DatabaseInterface {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <DT : DataType> DatabaseInterface.byType(type: DataTypes<DT>): EntityInterface<DT> =
+fun <DT : DataType> DatabaseInterface.byType(type: DataTypes<DT>): DataTypeInterface<DT> =
     when (type) {
         DataTypes.Area -> areas()
         DataTypes.Zone -> zones()
         DataTypes.Sector -> sectors()
         DataTypes.Path -> paths()
-    } as EntityInterface<DT>
+    } as DataTypeInterface<DT>
 
 /**
  * Should return the parent interface of this one, eg, the interface that fetches the parents
