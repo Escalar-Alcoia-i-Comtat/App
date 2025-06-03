@@ -291,5 +291,5 @@
     <string name="editor_pitch_info_aid_grade_label">Grau Artificial</string>
     <string name="editor_aid_grade_label">Grau Artificial</string>
     <string name="error_image_unknown">Error desconegut</string>
-    <string name="error_image_load_title">No s\'ha pogut carregar la imatge</string>
+    <string name="error_image_load_title">No s'ha pogut carregar la imatge</string>
 </resources>
