@@ -228,7 +228,7 @@
     <string name="update_error_update_code">No se ha podido actualizar. Código de error: %1$s</string>
     <string name="settings_app_info_intro_title">Intro</string>
     <string name="settings_credits_message">Proyecto co-financiado por el Centre Excursionista d'Alcoi.</string>
-    <string name="settings_credits_website">Página Web</string>
+    <string name="settings_credits_website">Sitio web</string>
     <string name="update_action_dismiss">Cerrar</string>
     <string name="update_error_title">Error</string>
     <string name="status_loading">Cargando...</string>
@@ -283,7 +283,7 @@
     <string name="report_send">Enviar Informe</string>
     <string name="report_element">Elemento</string>
     <string name="report_name">tu nombre</string>
-    <string name="report_email">Correo Electrónico</string>
+    <string name="report_email">Correo electrónico</string>
     <string name="report_attachments">Adjuntos</string>
     <string name="report_message">Mensaje (obligatorio)</string>
     <string name="report_error_attachments_size">El tamaño máximo de los adjuntos es %1$s.</string>
