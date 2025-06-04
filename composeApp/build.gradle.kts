@@ -274,6 +274,7 @@ kotlin {
         wasmJsMain {
             dependencies {
                 implementation(libs.kotlinx.browser)
+                implementation(libs.androidx.graphics.shapes)
             }
         }
     }
