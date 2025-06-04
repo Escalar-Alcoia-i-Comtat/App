@@ -283,7 +283,7 @@
     <string name="report_send">Enviar Informe</string>
     <string name="report_element">Element</string>
     <string name="report_name">El teu nom</string>
-    <string name="report_email">Correu Electrònic</string>
+    <string name="report_email">Correu electrònic</string>
     <string name="report_attachments">Adjunts</string>
     <string name="report_message">Missatge (necessari)</string>
     <string name="report_error_attachments_size">El tamany màxim dels adjunts és %1$s.</string>
