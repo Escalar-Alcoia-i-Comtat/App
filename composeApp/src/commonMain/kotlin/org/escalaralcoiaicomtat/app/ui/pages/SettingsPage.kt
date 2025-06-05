@@ -61,6 +61,7 @@ import org.escalaralcoiaicomtat.app.sync.SyncProcess
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
 import org.escalaralcoiaicomtat.app.ui.lang.ContributorCredit
 import org.escalaralcoiaicomtat.app.ui.lang.Language
+import org.escalaralcoiaicomtat.app.ui.lang.LanguagePreferences
 import org.escalaralcoiaicomtat.app.ui.lang.LocalLanguage
 import org.escalaralcoiaicomtat.app.ui.model.SettingsModel
 import org.escalaralcoiaicomtat.app.ui.platform.PlatformSettings
@@ -185,7 +186,8 @@ fun SettingsPage(
                 },
                 selection = language,
                 optionsDialogTitle = stringResource(Res.string.settings_language_title),
-                stringConverter = { it.localeDisplayName }
+                stringConverter = { it.localeDisplayName },
+                enabled = LanguagePreferences.isLanguageChangeSupported,
             )
 
             var showingUnlockDialog by remember { mutableStateOf(false) }
