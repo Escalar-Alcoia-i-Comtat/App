@@ -4,6 +4,7 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getLongOrNullFlow
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import com.russhwolf.settings.set
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,10 @@ import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
 import org.escalaralcoiaicomtat.app.sync.BlockingSync
 import org.escalaralcoiaicomtat.app.sync.DataSync
 import org.escalaralcoiaicomtat.app.sync.SyncProcess
+import org.escalaralcoiaicomtat.app.ui.Locales
+import org.escalaralcoiaicomtat.app.ui.lang.ContributorCredit
+import org.escalaralcoiaicomtat.app.ui.lang.Language
+import org.escalaralcoiaicomtat.app.ui.lang.LanguagePreferences
 import org.escalaralcoiaicomtat.app.utils.IO
 
 @OptIn(ExperimentalSettingsApi::class)
@@ -62,6 +67,9 @@ class SettingsModel : ViewModelBase() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
 
+    private val _contributors = MutableStateFlow<Map<Language, List<ContributorCredit>>?>(null)
+    val contributors: StateFlow<Map<Language, List<ContributorCredit>>?> get() = _contributors.asStateFlow()
+
     fun load() {
         launch(Dispatchers.IO) {
             val response = BasicBackend.serverInfo()
@@ -75,6 +83,14 @@ class SettingsModel : ViewModelBase() {
                     DatabaseInterface.paths().count(),
                 )
             )
+
+            try {
+                _contributors.emit(
+                    Locales.contributors()
+                )
+            } catch (e: Exception) {
+                Napier.e(e) { "Could not load contributors" }
+            }
         }
     }
 
@@ -109,6 +125,11 @@ class SettingsModel : ViewModelBase() {
     fun onIntroRequested(onNavigateToIntroRequested: () -> Unit) {
         settings.remove(SettingsKeys.SHOWN_INTRO)
         onNavigateToIntroRequested()
+    }
+
+    fun changeLanguage(lang: Language) {
+        LanguagePreferences.changeLang(lang)
+        settings[SettingsKeys.LANGUAGE] = lang.key
     }
 
     data class ServerStats(

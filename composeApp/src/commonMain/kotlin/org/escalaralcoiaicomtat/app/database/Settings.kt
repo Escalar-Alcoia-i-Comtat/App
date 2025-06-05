@@ -44,4 +44,9 @@ object SettingsKeys {
      * The API key that allows the user to edit the data.
      */
     const val API_KEY = "api_key"
+
+    /**
+     * The language selected for the app.
+     */
+    const val LANGUAGE = "language"
 }

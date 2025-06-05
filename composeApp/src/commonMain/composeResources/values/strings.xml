@@ -51,6 +51,8 @@
 
     <string name="settings_category_general">General Configuration</string>
     <string name="settings_units_distance">Distance Units</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_contributors">Made possible by %1$s</string>
 
     <string name="settings_category_admin">Administration</string>
     <string name="settings_admin_lock_title">Admin Lock</string>

@@ -1,0 +1,49 @@
+[
+  {
+    "Catalan": [
+      {
+        "email": "username1@mail.com",
+        "username": "username1",
+        "full_name": "User 1",
+        "change_count": 4,
+        "date_joined": "2018-10-10T11:03:34.342978+00:00"
+      },
+      {
+        "email": "username2@mail.com",
+        "username": "username2",
+        "full_name": "User 2",
+        "change_count": 1,
+        "date_joined": "2020-03-19T04:51:48.045012+00:00"
+      }
+    ]
+  },
+  {
+    "French": [
+      {
+        "email": "username2@mail.com",
+        "username": "username2",
+        "full_name": "User 2",
+        "change_count": 149,
+        "date_joined": "2020-03-19T04:51:48.045012+00:00"
+      }
+    ]
+  },
+  {
+    "Spanish": [
+      {
+        "email": "username1@mail.com",
+        "username": "username1",
+        "full_name": "User 1",
+        "change_count": 4,
+        "date_joined": "2018-10-10T11:03:34.342978+00:00"
+      },
+      {
+        "email": "username2@mail.com",
+        "username": "username2",
+        "full_name": "User 2",
+        "change_count": 2,
+        "date_joined": "2020-03-19T04:51:48.045012+00:00"
+      }
+    ]
+  }
+]
