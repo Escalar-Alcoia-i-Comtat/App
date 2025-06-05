@@ -292,4 +292,8 @@
     <string name="editor_pitch_info_aid_grade_label">Grado Artificial</string>
     <string name="error_image_unknown">Error desconocido</string>
     <string name="error_image_load_title">No se ha podido cargar la imagen</string>
+    <string name="sector_previous">Sector Anterior</string>
+    <string name="sector_next">Sector Siguiente</string>
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_contributors">Posible gracias a %1$s</string>
 </resources>
