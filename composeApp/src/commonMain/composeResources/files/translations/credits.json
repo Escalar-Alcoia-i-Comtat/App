@@ -1,0 +1,49 @@
+[
+  {
+    "Catalan": [
+      {
+        "email": "arnyminer.z@gmail.com",
+        "username": "arnyminerz",
+        "full_name": "Arnau Mora",
+        "change_count": 4,
+        "date_joined": "2018-10-10T11:03:34.342978+00:00"
+      },
+      {
+        "email": "j.lavoie@net-c.ca",
+        "username": "Edanas",
+        "full_name": "J. Lavoie",
+        "change_count": 1,
+        "date_joined": "2020-03-19T04:51:48.045012+00:00"
+      }
+    ]
+  },
+  {
+    "French": [
+      {
+        "email": "j.lavoie@net-c.ca",
+        "username": "Edanas",
+        "full_name": "J. Lavoie",
+        "change_count": 149,
+        "date_joined": "2020-03-19T04:51:48.045012+00:00"
+      }
+    ]
+  },
+  {
+    "Spanish": [
+      {
+        "email": "arnyminer.z@gmail.com",
+        "username": "arnyminerz",
+        "full_name": "Arnau Mora",
+        "change_count": 4,
+        "date_joined": "2018-10-10T11:03:34.342978+00:00"
+      },
+      {
+        "email": "j.lavoie@net-c.ca",
+        "username": "Edanas",
+        "full_name": "J. Lavoie",
+        "change_count": 2,
+        "date_joined": "2020-03-19T04:51:48.045012+00:00"
+      }
+    ]
+  }
+]
