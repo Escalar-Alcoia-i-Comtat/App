@@ -363,7 +363,7 @@ fun SettingsPage(
                 headline = stringResource(Res.string.settings_links_crowdin),
                 summary = stringResource(Res.string.settings_links_tap),
                 icon = Icons.Outlined.Language
-            ) { uriHandler.openUri("https://hosted.weblate.org/projects/escalar-alcoia-i-comtat/") }
+            ) { uriHandler.openUri("https://hosted.weblate.org/engage/escalar-alcoia-i-comtat/") }
 
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
