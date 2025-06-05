@@ -12,3 +12,9 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Desktop.
 
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+# Translation contributions
+
+Translate the app to your own language through [Weblate](https://hosted.weblate.org/engage/escalar-alcoia-i-comtat/).
+
+[![Estat de la traducció](https://hosted.weblate.org/widget/escalar-alcoia-i-comtat/multi-auto.svg)](https://hosted.weblate.org/engage/escalar-alcoia-i-comtat/)

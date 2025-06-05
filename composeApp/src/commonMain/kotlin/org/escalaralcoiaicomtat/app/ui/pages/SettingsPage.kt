@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Dns
@@ -58,6 +59,10 @@ import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
 import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.sync.SyncProcess
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
+import org.escalaralcoiaicomtat.app.ui.lang.ContributorCredit
+import org.escalaralcoiaicomtat.app.ui.lang.Language
+import org.escalaralcoiaicomtat.app.ui.lang.LanguagePreferences
+import org.escalaralcoiaicomtat.app.ui.lang.LocalLanguage
 import org.escalaralcoiaicomtat.app.ui.model.SettingsModel
 import org.escalaralcoiaicomtat.app.ui.platform.PlatformSettings
 import org.escalaralcoiaicomtat.app.ui.reusable.settings.SettingsCategory
@@ -84,6 +89,7 @@ fun SettingsPage(
     val serverInfo by model.serverInfo.collectAsState()
     val serverStats by model.serverStats.collectAsState()
     val apiKey by model.apiKey.collectAsState(null)
+    val contributors by model.contributors.collectAsState()
 
     LaunchedEffect(Unit) { model.load() }
 
@@ -99,7 +105,9 @@ fun SettingsPage(
         onLockRequest = model::lock,
         onUnlockRequest = model::unlock,
         distanceUnits = units,
-        onIntroRequested = { model.onIntroRequested(onNavigateToIntroRequested) }
+        onIntroRequested = { model.onIntroRequested(onNavigateToIntroRequested) },
+        onLanguageChangeRequest = model::changeLanguage,
+        contributors = contributors,
     )
 }
 
@@ -118,6 +126,8 @@ fun SettingsPage(
     onUnlockRequest: (apiKey: String, onUnlock: () -> Unit) -> Unit,
     distanceUnits: DistanceUnits,
     onIntroRequested: () -> Unit,
+    onLanguageChangeRequest: (Language) -> Unit,
+    contributors: Map<Language, List<ContributorCredit>>?,
 ) {
     val uriHandler = LocalUriHandler.current
     val unitsConfiguration = LocalUnitsConfiguration.current
@@ -157,6 +167,27 @@ fun SettingsPage(
                 selection = distanceUnits,
                 optionsDialogTitle = stringResource(Res.string.settings_units_distance),
                 stringConverter = { stringResource(it.label) }
+            )
+
+            val language = LocalLanguage.current
+            val contributorsList = contributors?.get(language).orEmpty()
+            SettingsSelector(
+                headline = stringResource(Res.string.settings_language_title),
+                summary = contributorsList.takeUnless { it.isEmpty() }?.let {
+                    stringResource(
+                        Res.string.settings_language_contributors,
+                        contributorsList.joinToString(", ") { it.fullName }
+                    )
+                },
+                icon = Icons.Default.Language,
+                options = Language.all,
+                onOptionSelected = {
+                    onLanguageChangeRequest(it)
+                },
+                selection = language,
+                optionsDialogTitle = stringResource(Res.string.settings_language_title),
+                stringConverter = { it.localeDisplayName },
+                enabled = LanguagePreferences.isLanguageChangeSupported,
             )
 
             var showingUnlockDialog by remember { mutableStateOf(false) }
