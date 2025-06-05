@@ -9,7 +9,8 @@ actual object LanguagePreferences {
     actual val isLanguageChangeSupported: Boolean = true
 
     actual fun currentLang(): Language {
-        val default = Locale.getDefault().language
+        val appCompatLanguages = AppCompatDelegate.getApplicationLocales().takeUnless { it.isEmpty }
+        val default = appCompatLanguages?.get(0)?.language ?: Locale.getDefault().language
         return Locales.valueOf(default)
     }
 
