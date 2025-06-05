@@ -292,4 +292,8 @@
     <string name="editor_aid_grade_label">Grau Artificial</string>
     <string name="error_image_unknown">Error desconegut</string>
     <string name="error_image_load_title">No s'ha pogut carregar la imatge</string>
+    <string name="sector_previous">Sector Anterior</string>
+    <string name="sector_next">Sector Següent</string>
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_contributors">Fet possible per %1$s</string>
 </resources>
