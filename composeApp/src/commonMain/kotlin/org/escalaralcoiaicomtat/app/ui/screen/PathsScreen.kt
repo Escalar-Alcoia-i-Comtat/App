@@ -1013,6 +1013,7 @@ private fun MetaCard(
 }
 
 @Composable
+@OptIn(ExperimentalSettingsApi::class)
 fun PitchInfoRow(
     pitch: PitchInfo,
     modifier: Modifier = Modifier,
@@ -1025,18 +1026,10 @@ fun PitchInfoRow(
             Badge {
                 Text("L${pitch.pitch}")
             }
-            pitch.grade?.let { grade ->
+            if (pitch.grade != null || pitch.aidGrade != null) {
                 Text(
-                    text = grade.toString(),
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    color = grade.color.current,
-                )
-            }
-            pitch.aidGrade?.let { aidGrade ->
-                Text(
-                    text = aidGrade.toString(),
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    color = aidGrade.color.current,
+                    text = pitch.grade(),
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 )
             }
             pitch.height?.let { height ->
@@ -1048,7 +1041,7 @@ fun PitchInfoRow(
             pitch.ending?.let { ending ->
                 Text(
                     text = stringResource(ending.displayName),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(3f),
                 )
             }
         }
