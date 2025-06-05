@@ -102,7 +102,6 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.SafesCount
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
-import org.escalaralcoiaicomtat.app.data.generic.color
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.platform.launchUrl
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
@@ -1033,9 +1032,12 @@ fun PitchInfoRow(
                 )
             }
             pitch.height?.let { height ->
+                val localUnitsConfiguration = LocalUnitsConfiguration.current
                 Text(
-                    text = "$height m",
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = with(localUnitsConfiguration) {
+                        height.meters.asDistanceValue()
+                    },
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 )
             }
             pitch.ending?.let { ending ->
