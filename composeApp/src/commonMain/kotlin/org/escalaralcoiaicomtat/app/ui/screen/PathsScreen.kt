@@ -1029,7 +1029,14 @@ fun PitchInfoRow(
                 Text(
                     text = grade.toString(),
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    color = pitch.grade.color.current,
+                    color = grade.color.current,
+                )
+            }
+            pitch.aidGrade?.let { aidGrade ->
+                Text(
+                    text = aidGrade.toString(),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    color = aidGrade.color.current,
                 )
             }
             pitch.height?.let { height ->
