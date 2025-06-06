@@ -71,7 +71,7 @@ fun PathListItem(
             )
             if (path.grade != null || path.aidGrade != null) {
                 Text(
-                    text = path.grade(),
+                    text = path.gradeAnnotatedString(),
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(start = 8.dp)
                 )

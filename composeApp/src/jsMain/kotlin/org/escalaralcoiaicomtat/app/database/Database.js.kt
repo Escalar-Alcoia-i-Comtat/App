@@ -2,7 +2,6 @@ package org.escalaralcoiaicomtat.app.database
 
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.await
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.builtins.ListSerializer
@@ -14,20 +13,19 @@ import org.escalaralcoiaicomtat.app.database.indexeddb.IDBObjectStoreOptions
 import org.escalaralcoiaicomtat.app.database.indexeddb.IDBRequest
 import org.escalaralcoiaicomtat.app.database.indexeddb.getDatabase
 import org.escalaralcoiaicomtat.app.database.indexeddb.indexedDB
-import org.escalaralcoiaicomtat.app.exception.JavaScriptException.Companion.toJavaScriptException
-import org.escalaralcoiaicomtat.app.interop.DOMException
 import org.escalaralcoiaicomtat.app.json
 import kotlin.js.Promise
 
 actual object Database {
     private lateinit var db: IDBDatabase
+    private var dbInitPromise: Promise<Unit>? = null
+    private val awaitMutex = Semaphore(1)
 
     actual fun open() {
-        Promise<JsAny?> { resolve, reject ->
+        dbInitPromise = Promise<Unit> { resolve, reject ->
             val indexedDB = indexedDB
             if (indexedDB == null) {
-                // UnsupportedOperationException("IndexedDB not supported")
-                reject("IndexedDB not supported".toJsString())
+                reject(UnsupportedOperationException("IndexedDB not supported"))
                 return@Promise
             }
             Napier.i { "Opening database $DATABASE_NAME @ $DATABASE_VERSION..." }
@@ -47,22 +45,22 @@ actual object Database {
                 }
             }
             openRequest.onerror = {
-                Napier.e { "Could not open database: ${openRequest.error}" }
-                // Exception("Could not open database: ${openRequest.error}")
-                reject("Could not open database: ${openRequest.error}".toJsString())
+                Napier.e(openRequest.error) { "Could not open database" }
+                reject(openRequest.error!!)
             }
             openRequest.onsuccess = {
                 Napier.i { "Database opened successfully" }
                 db = openRequest.result
-                resolve(null)
+                resolve(Unit)
             }
-        }
+        }.then { dbInitPromise = null }
     }
 
-    private suspend fun await() {
-        while (!this::db.isInitialized) {
-            delay(5)
-        }
+    private suspend fun await() = awaitMutex.withPermit {
+        if (this::db.isInitialized) return
+        Napier.d { "Awaiting database initialization..." }
+        dbInitPromise?.await()
+        if (!this::db.isInitialized) error("Could not initialize database.")
     }
 
     private fun createObjectStores(database: IDBDatabase) {
@@ -77,12 +75,12 @@ actual object Database {
         try {
             val objectStore = database.createObjectStore(
                 int.objectStoreName,
-                IDBObjectStoreOptions(keyPath = "id".toJsString())
+                IDBObjectStoreOptions(keyPath = "id")
             )
             if (int.parentKey != null) {
-                objectStore.createIndex(int.parentKeyIndexName(), int.parentKey.toJsString())
+                objectStore.createIndex(int.parentKeyIndexName(), int.parentKey)
             }
-        } catch (e: JsException) {
+        } catch (e: Exception) {
             Napier.e(e) { "Could not create object store." }
         }
     }
@@ -94,25 +92,18 @@ actual object Database {
     ): R {
         await()
 
-        val transaction =
-            db.transaction(ddti.objectStoreName, if (isWrite) "readwrite" else "readonly")
-
-        var error: JsAny? = null
-        var isComplete = false
-
-        transaction.onerror = { error = it }
+        val transaction = db.transaction(
+            ddti.objectStoreName,
+            if (isWrite) "readwrite" else "readonly"
+        )
+        val transactionPromise = transaction.promise()
 
         val objectStore = transaction.objectStore(ddti.objectStoreName)
         val context = TransactionContext(objectStore, ddti)
         val result = block(context)
 
-        transaction.oncomplete = { isComplete = true }
-
-        // Wait until an error occurs or the transaction completes
-        while (!isComplete || error != null) delay(5)
-
-        // If an error happened, throw it
-        if (error != null) throw Exception(error.toString())
+        // Wait until the transaction completes or an error is thrown
+        transactionPromise.await()
 
         // If the transaction was a write, notify all listeners
         if (isWrite) notifyUpdate(ddti.objectStoreName)
@@ -152,9 +143,9 @@ actual object Database {
         val ddti: DatabaseEntityInterface<T>
     )
 
-    private suspend fun <R : JsAny?> IDBObjectStore.request(
+    private suspend fun <R : Any?> IDBObjectStore.request(
         operation: IDBObjectStore.() -> IDBRequest<R>
-    ): JsString? = Promise { resolve, reject ->
+    ): String? = Promise { resolve, reject ->
         val req = operation(this)
         req.onsuccess = {
             val result = req.result?.let { jsonStringify(it) }
@@ -163,7 +154,7 @@ actual object Database {
         req.onerror = { reject(req.error!!) }
     }.await()
 
-    private fun <R : JsAny?, I> IDBObjectStore.requestBatch(
+    private fun <R, I> IDBObjectStore.requestBatch(
         list: List<I>,
         onSuccess: (R) -> Unit = {},
         operation: IDBObjectStore.(I) -> IDBRequest<R>
@@ -174,7 +165,7 @@ actual object Database {
                 onSuccess(req.result)
             }
             req.onerror = {
-                throw req.error!!.unsafeCast<DOMException>().toJavaScriptException()
+                throw req.error!!
             }
         }
     }
@@ -191,7 +182,7 @@ actual object Database {
     fun <T : Entity> TransactionContext<T>.insertAll(data: List<T>) {
         store.requestBatch(data) { item ->
             val jsonString = json.encodeToString(ddti.serializer, item)
-            val obj: JsAny = jsonParse(jsonString)
+            val obj = jsonParse(jsonString)
             add(obj)
         }
     }
@@ -199,7 +190,7 @@ actual object Database {
     fun <T : Entity> TransactionContext<T>.updateAll(data: List<T>) {
         store.requestBatch(data) { item ->
             val jsonString = json.encodeToString(ddti.serializer, item)
-            val obj: JsAny = jsonParse(jsonString)
+            val obj = jsonParse(jsonString)
             put(obj)
         }
     }

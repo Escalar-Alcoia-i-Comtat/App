@@ -2,6 +2,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
@@ -64,6 +65,15 @@ kotlin {
         compilerOptions {
             freeCompilerArgs.add("-Xwasm-attach-js-exception")
             // freeCompilerArgs.add("-Xwasm-generate-dwarf")
+        }
+        binaries.executable()
+    }
+
+    js {
+        browser {
+            commonWebpackConfig {
+                outputFileName = "webApp.js"
+            }
         }
         binaries.executable()
     }
@@ -271,9 +281,28 @@ kotlin {
             }
         }
 
+        val webMain by creating {
+            dependsOn(commonMain.get())
+        }
+
         wasmJsMain {
+            dependsOn(webMain)
+
             dependencies {
                 implementation(libs.kotlinx.browser)
+                implementation(libs.androidx.graphics.shapes)
+            }
+        }
+
+        jsMain {
+            dependsOn(webMain)
+
+            languageSettings {
+                optIn("kotlin.js.ExperimentalJsCollectionsApi")
+            }
+
+            dependencies {
+                // implementation(libs.androidx.graphics.shapes)
             }
         }
     }
@@ -466,5 +495,12 @@ sentry {
 tasks.withType(KotlinCompilationTask::class.java) {
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+}
+
+// Use the experimental support for ES2015
+tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions {
+        target = "es2015"
     }
 }
