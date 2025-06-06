@@ -45,8 +45,8 @@ actual object Database {
                 }
             }
             openRequest.onerror = {
-                Napier.e { "Could not open database: ${openRequest.error}" }
-                reject(IllegalStateException("Could not open database: ${openRequest.error}"))
+                Napier.e(openRequest.error) { "Could not open database" }
+                reject(openRequest.error!!)
             }
             openRequest.onsuccess = {
                 Napier.i { "Database opened successfully" }
