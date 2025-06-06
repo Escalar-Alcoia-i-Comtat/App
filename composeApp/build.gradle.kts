@@ -290,11 +290,20 @@ kotlin {
 
             dependencies {
                 implementation(libs.kotlinx.browser)
+                implementation(libs.androidx.graphics.shapes)
             }
         }
 
         jsMain {
             dependsOn(webMain)
+
+            languageSettings {
+                optIn("kotlin.js.ExperimentalJsCollectionsApi")
+            }
+
+            dependencies {
+                implementation(libs.androidx.graphics.shapes)
+            }
         }
     }
 }
