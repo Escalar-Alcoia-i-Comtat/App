@@ -2,7 +2,6 @@ package org.escalaralcoiaicomtat.app.database
 
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.await
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.builtins.ListSerializer
@@ -20,6 +19,7 @@ import kotlin.js.Promise
 actual object Database {
     private lateinit var db: IDBDatabase
     private var dbInitPromise: Promise<Unit>? = null
+    private val awaitMutex = Semaphore(1)
 
     actual fun open() {
         dbInitPromise = Promise<Unit> { resolve, reject ->
@@ -53,11 +53,12 @@ actual object Database {
                 db = openRequest.result
                 resolve(Unit)
             }
-        }
+        }.then { dbInitPromise = null }
     }
 
-    private suspend fun await() {
+    private suspend fun await() = awaitMutex.withPermit {
         if (this::db.isInitialized) return
+        Napier.d { "Awaiting database initialization..." }
         dbInitPromise?.await()
         if (!this::db.isInitialized) error("Could not initialize database.")
     }
@@ -91,25 +92,18 @@ actual object Database {
     ): R {
         await()
 
-        val transaction =
-            db.transaction(ddti.objectStoreName, if (isWrite) "readwrite" else "readonly")
-
-        var error: Any? = null
-        var isComplete = false
-
-        transaction.onerror = { error = it }
+        val transaction = db.transaction(
+            ddti.objectStoreName,
+            if (isWrite) "readwrite" else "readonly"
+        )
+        val transactionPromise = transaction.promise()
 
         val objectStore = transaction.objectStore(ddti.objectStoreName)
         val context = TransactionContext(objectStore, ddti)
         val result = block(context)
 
-        transaction.oncomplete = { isComplete = true }
-
-        // Wait until an error occurs or the transaction completes
-        while (!isComplete || error != null) delay(5)
-
-        // If an error happened, throw it
-        if (error != null) throw Exception(error.toString())
+        // Wait until the transaction completes or an error is thrown
+        transactionPromise.await()
 
         // If the transaction was a write, notify all listeners
         if (isWrite) notifyUpdate(ddti.objectStoreName)
