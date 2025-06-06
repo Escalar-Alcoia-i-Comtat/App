@@ -8,7 +8,7 @@ import kotlin.js.collections.JsArray
 external class IDBTransaction : EventTarget {
     val objectStoreNames: JsArray<String> // Actually a DOMStringList
     val db: IDBDatabase
-    val error: Any?
+    val error: Exception? // Actually a DOMException
     fun objectStore(name: String): IDBObjectStore
     fun abort()
     fun commit()

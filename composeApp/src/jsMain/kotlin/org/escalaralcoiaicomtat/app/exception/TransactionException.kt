@@ -1,3 +1,3 @@
 package org.escalaralcoiaicomtat.app.exception
 
-class TransactionException : RuntimeException("Transaction failed.")
+class TransactionException(cause: Exception? = null) : IDBException("Transaction failed.", cause)
