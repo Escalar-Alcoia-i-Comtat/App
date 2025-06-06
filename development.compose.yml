@@ -1,0 +1,10 @@
+services:
+  app:
+    image: httpd:latest
+    container_name: escalaralcoiaicomtat_web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+      - ./composeApp/build/dist/wasmJs/developmentExecutable:/usr/local/apache2/htdocs/
