@@ -19,9 +19,10 @@ import kotlin.js.Promise
 
 actual object Database {
     private lateinit var db: IDBDatabase
+    private var dbInitPromise: Promise<Unit>? = null
 
     actual fun open() {
-        Promise<Any?> { resolve, reject ->
+        dbInitPromise = Promise<Unit> { resolve, reject ->
             val indexedDB = indexedDB
             if (indexedDB == null) {
                 reject(UnsupportedOperationException("IndexedDB not supported"))
@@ -50,15 +51,15 @@ actual object Database {
             openRequest.onsuccess = {
                 Napier.i { "Database opened successfully" }
                 db = openRequest.result
-                resolve(null)
+                resolve(Unit)
             }
         }
     }
 
     private suspend fun await() {
-        while (!this::db.isInitialized) {
-            delay(5)
-        }
+        if (this::db.isInitialized) return
+        dbInitPromise?.await()
+        if (!this::db.isInitialized) error("Could not initialize database.")
     }
 
     private fun createObjectStores(database: IDBDatabase) {
