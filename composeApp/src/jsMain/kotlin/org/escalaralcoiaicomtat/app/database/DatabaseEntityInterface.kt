@@ -1,9 +1,9 @@
 package org.escalaralcoiaicomtat.app.database
 
 import kotlinx.coroutines.channels.onClosed
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.serialization.KSerializer
 import org.escalaralcoiaicomtat.app.data.Entity
 import org.escalaralcoiaicomtat.app.database.Database.deleteAll
@@ -25,12 +25,13 @@ actual open class DatabaseEntityInterface<T : Entity> actual constructor(
     private fun <R> observe(
         operation: suspend Database.TransactionContext<T>.() -> R
     ) = channelFlow {
-        var closed = false
+        // TODO: Test that this works correctly
+        val mutex = Semaphore(1, 1)
         val flowReceiver = Database.ObserverCallback {
             val result = transaction(block = operation)
             trySend(result).onClosed {
                 // channel is closed
-                closed = true
+                mutex.release()
             }
         }
         Database.newFlow(objectStoreName, flowReceiver)
@@ -39,9 +40,7 @@ actual open class DatabaseEntityInterface<T : Entity> actual constructor(
         send(result)
 
         // Lock current thread until the flow is closed
-        while (!closed) {
-            delay(5)
-        }
+        mutex.acquire()
 
         Database.removeFlow(objectStoreName, flowReceiver)
     }
