@@ -13,10 +13,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.cache.StorageProvider
 import org.escalaralcoiaicomtat.app.cache.storageProvider
+import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.getDatabaseBuilder
 import org.escalaralcoiaicomtat.app.database.roomDatabaseBuilder
+import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.sync.SyncManager
+import org.escalaralcoiaicomtat.app.ui.Locales
+import org.escalaralcoiaicomtat.app.ui.lang.LanguagePreferences
 import org.escalaralcoiaicomtat.app.ui.state.KeyEventCollector
 import org.jetbrains.compose.resources.painterResource
 
@@ -34,6 +38,12 @@ fun main() {
 
     CoroutineScope(Dispatchers.IO).launch {
         Updates.checkForUpdates()
+    }
+
+    // Update the default language
+    settings.getStringOrNull(SettingsKeys.LANGUAGE)?.let { langKey ->
+        val locale = Locales.valueOf(langKey)
+        LanguagePreferences.changeLang(locale)
     }
 
     application {

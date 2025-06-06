@@ -34,7 +34,7 @@ fun main() {
 
         LaunchedEffect(Unit) {
             val lang = window.navigator.language
-            body.lang = Locales.valueOf(lang)
+            body.lang = Locales.valueOf(lang).key
         }
 
         AppRoot(startDestination = null, navController = navController)

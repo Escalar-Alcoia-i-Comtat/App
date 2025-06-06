@@ -2,14 +2,12 @@
 
 package org.escalaralcoiaicomtat.app.data
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
+import org.escalaralcoiaicomtat.app.data.generic.GradeContainer
 import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.SafesCount
@@ -26,8 +24,8 @@ data class Path(
     @SerialName("sketch_id") val sketchId: UInt,
 
     val height: UInt? = null,
-    @Serializable(GradeSerializer::class) val grade: GradeValue? = null,
-    @Serializable(GradeSerializer::class) @SerialName("aid_grade") val aidGrade: GradeValue? = null,
+    @Serializable(GradeSerializer::class) override val grade: GradeValue? = null,
+    @Serializable(GradeSerializer::class) @SerialName("aid_grade") override val aidGrade: GradeValue? = null,
     val ending: Ending? = null,
     val pitches: List<PitchInfo>? = null,
 
@@ -55,7 +53,7 @@ data class Path(
     val images: List<Uuid>? = null,
 
     @SerialName("sector_id") val parentSectorId: Long
-) : DataType, DataTypeWithParent {
+) : DataType, DataTypeWithParent, GradeContainer {
     val safes: SafesCount get() = SafesCount(this)
 
     override fun compareTo(other: DataType): Int {
@@ -79,12 +77,5 @@ data class Path(
 
     override fun copy(parentId: Long): Path {
         return copy(id = id, parentSectorId = parentId)
-    }
-
-    @Composable
-    fun grade(): AnnotatedString = buildAnnotatedString {
-        grade?.toAnnotatedString()?.let { append(it) }
-        if (grade != null && aidGrade != null) append('/')
-        aidGrade?.toAnnotatedString()?.let { append(it) }
     }
 }

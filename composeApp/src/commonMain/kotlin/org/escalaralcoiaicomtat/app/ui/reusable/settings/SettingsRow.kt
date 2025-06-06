@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 @ExperimentalMaterial3Api
 fun SettingsRow(
     headline: String,
-    summary: String,
+    summary: String?,
     icon: ImageVector,
     iconContentDescription: String? = null,
     enabled: Boolean = true,
@@ -42,7 +42,7 @@ fun SettingsRow(
                 }
             } ?: Text(headline)
         },
-        supportingContent = { Text(summary) },
+        supportingContent = summary?.let { { Text(summary) } },
         leadingContent = { Icon(icon, iconContentDescription) },
         modifier = Modifier.clickable(enabled = enabled && onClick != null) { onClick?.invoke() }
     )

@@ -283,7 +283,7 @@
     <string name="report_send">Enviar Informe</string>
     <string name="report_element">Element</string>
     <string name="report_name">El teu nom</string>
-    <string name="report_email">Correu Electrònic</string>
+    <string name="report_email">Correu electrònic</string>
     <string name="report_attachments">Adjunts</string>
     <string name="report_message">Missatge (necessari)</string>
     <string name="report_error_attachments_size">El tamany màxim dels adjunts és %1$s.</string>
@@ -292,4 +292,8 @@
     <string name="editor_aid_grade_label">Grau Artificial</string>
     <string name="error_image_unknown">Error desconegut</string>
     <string name="error_image_load_title">No s'ha pogut carregar la imatge</string>
+    <string name="sector_previous">Sector Anterior</string>
+    <string name="sector_next">Sector Següent</string>
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_contributors">Fet possible per %1$s</string>
 </resources>

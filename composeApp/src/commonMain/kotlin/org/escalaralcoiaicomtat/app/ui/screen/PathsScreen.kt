@@ -102,7 +102,6 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.SafesCount
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
-import org.escalaralcoiaicomtat.app.data.generic.color
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.platform.launchUrl
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
@@ -1013,6 +1012,7 @@ private fun MetaCard(
 }
 
 @Composable
+@OptIn(ExperimentalSettingsApi::class)
 fun PitchInfoRow(
     pitch: PitchInfo,
     modifier: Modifier = Modifier,
@@ -1025,23 +1025,25 @@ fun PitchInfoRow(
             Badge {
                 Text("L${pitch.pitch}")
             }
-            pitch.grade?.let { grade ->
+            if (pitch.grade != null || pitch.aidGrade != null) {
                 Text(
-                    text = grade.toString(),
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    color = pitch.grade.color.current,
+                    text = pitch.grade(),
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 )
             }
             pitch.height?.let { height ->
+                val localUnitsConfiguration = LocalUnitsConfiguration.current
                 Text(
-                    text = "$height m",
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = with(localUnitsConfiguration) {
+                        height.meters.asDistanceValue()
+                    },
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 )
             }
             pitch.ending?.let { ending ->
                 Text(
                     text = stringResource(ending.displayName),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(3f),
                 )
             }
         }
