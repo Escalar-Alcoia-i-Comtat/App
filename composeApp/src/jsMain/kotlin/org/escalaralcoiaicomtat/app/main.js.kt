@@ -26,7 +26,7 @@ fun main() {
 
     SyncManager.schedule()
 
-    val body = document.body ?: return
+    val body = document.body ?: return Napier.e { "Body not found" }
 
     ComposeViewport(body) {
         val navController = rememberNavController()
