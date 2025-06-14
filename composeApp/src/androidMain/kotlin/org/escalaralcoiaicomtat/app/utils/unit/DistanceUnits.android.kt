@@ -12,7 +12,7 @@ import androidx.annotation.RequiresApi
 fun MeasurementSystem?.toDistanceUnits(): DistanceUnits {
     return when (this) {
         MeasurementSystem.SI -> DistanceUnits.METER
-        MeasurementSystem.US,  MeasurementSystem.UK -> DistanceUnits.FEET
+        MeasurementSystem.US, MeasurementSystem.UK -> DistanceUnits.FEET
         else -> DistanceUnits.METER
     }
 }
