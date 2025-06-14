@@ -1,6 +1,6 @@
 [versions]
 # View compatibility in: https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-compatibility-guide.html
-agp = "8.7.2"
+agp = "8.9.3"
 androidx-activityCompose = "1.10.1"
 androidx-appcompat = "1.7.1"
 androidx-sqlite-bundled = "2.5.1"
