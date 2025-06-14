@@ -9,7 +9,7 @@ interface GradeContainer {
     val aidGrade: GradeValue?
 
     @Composable
-    fun grade(): AnnotatedString = buildAnnotatedString {
+    fun gradeAnnotatedString(): AnnotatedString = buildAnnotatedString {
         grade?.toAnnotatedString()?.let { append(it) }
         if (grade != null && aidGrade != null) append('/')
         aidGrade?.toAnnotatedString()?.let { append(it) }

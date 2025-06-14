@@ -720,7 +720,7 @@ private fun LazyListScope.bottomSheetContents(
         MetaCard(
             icon = Icons.Filled.ClimbingShoes,
             text = stringResource(Res.string.path_grade),
-            bigText = child.grade(),
+            bigText = child.gradeAnnotatedString(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -1027,7 +1027,7 @@ fun PitchInfoRow(
             }
             if (pitch.grade != null || pitch.aidGrade != null) {
                 Text(
-                    text = pitch.grade(),
+                    text = pitch.gradeAnnotatedString(),
                     modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 )
             }
