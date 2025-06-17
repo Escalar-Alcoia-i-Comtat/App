@@ -40,7 +40,7 @@ jobs:
 
       - name: Commit modified files
         id: commit_files
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: 'Updated Version'
           file_pattern: 'version.properties composeApp/src/commonMain/composeResources/values-*/strings.xml'
