@@ -53,6 +53,7 @@ import build.BuildKonfig
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
 import org.escalaralcoiaicomtat.app.sync.SyncManager
@@ -477,9 +478,9 @@ private fun instantToString(instant: Instant): String {
             StringBuilder()
                 .append(it.year)
                 .append('/')
-                .append(it.monthNumber.toString().padStart(2, '0'))
+                .append(it.month.number.toString().padStart(2, '0'))
                 .append('/')
-                .append(it.dayOfMonth.toString().padStart(2, '0'))
+                .append(it.day.toString().padStart(2, '0'))
                 .append(' ')
                 .append(it.hour.toString().padStart(2, '0'))
                 .append(':')

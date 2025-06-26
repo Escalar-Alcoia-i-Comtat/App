@@ -26,9 +26,9 @@ data class BlockingRecurrenceYearly(
             val now = clock.now().toLocalDateTime(timeZone).date
             val nextMonth = now.plus(31, DateTimeUnit.DAY)
             return BlockingRecurrenceYearly(
-                now.dayOfMonth.toUShort(),
+                now.day.toUShort(),
                 now.month,
-                nextMonth.dayOfMonth.toUShort(),
+                nextMonth.day.toUShort(),
                 nextMonth.month,
             )
         }
@@ -39,7 +39,7 @@ data class BlockingRecurrenceYearly(
      */
     fun contains(localDate: LocalDate): Boolean {
         val currentMonth = localDate.month
-        val currentDay = localDate.dayOfMonth
+        val currentDay = localDate.day
 
         val startMonth = fromMonth
         val startDay = fromDay.toInt()
