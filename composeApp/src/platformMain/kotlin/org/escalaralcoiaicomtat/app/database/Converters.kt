@@ -1,7 +1,6 @@
 package org.escalaralcoiaicomtat.app.database
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -12,6 +11,7 @@ import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 object Converters {

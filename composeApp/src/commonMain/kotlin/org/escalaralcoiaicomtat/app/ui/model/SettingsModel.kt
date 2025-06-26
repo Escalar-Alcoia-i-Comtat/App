@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
@@ -26,6 +25,7 @@ import org.escalaralcoiaicomtat.app.ui.lang.ContributorCredit
 import org.escalaralcoiaicomtat.app.ui.lang.Language
 import org.escalaralcoiaicomtat.app.ui.lang.LanguagePreferences
 import org.escalaralcoiaicomtat.app.utils.IO
+import kotlin.time.Instant
 
 @OptIn(ExperimentalSettingsApi::class)
 class SettingsModel : ViewModelBase() {

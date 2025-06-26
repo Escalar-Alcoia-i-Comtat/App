@@ -3,9 +3,9 @@ package org.escalaralcoiaicomtat.app.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.database.entity.PathEntity
+import kotlin.time.Instant
 
 @Dao
 interface PathsDao : DataTypeDao<Path, PathEntity> {

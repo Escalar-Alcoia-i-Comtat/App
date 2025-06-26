@@ -3,9 +3,9 @@ package org.escalaralcoiaicomtat.app.sync
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.until
+import kotlin.time.Clock
 
 /**
  * Provides a template for objects to define synchronization routines.

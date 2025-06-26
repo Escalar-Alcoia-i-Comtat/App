@@ -2,8 +2,8 @@ package org.escalaralcoiaicomtat.app.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.Area
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 @Entity

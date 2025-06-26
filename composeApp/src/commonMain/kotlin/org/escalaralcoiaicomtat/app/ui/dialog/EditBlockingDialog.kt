@@ -13,8 +13,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
@@ -26,6 +24,8 @@ import org.escalaralcoiaicomtat.app.ui.reusable.form.FormDatePicker
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormDateRangePicker
 import org.escalaralcoiaicomtat.app.ui.reusable.form.FormDropdown
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,9 +143,9 @@ fun EditBlockingDialog(
                             onBlockingChange(
                                 blocking.copy(
                                     recurrence = BlockingRecurrenceYearly(
-                                        from.dayOfMonth.toUShort(),
+                                        from.day.toUShort(),
                                         from.month,
-                                        to.dayOfMonth.toUShort(),
+                                        to.day.toUShort(),
                                         to.month,
                                     ),
                                 )

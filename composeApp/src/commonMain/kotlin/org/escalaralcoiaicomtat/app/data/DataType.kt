@@ -1,8 +1,8 @@
 package org.escalaralcoiaicomtat.app.data
 
-import kotlinx.datetime.Clock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
 
 @Serializable
 sealed interface DataType : Entity, Comparable<DataType> {

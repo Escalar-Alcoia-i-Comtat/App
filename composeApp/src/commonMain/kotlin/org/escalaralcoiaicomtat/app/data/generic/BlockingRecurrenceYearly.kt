@@ -1,7 +1,5 @@
 package org.escalaralcoiaicomtat.app.data.generic
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Clock.System
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
@@ -10,6 +8,8 @@ import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
+import kotlin.time.Clock.System
 
 @Serializable
 data class BlockingRecurrenceYearly(

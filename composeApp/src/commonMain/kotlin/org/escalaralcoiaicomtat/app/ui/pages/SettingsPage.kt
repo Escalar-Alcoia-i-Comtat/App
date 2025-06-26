@@ -52,7 +52,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import build.BuildKonfig
 import com.russhwolf.settings.ExperimentalSettingsApi
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.escalaralcoiaicomtat.app.network.response.data.ServerInfoResponseData
@@ -71,6 +70,7 @@ import org.escalaralcoiaicomtat.app.ui.reusable.settings.SettingsSelector
 import org.escalaralcoiaicomtat.app.utils.unit.DistanceUnits
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.Instant
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)

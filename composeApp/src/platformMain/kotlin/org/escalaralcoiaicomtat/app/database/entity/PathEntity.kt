@@ -4,12 +4,12 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.Ending
 import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 @Entity(

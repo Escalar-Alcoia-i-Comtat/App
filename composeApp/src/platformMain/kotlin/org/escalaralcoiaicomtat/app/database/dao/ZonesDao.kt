@@ -3,9 +3,9 @@ package org.escalaralcoiaicomtat.app.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.Zone
 import org.escalaralcoiaicomtat.app.database.entity.ZoneEntity
+import kotlin.time.Instant
 
 @Dao
 interface ZonesDao : DataTypeDao<Zone, ZoneEntity> {

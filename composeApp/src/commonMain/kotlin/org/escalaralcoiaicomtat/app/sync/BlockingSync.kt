@@ -2,11 +2,11 @@ package org.escalaralcoiaicomtat.app.sync
 
 import com.russhwolf.settings.set
 import io.github.aakira.napier.Napier
-import kotlinx.datetime.Clock
 import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.BasicBackend
+import kotlin.time.Clock
 
 object BlockingSync : SyncProcess() {
     const val SYNC_PERIOD_HOURS = 4L

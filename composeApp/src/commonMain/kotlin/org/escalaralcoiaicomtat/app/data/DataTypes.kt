@@ -1,7 +1,7 @@
 package org.escalaralcoiaicomtat.app.data
 
-import kotlinx.datetime.Clock
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
+import kotlin.time.Clock
 import kotlin.uuid.Uuid
 
 sealed class DataTypes<out DT : DataType>(

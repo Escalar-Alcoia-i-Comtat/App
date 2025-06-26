@@ -1,7 +1,5 @@
 package org.escalaralcoiaicomtat.app.data
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Clock.System
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -11,6 +9,8 @@ import kotlinx.serialization.Serializable
 import org.escalaralcoiaicomtat.app.data.generic.BlockingRecurrenceYearly
 import org.escalaralcoiaicomtat.app.data.generic.BlockingTypes
 import org.escalaralcoiaicomtat.app.network.request.AddBlockRequest
+import kotlin.time.Clock
+import kotlin.time.Clock.System
 
 @Serializable
 data class Blocking(
