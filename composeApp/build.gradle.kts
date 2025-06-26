@@ -96,8 +96,9 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+                optIn("kotlin.time.ExperimentalTime")
                 optIn("kotlin.uuid.ExperimentalUuidApi")
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
             }
         }
 
