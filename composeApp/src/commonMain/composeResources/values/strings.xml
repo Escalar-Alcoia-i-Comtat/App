@@ -325,4 +325,6 @@
 
     <string name="error_image_unknown">Unknown error</string>
     <string name="error_image_load_title">Could not load image</string>
+    <string name="error_map_title">Could not load map</string>
+    <string name="error_map_subtitle">Tap to copy info</string>
 </resources>
