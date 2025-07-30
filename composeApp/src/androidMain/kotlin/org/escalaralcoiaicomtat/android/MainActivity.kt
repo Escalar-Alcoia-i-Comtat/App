@@ -18,7 +18,6 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
-import io.github.vinceglb.filekit.core.FileKit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,9 +68,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         instance = this
-
-        // Initialize the file picker
-        FileKit.init(this)
 
         val startDestination = computeStartDestination()
         setContent {
