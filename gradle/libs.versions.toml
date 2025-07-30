@@ -33,7 +33,6 @@ mapbox = "5.8.0"
 multiplatform-settings = "1.3.0"
 napier = "2.7.1"
 play-appupdate = "2.1.0"
-play-instantapps = "18.1.0"
 room = "2.7.2"
 sentry-android = "5.8.0"
 sentry-multiplatform = "0.17.1"
@@ -84,7 +83,6 @@ multiplatformSettings-coroutines = { module = "com.russhwolf:multiplatform-setti
 multiplatformSettings-makeObservable = { module = "com.russhwolf:multiplatform-settings-make-observable", version.ref = "multiplatform-settings" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 play-appupdate = { module = "com.google.android.play:app-update-ktx", version.ref = "play-appupdate" }
-play-instantapps = { module = "com.google.android.gms:play-services-instantapps", version.ref = "play-instantapps" }
 room-bundledSqlite = { module = "androidx.sqlite:sqlite-bundled", version.ref = "androidx-sqlite-bundled" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

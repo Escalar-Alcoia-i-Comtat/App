@@ -213,9 +213,6 @@ kotlin {
                 // WorkManager
                 implementation(libs.androidx.work.runtime)
 
-                // Instant Apps Support
-                implementation(libs.play.instantapps)
-
                 // App Update Check
                 implementation(libs.play.appupdate)
 
