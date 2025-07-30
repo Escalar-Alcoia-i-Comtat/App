@@ -46,7 +46,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
-compose-filekit = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
+compose-filekit = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 compose-maps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-maps" }
 compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-maps" }
 compose-markdown-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "compose-markdown" }

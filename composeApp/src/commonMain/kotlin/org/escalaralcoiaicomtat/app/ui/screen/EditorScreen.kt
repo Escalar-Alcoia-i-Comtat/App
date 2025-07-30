@@ -56,8 +56,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
 import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.data.DataType
 import org.escalaralcoiaicomtat.app.data.DataTypeWithImage
@@ -369,7 +369,7 @@ private fun <DT : DataType> EditorContent(
             file = files[EditorModel.Companion.FILE_KEY_KMZ],
             onFilePicked = { onFilePicked(EditorModel.Companion.FILE_KEY_KMZ, it) },
             label = stringResource(Res.string.editor_kmz_label),
-            type = PickerType.File(listOf("kmz")),
+            type = FileKitType.File(listOf("kmz")),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             fallbackContent = if (item.kmz != null) {
                 {
@@ -392,7 +392,7 @@ private fun <DT : DataType> EditorContent(
             file = files[EditorModel.Companion.FILE_KEY_GPX],
             onFilePicked = { onFilePicked(EditorModel.Companion.FILE_KEY_GPX, it) },
             label = stringResource(Res.string.editor_gpx_label),
-            type = PickerType.File(listOf("gpx")),
+            type = FileKitType.File(listOf("gpx")),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             fallbackContent = if (item.gpx != null) {
                 {

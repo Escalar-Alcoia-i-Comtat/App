@@ -1,9 +1,9 @@
 package org.escalaralcoiaicomtat.android.push
 
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.firebase.messaging.ktx.messaging
+import com.google.firebase.messaging.messaging
 import io.github.aakira.napier.Napier
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.sync.SyncManager

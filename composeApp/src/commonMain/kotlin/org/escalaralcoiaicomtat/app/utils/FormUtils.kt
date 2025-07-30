@@ -1,7 +1,8 @@
 package org.escalaralcoiaicomtat.app.utils
 
-import io.github.vinceglb.filekit.core.PlatformFile
-import io.github.vinceglb.filekit.core.extension
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.extension
+import io.github.vinceglb.filekit.name
 import io.ktor.client.request.forms.FormBuilder
 import io.ktor.http.ContentType
 import io.ktor.http.Headers

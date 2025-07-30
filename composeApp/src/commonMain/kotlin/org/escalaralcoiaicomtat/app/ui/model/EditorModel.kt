@@ -1,7 +1,7 @@
 package org.escalaralcoiaicomtat.app.ui.model
 
 import io.github.aakira.napier.Napier
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -27,11 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import io.github.vinceglb.filekit.core.FileKit
-import io.github.vinceglb.filekit.core.PickerMode
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.PlatformFile
-import io.github.vinceglb.filekit.core.extension
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.extension
+import io.github.vinceglb.filekit.name
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +46,7 @@ fun FormMultipleFilePicker(
     files: List<PlatformFile>,
     onFilePicked: (PlatformFile) -> Unit,
     onFileRemoved: (PlatformFile) -> Unit,
-    type: PickerType,
+    type: FileKitType,
     label: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -63,7 +65,7 @@ fun FormMultipleFilePicker(
                 enabled = enabled,
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val pickedFiles = FileKit.pickFile(type, PickerMode.Multiple()) ?: return@launch
+                        val pickedFiles = FileKit.openFilePicker(type, mode = FileKitMode.Multiple()) ?: return@launch
                         pickedFiles.forEach(onFilePicked)
                     }
                 },

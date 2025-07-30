@@ -29,8 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.size
 import kotlinx.coroutines.Job
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
@@ -218,12 +219,12 @@ private fun ReportScreenContent(
             singleLine = false,
         )
 
-        val filesSize = files.sumOf { it.getSize() ?: 0L }
+        val filesSize = files.sumOf { it.size() }
         FormMultipleFilePicker(
             files = files,
             onFilePicked = onAddFile,
             onFileRemoved = onRemoveFile,
-            type = PickerType.ImageAndVideo,
+            type = FileKitType.ImageAndVideo,
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.report_attachments),
             enabled = !isLoading,

@@ -31,10 +31,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import escalaralcoiaicomtat.composeapp.generated.resources.*
-import io.github.vinceglb.filekit.core.FileKit
-import io.github.vinceglb.filekit.core.PickerMode
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +49,7 @@ import org.jetbrains.compose.resources.stringResource
 fun FormFilePicker(
     file: PlatformFile?,
     onFilePicked: (PlatformFile?) -> Unit,
-    type: PickerType,
+    type: FileKitType,
     label: String,
     modifier: Modifier = Modifier,
     canBeCleared: Boolean = false,
@@ -65,7 +68,7 @@ fun FormFilePicker(
             enabled = enabled,
             onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val pickedFile = FileKit.pickFile(type, PickerMode.Single) ?: return@launch
+                    val pickedFile = FileKit.openFilePicker(type, mode = FileKitMode.Single) ?: return@launch
                     onFilePicked(pickedFile)
                 }
             },
@@ -88,7 +91,7 @@ fun FormFilePicker(
             }
             Spacer(Modifier.height(8.dp))
             file?.let {
-                if (type == PickerType.Image) {
+                if (type == FileKitType.Image) {
                     var image by remember { mutableStateOf<ByteArray?>(null) }
 
                     LaunchedEffect(file) {
@@ -142,7 +145,7 @@ fun FormImagePicker(
         label = label,
         modifier = modifier,
         canBeCleared = canBeCleared,
-        type = PickerType.Image,
+        type = FileKitType.Image,
         enabled = enabled,
         fallbackContent = if (fallbackImage != null) {
             {

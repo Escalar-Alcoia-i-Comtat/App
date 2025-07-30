@@ -1,7 +1,8 @@
 package org.escalaralcoiaicomtat.app.network
 
 import io.github.aakira.napier.Napier
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.readBytes
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.http.HttpStatusCode

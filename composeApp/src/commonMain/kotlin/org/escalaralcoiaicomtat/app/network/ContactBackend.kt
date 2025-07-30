@@ -1,6 +1,8 @@
 package org.escalaralcoiaicomtat.app.network
 
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import org.escalaralcoiaicomtat.app.utils.append
 
 object ContactBackend : Backend() {
