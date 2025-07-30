@@ -5,12 +5,12 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.escalaralcoiaicomtat.app.data.DataTypes
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.sync.SyncProcess.Cause
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 actual object SyncManager {
     private suspend fun runIfSchedulePermits(
