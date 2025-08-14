@@ -297,6 +297,6 @@
     <string name="settings_language_title">Idioma</string>
     <string name="settings_language_contributors">Fet possible per %1$s</string>
     <string name="editor_point_description">Descripció</string>
-    <string name="error_map_title">No s\'ha pogut carregar el mapa</string>
+    <string name="error_map_title">No s'ha pogut carregar el mapa</string>
     <string name="error_map_subtitle">Toca per copiar la informació</string>
 </resources>
