@@ -19,6 +19,7 @@ import org.escalaralcoiaicomtat.app.data.generic.LatLng
 fun LocationCard(
     icon: ImageVector,
     title: String,
+    description: String?,
     point: LatLng,
     modifier: Modifier = Modifier,
     contentDescription: String? = title,
@@ -44,6 +45,12 @@ fun LocationCard(
                     text = "${point.latitude}, ${point.longitude}",
                     style = MaterialTheme.typography.labelSmall
                 )
+                if (description != null) {
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
             }
         }
     }

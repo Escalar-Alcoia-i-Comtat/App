@@ -868,7 +868,7 @@ private fun PointListEditor(
         validate = EditablePoint::validate,
         enabled = enabled,
         creator = { value, onChange ->
-            val (icon, latLng, label) = value
+            val (icon, latLng, label, description) = value
             FormDropdown(
                 selection = icon,
                 onSelectionChanged = { onChange(value.copy(icon = it)) },
@@ -900,9 +900,16 @@ private fun PointListEditor(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
             )
+            FormField(
+                value = description,
+                onValueChange = { onChange(value.copy(description = it)) },
+                label = stringResource(Res.string.editor_point_description),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
         },
         title = stringResource(Res.string.editor_points_label),
-        elementRender = { (icon, latLng, label), _, edit, delete ->
+        elementRender = { (icon, latLng, label, description), _, edit, delete ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
                     .padding(vertical = 2.dp),
@@ -923,6 +930,10 @@ private fun PointListEditor(
                     Text(
                         text = label.takeUnless { it.isBlank() } ?: "N/A",
                         fontStyle = if (label.isBlank()) FontStyle.Italic else FontStyle.Normal,
+                    )
+                    Text(
+                        text = description.takeUnless { it.isBlank() } ?: "N/A",
+                        fontStyle = if (description.isBlank()) FontStyle.Italic else FontStyle.Normal,
                     )
                 }
 

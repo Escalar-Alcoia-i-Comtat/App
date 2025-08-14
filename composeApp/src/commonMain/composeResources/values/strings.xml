@@ -277,6 +277,7 @@
     <string name="editor_external_track_url_label">Track URL</string>
     <string name="editor_points_label">Points</string>
     <string name="editor_point_label_label">Label</string>
+    <string name="editor_point_description">Description</string>
     <string name="editor_builder_label">Builder</string>
     <string name="editor_builder_name_label">Builder Name</string>
     <string name="editor_builder_date_label">Building Date</string>
