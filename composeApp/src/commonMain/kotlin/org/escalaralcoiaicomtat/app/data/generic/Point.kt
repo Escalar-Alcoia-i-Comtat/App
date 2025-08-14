@@ -21,7 +21,8 @@ import org.jetbrains.compose.resources.stringResource
 data class Point(
     @Serializable(with = PointNameSerializer::class) val icon: Name,
     val location: LatLng,
-    val label: String
+    val label: String,
+    val description: String? = null,
 ) {
     enum class Name {
         DEFAULT, PARKING, PARK, WATER, POOL, RESTAURANT, HOTEL;

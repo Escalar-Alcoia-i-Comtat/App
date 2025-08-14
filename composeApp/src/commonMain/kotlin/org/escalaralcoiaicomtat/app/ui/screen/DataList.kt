@@ -247,6 +247,7 @@ private fun LazyListScope.display(zone: Zone, onMapClicked: () -> Unit) {
                 LocationCard(
                     icon = Icons.Default.OutlinedFlag,
                     title = stringResource(Res.string.zone_information_location),
+                    description = null,
                     point = zone.point,
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -263,6 +264,7 @@ private fun LazyListScope.display(zone: Zone, onMapClicked: () -> Unit) {
             LocationCard(
                 icon = point.icon.iconVector,
                 title = point.displayName(),
+                description = point.description,
                 point = point.location,
                 modifier = Modifier
                     .padding(horizontal = 8.dp, vertical = 4.dp)
