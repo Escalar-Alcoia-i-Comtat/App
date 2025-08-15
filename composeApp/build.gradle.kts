@@ -273,6 +273,9 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.browser)
             }
+            languageSettings {
+                optIn("kotlin.js.ExperimentalWasmJsInterop")
+            }
         }
     }
 }
