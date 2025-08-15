@@ -226,8 +226,6 @@ jobs:
     runs-on: ubuntu-latest
 
     needs: [update-version-name, clean-resources, update-credits]
-    # Disable wasm release
-    if: false
 
     steps:
       - uses: actions/checkout@v5
@@ -250,7 +248,7 @@ jobs:
 
       - name: Build distribution
         run: |
-          ./gradlew :composeApp:wasmJsBrowserDevelopmentExecutableDistribution --stacktrace --no-daemon
+          ./gradlew :composeApp:wasmJsBrowserDistribution --stacktrace --no-daemon
 
       # Build and push the release image, tagging it as latest and the release tag
       - name: Build and push release
@@ -259,6 +257,5 @@ jobs:
         with:
           push: true
           tags: arnyminerz/escalaralcoiaicomtat-web:latest,arnyminerz/escalaralcoiaicomtat-web:${{ github.event.release.tag_name }}
-          # There's an issue when building the regular Dockerfile, so build manually, and then push
-          # the standalone image
-          file: standalone.Dockerfile
+          # Since we have manually built the Gradle distribution, use external.Dockerfile
+          file: external.Dockerfile
