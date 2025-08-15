@@ -17,7 +17,7 @@ import org.w3c.dom.Window
  * launched for any reason.
  */
 actual fun launchPoint(point: LatLng, label: String?): Boolean {
-    val url = "https://www.google.com/maps/search/?api=1&query=${point.latitude}%2C${point.longitude}"
+    val url = "https://www.openstreetmap.org/?mlat=${point.latitude}&mlon=${point.longitude}#map=17/${point.latitude}/${point.longitude}"
 
     return window.open(url, "_blank")?.also(Window::focus) != null
 }
