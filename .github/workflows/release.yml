@@ -257,5 +257,6 @@ jobs:
         with:
           push: true
           tags: arnyminerz/escalaralcoiaicomtat-web:latest,arnyminerz/escalaralcoiaicomtat-web:${{ github.event.release.tag_name }}
+          context: .
           # Since we have manually built the Gradle distribution, use external.Dockerfile
           file: external.Dockerfile
