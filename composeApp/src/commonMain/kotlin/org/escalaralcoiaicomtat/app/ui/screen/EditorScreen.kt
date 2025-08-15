@@ -876,6 +876,9 @@ private fun PointListEditor(
                 label = stringResource(Res.string.editor_external_track_type_label),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
+                leadingIcon = { Icon(icon.iconVector, stringResource(icon.label)) },
+                icon = { it.iconVector },
+                toString = { stringResource(it.label) },
             )
             Row(modifier = Modifier.fillMaxWidth()) {
                 FormField(

@@ -26,6 +26,7 @@ fun <T : Any> FormDropdown(
     label: String?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    leadingIcon:  @Composable (() -> Unit)? = null,
     icon: (@Composable (T) -> ImageVector)? = null,
     color: (@Composable (T) -> Color)? = null,
     toString: @Composable (T) -> String = { it.toString() }
@@ -38,6 +39,7 @@ fun <T : Any> FormDropdown(
         modifier = modifier,
         enabled = enabled,
         canUnselect = false,
+        leadingIcon = leadingIcon,
         icon = icon,
         color = color,
         toString = toString
@@ -54,6 +56,7 @@ fun <T : Any> FormDropdown(
     canUnselect: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    leadingIcon:  @Composable (() -> Unit)? = null,
     icon: (@Composable (T) -> ImageVector)? = null,
     color: (@Composable (T) -> Color)? = null,
     toString: @Composable (T) -> String = { it.toString() }
@@ -70,6 +73,7 @@ fun <T : Any> FormDropdown(
             onValueChange = { },
             readOnly = true,
             label = label?.let { { Text(it) } },
+            leadingIcon = leadingIcon,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             },

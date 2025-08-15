@@ -20,6 +20,7 @@ fun <T : Any> FormOptionPicker(
     label: String?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    leadingIcon:  @Composable (() -> Unit)? = null,
     icon: (@Composable (T) -> ImageVector)? = null,
     color: (@Composable (T) -> Color)? = null,
     toString: @Composable (T) -> String = { it.toString() }
@@ -32,6 +33,7 @@ fun <T : Any> FormOptionPicker(
             label,
             modifier,
             enabled,
+            leadingIcon,
             icon,
             color,
             toString

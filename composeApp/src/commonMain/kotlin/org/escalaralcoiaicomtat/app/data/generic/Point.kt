@@ -50,7 +50,7 @@ data class Point(
         }
     }
 
-    fun editable(): EditablePoint = EditablePoint(icon, location.editable(), label)
+    fun editable(): EditablePoint = EditablePoint(icon, location.editable(), label, description ?: "")
 
     @Composable
     fun displayName(): String = label.takeIf { it.isNotBlank() } ?: stringResource(icon.label)
