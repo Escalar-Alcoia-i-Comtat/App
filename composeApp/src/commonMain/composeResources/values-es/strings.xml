@@ -296,4 +296,7 @@
     <string name="sector_next">Sector Siguiente</string>
     <string name="settings_language_title">Idioma</string>
     <string name="settings_language_contributors">Posible gracias a %1$s</string>
+    <string name="editor_point_description">Descripción</string>
+    <string name="error_map_title">No se ha podido cargar el mapa</string>
+    <string name="error_map_subtitle">Toca para copiar la información</string>
 </resources>
