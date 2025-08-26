@@ -27,6 +27,9 @@ fun main() {
 
     SyncManager.schedule()
 
+    // Remove the loading indicator
+    document.getElementById("loading")?.remove()
+
     val body = document.body ?: return
 
     ComposeViewport(body) {

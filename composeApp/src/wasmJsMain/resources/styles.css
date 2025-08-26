@@ -5,3 +5,28 @@ html, body {
     padding: 0;
     overflow: hidden;
 }
+
+
+/* Loading indicator */
+#loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* full screen */
+    flex-direction: column;
+    font-family: sans-serif;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #ddd;
+    border-top: 5px solid #3a86ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1em;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
