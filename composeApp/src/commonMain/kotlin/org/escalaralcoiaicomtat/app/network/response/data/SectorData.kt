@@ -8,6 +8,7 @@ import kotlinx.serialization.UseSerializers
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
 import org.escalaralcoiaicomtat.app.data.serialization.UuidSerializer
 import kotlin.uuid.Uuid
@@ -23,6 +24,7 @@ data class SectorData(
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
     @SerialName("walking_time") val walkingTime: Long? = null,
+    @SerialName("phone_signal_availability") val phoneSignalAvailability: List<PhoneSignalAvailability>? = null,
     val point: LatLng? = null,
     @SerialName("sun_time") val sunTime: SunTime,
     @SerialName("zone_id") val parentZoneId: Long,
@@ -42,6 +44,7 @@ data class SectorData(
         kidsApt,
         weight,
         walkingTime,
+        phoneSignalAvailability,
         point,
         sunTime,
         parentZoneId,
