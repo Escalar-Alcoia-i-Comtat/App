@@ -25,6 +25,7 @@ import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.Zone
 import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
 import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
@@ -161,6 +162,11 @@ object AdminBackend : Backend() {
                     if (stored.sunTime != item.sunTime) append("sunTime", item.sunTime.name)
                     if (stored.weight != item.weight) append("weight", item.weight)
                     if (stored.walkingTime != item.walkingTime) appendOrRemove("walkingTime", item.walkingTime)
+                    if (stored.phoneSignalAvailability != item.phoneSignalAvailability) appendOrRemove(
+                        "phoneSignalAvailability",
+                        item.phoneSignalAvailability,
+                        ListSerializer(PhoneSignalAvailability.serializer())
+                    )
                     if (stored.tracks != item.tracks) {
                         if (item.tracks == null) {
                             append("tracks", "")

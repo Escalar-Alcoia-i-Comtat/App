@@ -279,6 +279,8 @@
     <string name="editor_external_tracks_label">External Tracks</string>
     <string name="editor_external_track_type_label">Track Type</string>
     <string name="editor_external_track_url_label">Track URL</string>
+    <string name="editor_phone_signal_availability">Phone Signal Availability</string>
+    <string name="editor_phone_signal_availability_signal">Signal</string>
     <string name="editor_points_label">Points</string>
     <string name="editor_point_label_label">Label</string>
     <string name="editor_point_description">Description</string>

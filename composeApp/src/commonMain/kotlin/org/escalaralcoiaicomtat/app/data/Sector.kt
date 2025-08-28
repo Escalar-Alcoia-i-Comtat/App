@@ -28,7 +28,7 @@ data class Sector(
     @SerialName("kids_apt") val kidsApt: Boolean,
     val weight: String = "",
     @SerialName("walking_time") val walkingTime: Long? = null,
-    @SerialName("phone_signal_availability") val phoneSignalAvailability: List<PhoneSignalAvailability>?,
+    @SerialName("phone_signal_availability") val phoneSignalAvailability: List<PhoneSignalAvailability>? = null,
     override val point: LatLng? = null,
     @SerialName("sun_time") val sunTime: SunTime,
     @SerialName("zone_id") val parentZoneId: Long,
