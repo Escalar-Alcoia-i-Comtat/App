@@ -63,6 +63,7 @@ sealed class DataTypes<out DT : DataType>(
             kidsApt = false,
             weight = "",
             walkingTime = null,
+            phoneSignalAvailability = null,
             point = null,
             sunTime = SunTime.None,
             parentZoneId = 0,

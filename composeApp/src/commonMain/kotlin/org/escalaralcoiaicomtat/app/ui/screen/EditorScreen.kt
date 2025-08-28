@@ -1,6 +1,7 @@
 package org.escalaralcoiaicomtat.app.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,8 +20,11 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Badge
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,6 +82,9 @@ import org.escalaralcoiaicomtat.app.data.generic.EndingInclination
 import org.escalaralcoiaicomtat.app.data.generic.EndingInfo
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.data.generic.PhoneCarrier
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalStrength
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
@@ -457,6 +464,71 @@ private fun <DT : DataType> EditorContent(
             toString = { it.label() },
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         )
+
+        Text(
+            text = stringResource(Res.string.editor_phone_signal_availability),
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        ) {
+            var adjustingCarrierData by remember { mutableStateOf<PhoneCarrier?>(null) }
+            adjustingCarrierData?.let { carrier ->
+                val availability = item.phoneSignalAvailability?.find { it.carrier == carrier }
+                AlertDialog(
+                    onDismissRequest = { adjustingCarrierData = null },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { adjustingCarrierData = null }
+                        ) { Text(stringResource(Res.string.editor_close)) }
+                    },
+                    title = { Text(carrier.displayName) },
+                    text = {
+                        FormDropdown(
+                            selection = availability?.strength,
+                            onSelectionChanged = { value ->
+                                val availability = if (value == null) {
+                                    // Remove the carrier from the availability
+                                    item.phoneSignalAvailability?.filter { it.carrier == carrier }
+                                } else {
+                                    val valueAvailability = PhoneSignalAvailability(value, carrier)
+                                    if (availability == null) {
+                                        // There's no availability for the current carrier
+                                        item.phoneSignalAvailability?.plus(valueAvailability)
+                                            ?: listOf(valueAvailability)
+                                    } else {
+                                        // There's already availability for the current carrier
+                                        item.phoneSignalAvailability.map { av ->
+                                            if (av.carrier == carrier) valueAvailability
+                                            else av
+                                        }
+                                    }
+                                }?.takeUnless { it.isEmpty() }
+                                onUpdateItem(item.copy(phoneSignalAvailability = availability))
+                            },
+                            label = stringResource(Res.string.editor_phone_signal_availability_signal),
+                            options = PhoneSignalStrength.entries,
+                            canUnselect = true,
+                            icon = { it.icon }
+                        )
+                    },
+                )
+            }
+            
+            PhoneCarrier.entries.forEach { carrier ->
+                val availability = item.phoneSignalAvailability?.find { it.carrier == carrier }
+                AssistChip(
+                    onClick = { adjustingCarrierData = carrier },
+                    label = { Text(carrier.displayName) },
+                    leadingIcon = { Icon(carrier.icon, carrier.displayName) },
+                    trailingIcon = { Icon(availability?.strength?.icon ?: Icons.Default.QuestionMark, null) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        leadingIconContentColor = carrier.color,
+                    ),
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+            }
+        }
     }
     if (item is Path) {
         HorizontalDivider()

@@ -9,6 +9,7 @@ import org.escalaralcoiaicomtat.app.data.generic.Builder
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
 import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
 import kotlin.time.Instant
@@ -140,5 +141,16 @@ object Converters {
     @TypeConverter
     fun toUuidList(value: List<Uuid>?): String? {
         return value?.joinToString(",")
+    }
+
+
+    @TypeConverter
+    fun fromPhoneSignalAvailabilityList(value: String?): List<PhoneSignalAvailability>? {
+        return value?.let { Json.decodeFromString(ListSerializer(PhoneSignalAvailability.serializer()), it) }
+    }
+
+    @TypeConverter
+    fun toPhoneSignalAvailabilityList(value: List<PhoneSignalAvailability>?): String? {
+        return value?.let { Json.encodeToString(ListSerializer(PhoneSignalAvailability.serializer()), it) }
     }
 }

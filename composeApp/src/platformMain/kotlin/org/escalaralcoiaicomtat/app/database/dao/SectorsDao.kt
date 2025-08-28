@@ -41,6 +41,7 @@ interface SectorsDao : DataTypeDao<Sector, SectorEntity> {
                 kidsApt,
                 weight,
                 walkingTime,
+                phoneSignalAvailability,
                 point,
                 sunTime,
                 parentZoneId

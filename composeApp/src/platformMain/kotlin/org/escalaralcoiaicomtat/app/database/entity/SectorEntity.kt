@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import org.escalaralcoiaicomtat.app.data.Sector
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
@@ -32,6 +33,7 @@ data class SectorEntity(
     val kidsApt: Boolean,
     val weight: String,
     val walkingTime: Long?,
+    val phoneSignalAvailability: List<PhoneSignalAvailability>?,
     val point: LatLng?,
     val sunTime: SunTime,
     val parentZoneId: Long,
@@ -46,6 +48,7 @@ data class SectorEntity(
         kidsApt,
         weight,
         walkingTime,
+        phoneSignalAvailability,
         point,
         sunTime,
         parentZoneId,

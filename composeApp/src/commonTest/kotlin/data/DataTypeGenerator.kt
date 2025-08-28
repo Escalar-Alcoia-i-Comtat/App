@@ -9,6 +9,9 @@ import org.escalaralcoiaicomtat.app.data.generic.Ending
 import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
 import org.escalaralcoiaicomtat.app.data.generic.GradeValue
 import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import org.escalaralcoiaicomtat.app.data.generic.PhoneCarrier
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalStrength
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
 import org.escalaralcoiaicomtat.app.data.generic.SunTime
@@ -59,6 +62,7 @@ object DataTypeGenerator {
         kidsApt: Boolean = false,
         weight: String = "zzz",
         walkingTime: Long? = null,
+        phoneSignalAvailability: List<PhoneSignalAvailability>? = null,
         point: LatLng? = null,
         sunTime: SunTime = SunTime.Morning,
         parentZoneId: Long = 0L,
@@ -73,6 +77,7 @@ object DataTypeGenerator {
         kidsApt,
         weight,
         walkingTime,
+        phoneSignalAvailability,
         point,
         sunTime,
         parentZoneId,
