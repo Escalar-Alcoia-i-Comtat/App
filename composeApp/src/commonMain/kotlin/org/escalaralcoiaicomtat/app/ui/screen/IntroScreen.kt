@@ -91,9 +91,9 @@ private val pages: List<@Composable () -> Unit> = listOfNotNull(
     },
     {
         IntroPage<Any>(
-            icon = painterResource(Res.drawable.drawstring_bag_color).icon,
-            title = stringResource(Res.string.intro_5_title),
-            message = stringResource(Res.string.intro_5_message)
+            icon = painterResource(Res.drawable.offline_color).icon,
+            title = stringResource(Res.string.intro_offline_title),
+            message = stringResource(Res.string.intro_offline_message)
         )
     },
     {
@@ -101,6 +101,13 @@ private val pages: List<@Composable () -> Unit> = listOfNotNull(
             icon = painterResource(Res.drawable.cea).icon,
             title = stringResource(Res.string.intro_credits_title),
             message = stringResource(Res.string.intro_credits_message)
+        )
+    },
+    {
+        IntroPage<Any>(
+            icon = painterResource(Res.drawable.drawstring_bag_color).icon,
+            title = stringResource(Res.string.intro_5_title),
+            message = stringResource(Res.string.intro_5_message)
         )
     },
 )

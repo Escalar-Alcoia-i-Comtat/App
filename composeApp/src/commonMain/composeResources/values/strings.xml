@@ -48,6 +48,8 @@
     <string name="intro_5_message">You are ready to access the app! Don't hesitate in contacting us if you find any data wrong or inaccurate.</string>
     <string name="intro_credits_title">Thanks!</string>
     <string name="intro_credits_message">This project is possible thanks to the co-financing from the Centre Excursionista d'Alcoi.</string>
+    <string name="intro_offline_title">Explore offline</string>
+    <string name="intro_offline_message">All the contents you access in the app are stored in memory for later, so if you are going to a place without phone signal, feel free to access it before with a Internet connection, and it will be available in-site. Please note that you may have to disable mobile data completely in some cases when the signal is low, but not enough to load data.</string>
 
     <string name="settings_category_general">General Configuration</string>
     <string name="settings_units_distance">Distance Units</string>
