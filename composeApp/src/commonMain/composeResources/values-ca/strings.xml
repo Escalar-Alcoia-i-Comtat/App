@@ -300,5 +300,5 @@
     <string name="error_map_title">No s'ha pogut carregar el mapa</string>
     <string name="error_map_subtitle">Toca per copiar la informació</string>
     <string name="intro_offline_title">Explora sense connexió</string>
-    <string name="intro_offline_message">Tots els continguts als quals accedeixis es queden guardats a la memòria per a més tard, així que si vas a algun lloc sense connexió a Internet, si l\'obres abans amb l\'app, estarà disponible sense connexió. Tingues en compte que pot ser hagis de desconnectar les dades mòbils per complet en llocs on la connexió existisca, però siga massa dèbil per a carregar dades.</string>
+    <string name="intro_offline_message">Tots els continguts als quals accedeixis es queden guardats a la memòria per a més tard, així que si vas a algun lloc sense connexió a Internet, si l'obres abans amb l'app, estarà disponible sense connexió. Tingues en compte que pot ser hagis de desconnectar les dades mòbils per complet en llocs on la connexió existisca, però siga massa dèbil per a carregar dades.</string>
 </resources>
