@@ -1,6 +1,5 @@
 package org.escalaralcoiaicomtat.app.network
 
-import kotlin.UnsupportedOperationException
 
 actual object PlatformCarrier {
     actual fun getCarrier(): String {
