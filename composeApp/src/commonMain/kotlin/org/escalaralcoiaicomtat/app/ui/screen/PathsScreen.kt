@@ -334,24 +334,29 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
                     modifier = Modifier.padding(vertical = 4.dp),
                     dialogContent = {
                         Column {
-                            Text("Phone signal summary:")
-                            for ((strength, carrier) in phoneSignalAvailability) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Icon(carrier.icon, carrier.displayName)
-                                    Text(carrier.displayName, modifier = Modifier.weight(1f))
-                                    Icon(strength.icon, strength.name)
-                                }
-                            }
-
                             val carrier = try {
                                 PlatformCarrier.getCarrier()
                             } catch (_: UnsupportedOperationException) {
-                                // nothing
+                                null
                             }
-                            Text("Your carrier: $carrier")
+                            if (carrier != null) {
+                                Text(
+                                    stringResource(
+                                        Res.string.sector_information_phone_signal_carrier,
+                                        carrier
+                                    )
+                                )
+                                phoneSignalAvailability
+                                    .find { it.carrier.usedBy.contains(carrier) }
+                                    ?.let { availability ->
+                                        PhoneSignalAvailabilityRow(availability)
+                                    }
+                            }
+
+                            val list = phoneSignalAvailability.filterNot { it.carrier.usedBy.contains(carrier) }
+                            for (availability in list) {
+                                PhoneSignalAvailabilityRow(availability)
+                            }
                         }
                     },
                 )
@@ -435,6 +440,29 @@ fun SectorInformationBottomSheet_Preview() {
         ),
         onDismissRequest = {}
     )
+}
+
+@Composable
+private fun PhoneSignalAvailabilityRow(availability: PhoneSignalAvailability) {
+    val (strength, carrier) = availability
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = carrier.icon,
+            contentDescription = carrier.displayName,
+            tint = carrier.color
+        )
+        Text(
+            text = carrier.displayName,
+            modifier = Modifier.weight(1f).padding(start = 4.dp)
+        )
+        Icon(
+            imageVector = strength.icon,
+            contentDescription = strength.name
+        )
+    }
 }
 
 @Composable

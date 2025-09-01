@@ -13,8 +13,9 @@ enum class PhoneCarrier(
     val color: Color,
     val icon: ImageVector,
     val displayName: String,
+    val usedBy: List<String>
 ) {
-    MOVISTAR(Color(0xFF019DF4), PhoneCarrierIcons.Movistar, "Movistar"),
-    ORANGE(Color(0xFFFF7900), PhoneCarrierIcons.Orange, "Orange"),
-    VODAFONE(Color(0xFFE60000), PhoneCarrierIcons.Vodafone, "Vodafone")
+    MOVISTAR(Color(0xFF019DF4), PhoneCarrierIcons.Movistar, "Movistar", listOf("Movistar", "O2", "Digi.Mobil")),
+    ORANGE(Color(0xFFFF7900), PhoneCarrierIcons.Orange, "Orange", listOf("Orange", "Simyo")),
+    VODAFONE(Color(0xFFE60000), PhoneCarrierIcons.Vodafone, "Vodafone", listOf("Vodafone", "Pepephone"))
 }
