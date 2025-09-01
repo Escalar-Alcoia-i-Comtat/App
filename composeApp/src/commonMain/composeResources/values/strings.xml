@@ -237,6 +237,9 @@
     <string name="file_picker_hint">Click to pick</string>
     <string name="file_picker_type_file">File</string>
 
+    <string name="map_error_no_internet">No Internet Connection</string>
+    <string name="map_error_unknown">Unknown Error</string>
+
     <string name="editor_yes">Yes</string>
     <string name="editor_no">No</string>
     <string name="editor_close">Close</string>

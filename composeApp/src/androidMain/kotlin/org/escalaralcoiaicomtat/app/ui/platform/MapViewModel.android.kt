@@ -2,6 +2,10 @@ package org.escalaralcoiaicomtat.app.ui.platform
 
 import android.content.Context
 import androidx.annotation.WorkerThread
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.CameraUpdate
@@ -16,6 +20,7 @@ import com.google.maps.android.data.Feature
 import com.google.maps.android.data.Geometry
 import com.google.maps.android.data.kml.KmlContainer
 import com.google.maps.android.data.kml.KmlLayer
+import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,12 +28,28 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.escalaralcoiaicomtat.app.maps.KMZHandler
+import org.jetbrains.compose.resources.StringResource
+import java.net.UnknownHostException
 import kotlin.uuid.Uuid
 
 actual class MapViewModel actual constructor() : ViewModel() {
 
     private var _isLoading = MutableStateFlow(false)
     val isLoading get() = _isLoading.asStateFlow()
+
+    enum class MapError(val icon: ImageVector, val message: StringResource) {
+        NoInternet(
+            Icons.Default.CloudOff,
+            Res.string.map_error_no_internet
+        ),
+        Unknown(
+            Icons.Default.ErrorOutline,
+            Res.string.map_error_unknown
+        )
+    }
+
+    private var _mapError = MutableStateFlow<MapError?>(null)
+    val mapError get() = _mapError.asStateFlow()
 
     private var kmlLayer: KmlLayer? = null
 
@@ -159,8 +180,15 @@ actual class MapViewModel actual constructor() : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _isLoading.emit(true)
+                _mapError.emit(null)
 
                 loadKMZ(context, googleMap, kmz, onMoveCameraRequested)
+            } catch (e: UnknownHostException) {
+                Napier.e("Internet access not available.", e)
+                _mapError.emit(MapError.NoInternet)
+            } catch (e: Exception) {
+                Napier.e("Could not load map.", e)
+                _mapError.emit(MapError.Unknown)
             } finally {
                 _isLoading.emit(false)
             }
