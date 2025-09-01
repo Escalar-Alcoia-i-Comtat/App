@@ -296,6 +296,13 @@ object AdminBackend : Backend() {
                 if (item.tracks != null) {
                     append("tracks", item.tracks.joinToString("\n") { "${it.type};${it.url}" })
                 }
+                if (item.phoneSignalAvailability != null) {
+                    appendSerializable(
+                        "phoneSignalAvailability",
+                        item.phoneSignalAvailability,
+                        ListSerializer(PhoneSignalAvailability.serializer())
+                    )
+                }
             }
             if (item is Path) {
                 append("sketchId", item.sketchId.toInt())
