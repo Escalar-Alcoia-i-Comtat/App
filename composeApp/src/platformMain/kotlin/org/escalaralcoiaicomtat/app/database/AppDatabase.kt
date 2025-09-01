@@ -17,6 +17,7 @@ import org.escalaralcoiaicomtat.app.database.entity.SectorEntity
 import org.escalaralcoiaicomtat.app.database.entity.ZoneEntity
 import org.escalaralcoiaicomtat.app.database.migrations.Migration1To2
 import org.escalaralcoiaicomtat.app.database.migrations.Migration3To4
+import org.escalaralcoiaicomtat.app.database.migrations.Migration5To6
 
 @Database(
     exportSchema = true,
@@ -27,12 +28,13 @@ import org.escalaralcoiaicomtat.app.database.migrations.Migration3To4
         PathEntity::class,
         BlockingEntity::class,
     ],
-    version = 5,
+    version = 6,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = Migration1To2::class),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4, spec = Migration3To4::class),
         // Migration from 4 to 5 is specified in Database.kt
+        // Migration from 5 to 6 is specified in Database.kt
     ]
 )
 @TypeConverters(Converters::class)

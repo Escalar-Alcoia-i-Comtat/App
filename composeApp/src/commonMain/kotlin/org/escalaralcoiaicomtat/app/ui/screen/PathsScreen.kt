@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.NetworkCell
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.SwipeDownAlt
@@ -99,9 +100,14 @@ import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
+import org.escalaralcoiaicomtat.app.data.generic.PhoneCarrier
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
+import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalStrength
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.SafesCount
 import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
+import org.escalaralcoiaicomtat.app.data.generic.SunTime
+import org.escalaralcoiaicomtat.app.network.PlatformCarrier
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.platform.launchUrl
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
@@ -175,9 +181,10 @@ fun PathsScreen(
         onEditBlockingRequested = viewModel::editBlocking.takeIf { onCreatePathRequested != null },
         onEditBlockingStopRequested = viewModel::stopEditingBlocking,
         onPathClicked = viewModel::selectChild,
-        onPreviousSectorRequested = onPreviousSectorRequested.takeIf { previousParentId != null }?.let {
-            { it(previousParentId!!) }
-        },
+        onPreviousSectorRequested = onPreviousSectorRequested.takeIf { previousParentId != null }
+            ?.let {
+                { it(previousParentId!!) }
+            },
         onNextSectorRequested = onNextSectorRequested.takeIf { nextParentId != null }?.let {
             { it(nextParentId!!) }
         },
@@ -319,6 +326,42 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
                 ) { launchPoint(point, sector.displayName) }
             }
 
+            sector.phoneSignalAvailability?.let { phoneSignalAvailability ->
+                MetaCard(
+                    icon = Icons.Default.NetworkCell,
+                    text = stringResource(Res.string.sector_information_phone_signal),
+                    message = stringResource(Res.string.sector_information_phone_signal_tap),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    dialogContent = {
+                        Column {
+                            val carrier = try {
+                                PlatformCarrier.getCarrier()
+                            } catch (_: UnsupportedOperationException) {
+                                null
+                            }
+                            if (carrier != null) {
+                                Text(
+                                    stringResource(
+                                        Res.string.sector_information_phone_signal_carrier,
+                                        carrier
+                                    )
+                                )
+                                phoneSignalAvailability
+                                    .find { it.carrier.usedBy.contains(carrier) }
+                                    ?.let { availability ->
+                                        PhoneSignalAvailabilityRow(availability)
+                                    }
+                            }
+
+                            val list = phoneSignalAvailability.filterNot { it.carrier.usedBy.contains(carrier) }
+                            for (availability in list) {
+                                PhoneSignalAvailabilityRow(availability)
+                            }
+                        }
+                    },
+                )
+            }
+
             val gpxDownloadUrl = sector.getGPXDownloadUrl()
             if (sector.walkingTime != null) {
                 MetaCard(
@@ -365,6 +408,60 @@ fun SectorInformationBottomSheet(sector: Sector, onDismissRequest: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun SectorInformationBottomSheet_Preview() {
+    SectorInformationBottomSheet(
+        sector = Sector(
+            id = 0L,
+            timestamp = 0L,
+            displayName = "Example Sector",
+            image = null,
+            kidsApt = true,
+            sunTime = SunTime.Morning,
+            phoneSignalAvailability = listOf(
+                PhoneSignalAvailability(
+                    strength = PhoneSignalStrength.SIGNAL_4G,
+                    carrier = PhoneCarrier.MOVISTAR,
+                ),
+                PhoneSignalAvailability(
+                    strength = PhoneSignalStrength.NOT_AVAILABLE,
+                    carrier = PhoneCarrier.ORANGE,
+                ),
+                PhoneSignalAvailability(
+                    strength = PhoneSignalStrength.BAD_SIGNAL,
+                    carrier = PhoneCarrier.VODAFONE,
+                ),
+            ),
+            parentZoneId = 0,
+        ),
+        onDismissRequest = {}
+    )
+}
+
+@Composable
+private fun PhoneSignalAvailabilityRow(availability: PhoneSignalAvailability) {
+    val (strength, carrier) = availability
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = carrier.icon,
+            contentDescription = carrier.displayName,
+            tint = carrier.color
+        )
+        Text(
+            text = carrier.displayName,
+            modifier = Modifier.weight(1f).padding(start = 4.dp)
+        )
+        Icon(
+            imageVector = strength.icon,
+            contentDescription = strength.name
+        )
     }
 }
 
@@ -656,7 +753,10 @@ private fun LazyListScope.bottomSheetContents(
                 IconButton(
                     onClick = { onEditBlockingRequested(Blocking.new(pathId = child.id)) },
                 ) {
-                    Icon(Icons.Default.NotificationAdd, stringResource(Res.string.path_blocking_create))
+                    Icon(
+                        Icons.Default.NotificationAdd,
+                        stringResource(Res.string.path_blocking_create)
+                    )
                 }
             }
             if (onEditRequested != null) {
@@ -889,6 +989,7 @@ private fun MetaCard(
     bigText: String? = null,
     bigTextColor: Color = Color.Unspecified,
     dialogText: AnnotatedString? = null,
+    dialogContent: (@Composable () -> Unit)? = null,
     message: String? = null,
     colors: CardColors = CardDefaults.outlinedCardColors(),
     content: (@Composable ColumnScope.() -> Unit)? = null,
@@ -906,6 +1007,7 @@ private fun MetaCard(
             }
         },
         dialogText = dialogText,
+        dialogContent = dialogContent,
         message = message,
         colors = colors,
         content = content,
@@ -922,17 +1024,21 @@ private fun MetaCard(
     iconContentDescription: String? = null,
     bigText: AnnotatedString? = null,
     dialogText: AnnotatedString? = null,
+    dialogContent: (@Composable () -> Unit)? = null,
     message: String? = null,
     colors: CardColors = CardDefaults.outlinedCardColors(),
     content: (@Composable ColumnScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
     var showingDialog by remember { mutableStateOf(false) }
-    if (showingDialog && dialogText != null) {
+    if (showingDialog && (dialogText != null || dialogContent != null)) {
         AlertDialog(
             onDismissRequest = { showingDialog = false },
             title = { Text(stringResource(Res.string.dialog_more_information)) },
-            text = { Text(dialogText) },
+            text = {
+                dialogText?.let { Text(it) }
+                dialogContent?.invoke()
+            },
             confirmButton = {
                 TextButton(onClick = { showingDialog = false }) {
                     Text(stringResource(Res.string.action_close))
@@ -944,9 +1050,9 @@ private fun MetaCard(
     OutlinedCard(
         modifier = Modifier
             .clickable(
-                enabled = dialogText != null || onClick != null
+                enabled = dialogText != null || dialogContent != null || onClick != null
             ) {
-                if (dialogText != null) {
+                if (dialogText != null || dialogContent != null) {
                     showingDialog = true
                 } else if (onClick != null) {
                     onClick()
