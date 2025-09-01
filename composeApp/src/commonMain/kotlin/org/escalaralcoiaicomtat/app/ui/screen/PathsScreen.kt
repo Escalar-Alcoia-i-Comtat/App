@@ -1022,9 +1022,9 @@ private fun MetaCard(
     OutlinedCard(
         modifier = Modifier
             .clickable(
-                enabled = dialogText != null || onClick != null
+                enabled = dialogText != null || dialogContent != null || onClick != null
             ) {
-                if (dialogText != null) {
+                if (dialogText != null || dialogContent != null) {
                     showingDialog = true
                 } else if (onClick != null) {
                     onClick()
