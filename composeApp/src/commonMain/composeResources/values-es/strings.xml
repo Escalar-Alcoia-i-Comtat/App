@@ -301,4 +301,9 @@
     <string name="error_map_subtitle">Toca para copiar la información</string>
     <string name="intro_offline_title">Explora sin conexión</string>
     <string name="intro_offline_message">Todos los contenidos a los que accedas desde la app serán guardados en la memoria para más tarde, así que si vas a ir a algún sitio sin conexión a Internet, explóralo antes en la app, y estará disponible in-situ. Por favor, ten en cuanta que puede ser necesario que desconectes los datos móviles por completo en sitios donde haya conexión a Internet, pero sea muy débil para cargar los datos.</string>
+    <string name="sector_information_phone_signal">Señal Móvil</string>
+    <string name="sector_information_phone_signal_tap">Toca para saber más</string>
+    <string name="sector_information_phone_signal_carrier">Tu operadora: %1$s</string>
+    <string name="editor_phone_signal_availability">Disponibilidad de Señal Móvil</string>
+    <string name="editor_phone_signal_availability_signal">Señal</string>
 </resources>
