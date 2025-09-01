@@ -9,7 +9,7 @@
     <string name="gender_neuter">Neutre</string>
     <string name="intro_0_title">Hola!</string>
     <string name="intro_0_message">Com prefereixes que ens dirigim a tú?</string>
-    <string name="app_name">Escalar Alcoia i Comtat</string>
+    <string name="app_name">Escalar Alcoià i Comtat</string>
     <string name="link_view_zone">Veure Zona</string>
-    <string name="downloading_update_progress">Descarregant...</string>
+    <string name="downloading_update_progress">Descarregant…</string>
 </resources>
