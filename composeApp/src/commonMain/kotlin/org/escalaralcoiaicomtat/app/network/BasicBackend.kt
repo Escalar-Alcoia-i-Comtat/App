@@ -2,12 +2,15 @@ package org.escalaralcoiaicomtat.app.network
 
 import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.onDownload
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readBuffer
+import kotlinx.io.RawSource
 import org.escalaralcoiaicomtat.app.data.Area
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
@@ -154,4 +157,9 @@ object BasicBackend : Backend() {
         URLBuilder(baseUrl)
             .appendPathSegments("download", uuid.toString())
             .build()
+
+    suspend fun urlToRawSource(url: String, block: HttpRequestBuilder.() -> Unit = {}): RawSource {
+        val channel = client.get(url, block).bodyAsChannel()
+        return channel.readBuffer()
+    }
 }

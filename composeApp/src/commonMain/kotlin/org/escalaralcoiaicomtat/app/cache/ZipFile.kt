@@ -14,4 +14,9 @@ class ZipFile {
     fun read(name: String): ByteArray? {
         return files[name]
     }
+
+    fun rewrite(map: MutableMap<String, ByteArray>) {
+        files.clear()
+        files.putAll(map)
+    }
 }
