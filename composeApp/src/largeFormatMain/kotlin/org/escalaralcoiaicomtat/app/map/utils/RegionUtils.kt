@@ -44,7 +44,7 @@ object RegionUtils {
                 (maxLat - latitudeDelta / 2) to (maxLon - longitudeDelta / 2)
             )
 
-            val (lat, lon) = center
+            val (lon, lat) = center
             Napier.i { "Center is on ${lat},${lon}" }
             Region(lat to lon, span)
         }

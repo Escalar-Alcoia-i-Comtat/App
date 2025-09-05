@@ -52,6 +52,16 @@ actual class MapViewModel actual constructor() : ViewModel() {
         return tileSize * 2.0.pow(wmtsLevel).toInt()
     }
 
+    actual fun zoomIn() {
+        val state = state.value ?: return
+        state.scale += 1f
+    }
+
+    actual fun zoomOut() {
+        val state = state.value ?: return
+        state.scale -= 1f
+    }
+
     fun loadMap(kmz: Uuid, blockInteractions: Boolean, onMapClick: (() -> Unit)?) {
         val mapSize = mapSizeAtLevel(MAX_ZOOM_LEVEL)
         val mapState = MapState(
@@ -93,7 +103,7 @@ actual class MapViewModel actual constructor() : ViewModel() {
             }
             val center = region.center
             Napier.d { "Moving camera to ${center.latitude}, ${center.longitude}" }
-            mapState.scrollToLatLng(center.latitude, center.longitude, 12.0)
+            mapState.scrollToLatLng(center.latitude, center.longitude, 0.0)
         }
     }
 }

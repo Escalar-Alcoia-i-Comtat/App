@@ -72,6 +72,10 @@ fun main() {
                         val args = entry.toRoute<Destinations.Editor>()
                         "#edit/${args.dataTypes}${args.id?.let { "/$it" } ?: "/new"}"
                     }
+                    route.startsWith(Destinations.Map.serializer().descriptor.serialName) -> {
+                        val args = entry.toRoute<Destinations.Map>()
+                        "#map" + (args.kmz?.let { "/$it" } ?: "")
+                    }
                     // Doesn't set a URL fragment for all other routes
                     else -> ""
                 }
