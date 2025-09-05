@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.cache.storageProvider
-import org.escalaralcoiaicomtat.app.map.MapData
 import org.escalaralcoiaicomtat.app.map.kmz.KMZLoader
 import org.escalaralcoiaicomtat.app.map.placemark.Polygon
 import org.escalaralcoiaicomtat.app.network.createHttpClient

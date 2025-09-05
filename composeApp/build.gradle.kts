@@ -180,6 +180,18 @@ kotlin {
             dependsOn(platformMain)
         }
 
+        // Desktop & Web
+        val largeFormatMain by creating {
+            dependsOn(commonMain.get())
+
+            dependencies {
+                implementation(libs.compose.mapCompose)
+
+                // XML Parsing
+                implementation(libs.ksoup)
+            }
+        }
+
         val mobileMain by creating {
             dependsOn(platformMain)
 
@@ -201,8 +213,8 @@ kotlin {
                 implementation(libs.compose.ui.tooling.preview)
 
                 // Compose - Maps
-                implementation(libs.compose.maps.base)
-                implementation(libs.compose.maps.utils)
+                implementation(libs.compose.googleMaps.base)
+                implementation(libs.compose.googleMaps.utils)
 
                 // Ktor client
                 implementation(libs.ktor.client.android)
@@ -248,15 +260,13 @@ kotlin {
 
         val desktopMain by getting {
             dependsOn(jvmMain)
+            dependsOn(largeFormatMain)
 
             dependencies {
                 implementation(compose.desktop.currentOs)
 
                 // Ktor client
                 implementation(libs.ktor.client.cio)
-
-                // XML Parsing
-                implementation(libs.ksoup)
 
                 // Mapbox SDK
                 implementation(libs.mapbox.core)
@@ -270,8 +280,12 @@ kotlin {
         }
 
         wasmJsMain {
+            dependsOn(largeFormatMain)
+
             dependencies {
                 implementation(libs.kotlinx.browser)
+
+                implementation(npm("jszip", "3.10.1"))
             }
             languageSettings {
                 optIn("kotlin.js.ExperimentalWasmJsInterop")

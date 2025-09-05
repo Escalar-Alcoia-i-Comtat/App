@@ -7,7 +7,8 @@ androidx-sqlite-bundled = "2.5.2"
 androidx-work = "2.10.3"
 buildkonfig = "0.17.1"
 coil = "3.3.0"
-compose-maps = "6.8.0"
+compose-googleMaps = "6.8.0"
+compose-mapCompose = "0.10.0"
 compose-markdown = "0.35.0"
 compose-navigation = "2.9.10-alpha01"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
@@ -47,8 +48,9 @@ androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 compose-filekit = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
-compose-maps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-maps" }
-compose-maps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-maps" }
+compose-googleMaps-base = { module = "com.google.maps.android:maps-compose", version.ref = "compose-googleMaps" }
+compose-googleMaps-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "compose-googleMaps" }
+compose-mapCompose = { module = "ovh.plrapps:mapcompose-mp", version.ref = "compose-mapCompose" }
 compose-markdown-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "compose-markdown" }
 compose-markdown-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "compose-markdown" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
