@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
-import org.escalaralcoiaicomtat.app.map.utils.normalizedWebMercatorToLatLon
-import ovh.plrapps.mapcompose.api.scroll
+import androidx.compose.ui.zIndex
+import ovh.plrapps.mapcompose.api.scale
 import ovh.plrapps.mapcompose.ui.MapUI
 import kotlin.uuid.Uuid
 
@@ -57,9 +57,9 @@ actual fun MapComposable(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                val (lat, lng) = normalizedWebMercatorToLatLon(state.scroll.x, state.scroll.y)
                 Text(
-                    text = "Scroll: ${state.scroll.x}, ${state.scroll.y} ($lat, $lng)"
+                    text = "Scale: ${state.scale}",
+                    modifier = Modifier.zIndex(10f).align(Alignment.TopEnd)
                 )
 
                 MapUI(

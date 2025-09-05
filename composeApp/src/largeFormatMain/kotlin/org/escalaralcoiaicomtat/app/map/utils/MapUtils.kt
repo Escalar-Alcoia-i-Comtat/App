@@ -6,8 +6,6 @@ import ovh.plrapps.mapcompose.api.scrollTo
 import ovh.plrapps.mapcompose.api.snapScrollTo
 import ovh.plrapps.mapcompose.ui.state.MapState
 import kotlin.math.PI
-import kotlin.math.atan
-import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.tan
 
@@ -25,22 +23,6 @@ fun latLonToNormalizedWebMercator(latitude: Double, longitude: Double): Pair<Dou
     val normalizedY = (piR - y) / (2.0 * piR)
 
     return Pair(normalizedX, normalizedY)
-}
-
-fun normalizedWebMercatorToLatLon(normalizedX: Double, normalizedY: Double): Pair<Double, Double> {
-    val earthRadius = 6_378_137.0 // in meters
-    val piR = earthRadius * PI
-
-    val x = normalizedX * (2.0 * piR) - piR
-    val y = piR - normalizedY * (2.0 * piR)
-
-    val lngRad = x / earthRadius
-    val latRad = 2.0 * atan(exp(y / earthRadius)) - PI / 2.0
-
-    val latitude = latRad * 180.0 / PI
-    val longitude = lngRad * 180.0 / PI
-
-    return Pair(latitude, longitude)
 }
 
 suspend fun MapState.scrollToLatLng(
