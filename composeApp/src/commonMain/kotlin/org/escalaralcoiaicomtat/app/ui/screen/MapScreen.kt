@@ -59,7 +59,7 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
         ) {
             val windowSizeClass = calculateWindowSizeClass()
-            if (windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded) {
+            if (viewModel.supportsZoomButtons && windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded) {
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier.align(Alignment.TopStart).padding(8.dp).zIndex(10f)
                 ) {

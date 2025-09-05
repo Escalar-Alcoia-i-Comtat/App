@@ -53,6 +53,12 @@ actual class MapViewModel actual constructor() : ViewModel() {
 
     private var kmlLayer: KmlLayer? = null
 
+    actual val supportsZoomButtons: Boolean = false
+
+    actual fun zoomIn() { }
+
+    actual fun zoomOut() { }
+
     private fun scanContainer(container: KmlContainer): List<LatLng> {
         val points = mutableListOf<LatLng>()
         if (container.hasPlacemarks()) {

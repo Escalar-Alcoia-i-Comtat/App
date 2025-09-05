@@ -45,6 +45,12 @@ actual class MapViewModel actual constructor() : ViewModel() {
     val mapImage: StateFlow<ByteArray?>
         get() = _mapImage.asStateFlow()
 
+    actual val supportsZoomButtons: Boolean = false
+
+    actual fun zoomIn() { }
+
+    actual fun zoomOut() { }
+
     fun loadMap(kmz: Uuid, layoutSize: IntSize) {
         viewModelScope.launch(Dispatchers.IO) {
             Napier.i { "Loading KMZ $kmz..." }

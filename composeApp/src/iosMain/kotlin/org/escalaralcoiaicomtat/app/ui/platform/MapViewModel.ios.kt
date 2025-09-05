@@ -19,6 +19,12 @@ actual class MapViewModel actual constructor() : ViewModelBase() {
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error.asStateFlow()
 
+    actual val supportsZoomButtons: Boolean = false
+
+    actual fun zoomIn() { }
+
+    actual fun zoomOut() { }
+
     fun loadKMZ(
         kmz: Uuid,
         onDocumentLoaded: (data: MapData) -> Unit

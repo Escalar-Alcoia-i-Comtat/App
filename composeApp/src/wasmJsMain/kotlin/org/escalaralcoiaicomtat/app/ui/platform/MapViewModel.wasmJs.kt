@@ -21,6 +21,8 @@ import ovh.plrapps.mapcompose.api.enableScrolling
 import ovh.plrapps.mapcompose.api.enableZooming
 import ovh.plrapps.mapcompose.api.onTap
 import ovh.plrapps.mapcompose.api.scale
+import ovh.plrapps.mapcompose.api.scroll
+import ovh.plrapps.mapcompose.api.scrollTo
 import ovh.plrapps.mapcompose.core.TileStreamProvider
 import ovh.plrapps.mapcompose.ui.layout.Forced
 import ovh.plrapps.mapcompose.ui.state.MapState
@@ -52,14 +54,20 @@ actual class MapViewModel actual constructor() : ViewModel() {
         return tileSize * 2.0.pow(wmtsLevel).toInt()
     }
 
+    actual val supportsZoomButtons: Boolean = true
+
     actual fun zoomIn() {
         val state = state.value ?: return
-        state.scale += 1f
+        viewModelScope.launch {
+            state.scrollTo(state.scroll.x, state.scroll.y, state.scale + 1f)
+        }
     }
 
     actual fun zoomOut() {
         val state = state.value ?: return
-        state.scale -= 1f
+        viewModelScope.launch {
+            state.scrollTo(state.scroll.x, state.scroll.y, state.scale - 1f)
+        }
     }
 
     fun loadMap(kmz: Uuid, blockInteractions: Boolean, onMapClick: (() -> Unit)?) {
