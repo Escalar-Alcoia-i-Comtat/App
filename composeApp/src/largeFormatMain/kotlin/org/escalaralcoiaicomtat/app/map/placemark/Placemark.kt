@@ -1,6 +1,7 @@
 package org.escalaralcoiaicomtat.app.map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
 
 interface Placemark {
     companion object {
@@ -19,5 +20,7 @@ interface Placemark {
     val description: String?
     val styleUrl: String?
 
-    fun addToPoints(list: MutableList<Pair<Double, Double>>)
+    fun addToPoints(list: MutableList<LatLng>)
+
+    fun generateId(): String
 }

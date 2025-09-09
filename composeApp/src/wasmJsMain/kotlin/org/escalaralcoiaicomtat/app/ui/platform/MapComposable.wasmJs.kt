@@ -12,12 +12,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastFold
 import ovh.plrapps.mapcompose.ui.MapUI
 import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun MapComposable(
     viewModel: MapViewModel,
@@ -55,7 +62,19 @@ actual fun MapComposable(
                 contentAlignment = Alignment.Center
             ) {
                 MapUI(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .onPointerEvent(PointerEventType.Scroll, PointerEventPass.Main) {
+                            if (blockInteractions) return@onPointerEvent
+
+                            val delta = it.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta }
+                            // usually -138 (zoom in) or +138 (zoom out)
+                            if (delta.y < 0) {
+                                viewModel.zoomIn()
+                            } else {
+                                viewModel.zoomOut()
+                            }
+                        },
                     state = state
                 )
             }

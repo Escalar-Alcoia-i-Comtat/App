@@ -1,6 +1,7 @@
 package org.escalaralcoiaicomtat.app.map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.map.parser.PlacemarkParser
 
 data class Point(
@@ -22,12 +23,16 @@ data class Point(
         }
     }
 
-    val latitude: Double = coordinates.split(',')[0].toDouble()
-    val longitude: Double = coordinates.split(',')[1].toDouble()
+    val latitude: Double = coordinates.split(',')[1].toDouble()
+    val longitude: Double = coordinates.split(',')[0].toDouble()
 
-    override fun addToPoints(list: MutableList<Pair<Double, Double>>) {
-        list.add(
-            latitude to longitude
-        )
+    val location: LatLng = LatLng(latitude, longitude)
+
+    override fun generateId(): String {
+        return name.lowercase().replace(' ', '-') + latitude.toString() + longitude.toString()
+    }
+
+    override fun addToPoints(list: MutableList<LatLng>) {
+        list.add(location)
     }
 }

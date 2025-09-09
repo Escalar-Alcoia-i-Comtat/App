@@ -1,12 +1,13 @@
 package org.escalaralcoiaicomtat.app.map.style
 
+import androidx.compose.ui.graphics.Color
 import com.fleeksoft.ksoup.nodes.Element
 import org.escalaralcoiaicomtat.app.map.parser.StyleParser
 
-data class LineStyle(
+open class LineStyle(
     override val id: String,
-    val color: String,
-    val width: Double
+    open val lineColor: String,
+    open val lineWidth: Double
 ): Style {
     companion object: StyleParser<LineStyle> {
         override fun parse(style: Element): LineStyle? {
@@ -14,12 +15,18 @@ data class LineStyle(
             return if (lineStyle != null) {
                 LineStyle(
                     style.attr("id"),
-                    lineStyle.getElementsByTag("color")[0].value(),
-                    lineStyle.getElementsByTag("width")[0].value().toDouble()
+                    lineStyle.getElementsByTag("color")[0].text(),
+                    lineStyle.getElementsByTag("width")[0].text().toDouble()
                 )
             } else {
                 null
             }
         }
+    }
+
+    fun lineColor(): Color = Color(lineColor.hexToInt())
+
+    override fun toString(): String {
+        return "LineStyle(id='$id', lineColor='$lineColor', lineWidth=$lineWidth)"
     }
 }

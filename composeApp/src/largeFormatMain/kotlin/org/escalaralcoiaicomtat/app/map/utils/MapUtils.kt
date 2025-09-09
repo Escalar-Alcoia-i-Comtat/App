@@ -1,15 +1,13 @@
 package org.escalaralcoiaicomtat.app.map.utils
 
-import io.github.aakira.napier.Napier
-import ovh.plrapps.mapcompose.api.scale
-import ovh.plrapps.mapcompose.api.scrollTo
-import ovh.plrapps.mapcompose.api.snapScrollTo
-import ovh.plrapps.mapcompose.ui.state.MapState
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
+import ovh.plrapps.mapcompose.utils.Point
 import kotlin.math.PI
 import kotlin.math.ln
 import kotlin.math.tan
+import org.escalaralcoiaicomtat.app.map.placemark.Point as PlacemarkPoint
 
-fun latLonToNormalizedWebMercator(latitude: Double, longitude: Double): Pair<Double, Double> {
+fun latLonToNormalizedWebMercator(latitude: Double, longitude: Double): Point {
     val earthRadius = 6_378_137.0 // in meters
     val latRad = latitude * PI / 180.0
     val lngRad = longitude * PI / 180.0
@@ -22,24 +20,9 @@ fun latLonToNormalizedWebMercator(latitude: Double, longitude: Double): Pair<Dou
     val normalizedX = (x + piR) / (2.0 * piR)
     val normalizedY = (piR - y) / (2.0 * piR)
 
-    return Pair(normalizedX, normalizedY)
+    return Point(normalizedX, normalizedY)
 }
 
-suspend fun MapState.scrollToLatLng(
-    targetLat: Double,
-    targetLng: Double,
-    destScale: Double = scale
-) {
-    val (targetX, targetY) = latLonToNormalizedWebMercator(targetLat, targetLng)
-    Napier.d { "Scrolling to $targetLat, $targetLng (tile $targetX, $targetY) at scale $destScale" }
-    scrollTo(targetX, targetY, destScale)
-}
+fun LatLng.toNormalizedWebMercator(): Point = latLonToNormalizedWebMercator(latitude, longitude)
 
-suspend fun MapState.snapScrollToLatLng(
-    targetLat: Double,
-    targetLng: Double
-) {
-    val (targetX, targetY) = latLonToNormalizedWebMercator(targetLat, targetLng)
-    Napier.d { "Snap scrolling to $targetLat, $targetLng (tile $targetX, $targetY)" }
-    snapScrollTo(targetX, targetY)
-}
+fun PlacemarkPoint.locationToNormalizedWebMercator(): Point = location.toNormalizedWebMercator()

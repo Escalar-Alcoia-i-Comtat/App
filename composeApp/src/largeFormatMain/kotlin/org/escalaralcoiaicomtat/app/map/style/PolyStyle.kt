@@ -1,16 +1,17 @@
 package org.escalaralcoiaicomtat.app.map.style
 
+import androidx.compose.ui.graphics.Color
 import com.fleeksoft.ksoup.nodes.Element
 import org.escalaralcoiaicomtat.app.map.parser.StyleParser
 
 class PolyStyle(
     override val id: String,
-    val lineColor: String,
-    val lineWidth: Double,
+    override val lineColor: String,
+    override val lineWidth: Double,
     val fillColor: String,
     val fill: Boolean,
     val outline: Boolean
-): Style {
+): LineStyle(id, lineColor, lineWidth) {
     companion object: StyleParser<PolyStyle> {
         override fun parse(style: Element): PolyStyle? {
             val polyStyle = style.getElementsByTag("PolyStyle").firstOrNull()
@@ -18,15 +19,21 @@ class PolyStyle(
             return if (lineStyle != null && polyStyle != null) {
                 PolyStyle(
                     style.attr("id"),
-                    lineStyle.color,
-                    lineStyle.width,
-                    polyStyle.getElementsByTag("color")[0].value(),
-                    polyStyle.getElementsByTag("fill")[0].value() == "1",
-                    polyStyle.getElementsByTag("outline")[0].value() == "1"
+                    lineStyle.lineColor,
+                    lineStyle.lineWidth,
+                    polyStyle.getElementsByTag("color")[0].text(),
+                    polyStyle.getElementsByTag("fill")[0].text() == "1",
+                    polyStyle.getElementsByTag("outline")[0].text() == "1"
                 )
             } else {
                 null
             }
         }
+    }
+
+    fun fillColor(): Color = Color(fillColor.hexToInt())
+
+    override fun toString(): String {
+        return "PolyStyle(id='$id', lineColor='$lineColor', lineWidth=$lineWidth, fillColor='$fillColor', fill=$fill, outline=$outline)"
     }
 }

@@ -1,13 +1,14 @@
 package org.escalaralcoiaicomtat.app.map.placemark
 
 import com.fleeksoft.ksoup.nodes.Element
+import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.map.parser.PlacemarkParser
 
 data class Polygon(
     override val name: String,
     override val description: String?,
     override val styleUrl: String?,
-    val coordinates: List<Pair<Double, Double>>
+    val coordinates: List<LatLng>
 ): Placemark {
     companion object: PlacemarkParser<Polygon> {
         override fun parse(style: Element): Polygon? {
@@ -18,7 +19,7 @@ data class Polygon(
                     .text()
                     .split(" ")
                     .map { it.trim().split(',') }
-                    .map { it[0].toDouble() to it[1].toDouble() }
+                    .map { LatLng(it[0].toDouble(), it[1].toDouble()) }
 
                 Polygon(
                     style.getElementsByTag("name").first()!!.text(),
@@ -30,7 +31,11 @@ data class Polygon(
         }
     }
 
-    override fun addToPoints(list: MutableList<Pair<Double, Double>>) {
+    override fun addToPoints(list: MutableList<LatLng>) {
         list.addAll(coordinates)
+    }
+
+    override fun generateId(): String {
+        return name.lowercase().replace(' ', '-') + coordinates.hashCode()
     }
 }

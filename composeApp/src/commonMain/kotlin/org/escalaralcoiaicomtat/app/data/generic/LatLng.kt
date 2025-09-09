@@ -16,6 +16,8 @@ data class LatLng(
         }
     }
 
+    constructor(latLng: Pair<Double, Double>): this(latLng.first, latLng.second)
+
     override fun toString(): String {
         return "$latitude,$longitude"
     }

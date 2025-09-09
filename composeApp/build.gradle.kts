@@ -62,7 +62,10 @@ kotlin {
             }
         }
         compilerOptions {
-            freeCompilerArgs.add("-Xwasm-attach-js-exception")
+            // Doesn't seem to be supported
+            // freeCompilerArgs.add("-Xwasm-attach-js-exception")
+
+            freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
             // freeCompilerArgs.add("-Xwasm-generate-dwarf")
         }
         binaries.executable()

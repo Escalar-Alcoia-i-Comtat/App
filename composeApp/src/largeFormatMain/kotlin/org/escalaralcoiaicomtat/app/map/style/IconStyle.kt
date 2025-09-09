@@ -11,11 +11,22 @@ data class IconStyle(
     companion object: StyleParser<IconStyle> {
         override fun parse(style: Element): IconStyle? {
             return style.getElementsByTag("IconStyle").firstOrNull()?.let { element ->
-                IconStyle(
-                    style.attr("id"),
-                    element.getElementsByTag("scale")[0].value().toFloat(),
-                    element.getElementsByTag("Icon")[0].getElementsByTag("href")[0].value()
-                )
+                val id = style.id()
+                    .takeUnless { it.isEmpty() }
+                    ?: return null
+                val scale = element.getElementsByTag("scale")
+                    .firstOrNull()
+                    ?.text()
+                    ?.toFloatOrNull()
+                    ?: return null
+                val iconHref = element.getElementsByTag("Icon")
+                    .firstOrNull()
+                    ?.getElementsByTag("href")
+                    ?.firstOrNull()
+                    ?.text()
+                    ?: return null
+
+                IconStyle(id, scale, iconHref)
             }
         }
     }
