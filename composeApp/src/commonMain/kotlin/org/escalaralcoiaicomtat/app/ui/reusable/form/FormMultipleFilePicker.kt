@@ -11,18 +11,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.PlainTooltip
-import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -54,7 +43,7 @@ fun FormMultipleFilePicker(
 ) {
     Column(modifier.padding(vertical = 4.dp)) {
         TooltipBox(
-            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(0.dp),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below, 0.dp),
             state = rememberTooltipState(),
             tooltip = {
                 PlainTooltip { Text(stringResource(Res.string.file_picker_hint)) }

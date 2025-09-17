@@ -1,45 +1,47 @@
 [versions]
 # View compatibility in: https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-compatibility-guide.html
-agp = "8.10.1"
-androidx-activityCompose = "1.10.1"
+#noinspection AndroidGradlePluginVersion
+agp = "8.11.1"
+androidx-activityCompose = "1.11.0"
 androidx-appcompat = "1.7.1"
-androidx-sqlite-bundled = "2.5.2"
+androidx-sqlite-bundled = "2.6.0"
 androidx-work = "2.10.4"
 buildkonfig = "0.17.1"
 coil = "3.3.0"
 compose-googleMaps = "6.10.0"
 compose-mapCompose = "0.10.0"
-compose-markdown = "0.35.0"
+compose-markdown = "0.37.0"
+compose-material3 = "1.9.0-beta06"
 compose-navigation = "2.9.10-alpha01"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
-compose-plugin = "1.8.2"
+compose-plugin = "1.9.0"
 compose-richeditor = "1.0.0-rc13"
 compose-ui = "1.9.1"
-compose-viewModel = "2.9.3"
+compose-viewModel = "2.9.4"
 compose-windowSizeClass = "0.5.0"
 filekit = "0.11.0"
 firebase-bom = "34.2.0"
 gms = "4.4.3"
 kmpio = "0.2.3"
-kotlin = "2.2.20-RC2"
+kotlin = "2.2.20"
 kotlinx = "1.10.2"
 kotlinx-browser = "0.5.0"
 kotlinx-datetime = "0.7.1"
 kotlinx-json = "1.9.0"
 kotlinx-io = "0.8.0"
-ksp = "2.2.20-RC2-2.0.2"
+ksp = "2.2.20-2.0.2"
 ksoup = "0.2.5"
-ktor = "3.2.3"
+ktor = "3.3.0"
 mapbox = "5.8.0"
 multiplatform-settings = "1.3.0"
 napier = "2.7.1"
 play-appupdate = "2.1.0"
-room = "2.7.2"
-sentry-android = "5.10.0"
-sentry-multiplatform = "0.18.0"
+room = "2.8.0"
+sentry-android = "5.11.0"
+sentry-multiplatform = "0.19.0"
 semver = "3.0.0"
 zoomimage = "1.4.0"
-roomKtx = "2.7.2"
+roomKtx = "2.8.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -53,6 +55,7 @@ compose-googleMaps-utils = { module = "com.google.maps.android:maps-compose-util
 compose-mapCompose = { module = "ovh.plrapps:mapcompose-mp", version.ref = "compose-mapCompose" }
 compose-markdown-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "compose-markdown" }
 compose-markdown-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "compose-markdown" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
 compose-viewModel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewModel" }
 compose-windowSizeClass = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "compose-windowSizeClass" }

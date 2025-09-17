@@ -1,19 +1,7 @@
 package org.escalaralcoiaicomtat.app.ui.reusable.form
 
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -77,7 +65,7 @@ fun <T : Any> FormDropdown(
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             },
-            modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+            modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             maxLines = 1,
             singleLine = true,
             enabled = enabled

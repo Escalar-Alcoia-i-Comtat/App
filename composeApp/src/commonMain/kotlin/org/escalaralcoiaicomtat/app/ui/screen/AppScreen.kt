@@ -12,40 +12,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.CloudOff
-import androidx.compose.material.icons.rounded.FilterAlt
-import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.PlainTooltip
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import escalaralcoiaicomtat.composeapp.generated.resources.*
 import org.escalaralcoiaicomtat.app.data.Area
@@ -152,7 +127,7 @@ fun AppScreen(
                                 visible = !isNetworkConnected
                             ) {
                                 TooltipBox(
-                                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
                                     state = rememberTooltipState(),
                                     tooltip = {
                                         PlainTooltip {
