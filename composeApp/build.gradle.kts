@@ -486,3 +486,20 @@ tasks.withType(KotlinCompilationTask::class.java) {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
+
+tasks.matching {
+    it.name == "kspDebugKotlinAndroid" || it.name == "kspReleaseKotlinAndroid"
+}.configureEach {
+    dependsOn(
+        "generateResourceAccessorsForAndroidDebug",
+        "generateResourceAccessorsForAndroidMain",
+        "generateActualResourceCollectorsForAndroidMain",
+        "generateResourceAccessorsForMobileMain",
+        "generateResourceAccessorsForPlatformMain",
+        "generateComposeResClass",
+        "generateResourceAccessorsForCommonMain",
+        "generateExpectResourceCollectorsForCommonMain",
+        "generateBuildKonfig",
+        "generateResourceAccessorsForJvmMain"
+    )
+}
