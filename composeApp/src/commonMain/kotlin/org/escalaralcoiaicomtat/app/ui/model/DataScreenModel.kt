@@ -34,11 +34,11 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
     val displayingChild: StateFlow<Children?> get() = _displayingChild.asStateFlow()
     private val _displayingChild = MutableStateFlow<Children?>(null)
 
-    fun load(id: Long, onNotFound: () -> Unit) = launch {
+    fun load(id: Long, onNotFound: () -> Unit) = async {
         loadData(id, onNotFound)
     }
 
-    protected open suspend fun loadData(id: Long, onNotFound: () -> Unit) {
+    protected open suspend fun loadData(id: Long, onNotFound: () -> Unit): Parent? {
         originalChildren = childrenListAccessor(id)
         _children.emit(
             if (sortChildren) originalChildren!!.sorted()
@@ -53,6 +53,7 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
             Napier.d { "Emitting #$id" }
             _parent.emit(dbParent)
         }
+        return dbParent
     }
 
     fun selectChild(child: Children?) {

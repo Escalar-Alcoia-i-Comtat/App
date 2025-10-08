@@ -1,29 +1,10 @@
 package org.escalaralcoiaicomtat.app.ui.screen
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -33,45 +14,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.filled.ListAlt
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.NetworkCell
-import androidx.compose.material.icons.filled.NotificationAdd
-import androidx.compose.material.icons.filled.Route
-import androidx.compose.material.icons.filled.SwipeDownAlt
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -100,13 +51,7 @@ import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.data.Blocking
 import org.escalaralcoiaicomtat.app.data.Path
 import org.escalaralcoiaicomtat.app.data.Sector
-import org.escalaralcoiaicomtat.app.data.generic.PhoneCarrier
-import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
-import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalStrength
-import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
-import org.escalaralcoiaicomtat.app.data.generic.SafesCount
-import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
-import org.escalaralcoiaicomtat.app.data.generic.SunTime
+import org.escalaralcoiaicomtat.app.data.generic.*
 import org.escalaralcoiaicomtat.app.network.PlatformCarrier
 import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.platform.launchUrl
@@ -119,11 +64,7 @@ import org.escalaralcoiaicomtat.app.ui.icons.Rope
 import org.escalaralcoiaicomtat.app.ui.list.PathListItem
 import org.escalaralcoiaicomtat.app.ui.model.PathsScreenModel
 import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
-import org.escalaralcoiaicomtat.app.ui.reusable.CircularProgressIndicatorBox
-import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenu
-import org.escalaralcoiaicomtat.app.ui.reusable.ContextMenuItem
-import org.escalaralcoiaicomtat.app.ui.reusable.ImageLoadError
-import org.escalaralcoiaicomtat.app.ui.reusable.ReportButton
+import org.escalaralcoiaicomtat.app.ui.reusable.*
 import org.escalaralcoiaicomtat.app.utils.format
 import org.escalaralcoiaicomtat.app.utils.unit.meters
 import org.jetbrains.compose.resources.getString
@@ -157,6 +98,7 @@ fun PathsScreen(
     val previousParentId by viewModel.previousParentId.collectAsState()
 
     LaunchedEffect(sectorId) {
+        Napier.d { "Loading sector data..." }
         viewModel.load(sectorId) {
             Napier.w { "Could not find sector with id $sectorId" }
             onBackRequested()

@@ -29,8 +29,8 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
     private val _nextParentId = MutableStateFlow<Long?>(null)
     val nextParentId: StateFlow<Long?> get() = _nextParentId.asStateFlow()
 
-    override suspend fun loadData(id: Long, onNotFound: () -> Unit) {
-        super.loadData(id, onNotFound)
+    override suspend fun loadData(id: Long, onNotFound: () -> Unit): Sector? {
+        val sector = super.loadData(id, onNotFound)
 
         val blocks = originalChildren.orEmpty()
             .flatMap { path ->
@@ -39,17 +39,22 @@ class PathsScreenModel : DataScreenModel<Sector, Path>(
             .filter { it.isActive() }
         _blocks.emit(blocks)
 
-        parent.value?.let { parent ->
+        if (sector != null) {
             // Fetch all the child sectors of the zone of the parent sector (brothers)
             val sectors = DatabaseInterface.sectors()
-                .getByParentId(parent.parentZoneId)
+                .getByParentId(sector.parentZoneId)
                 .sorted()
-            val sectorIdx = sectors.indexOfFirst { it.id == id }
+            val sectorIdx = sectors.indexOf(sector)
+            Napier.i { "There are ${sectors.size} sectors. Current index: $sectorIdx" }
             if (sectorIdx == 0) _previousParentId.tryEmit(null)
             else _previousParentId.tryEmit(sectors[sectorIdx - 1].id)
             if (sectorIdx +1 >= sectors.size) _nextParentId.tryEmit(null)
             else _nextParentId.tryEmit(sectors[sectorIdx + 1].id)
+        } else {
+            Napier.w { "Parent sector is null. Won't allow side navigation." }
         }
+
+        return sector
     }
 
     fun editBlocking(blocking: Blocking) {

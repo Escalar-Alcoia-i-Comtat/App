@@ -2,14 +2,10 @@ package org.escalaralcoiaicomtat.app.ui.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.utils.IO
 
 abstract class ViewModelBase : ViewModel() {
@@ -25,3 +21,5 @@ abstract class ViewModelBase : ViewModel() {
         block: suspend CoroutineScope.() -> Unit
     ) = viewModelScope.launch(dispatcher, start, block)
 }
+
+expect fun ViewModel.async(block: suspend CoroutineScope.() -> Unit)
