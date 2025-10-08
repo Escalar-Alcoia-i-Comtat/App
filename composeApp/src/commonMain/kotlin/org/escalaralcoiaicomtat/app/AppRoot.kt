@@ -1,20 +1,10 @@
 package org.escalaralcoiaicomtat.app
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.navigation.NavHostController
@@ -25,11 +15,7 @@ import androidx.navigation.toRoute
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import io.github.aakira.napier.Napier
-import org.escalaralcoiaicomtat.app.data.Area
-import org.escalaralcoiaicomtat.app.data.DataTypes
-import org.escalaralcoiaicomtat.app.data.Path
-import org.escalaralcoiaicomtat.app.data.Sector
-import org.escalaralcoiaicomtat.app.data.Zone
+import org.escalaralcoiaicomtat.app.data.*
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.settings
 import org.escalaralcoiaicomtat.app.network.ConnectivityStatusObserver
@@ -42,14 +28,7 @@ import org.escalaralcoiaicomtat.app.ui.lang.LocalizedApp
 import org.escalaralcoiaicomtat.app.ui.navigation.Destination
 import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
 import org.escalaralcoiaicomtat.app.ui.navigation.navigateTo
-import org.escalaralcoiaicomtat.app.ui.screen.AppScreen
-import org.escalaralcoiaicomtat.app.ui.screen.EditorScreen
-import org.escalaralcoiaicomtat.app.ui.screen.IntroScreen
-import org.escalaralcoiaicomtat.app.ui.screen.MapScreen
-import org.escalaralcoiaicomtat.app.ui.screen.PathsScreen
-import org.escalaralcoiaicomtat.app.ui.screen.ReportScreen
-import org.escalaralcoiaicomtat.app.ui.screen.SectorsScreen
-import org.escalaralcoiaicomtat.app.ui.screen.ZonesScreen
+import org.escalaralcoiaicomtat.app.ui.screen.*
 import org.escalaralcoiaicomtat.app.ui.theme.AppTheme
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -231,15 +210,6 @@ fun SharedTransitionScope.NavigationController(
             }
             composable<Destinations.Sector> { navBackStackEntry ->
                 val route = navBackStackEntry.toRoute<Destinations.Sector>()
-                val pbse = navController.previousBackStackEntry
-                val previousRoute = try {
-                    pbse?.toRoute<Destinations.Zone>()
-                } catch (e: IllegalArgumentException) {
-                    Napier.e(e) {
-                        "Could not decode destination. Route: ${pbse?.destination?.route}"
-                    }
-                    null
-                }
 
                 CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                     PathsScreen(
@@ -272,14 +242,12 @@ fun SharedTransitionScope.NavigationController(
                         }.takeIf { editAllowed },
                         onNextSectorRequested = { id ->
                             navController.navigateTo(
-                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id),
-                                popUpTo = previousRoute,
+                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id)
                             )
                         },
                         onPreviousSectorRequested = { id ->
                             navController.navigateTo(
-                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id),
-                                popUpTo = previousRoute,
+                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id)
                             )
                         }
                     )

@@ -4,7 +4,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation.ExperimentalBrowserHistoryApi
-import androidx.navigation.bindToNavigation
+import androidx.navigation.bindToBrowserNavigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.aakira.napier.DebugAntilog
@@ -16,7 +16,6 @@ import org.escalaralcoiaicomtat.app.cache.storageProvider
 import org.escalaralcoiaicomtat.app.sync.SyncManager
 import org.escalaralcoiaicomtat.app.ui.Locales
 import org.escalaralcoiaicomtat.app.ui.navigation.Destinations
-import org.escalaralcoiaicomtat.app.ui.navigation.navigateTo
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalBrowserHistoryApi::class)
 fun main() {
@@ -40,14 +39,8 @@ fun main() {
             body.lang = Locales.valueOf(lang).key
         }
 
-        AppRoot(startDestination = null, navController = navController)
-
-        LaunchedEffect(Unit) {
-            val initRoute = window.location.hash
-            val initDestination = Destinations.parse(initRoute)
-            navController.navigateTo(initDestination, true)
-
-            window.bindToNavigation(navController) { entry ->
+        LaunchedEffect(navController) {
+            navController.bindToBrowserNavigation { entry ->
                 val route = entry.destination.route.orEmpty()
                 when {
                     route.startsWith(Destinations.Root.serializer().descriptor.serialName) -> {
@@ -81,5 +74,10 @@ fun main() {
                 }
             }
         }
+
+        AppRoot(
+            startDestination = Destinations.parse(window.location.hash),
+            navController = navController
+        )
     }
 }
