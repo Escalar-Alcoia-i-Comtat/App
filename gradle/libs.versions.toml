@@ -14,7 +14,7 @@ compose-markdown = "0.37.0"
 compose-material3 = "1.9.0-beta06"
 compose-navigation = "2.9.0"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
-compose-plugin = "1.9.0"
+compose-plugin = "1.10.0+dev3050"
 compose-richeditor = "1.0.0-rc13"
 compose-ui = "1.9.2"
 compose-viewModel = "2.9.4"
