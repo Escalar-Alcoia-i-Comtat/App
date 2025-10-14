@@ -126,18 +126,22 @@ object BasicBackend : Backend() {
      * Downloads a file with the given UUID.
      * An exception may be thrown if the file was not found in the server.
      * @param uuid The UUID of the file to fetch.
+     * @param width If not null, the image will be resized to this width.
+     * @param height If not null, the image will be resized to this height.
      * @param progress If not null, will be called with the progress of the request.
      * @return A channel with the data of the file requested.
      */
     suspend fun downloadFile(
         uuid: Uuid,
+        width: Int? = null,
+        height: Int? = null,
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): ByteReadChannel {
         Napier.d { "Downloading file $uuid from server...." }
         var length: Long = 0
         progress?.invoke(0, length)
         val response = client.get(
-            downloadFileUrl(uuid).also { Napier.v("GET :: $it") }
+            downloadFileUrl(uuid, width, height).also { Napier.v("GET :: $it") }
         ) {
             onDownload { bytesSentTotal, contentLength ->
                 contentLength ?: return@onDownload
@@ -152,10 +156,17 @@ object BasicBackend : Backend() {
     /**
      * Constructs the URL to access for downloading files from the backend.
      * @param uuid The file's identifier.
+     * @param width If not null, the image will be resized to this width.
+     * @param height If not null, the image will be resized to this height.
+     * @return The URL to download the file.
      */
-    fun downloadFileUrl(uuid: Uuid): Url =
+    fun downloadFileUrl(uuid: Uuid, width: Int? = null, height: Int? = null): Url =
         URLBuilder(baseUrl)
             .appendPathSegments("download", uuid.toString())
+            .apply {
+                width?.let { parameters.append("width", it.toString()) }
+                height?.let { parameters.append("height", it.toString()) }
+            }
             .build()
 
     suspend fun urlToRawSource(url: String, block: HttpRequestBuilder.() -> Unit = {}): RawSource {

@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -94,7 +95,8 @@ fun <T : DataTypeWithImage> DataCard(
                     .clickable(onClick = onClick),
                 contentAlignment = Alignment.Center
             ) {
-                val painter = rememberAsyncImagePainter(item.imageUrl())
+                val heightPx = with(LocalDensity.current) { imageHeight.toPx() }.toInt()
+                val painter = rememberAsyncImagePainter(item.imageUrl(height = heightPx))
                 val state by painter.state.collectAsState()
                 when (state) {
                     is AsyncImagePainter.State.Empty,

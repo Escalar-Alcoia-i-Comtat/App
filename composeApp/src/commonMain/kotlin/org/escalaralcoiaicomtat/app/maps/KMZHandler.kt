@@ -47,7 +47,7 @@ object KMZHandler {
         progress: (suspend (current: Long, total: Long) -> Unit)? = null
     ): ZipFile {
         Napier.d { "Downloading KMZ for $uuid ..." }
-        val kmzFile = BasicBackend.downloadFile(uuid, progress).readBuffer()
+        val kmzFile = BasicBackend.downloadFile(uuid, progress = progress).readBuffer()
         Napier.d { "Unzipping KMZ into memory..." }
         val data = ZipFileHandler.unzip(kmzFile)
         if (replaceImagePaths) replaceImages(data)
