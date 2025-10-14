@@ -110,7 +110,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.foundation)
-            implementation(libs.compose.material3)
+            implementation(compose.material3)
             implementation(compose.materialIconsExtended)
             implementation(compose.runtime)
 
@@ -162,6 +162,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
 
         // Desktop & mobile
@@ -239,6 +240,24 @@ kotlin {
                 implementation(libs.firebase.messaging)
             }
         }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.androidx.test.runner)
+
+                implementation(libs.mockk.android)
+                implementation(libs.mockk.agent)
+                implementation(libs.mockk.core)
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                implementation(libs.androidx.test.runner)
+
+                implementation(libs.mockk.android)
+                implementation(libs.mockk.agent)
+                implementation(libs.mockk.core)
+            }
+        }
 
         val iosX64Main by getting
         val iosArm64Main by getting
@@ -259,6 +278,16 @@ kotlin {
                 // XML Parsing
                 implementation(libs.ksoup)
             }
+        }
+
+        val iosX64Test by getting
+        val iosArm64Test by getting
+        val iosSimulatorArm64Test by getting
+        val iosTest by creating {
+            dependsOn(commonTest.get())
+            iosX64Test.dependsOn(this)
+            iosArm64Test.dependsOn(this)
+            iosSimulatorArm64Test.dependsOn(this)
         }
 
         val desktopMain by getting {
