@@ -1,5 +1,6 @@
 package org.escalaralcoiaicomtat.app.ui.model
 
+import androidx.annotation.VisibleForTesting
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,8 @@ abstract class DataScreenModel<Parent : DataTypeWithImage, Children : DataTypeWi
 
     protected var originalChildren: List<Children>? = null
         private set
-    protected val _children = MutableStateFlow<List<Children>?>(null)
+    @VisibleForTesting(VisibleForTesting.PROTECTED)
+    val _children = MutableStateFlow<List<Children>?>(null)
     val children: StateFlow<List<Children>?> get() = _children.asStateFlow()
 
     /**
