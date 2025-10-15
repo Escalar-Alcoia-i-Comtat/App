@@ -12,7 +12,7 @@ coil = "3.3.0"
 compose-googleMaps = "6.12.1"
 compose-mapCompose = "0.10.0"
 compose-markdown = "0.37.0"
-compose-navigation = "2.9.0"
+compose-navigation = "2.9.1"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.9.1"
 compose-richeditor = "1.0.0-rc13"
