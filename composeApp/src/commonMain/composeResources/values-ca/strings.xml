@@ -306,4 +306,6 @@
     <string name="sector_information_phone_signal_carrier">La teva operadora: %1$s</string>
     <string name="editor_phone_signal_availability">Disponibilitat de Senyal Mòbil</string>
     <string name="editor_phone_signal_availability_signal">Senyal</string>
+    <string name="map_error_no_internet">Cap Connexió a Internet</string>
+    <string name="map_error_unknown">Error Desconegut</string>
 </resources>
