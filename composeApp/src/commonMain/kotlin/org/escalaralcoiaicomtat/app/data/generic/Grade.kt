@@ -16,8 +16,8 @@ interface GradeValue {
             val name = value
                 .uppercase()
                 .replace("+", "_PLUS")
-                .replace("E", "_EQUIPPED")
                 .replace("º", "A")
+                .replace("AE", "A_EQUIPPED")
             return SportsGrade.entries.find { it.name.endsWith(name) }
                 ?: AidGrade.entries.find { it.name == name }
                 ?: SportsGrade.UNKNOWN
@@ -91,7 +91,7 @@ enum class AidGrade : GradeValue {
         var string = name
         if (string.endsWith("_PLUS")) string = string.substringBeforeLast("_PLUS") + '+'
         if (string.endsWith("_EQUIPPED")) string = string.substringBeforeLast("_EQUIPPED") + 'e'
-        return string.uppercase()
+        return string
     }
 
     override fun toString(): String = asString()
