@@ -8,12 +8,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import org.escalaralcoiaicomtat.app.ui.color.ColorGroup
-import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade1
-import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade2
-import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade3
-import org.escalaralcoiaicomtat.app.ui.theme.ColorGrade4
-import org.escalaralcoiaicomtat.app.ui.theme.ColorGradeA
-import org.escalaralcoiaicomtat.app.ui.theme.ColorGradeP
+import org.escalaralcoiaicomtat.app.ui.theme.*
 
 interface GradeValue {
     companion object {
@@ -21,6 +16,7 @@ interface GradeValue {
             val name = value
                 .uppercase()
                 .replace("+", "_PLUS")
+                .replace("E", "_EQUIPPED")
                 .replace("º", "A")
             return SportsGrade.entries.find { it.name.endsWith(name) }
                 ?: AidGrade.entries.find { it.name == name }
@@ -88,11 +84,13 @@ enum class AidGrade : GradeValue {
     A2, A2_PLUS,
     A3, A3_PLUS,
     A4, A4_PLUS,
-    A5, A5_PLUS;
+    A5, A5_PLUS,
+    A_EQUIPPED;
 
     override fun asString(): String {
         var string = name
         if (string.endsWith("_PLUS")) string = string.substringBeforeLast("_PLUS") + '+'
+        if (string.endsWith("_EQUIPPED")) string = string.substringBeforeLast("_EQUIPPED") + 'e'
         return string.uppercase()
     }
 
