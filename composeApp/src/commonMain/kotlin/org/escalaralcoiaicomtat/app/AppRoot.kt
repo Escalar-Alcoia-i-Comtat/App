@@ -242,12 +242,14 @@ fun SharedTransitionScope.NavigationController(
                         }.takeIf { editAllowed },
                         onNextSectorRequested = { id ->
                             navController.navigateTo(
-                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id)
+                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id),
+                                popUpTo = route.up(),
                             )
                         },
                         onPreviousSectorRequested = { id ->
                             navController.navigateTo(
-                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id)
+                                Destinations.Sector(route.parentAreaId, route.parentZoneId, id),
+                                popUpTo = route.up(),
                             )
                         }
                     )
