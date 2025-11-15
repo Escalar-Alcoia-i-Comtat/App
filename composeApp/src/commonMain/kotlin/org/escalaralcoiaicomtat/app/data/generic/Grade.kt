@@ -12,14 +12,9 @@ import org.escalaralcoiaicomtat.app.ui.theme.*
 
 interface GradeValue {
     companion object {
-        fun fromString(value: String): GradeValue {
-            val name = value
-                .uppercase()
-                .replace("+", "_PLUS")
-                .replace("º", "A")
-                .replace("AE", "A_EQUIPPED")
-            return SportsGrade.entries.find { it.name.endsWith(name) }
-                ?: AidGrade.entries.find { it.name == name }
+        fun fromString(name: String): GradeValue {
+            return SportsGrade.entries.find { it.name.equals(name, true) }
+                ?: AidGrade.entries.find { it.name.equals(name, true) }
                 ?: SportsGrade.UNKNOWN
         }
     }

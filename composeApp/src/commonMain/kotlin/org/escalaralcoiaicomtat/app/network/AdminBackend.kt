@@ -28,7 +28,6 @@ import org.escalaralcoiaicomtat.app.data.generic.LatLng
 import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
 import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
 import org.escalaralcoiaicomtat.app.data.generic.Point
-import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
 import org.escalaralcoiaicomtat.app.database.DatabaseInterface
 import org.escalaralcoiaicomtat.app.database.SettingsKeys
 import org.escalaralcoiaicomtat.app.database.byType
@@ -180,12 +179,11 @@ object AdminBackend : Backend() {
                     if (stored.sketchId != item.sketchId) append("sketchId", item.sketchId.toInt())
 
                     if (stored.height != item.height) appendOrRemove("height", item.height?.toInt())
-                    if (stored.grade != item.grade) appendOrRemove("grade", item.grade, GradeSerializer)
-                    if (stored.aidGrade != item.aidGrade) appendOrRemove("aidGrade", item.aidGrade, GradeSerializer)
+                    if (stored.grade != item.grade) appendOrRemove("grade", item.grade?.name)
+                    if (stored.aidGrade != item.aidGrade) appendOrRemove("aidGrade", item.aidGrade?.name)
                     if (stored.ending != item.ending) appendOrRemove("ending", item.ending?.name)
 
-                    if (stored.pitches != item.pitches) appendOrRemove("pitches", item.pitches, ListSerializer(
-                        PitchInfo.serializer()))
+                    if (stored.pitches != item.pitches) appendOrRemove("pitches", item.pitches, ListSerializer(PitchInfo.serializer()))
 
                     if (stored.stringCount != item.stringCount) appendOrRemove("stringCount", item.stringCount?.toInt())
                     if (stored.paraboltCount != item.paraboltCount) appendOrRemove("paraboltCount", item.paraboltCount?.toInt())
@@ -205,8 +203,7 @@ object AdminBackend : Backend() {
                     if (stored.description != item.description) appendOrRemove("description", item.description)
 
                     if (stored.builder != item.builder) appendOrRemove("builder", item.builder, Builder.serializer())
-                    if (stored.reBuilders != item.reBuilders) appendOrRemove("reBuilder", item.reBuilders, ListSerializer(
-                        Builder.serializer()))
+                    if (stored.reBuilders != item.reBuilders) appendOrRemove("reBuilder", item.reBuilders, ListSerializer(Builder.serializer()))
 
                     // TODO: Upload and remove images
                 }
@@ -308,12 +305,11 @@ object AdminBackend : Backend() {
                 append("sketchId", item.sketchId.toInt())
 
                 if (item.height != null) append("height", item.height.toInt())
-                if (item.grade != null) appendSerializable("grade", item.grade, GradeSerializer)
-                if (item.aidGrade != null) appendSerializable("aidGrade", item.aidGrade, GradeSerializer)
+                if (item.grade != null) append("grade", item.grade.name)
+                if (item.aidGrade != null) append("aidGrade", item.aidGrade.name)
                 if (item.ending != null) append("ending", item.ending.name)
 
-                if (item.pitches != null) appendSerializable("pitches", item.pitches, ListSerializer(
-                    PitchInfo.serializer()))
+                if (item.pitches != null) appendSerializable("pitches", item.pitches, ListSerializer(PitchInfo.serializer()))
 
                 if (item.stringCount != null) append("stringCount", item.stringCount.toInt())
                 if (item.paraboltCount != null) append("paraboltCount", item.paraboltCount.toInt())
@@ -333,8 +329,7 @@ object AdminBackend : Backend() {
                 if (item.description != null) append("description", item.description)
 
                 if (item.builder != null) appendSerializable("builder", item.builder, Builder.serializer())
-                if (item.reBuilders != null) appendSerializable("reBuilder", item.reBuilders, ListSerializer(
-                    Builder.serializer()))
+                if (item.reBuilders != null) appendSerializable("reBuilder", item.reBuilders, ListSerializer(Builder.serializer()))
 
                 // TODO: Upload and remove images
             }
