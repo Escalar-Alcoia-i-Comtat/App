@@ -308,4 +308,14 @@
     <string name="editor_phone_signal_availability_signal">Senyal</string>
     <string name="map_error_no_internet">Cap Connexió a Internet</string>
     <string name="map_error_unknown">Error Desconegut</string>
+    <string name="path_safes_unknown">Desconegut</string>
+    <string name="path_safes_count_help">Deixa buit per a eliminar, estableix a 0 per a establir com a indeterminat, o introdueix un número positiu per establir la quantitat de segurs instal·lats.</string>
+    <string name="path_required_material_title">Material Necessari</string>
+    <string name="path_required_material_message">Per escalar aquesta via, cal que dugues %1$s.</string>
+    <string name="path_required_material_nut">empotradors</string>
+    <string name="path_required_material_friend">friends</string>
+    <string name="path_required_material_lanyard">cordins</string>
+    <string name="path_required_material_nail">ungles</string>
+    <string name="path_required_material_piton">claus</string>
+    <string name="path_required_material_stapes">estrips</string>
 </resources>
