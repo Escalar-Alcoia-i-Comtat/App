@@ -164,6 +164,7 @@
     <string name="path_safes_types">This route is equipped with %1$s</string>
     <string name="path_safes_and">and</string>
     <string name="path_safes_unknown">Unknown</string>
+    <string name="path_safes_count_help">Leave empty to remove, set to 0 to set indeterminate, or introduce a positive amount to set the amount of safes installed.</string>
     <string name="path_builder_message">This path was built %s.</string>
     <string name="path_re_builder_message">This path was re-built %s.</string>
     <string name="path_builder_name">by %s</string>

@@ -584,6 +584,7 @@ private fun <DT : DataType> EditorContent(
                 }
             },
             trailingContent = { IndeterminateCheckBox(item.paraboltCount) { onUpdateItem(item.copy(paraboltCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
             readOnly = item.paraboltCount == AMOUNT_UNKNOWN,
             textStyle = LocalTextStyle.current.copy(fontStyle = if (item.paraboltCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_parabolt_count_label),
@@ -601,6 +602,7 @@ private fun <DT : DataType> EditorContent(
                 }
             },
             trailingContent = { IndeterminateCheckBox(item.burilCount) { onUpdateItem(item.copy(burilCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
             readOnly = item.burilCount == AMOUNT_UNKNOWN,
             textStyle = LocalTextStyle.current.copy(fontStyle = if (item.burilCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_buril_count_label),
@@ -618,6 +620,7 @@ private fun <DT : DataType> EditorContent(
                 }
             },
             trailingContent = { IndeterminateCheckBox(item.pitonCount) { onUpdateItem(item.copy(pitonCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
             readOnly = item.pitonCount == AMOUNT_UNKNOWN,
             textStyle = LocalTextStyle.current.copy(fontStyle = if (item.pitonCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_piton_count_label),
@@ -635,6 +638,7 @@ private fun <DT : DataType> EditorContent(
                 }
             },
             trailingContent = { IndeterminateCheckBox(item.spitCount) { onUpdateItem(item.copy(spitCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
             readOnly = item.spitCount == AMOUNT_UNKNOWN,
             textStyle = LocalTextStyle.current.copy(fontStyle = if (item.spitCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_spit_count_label),
@@ -652,6 +656,7 @@ private fun <DT : DataType> EditorContent(
                 }
             },
             trailingContent = { IndeterminateCheckBox(item.tensorCount) { onUpdateItem(item.copy(tensorCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
             readOnly = item.tensorCount == AMOUNT_UNKNOWN,
             textStyle = LocalTextStyle.current.copy(fontStyle = if (item.tensorCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_tensor_count_label),

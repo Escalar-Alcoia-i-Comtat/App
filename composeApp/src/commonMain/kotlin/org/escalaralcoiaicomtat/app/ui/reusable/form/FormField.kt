@@ -25,6 +25,7 @@ fun FormField(
     singleLine: Boolean = true,
     enabled: Boolean = true,
     readOnly: Boolean = false,
+    supportingText: String? = null,
     textStyle: TextStyle = LocalTextStyle.current,
     capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
     thisFocusRequester: FocusRequester? = null,
@@ -62,7 +63,9 @@ fun FormField(
             onGo = { onGo?.invoke() },
         ),
         isError = error != null,
-        supportingText = error?.let {
+        supportingText = supportingText?.let {
+            { Text(it) }
+        } ?: error?.let {
             { Text(it) } // , color = MaterialTheme.colorScheme.error
         },
         trailingIcon = trailingContent,
