@@ -2,6 +2,7 @@ package org.escalaralcoiaicomtat.app.ui.reusable.form
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -9,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,6 +25,7 @@ fun FormField(
     singleLine: Boolean = true,
     enabled: Boolean = true,
     readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
     capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
     thisFocusRequester: FocusRequester? = null,
     nextFocusRequester: FocusRequester? = null,
@@ -39,6 +42,7 @@ fun FormField(
         modifier = modifier.applyIfNotNull(thisFocusRequester) { focusRequester(it) },
         singleLine = singleLine,
         enabled = enabled,
+        textStyle = textStyle,
         readOnly = readOnly,
         label = { Text(label) },
         keyboardOptions = KeyboardOptions(

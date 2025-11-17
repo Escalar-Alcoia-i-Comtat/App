@@ -163,6 +163,7 @@
     <string name="path_safes_count">The path has the following safes installed:</string>
     <string name="path_safes_types">This route is equipped with %1$s</string>
     <string name="path_safes_and">and</string>
+    <string name="path_safes_unknown">Unknown</string>
     <string name="path_builder_message">This path was built %s.</string>
     <string name="path_re_builder_message">This path was re-built %s.</string>
     <string name="path_builder_name">by %s</string>

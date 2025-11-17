@@ -29,7 +29,11 @@ sealed class SafeType(
 
     @Composable
     fun text(): String? = amount?.let {
-        if (amount == 0u) stringResource(uncountableStringRes)
+        if (amount == AMOUNT_UNKNOWN) stringResource(uncountableStringRes)
         else stringResource(countableStringRes, amount)
+    }
+
+    companion object {
+        const val AMOUNT_UNKNOWN = 0u
     }
 }
