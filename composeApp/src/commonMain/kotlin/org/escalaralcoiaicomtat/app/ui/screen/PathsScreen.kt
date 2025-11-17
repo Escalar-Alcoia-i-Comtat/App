@@ -105,6 +105,16 @@ fun PathsScreen(
         }
     }
 
+    LaunchedEffect(paths) {
+        val selectedPath = selectedPath
+        if (selectedPath != null) {
+            // Re-select the path from the updated list to have the latest data
+            // May be null, this means the path has been deleted
+            val path = paths?.find { it.id == selectedPath.id }
+            viewModel.selectChild(path)
+        }
+    }
+
     PathsScreen(
         sector = sector,
         paths = paths,

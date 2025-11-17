@@ -2,52 +2,13 @@ package org.escalaralcoiaicomtat.app.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Badge
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -63,45 +24,18 @@ import escalaralcoiaicomtat.composeapp.generated.resources.*
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import kotlinx.coroutines.launch
-import org.escalaralcoiaicomtat.app.data.DataType
-import org.escalaralcoiaicomtat.app.data.DataTypeWithImage
-import org.escalaralcoiaicomtat.app.data.DataTypeWithParent
-import org.escalaralcoiaicomtat.app.data.DataTypeWithPoint
-import org.escalaralcoiaicomtat.app.data.DataTypeWithPoints
-import org.escalaralcoiaicomtat.app.data.DataTypes
-import org.escalaralcoiaicomtat.app.data.Path
-import org.escalaralcoiaicomtat.app.data.Sector
-import org.escalaralcoiaicomtat.app.data.Zone
+import org.escalaralcoiaicomtat.app.data.*
 import org.escalaralcoiaicomtat.app.data.editable.EditableExternalTrack
 import org.escalaralcoiaicomtat.app.data.editable.EditablePitchInfo
 import org.escalaralcoiaicomtat.app.data.editable.EditablePoint
-import org.escalaralcoiaicomtat.app.data.generic.AidGrade
-import org.escalaralcoiaicomtat.app.data.generic.Builder
-import org.escalaralcoiaicomtat.app.data.generic.Ending
-import org.escalaralcoiaicomtat.app.data.generic.EndingInclination
-import org.escalaralcoiaicomtat.app.data.generic.EndingInfo
-import org.escalaralcoiaicomtat.app.data.generic.ExternalTrack
-import org.escalaralcoiaicomtat.app.data.generic.LatLng
-import org.escalaralcoiaicomtat.app.data.generic.PhoneCarrier
-import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalAvailability
-import org.escalaralcoiaicomtat.app.data.generic.PhoneSignalStrength
-import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
-import org.escalaralcoiaicomtat.app.data.generic.Point
-import org.escalaralcoiaicomtat.app.data.generic.SportsGrade
-import org.escalaralcoiaicomtat.app.data.generic.SunTime
-import org.escalaralcoiaicomtat.app.data.generic.color
+import org.escalaralcoiaicomtat.app.data.generic.*
+import org.escalaralcoiaicomtat.app.data.generic.SafeType.Companion.AMOUNT_UNKNOWN
 import org.escalaralcoiaicomtat.app.exception.StringException
 import org.escalaralcoiaicomtat.app.platform.clipEntryOf
 import org.escalaralcoiaicomtat.app.ui.dialog.DeleteConfirmationDialog
 import org.escalaralcoiaicomtat.app.ui.model.EditorModel
 import org.escalaralcoiaicomtat.app.ui.reusable.editor.RichTextEditor
-import org.escalaralcoiaicomtat.app.ui.reusable.form.FormDropdown
-import org.escalaralcoiaicomtat.app.ui.reusable.form.FormField
-import org.escalaralcoiaicomtat.app.ui.reusable.form.FormFilePicker
-import org.escalaralcoiaicomtat.app.ui.reusable.form.FormImagePicker
-import org.escalaralcoiaicomtat.app.ui.reusable.form.FormListCreator
-import org.escalaralcoiaicomtat.app.ui.reusable.form.FormOptionPicker
-import org.escalaralcoiaicomtat.app.ui.reusable.form.FormToggleSwitch
+import org.escalaralcoiaicomtat.app.ui.reusable.form.*
 import org.escalaralcoiaicomtat.app.ui.state.LaunchedKeyEvent
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -604,6 +538,27 @@ private fun <DT : DataType> EditorContent(
             enabled = !isLoading,
         )
 
+        @Composable
+        fun IndeterminateCheckBox(count: UInt?, onCountChange: (UInt?) -> Unit) {
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Left),
+                state = rememberTooltipState(),
+                tooltip = { PlainTooltip { Text(stringResource(Res.string.path_safes_unknown)) } },
+            ) {
+                Checkbox(
+                    checked = count == AMOUNT_UNKNOWN,
+                    onCheckedChange = { checked ->
+                        // If checked, set to AMOUNT_UNKNOWN, else set to null
+                        if (checked) onCountChange(AMOUNT_UNKNOWN)
+                        else onCountChange(null)
+                    },
+                )
+            }
+        }
+
+        @Composable
+        fun formFieldSafesCountValue(count: UInt?) = if (count == AMOUNT_UNKNOWN) stringResource(Res.string.path_safes_unknown) else count?.toString()
+
         FormField(
             value = item.stringCount?.toString(),
             onValueChange = { value ->
@@ -619,7 +574,7 @@ private fun <DT : DataType> EditorContent(
             enabled = !isLoading,
         )
         FormField(
-            value = item.paraboltCount?.toString(),
+            value = formFieldSafesCountValue(item.paraboltCount),
             onValueChange = { value ->
                 if (value.isBlank()) {
                     onUpdateItem(item.copy(paraboltCount = null))
@@ -628,12 +583,16 @@ private fun <DT : DataType> EditorContent(
                     onUpdateItem(item.copy(paraboltCount = number))
                 }
             },
+            trailingContent = { IndeterminateCheckBox(item.paraboltCount) { onUpdateItem(item.copy(paraboltCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
+            readOnly = item.paraboltCount == AMOUNT_UNKNOWN,
+            textStyle = LocalTextStyle.current.copy(fontStyle = if (item.paraboltCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_parabolt_count_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
         )
         FormField(
-            value = item.burilCount?.toString(),
+            value = formFieldSafesCountValue(item.burilCount),
             onValueChange = { value ->
                 if (value.isBlank()) {
                     onUpdateItem(item.copy(burilCount = null))
@@ -642,12 +601,16 @@ private fun <DT : DataType> EditorContent(
                     onUpdateItem(item.copy(burilCount = number))
                 }
             },
+            trailingContent = { IndeterminateCheckBox(item.burilCount) { onUpdateItem(item.copy(burilCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
+            readOnly = item.burilCount == AMOUNT_UNKNOWN,
+            textStyle = LocalTextStyle.current.copy(fontStyle = if (item.burilCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_buril_count_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
         )
         FormField(
-            value = item.pitonCount?.toString(),
+            value = formFieldSafesCountValue(item.pitonCount),
             onValueChange = { value ->
                 if (value.isBlank()) {
                     onUpdateItem(item.copy(pitonCount = null))
@@ -656,12 +619,16 @@ private fun <DT : DataType> EditorContent(
                     onUpdateItem(item.copy(pitonCount = number))
                 }
             },
+            trailingContent = { IndeterminateCheckBox(item.pitonCount) { onUpdateItem(item.copy(pitonCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
+            readOnly = item.pitonCount == AMOUNT_UNKNOWN,
+            textStyle = LocalTextStyle.current.copy(fontStyle = if (item.pitonCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_piton_count_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
         )
         FormField(
-            value = item.spitCount?.toString(),
+            value = formFieldSafesCountValue(item.spitCount),
             onValueChange = { value ->
                 if (value.isBlank()) {
                     onUpdateItem(item.copy(spitCount = null))
@@ -670,12 +637,16 @@ private fun <DT : DataType> EditorContent(
                     onUpdateItem(item.copy(spitCount = number))
                 }
             },
+            trailingContent = { IndeterminateCheckBox(item.spitCount) { onUpdateItem(item.copy(spitCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
+            readOnly = item.spitCount == AMOUNT_UNKNOWN,
+            textStyle = LocalTextStyle.current.copy(fontStyle = if (item.spitCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_spit_count_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,
         )
         FormField(
-            value = item.tensorCount?.toString(),
+            value = formFieldSafesCountValue(item.tensorCount),
             onValueChange = { value ->
                 if (value.isBlank()) {
                     onUpdateItem(item.copy(tensorCount = null))
@@ -684,6 +655,10 @@ private fun <DT : DataType> EditorContent(
                     onUpdateItem(item.copy(tensorCount = number))
                 }
             },
+            trailingContent = { IndeterminateCheckBox(item.tensorCount) { onUpdateItem(item.copy(tensorCount = it)) } },
+            supportingText = stringResource(Res.string.path_safes_count_help),
+            readOnly = item.tensorCount == AMOUNT_UNKNOWN,
+            textStyle = LocalTextStyle.current.copy(fontStyle = if (item.tensorCount == AMOUNT_UNKNOWN) FontStyle.Italic else FontStyle.Normal),
             label = stringResource(Res.string.editor_tensor_count_label),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             enabled = !isLoading,

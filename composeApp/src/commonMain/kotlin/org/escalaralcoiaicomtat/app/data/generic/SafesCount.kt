@@ -63,8 +63,10 @@ class SafesCount(
             }
             append(before)
             if (types.size == 1) withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                // Only one type, just show it
                 append(types.first().text()!!)
             } else {
+                // Multiple types, show them separated by commas and finish with "and"
                 val butLast = types.dropLast(1)
                 for (type in butLast) {
                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
