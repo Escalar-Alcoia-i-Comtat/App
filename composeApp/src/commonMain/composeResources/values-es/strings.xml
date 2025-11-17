@@ -308,4 +308,14 @@
     <string name="editor_phone_signal_availability_signal">Señal</string>
     <string name="map_error_no_internet">Cap Connexió a Internet</string>
     <string name="map_error_unknown">Error Desconegut</string>
+    <string name="path_safes_unknown">Desconocido</string>
+    <string name="path_safes_count_help">Deja en blanco para eliminar, pon a 0 para indeterminado, o introduce una cantidad positiva para establecer la cantidad de seguros instalados.</string>
+    <string name="path_required_material_title">Material Necesario</string>
+    <string name="path_required_material_message">Para escalar esta vía, es necesario que traigas %1$s.</string>
+    <string name="path_required_material_nut">empotradores</string>
+    <string name="path_required_material_friend">friends</string>
+    <string name="path_required_material_lanyard">cordinos</string>
+    <string name="path_required_material_nail">uñas</string>
+    <string name="path_required_material_piton">clavos</string>
+    <string name="path_required_material_stapes">estribos</string>
 </resources>
