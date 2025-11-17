@@ -46,7 +46,7 @@ data class RequiredRouteMaterial(
                 return ""
             }
             1 -> {
-                when {
+                "**" + when {
                     nutRequired -> stringResource(Res.string.path_required_material_nut)
                     friendRequired -> stringResource(Res.string.path_required_material_friend)
                     lanyardRequired -> stringResource(Res.string.path_required_material_lanyard)
@@ -54,16 +54,16 @@ data class RequiredRouteMaterial(
                     pitonRequired -> stringResource(Res.string.path_required_material_piton)
                     stapesRequired -> stringResource(Res.string.path_required_material_stapes)
                     else -> "" // should not be possible
-                }
+                } + "**"
             }
             else -> {
                 val materials = mutableListOf<String>()
-                if (nutRequired) materials.add(stringResource(Res.string.path_required_material_nut))
-                if (friendRequired) materials.add(stringResource(Res.string.path_required_material_friend))
-                if (lanyardRequired) materials.add(stringResource(Res.string.path_required_material_lanyard))
-                if (nailRequired) materials.add(stringResource(Res.string.path_required_material_nail))
-                if (pitonRequired) materials.add(stringResource(Res.string.path_required_material_piton))
-                if (stapesRequired) materials.add(stringResource(Res.string.path_required_material_stapes))
+                if (nutRequired) materials.add("**" + stringResource(Res.string.path_required_material_nut) + "**")
+                if (friendRequired) materials.add("**" + stringResource(Res.string.path_required_material_friend) + "**")
+                if (lanyardRequired) materials.add("**" + stringResource(Res.string.path_required_material_lanyard) + "**")
+                if (nailRequired) materials.add("**" + stringResource(Res.string.path_required_material_nail) + "**")
+                if (pitonRequired) materials.add("**" + stringResource(Res.string.path_required_material_piton) + "**")
+                if (stapesRequired) materials.add("**" + stringResource(Res.string.path_required_material_stapes) + "**")
 
                 materials.joinToString(separator = ", ")
             }
