@@ -5,12 +5,7 @@ package org.escalaralcoiaicomtat.app.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.escalaralcoiaicomtat.app.data.generic.Builder
-import org.escalaralcoiaicomtat.app.data.generic.Ending
-import org.escalaralcoiaicomtat.app.data.generic.GradeContainer
-import org.escalaralcoiaicomtat.app.data.generic.GradeValue
-import org.escalaralcoiaicomtat.app.data.generic.PitchInfo
-import org.escalaralcoiaicomtat.app.data.generic.SafesCount
+import org.escalaralcoiaicomtat.app.data.generic.*
 import org.escalaralcoiaicomtat.app.data.serialization.GradeSerializer
 import org.escalaralcoiaicomtat.app.data.serialization.UuidSerializer
 import kotlin.uuid.Uuid
@@ -55,6 +50,7 @@ data class Path(
     @SerialName("sector_id") val parentSectorId: Long
 ) : DataType, DataTypeWithParent, GradeContainer {
     val safes: SafesCount get() = SafesCount(this)
+    val requiredMaterial: RequiredRouteMaterial get() = RequiredRouteMaterial(this)
 
     override fun compareTo(other: DataType): Int {
         return (other as? Path)
