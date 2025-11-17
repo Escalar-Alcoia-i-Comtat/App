@@ -57,10 +57,7 @@ import org.escalaralcoiaicomtat.app.platform.launchPoint
 import org.escalaralcoiaicomtat.app.platform.launchUrl
 import org.escalaralcoiaicomtat.app.ui.composition.LocalUnitsConfiguration
 import org.escalaralcoiaicomtat.app.ui.dialog.EditBlockingDialog
-import org.escalaralcoiaicomtat.app.ui.icons.ClimbingAnchor
-import org.escalaralcoiaicomtat.app.ui.icons.ClimbingHelmet
-import org.escalaralcoiaicomtat.app.ui.icons.ClimbingShoes
-import org.escalaralcoiaicomtat.app.ui.icons.Rope
+import org.escalaralcoiaicomtat.app.ui.icons.*
 import org.escalaralcoiaicomtat.app.ui.list.PathListItem
 import org.escalaralcoiaicomtat.app.ui.model.PathsScreenModel
 import org.escalaralcoiaicomtat.app.ui.modifier.sharedElement
@@ -779,6 +776,9 @@ private fun LazyListScope.bottomSheetContents(
         )
     }
     countMetaCard(child.safes)
+    if (child.requiredMaterial.isNotFalse()) {
+        requiredMaterialMetaCard(child.requiredMaterial)
+    }
     if (child.ending != null) item {
         MetaCard(
             icon = Icons.Filled.SwipeDownAlt,
@@ -849,7 +849,7 @@ private fun LazyListScope.bottomSheetContents(
             }.toString()
         }
         MetaCard(
-            icon = Icons.Filled.ClimbingHelmet,
+            icon = Icons.Filled.ClimbingAnchor,
             text = text,
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
         )
@@ -867,7 +867,7 @@ private fun LazyListScope.bottomSheetContents(
 private fun LazyListScope.countMetaCard(safes: SafesCount) {
     if (safes.isNotNull) item {
         MetaCard(
-            icon = Icons.Filled.ClimbingAnchor,
+            icon = Icons.Filled.Quickdraw,
             text = stringResource(Res.string.path_quickdraws_title),
             bigText = safes.stringCount?.toInt().let {
                 stringResource(
@@ -880,9 +880,19 @@ private fun LazyListScope.countMetaCard(safes: SafesCount) {
     }
 }
 
+private fun LazyListScope.requiredMaterialMetaCard(requiredMaterial: RequiredRouteMaterial) {
+    item {
+        MetaCard(
+            icon = Icons.Filled.ClimbingHelmet,
+            text = stringResource(Res.string.path_required_material_title),
+            textMarkdown = requiredMaterial.text(),
+        )
+    }
+}
+
 @Preview
 @Composable
-private fun countMetaCard_parabolts_unknownAmount_Preview() {
+private fun CountMetaCard_parabolts_unknownAmount_Preview() {
     LazyColumn {
         countMetaCard(
             SafesCount(paraboltCount = 0u)
