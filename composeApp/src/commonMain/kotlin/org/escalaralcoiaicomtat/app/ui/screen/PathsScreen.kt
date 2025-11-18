@@ -681,7 +681,7 @@ private fun LazyListScope.bottomSheetContents(
     onEditBlockingRequested: ((Blocking) -> Unit)?,
     onDismissRequested: () -> Unit
 ) {
-    item {
+    item("header") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -724,7 +724,7 @@ private fun LazyListScope.bottomSheetContents(
             }
         }
     }
-    items(blocks) { blocking ->
+    items(blocks, key = { "blocking_${it.id}" }, contentType = { "blocking" }) { blocking ->
         MetaCard(
             icon = blocking.type.icon,
             text = stringResource(Res.string.path_blocking_title),
@@ -752,7 +752,7 @@ private fun LazyListScope.bottomSheetContents(
             onClick = onEditBlockingRequested?.let { { it(blocking) } },
         )
     }
-    if (child.height != null) item {
+    if (child.height != null) item("height") {
         val localUnitsConfiguration = LocalUnitsConfiguration.current
         MetaCard(
             icon = Icons.Filled.Rope,
@@ -765,7 +765,7 @@ private fun LazyListScope.bottomSheetContents(
                 .padding(vertical = 4.dp)
         )
     }
-    if ((child.grade != null && child.grade != SportsGrade.UNKNOWN) || child.aidGrade != null) item {
+    if ((child.grade != null && child.grade != SportsGrade.UNKNOWN) || child.aidGrade != null) item("grade") {
         MetaCard(
             icon = Icons.Filled.ClimbingShoes,
             text = stringResource(Res.string.path_grade),
@@ -775,11 +775,13 @@ private fun LazyListScope.bottomSheetContents(
                 .padding(vertical = 4.dp)
         )
     }
-    countMetaCard(child.safes)
+    if (child.safes.isNotNull) {
+        countMetaCard(child.safes)
+    }
     if (child.requiredMaterial.isNotFalse()) {
         requiredMaterialMetaCard(child.requiredMaterial)
     }
-    if (child.ending != null) item {
+    if (child.ending != null) item("ending") {
         MetaCard(
             icon = Icons.Filled.SwipeDownAlt,
             text = stringResource(Res.string.path_ending),
@@ -789,7 +791,7 @@ private fun LazyListScope.bottomSheetContents(
                 .padding(vertical = 4.dp)
         )
     }
-    if (!child.pitches.isNullOrEmpty()) item {
+    if (!child.pitches.isNullOrEmpty()) item("pitches") {
         val pitches = child.pitches.sortedBy { it.pitch }
         MetaCard(
             icon = Icons.AutoMirrored.Filled.ListAlt,
@@ -807,47 +809,45 @@ private fun LazyListScope.bottomSheetContents(
     }
     val pathBuilder = child.builder?.orNull()
     val pathReBuilders = child.reBuilders?.mapNotNull { it.orNull() }
-    if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) item {
-        var text by remember { mutableStateOf("") }
-        LaunchedEffect(Unit) {
-            val name = pathBuilder?.name
-            val date = pathBuilder?.date
-            text = StringBuilder().apply {
-                if (name != null || date != null) {
-                    appendLine(
-                        getString(Res.string.path_builder_message).format(
-                            if (name != null && date != null) {
-                                getString(Res.string.path_builder_name_date).format(name, date)
-                            } else if (name == null && date != null) {
-                                getString(Res.string.path_builder_date).format(date)
-                            } else if (name != null && date == null) {
-                                getString(Res.string.path_builder_name).format(name)
-                            } else {
-                                "" // never reached
-                            }
-                        )
+    if (pathBuilder != null || pathReBuilders?.isNotEmpty() == true) item("path_builders") {
+        val name = pathBuilder?.name
+        val date = pathBuilder?.date
+        val text = StringBuilder().apply {
+            if (name != null || date != null) {
+                appendLine(
+                    stringResource(Res.string.path_builder_message).format(
+                        if (name != null && date != null) {
+                            stringResource(Res.string.path_builder_name_date).format(name, date)
+                        } else if (name == null && date != null) {
+                            stringResource(Res.string.path_builder_date).format(date)
+                        } else if (name != null && date == null) {
+                            stringResource(Res.string.path_builder_name).format(name)
+                        } else {
+                            "" // never reached
+                        }
                     )
-                }
-                pathReBuilders?.forEach { builder ->
-                    appendLine(
-                        getString(Res.string.path_re_builder_message).format(
-                            if (builder.name != null && builder.date != null) {
-                                getString(Res.string.path_builder_name_date)
-                                    .format(builder.name, builder.date)
-                            } else if (builder.name == null && builder.date != null) {
-                                getString(Res.string.path_builder_date)
-                                    .format(builder.date)
-                            } else if (builder.name != null && builder.date == null) {
-                                getString(Res.string.path_builder_name)
-                                    .format(builder.name)
-                            } else {
-                                "" // never reached
-                            }
-                        )
+                )
+            }
+            pathReBuilders?.forEach { builder ->
+                appendLine(
+                    stringResource(Res.string.path_re_builder_message).format(
+                        if (builder.name != null && builder.date != null) {
+                            stringResource(Res.string.path_builder_name_date)
+                                .format(builder.name, builder.date)
+                        } else if (builder.name == null && builder.date != null) {
+                            stringResource(Res.string.path_builder_date)
+                                .format(builder.date)
+                        } else if (builder.name != null && builder.date == null) {
+                            stringResource(Res.string.path_builder_name)
+                                .format(builder.name)
+                        } else {
+                            "" // never reached
+                        }
                     )
-                }
-            }.toString()
-        }
+                )
+            }
+        }.toString()
+
         MetaCard(
             icon = Icons.Filled.ClimbingAnchor,
             text = text,
@@ -865,7 +865,7 @@ private fun LazyListScope.bottomSheetContents(
 }
 
 private fun LazyListScope.countMetaCard(safes: SafesCount) {
-    if (safes.isNotNull) item {
+    item("safes") {
         MetaCard(
             icon = Icons.Filled.Quickdraw,
             text = stringResource(Res.string.path_quickdraws_title),
@@ -881,7 +881,7 @@ private fun LazyListScope.countMetaCard(safes: SafesCount) {
 }
 
 private fun LazyListScope.requiredMaterialMetaCard(requiredMaterial: RequiredRouteMaterial) {
-    item {
+    item("required_material") {
         MetaCard(
             icon = Icons.Filled.ClimbingHelmet,
             text = stringResource(Res.string.path_required_material_title),
