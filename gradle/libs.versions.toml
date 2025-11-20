@@ -42,7 +42,7 @@ sentry-android = "5.12.2"
 sentry-multiplatform = "0.21.0"
 semver = "3.0.0"
 zoomimage = "1.4.0"
-roomKtx = "2.8.3"
+roomKtx = "2.8.4"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
