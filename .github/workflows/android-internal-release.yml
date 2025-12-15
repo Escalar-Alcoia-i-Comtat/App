@@ -85,7 +85,7 @@ jobs:
         run: ./gradlew :composeApp:bundleRelease
       - name: AAB Artifact
         id: aab_artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: AAB Artifact
           path: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
