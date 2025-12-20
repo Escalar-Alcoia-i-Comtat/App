@@ -11,7 +11,7 @@ buildkonfig = "0.17.1"
 coil = "3.3.0"
 compose-googleMaps = "7.0.0"
 compose-mapCompose = "0.12.0"
-compose-markdown = "0.38.1"
+compose-markdown = "0.39.0"
 compose-navigation = "2.9.1"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
 compose-plugin = "1.9.3"
