@@ -2,7 +2,7 @@
 # View compatibility in: https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-compatibility-guide.html
 #noinspection AndroidGradlePluginVersion
 agp = "8.13.0"
-androidx-activityCompose = "1.12.2"
+androidx-activityCompose = "1.12.3"
 androidx-appcompat = "1.7.1"
 androidx-sqlite-bundled = "2.6.2"
 androidx-test-runner = "1.7.0"
