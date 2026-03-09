@@ -39,7 +39,7 @@ jobs:
           ./gradlew :composeApp:wasmJsBrowserDevelopmentExecutableDistribution --stacktrace --no-daemon
 
       - name: Build and push development
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: arnyminerz/escalaralcoiaicomtat-web:development
