@@ -252,7 +252,7 @@ jobs:
 
       # Build and push the release image, tagging it as latest and the release tag
       - name: Build and push release
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         if: ${{ github.event_name == 'release' }}
         with:
           push: true
