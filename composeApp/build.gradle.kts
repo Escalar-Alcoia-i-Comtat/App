@@ -344,7 +344,7 @@ dependencies {
 
 android {
     namespace = "org.escalaralcoiaicomtat.android"
-    compileSdk = 36
+    compileSdk = 37
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -353,7 +353,7 @@ android {
     defaultConfig {
         applicationId = "org.escalaralcoiaicomtat.android"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
 
         versionName = appVersionName
         versionCode = appVersionCode.toInt()
