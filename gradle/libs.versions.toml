@@ -10,7 +10,7 @@ androidx-work = "2.11.2"
 buildkonfig = "0.21.2"
 coil = "3.4.0"
 compose-googleMaps = "8.3.0"
-compose-mapCompose = "0.12.1"
+compose-mapCompose = "0.13.1"
 compose-markdown = "0.41.0"
 compose-navigation = "2.9.2"
 # Check latest at https://github.com/JetBrains/compose-multiplatform/releases
