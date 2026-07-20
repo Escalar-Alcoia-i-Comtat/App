@@ -19,8 +19,9 @@ class UnitsConfiguration {
         return DistanceUnits.valueOf(units)
     }
 
-    fun setUnits(units: DistanceUnits) {
+    fun setUnits(units: DistanceUnits, isManual: Boolean = true) {
         settings[SettingsKeys.DISTANCE_UNITS] = units.name
+        settings[SettingsKeys.DISTANCE_UNITS_SYSTEM] = !isManual
     }
 
     @ExperimentalSettingsApi
