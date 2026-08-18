@@ -3,7 +3,7 @@
 #noinspection AndroidGradlePluginVersion
 agp = "9.0.0"
 androidx-activityCompose = "1.13.0"
-androidx-appcompat = "1.7.1"
+androidx-appcompat = "1.8.0"
 androidx-sqlite-bundled = "2.7.0"
 androidx-test-runner = "1.7.0"
 androidx-work = "2.11.2"
