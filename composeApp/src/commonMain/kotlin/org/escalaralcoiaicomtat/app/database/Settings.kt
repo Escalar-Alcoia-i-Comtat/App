@@ -41,6 +41,13 @@ object SettingsKeys {
     const val DISTANCE_UNITS = "distance_units"
 
     /**
+     * Whether the distance units preference was set by the user or the system.
+     *
+     * Only used by Android since it allows setting distance units system-wide.
+     */
+    const val DISTANCE_UNITS_SYSTEM = "distance_units_system"
+
+    /**
      * The API key that allows the user to edit the data.
      */
     const val API_KEY = "api_key"
