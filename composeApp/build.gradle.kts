@@ -2,6 +2,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
@@ -9,16 +10,14 @@ import java.util.Calendar
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.androidApplication)
     alias(libs.plugins.buildkonfig)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.gms)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinMultiplatformAndroid)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
-    alias(libs.plugins.sentry.android)
 }
 
 fun readProperties(fileName: String): Properties? {
@@ -71,7 +70,34 @@ kotlin {
         binaries.executable()
     }
 
-    androidTarget()
+    android {
+        namespace = "org.escalaralcoiaicomtat.app"
+        compileSdk {
+            version = release(37) {
+                minorApiLevel = 0
+            }
+        }
+        minSdk = 24
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+
+        // androidMain/res holds strings and drawables used by the Android sources
+        androidResources {
+            enable = true
+        }
+
+        withHostTest {}
+
+        withDeviceTestBuilder {
+            // A tree of its own: sharing "test" (jvmTest/commonTest's tree) would pull the whole commonTest suite
+            // onto the emulator too -- slow, and commonTest assumes a plain JVM, not Android/JUnit4.
+            sourceSetTreeName = "instrumentedTest"
+        }.configure {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
+    }
 
     listOf(
         iosX64(),
@@ -205,7 +231,7 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
+        androidMain {
             dependsOn(mobileMain)
             dependsOn(jvmMain)
 
@@ -229,6 +255,9 @@ kotlin {
                 // WorkManager
                 implementation(libs.androidx.work.runtime)
 
+                // Room
+                implementation(libs.androidx.room.ktx)
+
                 // App Update Check
                 implementation(libs.play.appupdate)
 
@@ -240,7 +269,7 @@ kotlin {
                 implementation(libs.firebase.messaging)
             }
         }
-        val androidUnitTest by getting {
+        getByName("androidHostTest") {
             dependencies {
                 implementation(libs.androidx.test.runner)
 
@@ -249,7 +278,7 @@ kotlin {
                 implementation(libs.mockk.core)
             }
         }
-        val androidInstrumentedTest by getting {
+        getByName("androidDeviceTest") {
             dependencies {
                 implementation(libs.androidx.test.runner)
 
@@ -327,9 +356,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(libs.androidx.room.ktx)
-    debugImplementation(compose.uiTooling)
-
     // Room Compilers
     add("kspCommonMainMetadata", libs.room.compiler)
 
@@ -340,69 +366,6 @@ dependencies {
     add("kspIosSimulatorArm64", libs.room.compiler)
 
     add("kspDesktop", libs.room.compiler)
-}
-
-android {
-    namespace = "org.escalaralcoiaicomtat.android"
-    compileSdk = 37
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
-    defaultConfig {
-        applicationId = "org.escalaralcoiaicomtat.android"
-        minSdk = 24
-        targetSdk = 37
-
-        versionName = appVersionName
-        versionCode = appVersionCode.toInt()
-
-        val localProperties = readProperties("local.properties")
-        val mapsApiKey = localProperties?.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY")
-        if (mapsApiKey == null) System.err.println("WARNING! Missing MAPS_API_KEY")
-        resValue("string", "maps_api_key", mapsApiKey ?: "")
-    }
-    buildFeatures {
-        compose = true
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    signingConfigs {
-        create("release") {
-            keyAlias = System.getenv("KEYSTORE_ALIAS")
-            keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD")
-
-            storeFile = File(rootDir, "keystore.jks")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-        }
-    }
-
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    @Suppress("UnstableApiUsage")
-    androidResources {
-        generateLocaleConfig = true
-    }
-
-    dependencies {
-        debugImplementation(libs.compose.ui.tooling)
-    }
 }
 
 compose.desktop {
@@ -502,33 +465,9 @@ buildkonfig {
     }
 }
 
-// Prevent Sentry dependencies from being included in the Android app through the AGP.
-sentry {
-    autoInstallation {
-        enabled.set(false)
-    }
-}
-
 // Disable the warning for expect/actual classes
 tasks.withType(KotlinCompilationTask::class.java) {
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
-}
-
-tasks.matching {
-    it.name == "kspDebugKotlinAndroid" || it.name == "kspReleaseKotlinAndroid"
-}.configureEach {
-    dependsOn(
-        "generateResourceAccessorsForAndroidDebug",
-        "generateResourceAccessorsForAndroidMain",
-        "generateActualResourceCollectorsForAndroidMain",
-        "generateResourceAccessorsForMobileMain",
-        "generateResourceAccessorsForPlatformMain",
-        "generateComposeResClass",
-        "generateResourceAccessorsForCommonMain",
-        "generateExpectResourceCollectorsForCommonMain",
-        "generateBuildKonfig",
-        "generateResourceAccessorsForJvmMain"
-    )
 }

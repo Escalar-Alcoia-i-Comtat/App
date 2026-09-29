@@ -7,7 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import org.escalaralcoiaicomtat.android.R
+import org.escalaralcoiaicomtat.app.R
 import org.escalaralcoiaicomtat.android.applicationContext
 import org.escalaralcoiaicomtat.app.ui.reusable.Icon
 import org.escalaralcoiaicomtat.app.ui.reusable.IntroPage

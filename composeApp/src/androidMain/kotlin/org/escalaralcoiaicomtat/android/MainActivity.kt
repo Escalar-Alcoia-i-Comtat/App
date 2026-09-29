@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.escalaralcoiaicomtat.app.AppRoot
+import org.escalaralcoiaicomtat.app.R
 import org.escalaralcoiaicomtat.app.platform.Updates
 import org.escalaralcoiaicomtat.app.ui.navigation.Destination
 import org.escalaralcoiaicomtat.app.ui.navigation.Destinations

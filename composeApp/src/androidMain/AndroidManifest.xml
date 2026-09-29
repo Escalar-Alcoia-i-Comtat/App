@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:targetSandboxVersion="2"
-    tools:ignore="UnusedAttribute">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -19,19 +17,12 @@
         </intent>
     </queries>
 
-    <application
-        android:allowBackup="true"
-        android:enableOnBackInvokedCallback="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:name=".App"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+    <!-- Application-level attributes are declared in the manifest of :android -->
+    <application>
         <activity
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
-            android:name=".MainActivity">
+            android:name="org.escalaralcoiaicomtat.android.MainActivity">
 
             <meta-data
                 android:name="default-url"
@@ -99,17 +90,14 @@
         </activity>
 
         <provider
-            android:name=".ContextProvider"
+            android:name="org.escalaralcoiaicomtat.android.ContextProvider"
             android:authorities="${applicationId}.ContextProvider"
             android:exported="false"
             tools:node="merge">
         </provider>
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/maps_api_key"/>
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-
         <service
-            android:name=".push.PushMessagingService"
+            android:name="org.escalaralcoiaicomtat.android.push.PushMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
