@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - '.github/workflows/android-internal-release.yml'
+      - 'android/**'
       - 'composeApp/**'
       - '*.gradle.kts'
       - '*.properties'
@@ -70,7 +71,7 @@ jobs:
       - name: Decode google-services.json
         run: |
           echo ${{ secrets.GOOGLE_SERVICES_BASE64 }} > google-services.base64
-          base64 --decode google-services.base64 > composeApp/google-services.json
+          base64 --decode google-services.base64 > android/google-services.json
 
       - name: Write local.properties
         shell: bash
@@ -82,13 +83,13 @@ jobs:
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        run: ./gradlew :composeApp:bundleRelease
+        run: ./gradlew :android:bundleRelease
       - name: AAB Artifact
         id: aab_artifact
         uses: actions/upload-artifact@v7
         with:
           name: AAB Artifact
-          path: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
+          path: ./android/build/outputs/bundle/release/android-release.aab
 
       - name: Upload to Play Store
         id: upload_play_store
@@ -96,7 +97,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_GOOGLE_CLOUD_JSON }}
           packageName: org.escalaralcoiaicomtat.android
-          releaseFiles: ./composeApp/build/outputs/bundle/release/composeApp-release.aab
+          releaseFiles: ./android/build/outputs/bundle/release/android-release.aab
           track: "internal"
           inAppUpdatePriority: 2
           # mappingFile: ./base/build/outputs/mapping/release/mapping.txt
